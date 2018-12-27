@@ -142,6 +142,9 @@ class ToMetaCumulative(object):
 		self.cum_hrr_activity_end_hr_days_count = raw_data[
 			"cum_hrr_activity_end_hr_days_count"
 		]
+		self.cum_sleep_reported_days_count = raw_data[
+			"cum_sleep_reported_days_count"
+		]
 
 class ToCumulativeSum(object):
 	'''
@@ -775,61 +778,109 @@ class ProgressReport():
 			else:
 				return 'A'
 
+		def _cal_custom_average(stat1, stat2,days):
+			if not stat1 == None and not stat2 == None and days:
+				avg = (stat1 - stat2)/days
+				return avg
+			return 0
+
 		def _calculate(key,alias,todays_data,current_data,
 			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
 				if key == 'total_sleep_in_hours_min':
-					val = self._get_average_for_duration(
-						todays_data.cum_total_sleep_in_hours,
-						current_data.cum_total_sleep_in_hours,alias)
-					return self._hours_to_hours_min(val)
+					if todays_meta_data and current_meta_data:
+						sleep_days = (
+							todays_meta_data.cum_sleep_reported_days_count - 
+							current_meta_data.cum_sleep_reported_days_count
+						)
+						if sleep_days:
+							val = _cal_custom_average(
+								todays_data.cum_total_sleep_in_hours,
+								current_data.cum_total_sleep_in_hours,sleep_days)
+							return self._hours_to_hours_min(val)
+						else:
+							return "00:00"
 
 				if key == 'deep_sleep_in_hours_min':
-					val = self._get_average_for_duration(
-						todays_data.cum_deep_sleep_in_hours,
-						current_data.cum_deep_sleep_in_hours,alias)
-					return self._hours_to_hours_min(val)
+					if todays_meta_data and current_meta_data:
+						sleep_days = (
+							todays_meta_data.cum_sleep_reported_days_count - 
+							current_meta_data.cum_sleep_reported_days_count
+						)
+						if sleep_days:
+							val = _cal_custom_average(
+								todays_data.cum_deep_sleep_in_hours,
+								current_data.cum_deep_sleep_in_hours,sleep_days)
+							return self._hours_to_hours_min(val)
+						else:
+							return "00:00"
 
 				if key == 'awake_duration_in_hours_min':
-					val = self._get_average_for_duration(
-						todays_data.cum_awake_duration_in_hours,
-						current_data.cum_awake_duration_in_hours,alias)
-					return self._hours_to_hours_min(val)
+					if todays_meta_data and current_meta_data:
+						sleep_days = (
+							todays_meta_data.cum_sleep_reported_days_count - 
+							current_meta_data.cum_sleep_reported_days_count
+						)
+						if sleep_days:
+							val = _cal_custom_average(
+								todays_data.cum_awake_duration_in_hours,
+								current_data.cum_awake_duration_in_hours,sleep_days)
+							return self._hours_to_hours_min(val)
+						else:
+							return "00:00"
 
 				elif key == 'overall_sleep_gpa':
-					val = self._get_average_for_duration(
-						todays_data.cum_overall_sleep_gpa,
-						current_data.cum_overall_sleep_gpa,alias)
-					return round(val,2)
+					if todays_meta_data and current_meta_data:
+						sleep_days = (
+							todays_meta_data.cum_sleep_reported_days_count - 
+							current_meta_data.cum_sleep_reported_days_count
+						)
+						if sleep_days:
+							val = _cal_custom_average(
+								todays_data.cum_overall_sleep_gpa,
+								current_data.cum_overall_sleep_gpa,sleep_days)
+							return round(val,2)
+						else:
+							return 0
 
 				elif key == 'average_sleep_grade':
-					avg_sleep_gpa = round(self._get_average_for_duration(
-						todays_data.cum_overall_sleep_gpa,
-						current_data.cum_overall_sleep_gpa,alias),2)
-					if alias == 'today' or alias == 'yesterday':
-						return garmin_calculation._get_sleep_grade_from_point(avg_sleep_gpa)
-					else:
-						return _get_sleep_grade_from_point_for_ranges(avg_sleep_gpa)
+					if todays_meta_data and current_meta_data:
+						sleep_days = (
+							todays_meta_data.cum_sleep_reported_days_count - 
+							current_meta_data.cum_sleep_reported_days_count
+						)
+						if sleep_days:
+							avg_sleep_gpa = round(_cal_custom_average(
+								todays_data.cum_overall_sleep_gpa,
+								current_data.cum_overall_sleep_gpa,sleep_days),2)
+							if alias == 'today' or alias == 'yesterday':
+								return garmin_calculation._get_sleep_grade_from_point(avg_sleep_gpa)
+							else:
+								return _get_sleep_grade_from_point_for_ranges(avg_sleep_gpa)
+						else:
+							return 'F'
 
 				elif key == 'num_days_sleep_aid_taken_in_period':
-					val = 0
-					if ((todays_data.cum_days_sleep_aid_taken is not None) and 
-						(current_data.cum_days_sleep_aid_taken is not None)):
-						val = todays_data.cum_days_sleep_aid_taken - current_data.cum_days_sleep_aid_taken
-					return val
+					if todays_meta_data and current_meta_data:
+						val = 0
+						if ((todays_data.cum_days_sleep_aid_taken is not None) and 
+							(current_data.cum_days_sleep_aid_taken is not None)):
+							val = todays_data.cum_days_sleep_aid_taken - current_data.cum_days_sleep_aid_taken
+						return val
 
 				elif key == 'prcnt_days_sleep_aid_taken_in_period':
-					val = 0
-					if((todays_data.cum_days_sleep_aid_taken is not None) and 
-						(current_data.cum_days_sleep_aid_taken is not None)):
-						val = todays_data.cum_days_sleep_aid_taken - current_data.cum_days_sleep_aid_taken
-					prcnt = 0
-					if val:
-						# if duration denominator is greator than 0
-						if self.duration_denominator[alias]:
-							prcnt = (val / self.duration_denominator[alias])*100
-						prcnt = int(Decimal(prcnt).quantize(0,ROUND_HALF_UP))
-					return prcnt
+					if todays_meta_data and current_meta_data:
+						val = 0
+						if((todays_data.cum_days_sleep_aid_taken is not None) and 
+							(current_data.cum_days_sleep_aid_taken is not None)):
+							val = todays_data.cum_days_sleep_aid_taken - current_data.cum_days_sleep_aid_taken
+						prcnt = 0
+						if val:
+							# if duration denominator is greator than 0
+							if self.duration_denominator[alias]:
+								prcnt = (val / self.duration_denominator[alias])*100
+							prcnt = int(Decimal(prcnt).quantize(0,ROUND_HALF_UP))
+						return prcnt
 
 			return None
 
@@ -1010,13 +1061,13 @@ class ProgressReport():
 							current_data.cum_total_active_min
 							- current_data.cum_sleep_active_min)
  
-						avg_sleep_hours = round(_cal_custom_average(
+						avg_sleep_mins = round(_cal_custom_average(
 								todays_data.cum_sleep_hours,
 								current_data.cum_sleep_hours,
 								mc_days
 							))
 
-						total_mins_without_sleep = 1440 - (avg_sleep_hours*60)
+						total_mins_without_sleep = 1440 - (avg_sleep_mins)
 
 						value = round(_cal_custom_average(
 									act_min_without_sleep_today,
@@ -1046,21 +1097,21 @@ class ProgressReport():
 							- current_data.cum_sleep_active_min
 							- current_data.cum_exercise_active_min)
 
-						avg_sleep_hours = round(_cal_custom_average(
+						avg_sleep_mins = round(_cal_custom_average(
 								todays_data.cum_sleep_hours,
 								current_data.cum_sleep_hours,
 								mc_days
 							))
 
-						avg_exercise_hours = round(_cal_custom_average(
+						avg_exercise_mins = round(_cal_custom_average(
 								todays_data.cum_exercise_hours,
 								current_data.cum_exercise_hours,
 								mc_days
 							))
 
 						total_mins_without_sleep_exercise = (1440 
-							- avg_sleep_hours*60 
-							- avg_exercise_hours*60)
+							- avg_sleep_mins
+							- avg_exercise_mins)
 
 
 						value = round(_cal_custom_average(

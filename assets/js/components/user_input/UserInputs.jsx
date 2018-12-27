@@ -286,8 +286,6 @@ class UserInputs extends React.Component{
     this.onWeatherReportFetchSuccess = this.onWeatherReportFetchSuccess.bind(this);
     this.onWeatherReportFetchFailure = this.onWeatherReportFetchFailure.bind(this);
     this.dateTimeValidation = this.dateTimeValidation.bind(this);
-    this.resetEndTime = this.resetEndTime.bind(this);
-    this.resetEndTimeProps = this.resetEndTimeProps.bind(this);
     }
     
     _extractDateTimeInfo(dateObj){
@@ -542,7 +540,7 @@ transformActivity(activity){
           travel:have_optional_input?data.data.optional_input.travel:'',
           travel_destination:have_optional_input?data.data.optional_input.travel_destination:'',
           travel_purpose:have_optional_input?data.data.optional_input.travel_purpose:'',
-          general_comment:have_optional_input?data.data.optional_input.general_comment:'',
+          general_comment:(have_optional_input&&canUpdateForm)?data.data.optional_input.general_comment:'',
           
           took_nap:have_optional_input?data.data.optional_input.took_nap:'',
           //nap_start_time_date:nap_start_time_info.calendarDate,
@@ -595,7 +593,6 @@ transformActivity(activity){
           this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
           window.scrollTo(0,0);
         });
-        
       }
     }
     onWeatherReportFetchSuccess(data,canUpdateForm=undefined){
@@ -620,6 +617,15 @@ transformActivity(activity){
           this.props.updateParentActivities(this.state.activities);
         });
       }
+    }
+
+    onWeatherReportFetchFailure(error){
+      this.setState(
+        {
+        selected_date:this.state.selected_date,
+        gender:this.state.gender},()=>{
+          window.scrollTo(0,0);
+        });
     }
 
     onWeatherReportFetchFailure(error){
@@ -1480,87 +1486,37 @@ handleScroll() {
     }
 
 
-    resetEndTimeProps(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name){
-      this.setState({
-        [end_date_prop_name] : null,
-        [end_hours_prop_name] : '',
-        [end_mins_prop_name] : '',
-        [end_am_pm_prop_name] : '',
-      },()=>{
-              toast.info(" Time fell asleep should be less than time woke up ",{
-              className:"dark"
-              })
-      });
+    sleepInvalidErrorPopup(){
+      toast.info("Time fell asleep should be less than time woke up",{
+        className:"dark"
+      })
+
     }
 
-    resetEndTime(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name){
-      var flag = 0;
-      for(var key in this.state){
-        if(end_hours_prop_name == key ){
-            this.resetEndTimeProps(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);
-            flag += 1;
-            break;
+    dateTimeValidation(start_time_date, start_time_hours,
+      start_time_mins,start_time_am_pm,end_time_date,
+      end_time_hours,end_time_mins,end_time_am_pm){
+        let sleep_bedtime_dt = null;
+        if (start_time_date && start_time_hours
+           && start_time_mins && start_time_am_pm){
+          console.log("Sleep bedtime date:",sleep_bedtime_dt);
+          sleep_bedtime_dt = this.getDTMomentObj(start_time_date,start_time_hours,
+            start_time_mins,start_time_am_pm)
         }
-      }
-      if(flag==0){
-        this.refs.child.resetEndTimeProps(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);
-      }
-      
-    }
 
-    dateTimeValidation(start_time_date, start_time_hours, start_time_mins, start_time_secs,start_time_am_pm, end_time_date, end_time_hours, end_time_mins, end_time_secs, end_time_am_pm, end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name){
+        let sleep_awake_time_dt = null;
+        if (end_time_date && end_time_hours
+           && end_time_mins && end_time_am_pm){
+          sleep_awake_time_dt = this.getDTMomentObj(end_time_date,end_time_hours,
+            end_time_mins,end_time_am_pm)
+        }
 
-      start_time_hours = Number(start_time_hours);
-      start_time_mins = Number(start_time_mins);
-      start_time_secs = Number(start_time_secs);
-      end_time_hours = Number(end_time_hours);
-      end_time_mins = Number(end_time_mins);
-      end_time_secs = Number(end_time_secs);
-      start_time_date.startOf('day');
-      end_time_date.startOf('day');
-  
-      if(start_time_date && start_time_hours && start_time_mins && start_time_secs && start_time_am_pm && end_time_date && end_time_hours && end_time_mins &&     end_time_secs && end_time_am_pm)
-      {
-        if(end_time_date > start_time_date){
-          //nothing
+        if(sleep_bedtime_dt && sleep_awake_time_dt){
+          // check if sleep bedtime is before the awake time
+          return sleep_awake_time_dt.isAfter(sleep_bedtime_dt);
+
         }
-        else if(end_time_date < start_time_date){
-          this.resetEndTime(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);     
-        }
-        else{
-              if((start_time_am_pm == "am" && end_time_am_pm == "am")||(start_time_am_pm == "pm" && end_time_am_pm == "pm")){
-                if(end_time_hours > start_time_hours){
-                  //nothing
-                }
-                else if(end_time_hours < start_time_hours){
-                  this.resetEndTime(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);
-                }
-                else{
-                  if(end_time_mins > start_time_mins){
-                    //nothing
-                  }
-                  else if(end_time_mins < start_time_mins){
-                    this.resetEndTime(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);
-                  }
-                  else{
-                    if(end_time_secs > start_time_secs)
-                    {
-                      //nothing
-                    }
-                    else{
-                      this.resetEndTime(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);
-                    }
-                  }
-                }
-              }
-              if(start_time_am_pm == "am" && end_time_am_pm == "pm"){
-                //nothing
-              }
-              if((start_time_am_pm == "pm") && (end_time_am_pm == "am")){
-                this.resetEndTime(end_date_prop_name, end_hours_prop_name, end_mins_prop_name, end_secs_prop_name, end_am_pm_prop_name);
-              }
-          }
-      }        
+        return true;
     }
 
     render(){

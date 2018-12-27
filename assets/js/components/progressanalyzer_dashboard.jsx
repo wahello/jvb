@@ -1071,7 +1071,7 @@ class ProgressDashboard extends Component{
 
 MinToHours(score){
   let time;// undefined
-      if(score != null && score != undefined && score != ""){
+      if(score != null && score != undefined && score != "" && score != "N/A"){
         if (score == -1){
           time = "Never"
         }

@@ -28,8 +28,11 @@ class MCS_Dashboard extends Component{
 		    selectedDate:new Date(),
 			calendarOpen:false,
 			isOpen:false,
-			last_synced:null,
+			last_synced:"",
 			mc_data:{},
+			exercise_steps:"",
+			non_exercise_steps:"",
+			total_steps:""
 		};
 
 		this.toggleCalendar = this.toggleCalendar.bind(this);
@@ -38,6 +41,7 @@ class MCS_Dashboard extends Component{
 	    this.errorMCFetch = this.errorMCFetch.bind(this);
 		this.successMCFetch = this.successMCFetch.bind(this);
 		this.renderLastSync = this.renderLastSync.bind(this);
+		this.renderSteps = this.renderSteps.bind(this);
 		this.successLastSync = this.successLastSync.bind(this);
 		this.errorquick = this.errorquick.bind(this);
 		this.stepsValueComma = this.stepsValueComma.bind(this);
@@ -75,10 +79,23 @@ class MCS_Dashboard extends Component{
           let sync="";
         if(value != null){
           time = moment(value).format("MMM DD, YYYY @ hh:mm a")
-          sync = <div className = "last_sync" style = {{fontWeight:"bold",fontFamily:'Proxima-Nova',color:"black"}}>Wearable Device Last Synced on {time}</div>;
+          sync = <div className = "last_sync" style = {{fontWeight:"bold",fontFamily:'Proxima-Nova',color:"black"}}> Wearable Device Last Synced on {time}</div>;
        }
         return sync;
+   }
        
+   renderSteps(es,nes,ts){
+   		  let exercise_steps;
+   		  let non_exercise_steps;
+   		  let total_steps;
+   		  let steps = "";
+   		if (es != null && nes != null && ts != null){
+   			exercise_steps = es;
+			non_exercise_steps = nes;
+			total_steps = ts;
+			steps = <span className = "steps_count" style = {{fontWeight: "bold",fontFamily:'Proxima-Nova', color:"black"}}> Today’s: Exercise Steps: {exercise_steps} | Non Exercise Steps: {non_exercise_steps} | Total Steps: {ts} </span>
+   		}
+   		return steps;
    }
     renderAddDate(){
     	/*added the angle-right to the calender to getting the next day data */
@@ -102,8 +119,36 @@ class MCS_Dashboard extends Component{
 	}
 
     successMCFetch(data){
+	  //console.log(data.data)
+	  	let exercise_steps = "";
+	  	let exercise_steps_value = "";
+		let non_exercise_steps = "";
+  		let non_exercise_steps_value = "";
+  		let total_steps = "";
+  		let total_steps_value = "";
+		if(!_.isEmpty(data.data)){
+        for(let[keys1,values1] of Object.entries(data.data)){
+         	for(let[key2,values2] of Object.entries(values1)){
+	         	if (key2 == "non_exercise_steps"){
+	         		non_exercise_steps = values2;
+		         	}
+		         else if(key2 == "exercise_steps"){
+		         	exercise_steps = values2;
+		         }
+		         else if(key2 == "total_steps"){
+		         	total_steps = values2;
+		         }
+		        }	         	
+	  		}
+  		}
+  		exercise_steps_value = this.stepsValueComma(exercise_steps);
+  		non_exercise_steps_value = this.stepsValueComma(non_exercise_steps);
+  		total_steps_value = this.stepsValueComma(total_steps);
 		this.setState({
-		  mc_data:data.data
+		  mc_data:data.data,
+		  exercise_steps:exercise_steps_value,
+  		  non_exercise_steps:non_exercise_steps_value,
+  		  total_steps:total_steps_value,
 	   });
    }
     toggleCalendar(){
@@ -352,33 +397,35 @@ class MCS_Dashboard extends Component{
 			   <NavbarMenu title = {<span className = "last_sync">Movement Consistency Score (MCS) Dashboard
                     </span>} />
                
-                    <div className="cla_center">
-						<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
-							<FontAwesome
-							className="arrow"
-		                        name = "angle-left"
-		                        size = "2x"
-			                />
-						 </span> 
-                
-			            <span id="navlink"  onClick={this.toggleCalendar} id="gd_progress">
-                            <FontAwesome
-                            className="arrow"
-			                  name = "calendar"
-			                  size = "2x"
-			                />
-			                <span className="date_sync" style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"4px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
+                    <div className=" row cla_center">
+                    	<span className = "col-md-3">
+							<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
+								<FontAwesome
+								className="arrow"
+			                        name = "angle-left"
+			                        size = "2x"
+				                />
+							 </span> 
+	                
+				            <span id="navlink"  onClick={this.toggleCalendar} id="gd_progress">
+	                            <FontAwesome
+	                            className="arrow"
+				                  name = "calendar"
+				                  size = "2x"
+				                />
+				                <span className="date_sync" style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"4px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
 
-		                </span>
-		                <span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
-						    <FontAwesome
-						    className="arrow"
-		                        name = "angle-right"
-		                        size = "2x"
-			                />
-						</span>
+			                	</span>
+			                <span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
+							    <FontAwesome
+							    className="arrow"
+			                        name = "angle-right"
+			                        size = "2x"
+				                />
+								</span>
+							</span>
 
-						 <span  className="last_sync" style = {{textAlign:"center"}}>{this.renderLastSync(this.state.last_synced)}</span> 
+						<span  className="last_sync col-md-5 offset-md-1">{this.renderLastSync(this.state.last_synced)}</span> 
 			                <Popover
 					            placement="bottom"
 					            isOpen={this.state.calendarOpen}
@@ -389,11 +436,15 @@ class MCS_Dashboard extends Component{
 				         
 				                </PopoverBody>
 			                </Popover>
+			            
+			            {/*<span className="steps_count col-md-3">{this.renderSteps(this.state.non_exercise_steps)}</span>*/}
 			         </div>
-			           
+			        
+			        
+		    
 			       <div className = "row justify-content-center mcs_dashboard">
 			          <div className="col-sm-9 table_process">
-			           
+			          	   <div style={{textAlign:'center'}}className="steps_count">{this.renderSteps(this.state.exercise_steps,this.state.non_exercise_steps,this.state.total_steps)}</div>          	
 	          	    	  <table className = "table table-striped table-bordered tableContent ">
 		          	    	<tr className="table_content">
 			          	    	<th className="table_size">12:00 - 12:59 AM</th>
@@ -442,9 +493,8 @@ class MCS_Dashboard extends Component{
 		          	    		{this.renderTablecolumndata(this.state.mc_data)}
 		          	    </tbody>
 		          	</table>
-		         
+	          	</div>
 		     </div>
-		  </div>
 
 		          <div className = "row justify-content-center table_size1">
 		          	<div className = "col-sm-9">
@@ -470,6 +520,9 @@ class MCS_Dashboard extends Component{
 					</div>
 					<div className = "row justify-content-center mcs-dashboard">
 		          	<div className = "col-sm-9">
+		          			<p className="mcs_content" style={{marginLeft:"15px"}}>Exercise Steps = Steps achieved during exercise</p>
+							<p className="mcs_content" style={{marginLeft:"15px"}}>Non Exercise Steps = Steps achieved when not exercising</p>
+							<p className="mcs_content" style={{marginLeft:"15px"}}>Total Steps = Exercise steps + Non exercise steps</p>
 	         				<p className="mcs_content" style={{marginLeft:"15px"}}>Data in each cell = Steps in that particular hour ( percentage of active minutes in that hour )</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>NDY(No Data Yet) = When no data is provided from a user's wearable device (usually due to not syncing the wearable device)</p>
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Sleeping Hours = Any portion of an hour user was asleep</p>

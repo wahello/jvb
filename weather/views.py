@@ -23,37 +23,39 @@ class ActivityWeatherView(APIView):
         activities = get_daily_activities_in_base_format(user, date)
         garmin_list, manually_edited_list = _get_activities_data(user, date)
         manually_edited = {dic['summaryId']:dic for dic in manually_edited_list}
-        print ('manually_edited', manually_edited)
-        print ('activities', activities)
 
         filtered_activities_list = get_filtered_activity_stats(activities_json=garmin_list,
                             manually_updated_json=manually_edited,
                             userinput_activities=activities)
         weather_data = {}
-        print ('>>>>>>>>>>>>>', filtered_activities_list)
         for activity in filtered_activities_list:
             epoch_time = activity['startTimeInSeconds']+activity['startTimeOffsetInSeconds']
-            if activity.get('activity_weather') == {}:
+            if has_weather_data(activity):
                 if 'startingLatitudeInDegree' in activity:
                     latitude = activity['startingLatitudeInDegree']
                     longitude = activity['startingLongitudeInDegree']
-                    weather_info = get_weather_info_using_lat_lng_time(
-                                                latitude, longitude, epoch_time)
-                    activity_weather = {'dewPoint': {'value': weather_info['currently']['dewPoint'], 'units': 'celsius'},
-                                'humidity': {'value': weather_info['currently']['humidity'], 'units': 'percentage'},
-                                'temperature':{'value': weather_info['currently']['temperature'], 'units': 'celsius'},
-                                'wind': {'value': weather_info['currently']['windSpeed'], 'units': 'meter/second'},
-                                'temperature_feels_like':{'value': weather_info['currently']['apparentTemperature'], 'units': 'celsius'},
-                                'weather_condition': weather_info['currently']['icon']}
+
+                    activity_weather = get_weather_response_as_required(
+                                            latitude, longitude, epoch_time)
+
                     weather_data[activity['summaryId']] = {**activity_weather}
                 else:
-                    weather_report = get_weather_info_using_garmin_activity(
-                                                user, epoch_time, activity['summaryId'])
+                    weather_report = {'dewPoint': {'value': None, 'units': None},
+                                'humidity': {'value': None, 'units': None},
+                                'temperature':{'value': None, 'units': None},
+                                'wind': {'value': None, 'units': None},
+                                'temperature_feels_like':{'value': None, 'units': None},
+                                'weather_condition': None}
                     weather_data[activity['summaryId']] = {**weather_report}
             else:
-                weather_report = get_weather_info_using_garmin_activity(
-                                                user, epoch_time, activity['summaryId'])
-                weather_data[activity['summaryId']] = {**weather_report}
+                # weather_report = get_weather_info_using_garmin_activity(
+                #                                 user, epoch_time, activity['summaryId'])
+                # weather_data[activity['summaryId']] = {**weather_report}
+                weather_keys = ("dewPoint", "humidity", "temperature", "wind", "temperature_feels_like")
+                weather_report = {}
+                for key in weather_keys:
+                    weather_report[key] = activity[key]
+                # weather_report["weather_condition"] = activity["weather_condition"]
         return Response(weather_data)
 
 
@@ -70,17 +72,34 @@ def get_weather_info_using_garmin_activity(user, epoch_time, summaryId):
         if 'startingLatitudeInDegree' in garmin_activity_data:
             latitude = garmin_activity_data['startingLatitudeInDegree']
             longitude = garmin_activity_data['startingLongitudeInDegree']
-            
-            weather_info = get_weather_info_using_lat_lng_time(latitude, longitude, epoch_time)
-            weather_report.update({'dewPoint': {'value': weather_info['currently']['dewPoint'], 'units': 'celsius'},
-                                'humidity': {'value': weather_info['currently']['humidity'], 'units': 'percentage'},
-                                'temperature':{'value': weather_info['currently']['temperature'], 'units': 'celsius'},
-                                'wind': {'value': weather_info['currently']['windSpeed'], 'units': 'meter/second'},
-                                'temperature_feels_like':{'value': weather_info['currently']['apparentTemperature'], 'units': 'celsius'},
-                                'weather_condition': weather_info['currently']['icon']})
+
+            activity_weather = get_weather_response_as_required(
+                                    latitude, longitude, epoch_time)
+            print("............:::", activity_weather)
+            weather_report.update({**activity_weather})
         return weather_report
     except UserGarminDataActivity.DoesNotExist:
         return weather_report
+
+def get_weather_response_as_required(latitude, longitude, epoch_time):
+    weather_info = get_weather_info_using_lat_lng_time(latitude, longitude, epoch_time)
+    dewPoint_value = round((weather_info['currently']['dewPoint'] * 9/5)+ 32)
+    temperature_value = round((weather_info['currently']['temperature'] * 9/5)+ 32)
+    temperature_feels_like_value = round((weather_info['currently']['apparentTemperature'] * 9/5)+ 32)
+    humidity_value = weather_info['currently']['humidity']*100
+    wind_value = round(weather_info['currently']['windSpeed']*2.237)
+                    
+    activity_weather = {'dewPoint': {#'value': weather_info['currently']['dewPoint'], 'units': 'celsius'},
+                                            'value': dewPoint_value, 'units': 'fahrenheit'},
+                'humidity': {'value': humidity_value, 'units': 'percentage'},
+                'temperature':{#'value': weather_info['currently']['temperature'], 'units': 'celsius'},
+                                'value': temperature_value, 'units': 'fahrenheit'},
+                'wind': {'value': wind_value, 'units': 'miles/hour'},
+                'temperature_feels_like':{#'value': weather_info['currently']['apparentTemperature'], 'units': 'celsius'},
+                                    'value': temperature_feels_like_value, 'units': 'fahrenheit'},
+                'weather_condition': weather_info['currently']['icon']}
+    return activity_weather
+
 
 def get_weather_info_using_lat_lng_time(latitude, longitude, epoch_time, unit='si',include_block=['currently']):
 
@@ -108,3 +127,10 @@ def get_weather_info_using_lat_lng_time(latitude, longitude, epoch_time, unit='s
         return weather_report.json()
     except:
         return ()
+
+def has_weather_data(activity):
+    ''' Returns Boolean type. Returns True if there is all weather column values are none in the database else returns False'''
+    dictfilt = lambda x, y: dict([(i, x[i]) for i in x if i in set(y)])
+    weather_keys = ("dewPoint", "humidity","temperature","wind","temperature_feels_like","weather_condition")
+    weather_keys_values = dictfilt(activity, weather_keys)
+    return True if all(value == None for value in weather_keys_values.values()) else False

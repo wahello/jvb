@@ -36,7 +36,6 @@ function createDropdown(start_num , end_num, mins=false, step=1){
 }
 
 export function renderSelectFeet(field){
-	console.log(field);
 	const { meta: {touched, error} } = field;
 	const className = `form-group ${ touched && error ? 'has-danger' : '' }`;
 	return(
@@ -115,7 +114,6 @@ export function renderSelectMinutes(field){
 }
 
 export function renderSelectMonth(field){
-	console.log(field);
 	const { meta: {touched, error} } = field;
 	const className = `form-group ${ touched && error ? 'has-danger' : '' }`;
 	return(
@@ -131,7 +129,6 @@ export function renderSelectMonth(field){
 	);
 }
 export function renderSelectDate(field){
-	console.log(field);
 	const { meta: {touched, error} } = field;
 	const className = `form-group ${ touched && error ? 'has-danger' : '' }`;
 	return(
@@ -147,7 +144,6 @@ export function renderSelectDate(field){
 	);
 }
 export function renderSelectYear(field){
-	console.log(field);
 	const { meta: {touched, error} } = field;
 	const className = `form-group ${ touched && error ? 'has-danger' : '' }`;
 	return(

@@ -141,7 +141,8 @@ def _get_blank_pa_model_fields(model):
 			"cum_reported_alcohol_days_count":None,
 			"cum_hrr_pure_1_minute_beat_lowered_days_count":None,
 			"cum_hrr_pure_time_to_99_days_count":None,
-			"cum_hrr_activity_end_hr_days_count":None
+			"cum_hrr_activity_end_hr_days_count":None,
+			"cum_sleep_reported_days_count":None
 		}
 		return fields
 
@@ -445,10 +446,10 @@ def _get_mc_active_min_sleep_exercise_hours(ql_data):
 	'''
 	mc = _safe_get_mobj(ql_data.steps_ql,"movement_consistency",None)
 	total_active_min = 0
-	sleep_active_min = 0
-	exercise_active_min = 0
-	sleep_hours = 0
-	exercise_hours = 0
+	sleep_active_sec = 0
+	exercise_active_sec = 0
+	sleep_min = 0
+	exercise_min = 0
 	NON_INTERVAL_KEYS = ['total_active_minutes','total_active_prcnt',
 		'active_hours','inactive_hours','sleeping_hours','strength_hours',
 		'exercise_hours','nap_hours','no_data_hours','timezone_change_hours',
@@ -457,15 +458,21 @@ def _get_mc_active_min_sleep_exercise_hours(ql_data):
 		mc = json.loads(mc)
 		total_active_min = mc['total_active_minutes']
 		for key,data in mc.items():
-			if(key not in NON_INTERVAL_KEYS and (data['status'] == 'sleeping'
-				or data['status'] == 'nap')):
-				sleep_active_min += data['active_duration']['duration']
-				sleep_hours += 1
-			elif(key not in NON_INTERVAL_KEYS and data['status'] == 'exercise'):
-				exercise_active_min += data['active_duration']['duration']
-				exercise_hours += 1
+			if key not in NON_INTERVAL_KEYS:
+				quarterly_data = data['quarterly']
+				for quarter in quarterly_data.values():
+					if(quarter['status'] == 'sleeping' or quarter['status'] == 'nap'):
+						sleep_min += 15
+						sleep_active_sec += quarter['active_sec']
+					elif(quarter['status'] == 'exercise'):
+						exercise_min += 15
+						exercise_active_sec += quarter['active_sec']
+
+	sleep_active_min = round(sleep_active_sec/60)
+	exercise_active_min = round(exercise_active_sec/60)
+
 	return (total_active_min,sleep_active_min,
-			exercise_active_min,sleep_hours,exercise_hours)
+			exercise_active_min,sleep_min,exercise_min)
 
 def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 	mc_cum_data = _get_blank_pa_model_fields("mc")
@@ -484,8 +491,8 @@ def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 		total_active_min = active_min_sleep_exercise_hours[0]
 		sleep_active_min = active_min_sleep_exercise_hours[1]
 		exercise_active_min = active_min_sleep_exercise_hours[2]
-		sleep_hours = active_min_sleep_exercise_hours[3]
-		exercise_hours = active_min_sleep_exercise_hours[4]
+		sleep_mins = active_min_sleep_exercise_hours[3]
+		exercise_mins = active_min_sleep_exercise_hours[4]
 
 		mc_cum_data['cum_movement_consistency_gpa'] = (GRADE_POINT[
 			_safe_get_mobj(
@@ -510,11 +517,11 @@ def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 			+ _safe_get_mobj(yday_cum_data.movement_consistency_cum,
 			"cum_exercise_active_min",0))
 
-		mc_cum_data['cum_sleep_hours'] = (sleep_hours
+		mc_cum_data['cum_sleep_hours'] = (sleep_mins
 			+ _safe_get_mobj(yday_cum_data.movement_consistency_cum,
 			"cum_sleep_hours",0))
 
-		mc_cum_data['cum_exercise_hours'] = (exercise_hours
+		mc_cum_data['cum_exercise_hours'] = (exercise_mins
 			+ _safe_get_mobj(yday_cum_data.movement_consistency_cum,
 			"cum_exercise_hours",0))
 
@@ -524,8 +531,8 @@ def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 		total_active_min = active_min_sleep_exercise_hours[0]
 		sleep_active_min = active_min_sleep_exercise_hours[1]
 		exercise_active_min = active_min_sleep_exercise_hours[2]
-		sleep_hours = active_min_sleep_exercise_hours[3]
-		exercise_hours = active_min_sleep_exercise_hours[4]
+		sleep_mins = active_min_sleep_exercise_hours[3]
+		exercise_mins = active_min_sleep_exercise_hours[4]
 		
 		mc_cum_data['cum_movement_consistency_gpa'] = GRADE_POINT[
 			_safe_get_mobj(
@@ -537,8 +544,8 @@ def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 		mc_cum_data['cum_total_active_min'] = total_active_min
 		mc_cum_data['cum_sleep_active_min'] = sleep_active_min
 		mc_cum_data['cum_exercise_active_min'] = exercise_active_min
-		mc_cum_data['cum_sleep_hours'] = sleep_hours
-		mc_cum_data['cum_exercise_hours'] = exercise_hours
+		mc_cum_data['cum_sleep_hours'] = sleep_mins
+		mc_cum_data['cum_exercise_hours'] = exercise_mins
 		
 	return mc_cum_data
 
@@ -687,7 +694,7 @@ def _get_hrr_api_data(user,date):
 				time_99 = _safe_get_mobj(data,"time_99",0)
 			else:
 				time_99 = _safe_get_mobj(data,"no_fitfile_hrr_time_reach_99",0)
-			if time_99:
+			if time_99 and time_99 != -1:
 				time_in_mins = time_99 / 60
 				time_in_mins = round(time_in_mins,3)
 				formated_data['hrr_time_to_99'] = time_in_mins
@@ -751,44 +758,51 @@ def _get_user_hrr_data(user,today_ql_data,hrr_api_lookup = True):
 	else:
 		hrr_api_data = None
 
-	hrr_time_to_99 = _safe_get_mobj(
-		today_ql_data.exercise_reporting_ql,"hrr_time_to_99",0
-	)
-	if hrr_time_to_99 and type(hrr_time_to_99) == str and hrr_time_to_99 != ":":
-		hrr_time_to_99 = round(
-			_str_to_hours_min_sec(hrr_time_to_99,'minute',"mm:ss"),3
-		)
-	elif(hrr_api_data):
-		hrr_time_to_99 = hrr_api_data.get("hrr_time_to_99")
-	else:
-		hrr_time_to_99 = 0
+	# hrr_time_to_99 = _safe_get_mobj(
+	# 	today_ql_data.exercise_reporting_ql,"hrr_time_to_99",0
+	# )
+	# if hrr_time_to_99 and type(hrr_time_to_99) == str and hrr_time_to_99 != ":":
+	# 	hrr_time_to_99 = round(
+	# 		_str_to_hours_min_sec(hrr_time_to_99,'minute',"mm:ss"),3
+	# 	)
+	# elif(hrr_api_data):
+	# 	hrr_time_to_99 = hrr_api_data.get("hrr_time_to_99")
+	# else:
+	# 	hrr_time_to_99 = 0
 
-	data['hrr_time_to_99'] = hrr_time_to_99
+	# data['hrr_time_to_99'] = hrr_time_to_99
 
-	hrr_starting_point = _safe_get_mobj(
-		today_ql_data.exercise_reporting_ql,"hrr_starting_point",0
-	)
-	if not hrr_starting_point and hrr_api_data:
-		hrr_starting_point = hrr_api_data.get("hrr_starting_point")
-	data['hrr_starting_point'] = hrr_starting_point
+	# hrr_starting_point = _safe_get_mobj(
+	# 	today_ql_data.exercise_reporting_ql,"hrr_starting_point",0
+	# )
+	# if not hrr_starting_point and hrr_api_data:
+	# 	hrr_starting_point = hrr_api_data.get("hrr_starting_point")
+	# data['hrr_starting_point'] = hrr_starting_point
 
-	lowest_hr_during_hrr = _safe_get_mobj(
-		today_ql_data.exercise_reporting_ql,"lowest_hr_during_hrr",0
-	)
-	if not lowest_hr_during_hrr and hrr_api_data:
-		lowest_hr_during_hrr = hrr_api_data.get("lowest_hr_during_hrr")
-	data['lowest_hr_during_hrr'] = lowest_hr_during_hrr
+	# lowest_hr_during_hrr = _safe_get_mobj(
+	# 	today_ql_data.exercise_reporting_ql,"lowest_hr_during_hrr",0
+	# )
+	# if not lowest_hr_during_hrr and hrr_api_data:
+	# 	lowest_hr_during_hrr = hrr_api_data.get("lowest_hr_during_hrr")
+	# data['lowest_hr_during_hrr'] = lowest_hr_during_hrr
 
-	hrr_beats_lowered_first_minute = _safe_get_mobj(
-		today_ql_data.exercise_reporting_ql,"hrr_beats_lowered_first_minute",0
-	)
-	if not hrr_beats_lowered_first_minute and hrr_api_data:
-		hrr_beats_lowered_first_minute = hrr_api_data.get(
-			"hrr_beats_lowered_first_minute"
-		)
-	data['hrr_beats_lowered_first_minute'] = hrr_beats_lowered_first_minute
+	# hrr_beats_lowered_first_minute = _safe_get_mobj(
+	# 	today_ql_data.exercise_reporting_ql,"hrr_beats_lowered_first_minute",0
+	# )
+	# if not hrr_beats_lowered_first_minute and hrr_api_data:
+	# 	hrr_beats_lowered_first_minute = hrr_api_data.get(
+	# 		"hrr_beats_lowered_first_minute"
+	# 	)
+	# data['hrr_beats_lowered_first_minute'] = hrr_beats_lowered_first_minute
 
 	if hrr_api_data:
+		data["hrr_time_to_99"] = hrr_api_data.get("hrr_time_to_99")
+		data["hrr_starting_point"] = hrr_api_data.get("hrr_starting_point")
+		data["lowest_hr_during_hrr"] = hrr_api_data.get("lowest_hr_during_hrr")
+		data["hrr_beats_lowered_first_minute"] = hrr_api_data.get(
+			"hrr_beats_lowered_first_minute"
+		)
+
 		data["hrr_pure_1_min_beats_lowered"] = hrr_api_data.get(
 			"hrr_pure_1_min_beats_lowered"
 		)
@@ -1133,6 +1147,12 @@ def _get_meta_cum_sum(today_ql_data, today_ui_data, user_hrr_data,
 			)
 		)
 
+		sleep_dur = _safe_get_mobj(today_ql_data.sleep_ql,"sleep_per_user_input",None)
+		if not sleep_dur:
+			sleep_dur = _safe_get_mobj(today_ql_data.sleep_ql,"sleep_per_wearable",None)
+		sleep_dur = 1 if sleep_dur else 0
+		meta_cum_data['cum_sleep_reported_days_count'] = sleep_dur \
+			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_sleep_reported_days_count",0)
 
 
 	elif today_ql_data:
@@ -1212,6 +1232,12 @@ def _get_meta_cum_sum(today_ql_data, today_ui_data, user_hrr_data,
 		)
 		hrr_activity_end_hr = 1 if hrr_activity_end_hr else 0
 		meta_cum_data['cum_hrr_activity_end_hr_days_count'] = hrr_activity_end_hr
+
+		sleep_dur = _safe_get_mobj(today_ql_data.sleep_ql,"sleep_per_user_input",None)
+		if not sleep_dur:
+			sleep_dur = _safe_get_mobj(today_ql_data.sleep_ql,"sleep_per_wearable",None)
+		sleep_dur = 1 if sleep_dur else 0
+		meta_cum_data['cum_sleep_reported_days_count'] = sleep_dur
 		
 	return meta_cum_data
 

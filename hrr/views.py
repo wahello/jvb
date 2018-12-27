@@ -15,7 +15,6 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 
-
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -35,12 +34,15 @@ from quicklook.calculations.garmin_calculation import get_filtered_activity_stat
 from user_input.utils.daily_activity import get_daily_activities_in_base_format
 from user_input.views.garmin_views import _get_activities
 from fitparse import FitFile
+import fitbit
+import quicklook
 from hrr.models import Hrr,\
 						AaCalculations,\
 						TimeHeartZones,\
 						AaWorkoutCalculations,\
 						AA
 import pprint
+from hrr import fitbit_aa
 from hrr.calculation_helper import week_date,\
 									get_weekly_workouts,\
 									get_weekly_aa,\
@@ -125,6 +127,45 @@ class UserHrrViewRawData(generics.ListCreateAPIView):
 
 		return queryset
 
+class UpdateHrr(generics.RetrieveUpdateDestroyAPIView):
+	'''
+		-update the HRR
+	'''
+	permission_classes = (IsAuthenticated,)
+
+	def get_queryset(self):
+		date = self.request.query_params.get('start_date',None)
+		if date:
+			qs = Hrr.objects.filter(
+				created_at = date 
+			).order_by('-created_at')
+		else:
+			qs = Hrr.objects.filter(
+			).order_by('-created_at')
+		return qs 
+
+	def get_object(self):
+		qs = self.get_queryset()
+		try:
+			obj = qs.filter(user_hrr = self.request.user)
+			if obj:
+				return obj[0]
+			else:
+				None
+		except Hrr.DoesNotExist:
+			return None
+
+	def put(self, request,format="json"):
+		latest_hrr = self.get_object()
+		if latest_hrr:
+			serializer = HrrSerializer(latest_hrr,data = request.data)
+			if serializer.is_valid():
+				serializer.save()
+				return Response(serializer.data)
+			else:
+				return Response({})
+		else:
+			return Response({})
 
 class UserAA(generics.ListCreateAPIView):
 	'''
@@ -139,17 +180,24 @@ class UserAA(generics.ListCreateAPIView):
 	def calculate_aa_data(self,aa_data_set,user_get,start_dt):
 		if aa_data_set:
 			final_query = aa_data_set[0]
+			return final_query
 		else:
 			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
 			final_query = aa_data(user_get,start_date)
-			if final_query.get('total_time'):
-				try:
-					user_aa = AA.objects.get(
-					user=user_get, created_at=start_date)
-					aa_update_instance(user_aa, final_query)
-				except AA.DoesNotExist:
-					aa_create_instance(user_get, final_query, start_date)
-		return final_query
+			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
+			if device_type == 'garmin':
+				if final_query.get('total_time'):
+					try:
+						user_aa = AA.objects.get(
+						user=user_get, created_at=start_date)
+						aa_update_instance(user_aa, final_query)
+					except AA.DoesNotExist:
+						aa_create_instance(user_get, final_query, start_date)
+				return final_query
+			elif device_type == 'fitbit':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				fitbit_hr_difference = fitbit_aa.fitbit_aa_chart_one_new(user_get,start_date)
+				return fitbit_hr_difference
 
 	def get(self,request,format="json"):
 		user_get = self.request.user
@@ -183,20 +231,28 @@ class UserAA_workout(generics.ListCreateAPIView):
 	def calculate_aa_data(self,aa_data_set,user_get,start_dt):
 		if aa_data_set:
 			final_query = aa_data_set[0]
+			return final_query
 		else:
-			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
-			final_query = aa_workout_data(user_get,start_date)
-			if final_query:
-				try:
-					user_obj = AaWorkoutCalculations.objects.get(
-					user_aa_workout=user_get, created_at=start_date)
-					user_obj.data = final_query
-					user_obj.save()
-				except AaWorkoutCalculations.DoesNotExist:
-					create_workout_instance(user_get, final_query, start_date)
-			else:
-				final_query = {}
-		return final_query
+			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
+			if device_type == 'garmin':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				final_query = aa_workout_data(user_get,start_date)
+				if final_query:
+					try:
+						user_obj = AaWorkoutCalculations.objects.get(
+						user_aa_workout=user_get, created_at=start_date)
+						user_obj.data = final_query
+						user_obj.save()
+					except AaWorkoutCalculations.DoesNotExist:
+						create_workout_instance(user_get, final_query, start_date)
+				else:
+					final_query = {}
+				return final_query
+			elif device_type == 'fitbit':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				fitbit_aa2_workout = fitbit_aa.calculate_AA2_workout(user_get,start_date)
+				return fitbit_aa2_workout
+
 
 	def get(self,request,format="json"):
 		user_get = self.request.user
@@ -233,20 +289,37 @@ class UserAA_daily(generics.ListCreateAPIView):
 	def calculate_aa_data(self,aa_data_set,user_get,start_dt):
 		if aa_data_set:
 			final_query = aa_data_set[0]
+			return final_query
 		else:
-			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
-			final_query = daily_aa_data(user_get,start_date)
-			if final_query:
-				try:
-					user_obj = AaCalculations.objects.get(
-					user_aa=user_get, created_at=start_date)
-					user_obj.data = final_query
-					user_obj.save()
-				except AaCalculations.DoesNotExist:
-					create_aa_instance(user_get, final_query, start_date)
-			else:
-				final_query = {}
-		return final_query
+			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
+			if device_type == 'garmin':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				final_query = daily_aa_data(user_get,start_date)
+				if final_query:
+					try:
+						user_obj = AaCalculations.objects.get(
+						user_aa=user_get, created_at=start_date)
+						user_obj.data = final_query
+						user_obj.save()
+					except AaCalculations.DoesNotExist:
+						create_aa_instance(user_get, final_query, start_date)
+				else:
+					final_query = {}
+				return final_query
+			elif device_type == 'fitbit':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				fitbit_aa2_daily = fitbit_aa.calculate_AA2_daily(user_get,start_date)
+				if fitbit_aa2_daily:
+					try:
+						user_obj = AaCalculations.objects.get(
+						user_aa=user_get, created_at=start_date)
+						user_obj.data = fitbit_aa2_daily
+						user_obj.save()
+					except AaCalculations.DoesNotExist:
+						create_aa_instance(user_get, fitbit_aa2_daily, start_date)
+				else:
+					fitbit_aa2_daily = {}
+				return fitbit_aa2_daily
 
 	def get(self,request,format="json"):
 		user_get = self.request.user
@@ -283,20 +356,27 @@ class UserAA_low_high_values(generics.ListCreateAPIView):
 	def calculate_aa_data(self,aa_data_set,user_get,start_dt):
 		if aa_data_set:
 			final_query = aa_data_set[0]
+			return final_query
 		else:
-			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
-			final_query = aa_low_high_end_data(user_get,start_date)
-			if final_query:
-				try:
-					user_obj = TimeHeartZones.objects.get(
-					user=user_get, created_at=start_date)
-					user_obj.data = final_query
-					user_obj.save()
-				except TimeHeartZones.DoesNotExist:
-					create_heartzone_instance(user_get, final_query, start_date)
-			else:
-				final_query = {}
-		return final_query
+			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
+			if device_type == 'garmin':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				final_query = aa_low_high_end_data(user_get,start_date)
+				if final_query:
+					try:
+						user_obj = TimeHeartZones.objects.get(
+						user=user_get, created_at=start_date)
+						user_obj.data = final_query
+						user_obj.save()
+					except TimeHeartZones.DoesNotExist:
+						create_heartzone_instance(user_get, final_query, start_date)
+				else:
+					final_query = {}
+				return final_query
+			elif device_type == 'fitbit':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				fitbit_aa3 = fitbit_aa.calculate_AA3(user_get,start_date,user_input_activities=None)
+				return fitbit_aa3
 
 	def get(self,request,format="json"):
 		user_get = self.request.user
@@ -355,7 +435,7 @@ def fitfile_parse(obj,offset,start_date_str):
 		timeheart_str = timeheart.strftime("%Y-%m-%d %H:%M:%S")
 		timeheart_utc = int(time.mktime(datetime.strptime(timeheart_str, "%Y-%m-%d %H:%M:%S").timetuple()))+offset
 		timeheart_utc = datetime.utcfromtimestamp(timeheart_utc)
-		if timeheart_utc >= start_date_obj and timeheart_utc <= end_date_obj:
+		if timeheart_utc >= start_date_obj and timeheart_utc <= end_date_obj and heart:
 			heartrate_selected_date.extend([heart])
 			timestamp_selected_date.extend([timeheart])
 	# print(timestamp_selected_date,"timestamp_selected_date")
@@ -384,12 +464,14 @@ def fitfile_parse(obj,offset,start_date_str):
 	# print(to_timestamp,"to_timestamp") 
 	return (final_heartrate,final_timestamp,to_timestamp)
 
-def get_fitfiles(user,start_date,start,end):
+def get_fitfiles(user,start_date,start,end,start_date_timestamp=None,end_date_timestamp=None):
 	'''
 		get the today fitfiles or 3 days fitfiles
 	'''
+	activity_files_qs=UserGarminDataActivity.objects.filter(
+		user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
 	fitfiles_obj = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=start_date)
-	if not fitfiles_obj:
+	if not fitfiles_obj or len(activity_files_qs) != len(fitfiles_obj):
 		fitfiles_obj=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 	return fitfiles_obj
 
@@ -433,6 +515,8 @@ def add_created_activity1(
 	'''
 		This function will add user created activty in user input form to AA calculation
 	'''
+	# print(di,"di")
+	# print(data,"data in side the below")
 	data_copy = data.copy()
 	modified_data = {}
 	data_copy["aerobic_range"] = aerobic_range
@@ -488,6 +572,7 @@ def add_created_activity1(
 			else:
 				data_copy["total_time"] = single_activity.get(
 						"durationInSeconds",0.0)
+	
 	return data_copy
 
 def add_total_percent(added_data):
@@ -557,21 +642,59 @@ def aa_data(user,start_date):
 
 	else:
 		activity_files = []
-
+	user_input_activities,activities_dic,user_input_strong = get_usernput_activities(
+		user,start_date)
 	hrr_not_recorded_list = []
 	hrr_recorded = []
 	activities_summary_id = []
+	hrr_summaryid = []
 	if activity_files:
 		for i in range(len(activity_files)):
 			one_activity_file_dict =  ast.literal_eval(activity_files[i])
 			activities_summary_id.append(one_activity_file_dict['summaryId'])
 			if 'averageHeartRateInBeatsPerMinute' in one_activity_file_dict.keys():
 				if (one_activity_file_dict['averageHeartRateInBeatsPerMinute'] == 0 or ''):
-					hrr_not_recorded_time = one_activity_file_dict['durationInSeconds']
-					hrr_not_recorded_list.append(hrr_not_recorded_time)
+					if user_input_activities:
+						for index,single_ui_act in enumerate(user_input_activities):
+							ui_id = single_ui_act.get("summaryId")
+							garmin_id = one_activity_file_dict.get('summaryId')
+							ui_hr = single_ui_act.get("averageHeartRateInBeatsPerMinute")
+							garmin_hr = one_activity_file_dict.get("averageHeartRateInBeatsPerMinute")
+							if ui_hr == None or ui_hr == '':
+								ui_hr = 0
+							if garmin_hr == None or garmin_hr == '':
+								garmin_hr = 0
+							if ui_id == garmin_id and garmin_hr == ui_hr:
+								if garmin_id not in hrr_summaryid:
+									hrr_not_recorded_time = one_activity_file_dict.get('durationInSeconds',0)
+									hrr_not_recorded_list.append(hrr_not_recorded_time)
+									hrr_summaryid.append(garmin_id)
+					else:
+						if garmin_id not in hrr_summaryid:
+							hrr_not_recorded_time = one_activity_file_dict.get('durationInSeconds',0)
+							hrr_not_recorded_list.append(hrr_not_recorded_time)
+							hrr_summaryid.append(garmin_id)
 			else:
-				hrr_not_recorded_time = one_activity_file_dict.get('durationInSeconds',0)
-				hrr_not_recorded_list.append(hrr_not_recorded_time)
+				if user_input_activities:
+					for index,single_ui_act in enumerate(user_input_activities):
+						ui_id = single_ui_act.get("summaryId")
+						garmin_id = one_activity_file_dict.get('summaryId')
+						ui_hr = single_ui_act.get("averageHeartRateInBeatsPerMinute")
+						garmin_hr = one_activity_file_dict.get("averageHeartRateInBeatsPerMinute")
+						if ui_hr == None or ui_hr == '':
+							ui_hr = 0
+						if garmin_hr == None or garmin_hr == '':
+							garmin_hr = 0
+						if ui_id == garmin_id and ui_hr == 0:
+							if garmin_id not in hrr_summaryid:
+								hrr_not_recorded_time = one_activity_file_dict.get('durationInSeconds',0)
+								hrr_not_recorded_list.append(hrr_not_recorded_time)
+								hrr_summaryid.append(garmin_id)
+				else:
+					if garmin_id not in hrr_summaryid:
+						hrr_not_recorded_time = one_activity_file_dict.get('durationInSeconds',0)
+						hrr_not_recorded_list.append(hrr_not_recorded_time)
+						hrr_summaryid.append(garmin_id)	
 
 	ui_data = _get_activities(user,start_date_str)
 	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
@@ -609,12 +732,14 @@ def aa_data(user,start_date):
 		user,start_date_timestamp,end_date_timestamp)
 	manually_edited_dic,manually_edited_list = get_garmin_manully_activities(
 		user,start_date_timestamp,end_date_timestamp)
+
 	activities_dic = get_usernput_activities(
 		user,start_date)
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic,
 													user=user,calendar_date=start_date)
+	# print(filtered_activities_files,"filtered activities")
 	filtered_activities_only = filtered_activities_files.copy()
 	filtered_activities_only = remove_hrr_file(filtered_activities_only)
 	if activities_dic:
@@ -640,11 +765,45 @@ def aa_data(user,start_date):
 			for single_activity_key in user_created_activity:
 				if single_activity_key == single_activity['summaryId']:
 					user_created_activity_list.append(single_activity)
-
+	remove_in_workout = []
 	for i,single_actiivty in enumerate(garmin_list):
 		if single_actiivty.get("manual",0) == True:
 			created_activity_dict[single_actiivty.get('summaryId',0)] = single_actiivty
-			user_created_activity_list.append(single_actiivty)
+			if user_input_strong:
+				for i,k in enumerate(filtered_activities_files):
+					garmin_id = single_actiivty.get("summaryId")
+					ui_id = filtered_activities_files[i].get('summaryId')
+					garmin_hr = single_actiivty.get("averageHeartRateInBeatsPerMinute",0)
+					ui_hr = filtered_activities_files[i].get("averageHeartRateInBeatsPerMinute",0)
+					garmin_duration = single_actiivty.get("durationInSeconds",0)
+					ui_duration = filtered_activities_files[i].get("durationInSeconds",0)
+					if ui_hr == None or ui_hr == '':
+						ui_hr = 0
+					if garmin_hr == None or garmin_hr == '':
+						garmin_hr = 0
+					if garmin_duration == None or garmin_duration == '':
+						garmin_duration = 0
+					if ui_duration == None or ui_duration == '':
+						ui_duration = 0
+					if (garmin_id == ui_id) and ((garmin_hr != ui_hr) or (garmin_duration != ui_duration)):
+						user_created_activity_list.append(k)
+						remove_in_workout.append(int(k["summaryId"]))
+		elif (single_actiivty.get("manual",0) != True 
+			and activities_dic
+			and activities_dic.get(single_actiivty["summaryId"])):
+			if user_input_strong:
+				for i,k in enumerate(filtered_activities_files):
+					garmin_id = single_actiivty.get("summaryId")
+					ui_id = filtered_activities_files[i].get('summaryId')
+					garmin_hr = single_actiivty.get("averageHeartRateInBeatsPerMinute",0)
+					ui_hr = filtered_activities_files[i].get("averageHeartRateInBeatsPerMinute",0)
+					if ui_hr == None or ui_hr == '':
+						ui_hr = 0
+					if garmin_hr == None or garmin_hr == '':
+						garmin_hr = 0
+					if (garmin_id == ui_id) and ((not garmin_hr and ui_hr) or (garmin_hr != ui_hr)):
+						user_created_activity_list.append(k)
+						remove_in_workout.append(int(k["summaryId"]))
 	for single_activity in created_activity_dict.values():
 		if single_activity.get('averageHeartRateInBeatsPerMinute',0) == 0 or single_activity.get('averageHeartRateInBeatsPerMinute',0) == '':
 			if activities_dic:
@@ -655,12 +814,11 @@ def aa_data(user,start_date):
 	if hrr_not_recorded_list:
 		hrr_not_recorded_seconds = sum(hrr_not_recorded_list)
 		data["hrr_not_recorded"] = hrr_not_recorded_seconds
-
 	workout = []
 	hrr = []
 	start = start_date
 	end = start_date + timedelta(days=3)
-	fitfiles_obj = get_fitfiles(user,start_date,start,end)
+	fitfiles_obj = get_fitfiles(user,start_date,start,end,start_date_timestamp,end_date_timestamp)
 	if activities_dic:
 		for tmp in fitfiles_obj:
 			meta = tmp.meta_data_fitfile
@@ -668,7 +826,7 @@ def aa_data(user,start_date):
 			data_id = int(meta['activityIds'][0])
 			if id_act == data_id:
 				hrr.append(tmp)
-			elif user_input_workout_keys:
+			elif user_input_workout_keys and data_id not in remove_in_workout:
 				workout.append(tmp)
 	else:
 		
@@ -680,7 +838,6 @@ def aa_data(user,start_date):
 				workout.append(tmp)
 			elif str(data_id) in ui_data_hrr:
 				hrr.append(tmp)
-
 	# profile = Profile.objects.filter(user=user)
 	# for tmp_profile in profile:
 	# 	user_dob = tmp_profile.date_of_birth
@@ -797,10 +954,11 @@ def aa_data(user,start_date):
 			user_created_activity_list,data,below_aerobic_value,anaerobic_value,aerobic_range,anaerobic_range,below_aerobic_range)
 	else:
 		added_data = {}
+	# print(added_data,"added_data")
 	if added_data:
 		final_data = add_total_percent(added_data)
 		return final_data
-	return 	data
+	return data
 
 def aa_update_helper(instance,data_dict):
 	'''
@@ -839,22 +997,15 @@ def aa_calculations(request):
 			aa_create_instance(request.user, data, start_date)
 	return JsonResponse(data)
 
-def store_aa_calculations(user,from_date,to_date):
-	'''
-	This function takes user start date and end date, calculate the AA calculations 
-	then stores in Data base
-	Args:user(user object)
-		:from_date(start date)
-		:to_date(end date)
-	Return:None
-	'''
+def store_garmin_aa1(user,from_date,to_date):
 	print("AA calculations got started",user.username)
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
+	AA1 = AA.objects.filter(user=user,created_at=from_date_obj)
 	while (current_date >= from_date_obj):
 		data = aa_data(user,current_date)
-		if data.get('total_time'):
+		if data.get('total_time') or (AA1 and not data.get('total_time')):
 			print("AA calculations creating")
 			try:
 				user_aa = AA.objects.get(user=user, created_at=current_date)
@@ -865,6 +1016,38 @@ def store_aa_calculations(user,from_date,to_date):
 			print("NO AA")
 		current_date -= timedelta(days=1)
 	print("HRR calculations got finished")
+
+def store_fitbit_aa1(user,from_date,to_date):
+	actvities_list,activities_dict,userinput_form = get_usernput_activities(user,from_date)
+	data = fitbit_aa.fitbit_aa_chart_one_new(user,from_date,user_input_activities=activities_dict)
+	if data.get('total_time'):
+		print("Fitbit AA1 calculations creating")
+		try:
+			user_aa = AA.objects.get(user=user, created_at=from_date)
+			aa_update_instance(user_aa, data)
+		except AA.DoesNotExist:
+			aa_create_instance(user, data, from_date)
+	else:
+		print("NO Fitbit AA1")
+
+def store_aa_calculations(user,from_date,to_date):
+	'''
+	This function takes user start date and end date, calculate the AA calculations 
+	then stores in Data base
+
+	Args:user(user object)
+		:from_date(start date)
+		:to_date(end date)
+
+	Return:None
+	'''
+	device_type = quicklook.calculations.calculation_driver.which_device(user)
+	if device_type == "garmin":
+		store_garmin_aa1(user,from_date,to_date)
+	elif device_type == "fitbit":
+		print("Fitbit AA chat1 data calculation got started")
+		store_fitbit_aa1(user,from_date,to_date)
+		print("Fitbit AA chat1 data calculation finished")
 	return None
 
 def get_garmin_activities(user,start_date_timestamp,end_date_timestamp):
@@ -965,6 +1148,7 @@ def aa_workout_data(user,start_date):
 			ui_data_keys.remove(summaryId)
 	
 	activities_dic = get_usernput_activities(user,start_date)
+
 	count = 0
 	id_act = 0
 	activities = []
@@ -1005,9 +1189,12 @@ def aa_workout_data(user,start_date):
 
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
 													manually_updated_json=manually_edited_dic,
-													userinput_activities=activities_dic)
-	filtered_activities_files = remove_hrr_file(filtered_activities_files)
-	# print(filtered_activities_files,"filtered_activities_files")
+													userinput_activities=activities_dic,
+													user=user,calendar_date=start_date)
+	
+	filtered_activities_files_copy = filtered_activities_files.copy()
+	filtered_activities_files_copy = remove_hrr_file(filtered_activities_files_copy)
+	
 	act_id = []
 	workout = []
 	hrr = []
@@ -1015,20 +1202,19 @@ def aa_workout_data(user,start_date):
 	end = start_date + timedelta(days=3)
 	a1=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 	if activities:
-		if filtered_activities_files:
-			for i,k in enumerate(filtered_activities_files):
-				if filtered_activities_files[i].get("summaryId") in only_hrr_summary_id:
-					hrr.append(filtered_activities_files[i])
+		if filtered_activities_files_copy:
+			for i,k in enumerate(filtered_activities_files_copy):
+				if filtered_activities_files_copy[i].get("summaryId") in only_hrr_summary_id:
+					hrr.append(filtered_activities_files_copy[i])
 				else:
-					workout.append(filtered_activities_files[i])
+					workout.append(filtered_activities_files_copy[i])
 	else:
-		if filtered_activities_files:
-			for i,k in enumerate(filtered_activities_files):
-				if filtered_activities_files[i].get("summaryId") in ui_data_keys:
-					workout.append(filtered_activities_files[i])
+		if filtered_activities_files_copy:
+			for i,k in enumerate(filtered_activities_files_copy):
+				if filtered_activities_files_copy[i].get("summaryId") in ui_data_keys:
+					workout.append(filtered_activities_files_copy[i])
 				else:
-					hrr.append(filtered_activities_files[i])
-
+					hrr.append(filtered_activities_files_copy[i])
 	data={"date":"",
 		  "workout_type":"",
 		  "duration":"",
@@ -1159,24 +1345,26 @@ def store_aa_workout_calculations(user,from_date,to_date):
 		:to_date(end date)
 	Return:None
 	'''
-	print("HRR A/A Workout started")
+	print("A/A Workout started")
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
+	AA2 = AaWorkoutCalculations.objects.filter(user_aa_workout=user,created_at=from_date_obj)
 	while (current_date >= from_date_obj):
 		data = aa_workout_data(user,current_date)
 		# data = json.dumps(data)
-		if data:
-			print("HRR A/A workout")
+		if data or (AA2 and not data):
+			print("A/A workout")
 			try:
 				user_obj = AaWorkoutCalculations.objects.get(
 					user_aa_workout=user, created_at=current_date)
 				user_obj.data = data
 				user_obj.save()
+				# update_workout_instance(user,start_date,data)
 			except AaWorkoutCalculations.DoesNotExist:
 				create_workout_instance(user, data, current_date)
 		current_date -= timedelta(days=1)
-	print("HRR A/A workout finished")
+	print("A/A workout finished")
 	return None
 
 def total_percent(modified_data_total):
@@ -1316,9 +1504,11 @@ def daily_aa_data(user, start_date):
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic,
 													user=user,calendar_date=start_date)
+	# print(filtered_activities_files,"filtered_activities_files")
 	filtered_activities_only = get_filtered_activity_stats(activities_json=garmin_list,
 													manually_updated_json=manually_edited_dic,
 													user=user,calendar_date=start_date)
+	
 	filtered_activities_only = remove_hrr_file(filtered_activities_only)
 	garmin_activity_keys = []
 	for i,single_activity in enumerate(filtered_activities_only):
@@ -1347,16 +1537,51 @@ def daily_aa_data(user, start_date):
 			for single_activity_key in user_created_activity:
 				if single_activity_key == single_activity['summaryId']:
 					user_created_activity_list.append(single_activity)
+	
 	for i,single_activity in enumerate(filtered_activities_only):
 		avg_hr = single_activity.get('averageHeartRateInBeatsPerMinute',0)
 		if avg_hr == '' or avg_hr == 0:
 			user_created_activity_list.append(single_activity)
+	remove_in_workout = []
+	# print(garmin_list,"garmin_list")
+	# print(filtered_activities_files,"filtered_activities_files")
 	for i,single_actiivty in enumerate(garmin_list):
 		if (single_actiivty.get("manual",0) == True 
 			and activities_dic
 			and activities_dic.get(single_actiivty["summaryId"])):
-			user_created_activity_list.append(
-				activities_dic.get(single_actiivty["summaryId"]))
+			for i,k in enumerate(filtered_activities_files):
+				garmin_id = single_actiivty.get("summaryId")
+				ui_id = filtered_activities_files[i].get('summaryId')
+				garmin_hr = single_actiivty.get("averageHeartRateInBeatsPerMinute",0)
+				ui_hr = filtered_activities_files[i].get("averageHeartRateInBeatsPerMinute",0)
+				garmin_duration = single_actiivty.get("durationInSeconds",0)
+				ui_duration = filtered_activities_files[i].get("durationInSeconds",0)
+				if ui_hr == None or ui_hr == '':
+					ui_hr = 0
+				if garmin_hr == None or garmin_hr == '':
+					garmin_hr = 0
+				if garmin_duration == None or garmin_duration == '':
+					garmin_duration = 0
+				if ui_duration == None or ui_duration == '':
+					ui_duration = 0
+				if (garmin_id == ui_id) and ((garmin_hr != ui_hr) or (garmin_duration != ui_duration)):
+					user_created_activity_list.append(k)
+					remove_in_workout.append(int(k["summaryId"]))
+		elif (single_actiivty.get("manual",0) != True 
+			and activities_dic
+			and activities_dic.get(single_actiivty["summaryId"])):
+			for i,k in enumerate(filtered_activities_files):
+				garmin_id = single_actiivty.get("summaryId")
+				ui_id = filtered_activities_files[i].get('summaryId')
+				garmin_hr = single_actiivty.get("averageHeartRateInBeatsPerMinute",0)
+				ui_hr = filtered_activities_files[i].get("averageHeartRateInBeatsPerMinute",0)
+				if ui_hr == None or ui_hr == '':
+					ui_hr = 0
+				if garmin_hr == None or garmin_hr == '':
+					garmin_hr = 0
+				if (garmin_id == ui_id) and ((not garmin_hr and ui_hr) or (garmin_hr != ui_hr)):
+					user_created_activity_list.append(k)
+					remove_in_workout.append(int(k["summaryId"]))
 	hrr_not_recorded_list = []
 	prcnt_hrr_not_recorded_list = []
 	hrr_recorded = []
@@ -1382,9 +1607,7 @@ def daily_aa_data(user, start_date):
 	data_summaryid = []
 	start = start_date
 	end = start_date + timedelta(days=3)
-	fitfiles_obj = get_fitfiles(user,start_date,start,end)
-	filtered_activities_files_ui = get_filtered_activity_stats(activities_json=garmin_list,
-													manually_updated_json=manually_edited_dic)
+	fitfiles_obj = get_fitfiles(user,start_date,start,end,start_date_timestamp,end_date_timestamp)
 
 	try:
 		if activities_dic:
@@ -1394,7 +1617,7 @@ def daily_aa_data(user, start_date):
 				data_id = int(meta['activityIds'][0])
 				if id_act == data_id:
 					hrr.append(tmp)
-				elif str(data_id) in garmin_workout_keys:
+				elif str(data_id) in garmin_workout_keys and data_id not in remove_in_workout:
 					workout.append(tmp)
 					data_summaryid.append(data_id)
 				if filtered_activities_files:
@@ -1498,7 +1721,7 @@ def daily_aa_data(user, start_date):
 	all_activities_timestamp = []
 	activies_timestamp = []
 	daily_aa_data={}
-	if workout:
+	if workout and workout_data:
 		for tmp in workout:
 			workout_activities = fitfile_parse([tmp],offset,start_date_str)
 			workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_activities
@@ -1646,23 +1869,16 @@ def daily_aa_calculations(request):
 			create_aa_instance(request.user, data, start_date)
 	return JsonResponse(data)
 
-def store_daily_aa_calculations(user,from_date,to_date):
-	'''
-	This function takes user start date and end date, calculate the Daily A/A calculations 
-	then stores in Data base
-	Args:user(user object)
-		:from_date(start date)
-		:to_date(end date)
-	Return:None
-	'''
+def store_garmin_aa_daily(user,from_date,to_date):
 	print("A/A dailies got started")
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
+	AA3 = AaCalculations.objects.filter(user_aa=user,created_at=from_date_obj)
 	while (current_date >= from_date_obj):
 		data = daily_aa_data(user,current_date)
 		# data = json.dumps(data)
-		if data:
+		if data or (AA3 and not data):
 			print("A/A low high creating")
 			try:
 				user_aa = AaCalculations.objects.get(
@@ -1672,14 +1888,44 @@ def store_daily_aa_calculations(user,from_date,to_date):
 				create_aa_instance(user, data, current_date)
 		current_date -= timedelta(days=1)
 	print("A/A dailes finished")
+
+def store_fitbit_aa_daily(user,from_date,to_date):
+	actvities_list,activities_dict,userinput_form = get_usernput_activities(user,from_date)
+	data = fitbit_aa.calculate_AA2_daily(user,from_date,user_input_activities=activities_dict)
+	if data:
+			try:
+				user_aa = AaCalculations.objects.get(
+					user_aa=user, created_at=from_date)
+				update_aa_instance(user,from_date,data)
+			except AaCalculations.DoesNotExist:
+				create_aa_instance(user, data, from_date)
+
+def store_daily_aa_calculations(user,from_date,to_date):
+	'''
+	This function takes user start date and end date, calculate the Daily A/A calculations 
+	then stores in Data base
+
+	Args:user(user object)
+		:from_date(start date)
+		:to_date(end date)
+
+	Return:None
+	'''
+	device_type = quicklook.calculations.calculation_driver.which_device(user)
+	if device_type == "garmin":
+		store_garmin_aa_daily(user,from_date,to_date)
+	elif device_type == "fitbit":
+		print("Fitbit AA chat daily data calculation got started")
+		store_fitbit_aa_daily(user,from_date,to_date)
+		print("Fitbit AA chat daily data calculation finished")
 	return None
 
 def low_high_hr(low_end_heart,high_end_heart,heart_beat):
 	'''
 		Making ranges for A/A third chart
 	'''
-	low_hr = sorted(i for i in low_end_heart if i <= heart_beat)
-	high_hr = sorted(i for i in high_end_heart if i >= heart_beat)
+	low_hr = sorted(i for i in low_end_heart if i <= int(heart_beat))
+	high_hr = sorted(i for i in high_end_heart if i >= int(heart_beat))
 	return low_hr[-1],high_hr[1]
 
 def add_hr_nor_recorded_heartbeat(
@@ -1850,28 +2096,64 @@ def aa_low_high_end_data(user,start_date):
 				if single_activity_key == single_activity['summaryId']:
 					user_created_activity_list.append(single_activity)
 
-	for i,single_activity in enumerate(filtered_activities_only):
-		avg_hr = single_activity.get('averageHeartRateInBeatsPerMinute',0)
-		if avg_hr == '' or avg_hr == 0:
-			user_created_activity_list.append(single_activity)
-
+	remove_in_workout = []
 	for i,single_actiivty in enumerate(garmin_list):
 		if (single_actiivty.get("manual",0) == True 
 			and activities_dic
 			and activities_dic.get(single_actiivty["summaryId"])):
 			user_created_activity_list.append(
 				activities_dic.get(single_actiivty["summaryId"]))
+			for i,k in enumerate(filtered_activities_files):
+				garmin_id = single_actiivty.get("summaryId")
+				ui_id = filtered_activities_files[i].get('summaryId')
+				garmin_hr = single_actiivty.get("averageHeartRateInBeatsPerMinute",0)
+				ui_hr = filtered_activities_files[i].get("averageHeartRateInBeatsPerMinute",0)
+				garmin_duration = single_actiivty.get("durationInSeconds",0)
+				ui_duration = filtered_activities_files[i].get("durationInSeconds",0)
+				if ui_hr == None or ui_hr == '':
+					ui_hr = 0
+				if garmin_hr == None or garmin_hr == '':
+					garmin_hr = 0
+				if garmin_duration == None or garmin_duration == '':
+					garmin_duration = 0
+				if ui_duration == None or ui_duration == '':
+					ui_duration = 0
+				if (garmin_id == ui_id) and ((garmin_hr != ui_hr) or (garmin_duration != ui_duration)):
+					user_created_activity_list.append(k)
+					remove_in_workout.append(int(k["summaryId"]))
+		elif (single_actiivty.get("manual",0) != True 
+			and activities_dic
+			and activities_dic.get(single_actiivty["summaryId"])):
+			for i,k in enumerate(filtered_activities_files):
+				garmin_id = single_actiivty.get("summaryId")
+				ui_id = filtered_activities_files[i].get('summaryId')
+				garmin_hr = single_actiivty.get("averageHeartRateInBeatsPerMinute",0)
+				ui_hr = filtered_activities_files[i].get("averageHeartRateInBeatsPerMinute",0)
+				if ui_hr == None or ui_hr == '':
+					ui_hr = 0
+				if garmin_hr == None or garmin_hr == '':
+					garmin_hr = 0
+				if (garmin_id == ui_id) and ((not garmin_hr and ui_hr) or (garmin_hr != ui_hr)):
+					user_created_activity_list.append(k)
+					remove_in_workout.append(int(k["summaryId"]))
+
+	for i,single_activity in enumerate(filtered_activities_only):
+		avg_hr = single_activity.get('averageHeartRateInBeatsPerMinute',0)
+		summaryid = int(single_activity.get('summaryId',0))
+		if avg_hr == '' or avg_hr == 0 and summaryid not in remove_in_workout:
+			user_created_activity_list.append(single_activity)
+
 	workout = []
 	hrr = []
 	start = start_date
 	end = start_date + timedelta(days=3)
-	fitfiles_obj = get_fitfiles(user,start_date,start,end)
+	fitfiles_obj = get_fitfiles(user,start_date,start,end,start_date_timestamp,end_date_timestamp)
 	if activities_dic and fitfiles_obj:
 		for tmp in fitfiles_obj:
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
-			if str(data_id) in workout_summary_id:
+			if str(data_id) in workout_summary_id and str(data_id) not in remove_in_workout:
 				workout.append(tmp)
 			elif str(data_id) in hrr_summary_id	:
 				hrr.append(tmp)
@@ -2032,23 +2314,15 @@ def aa_low_high_end_calculations(request):
 			create_heartzone_instance(request.user, data, start_date)
 	return JsonResponse(data)
 
-def store_aa_low_high_end_calculations(user,from_date,to_date):
-	'''
-	This function takes user start date and end date, calculate the low_high_end 
-	HR calculations 
-	then stores in Data base
-	Args:user(user object)
-		:from_date(start date)
-		:to_date(end date)
-	Return:None
-	'''
+def store_garmin_aa3(user,from_date,to_date):
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
+	AA4 = TimeHeartZones.objects.filter(user=user,created_at=from_date_obj)
 	while (current_date >= from_date_obj):
 		data = aa_low_high_end_data(user,current_date)
 		# data = json.dumps(data)
-		if data:
+		if data or (AA4 and not data):
 			try:
 				time_hr_zone_obj = TimeHeartZones.objects.get(
 					user=user, created_at=current_date)
@@ -2058,7 +2332,38 @@ def store_aa_low_high_end_calculations(user,from_date,to_date):
 				create_heartzone_instance(user, data, current_date)
 		current_date -= timedelta(days=1)
 	return None
-	
+
+def store_fitbit_aa3(user,from_date,to_date):
+	actvities_list,activities_dict,userinput_form = get_usernput_activities(user,from_date)
+	data = fitbit_aa.calculate_AA3(user,from_date,user_input_activities=activities_dict)
+	if data:
+		try:
+			time_hr_zone_obj = TimeHeartZones.objects.get(
+				user=user, created_at=from_date)
+			if time_hr_zone_obj:
+				update_heartzone_instance(user, from_date,data)
+		except TimeHeartZones.DoesNotExist:
+			create_heartzone_instance(user, data, from_date)
+			
+def store_aa_low_high_end_calculations(user,from_date,to_date):
+	'''
+	This function takes user start date and end date, calculate the low_high_end 
+	HR calculations 
+	then stores in Data base
+
+	Args:user(user object)
+		:from_date(start date)
+		:to_date(end date)
+
+	Return:None
+	'''
+	device_type = quicklook.calculations.calculation_driver.which_device(user)
+	if device_type == "garmin":
+		store_garmin_aa3(user,from_date,to_date)
+	elif device_type == 'fitbit':
+		print("Fitbit AA chat3 data calculation got started")
+		store_fitbit_aa3(user,from_date,to_date)
+		print("Fitbit AA chat3 data calculation finished")
 
 def hrr_data(user,start_date):
 	Did_heartrate_reach_99 = ''
@@ -2118,12 +2423,12 @@ def hrr_data(user,start_date):
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic)
 	count = 0
-	id_act = 0
+	id_act = []
 	activities = []
 	workout_id = []
 	for i,k in enumerate(filtered_activities_files):
 		if filtered_activities_files[i]['activityType'] == 'HEART_RATE_RECOVERY':
-			id_act = int(filtered_activities_files[i]['summaryId'])
+			id_act.append(int(filtered_activities_files[i]['summaryId']))
 			count = count + 1
 			activities.append(filtered_activities_files[i])
 		else:
@@ -2140,10 +2445,9 @@ def hrr_data(user,start_date):
 
 	start = start_date
 	end = start_date + timedelta(days=3)
-	fitfiles_obj = get_fitfiles(user,start_date,start,end)
+	fitfiles_obj = get_fitfiles(user,start_date,start,end,start_date_timestamp,end_date_timestamp)
 	workout = []
 	hrr = []
-	
 	'''
 		Below try block do, first capture data from user input form and identify file as  
 		hrr file if it fails then else block will do assumtion calculation for idetifying
@@ -2155,7 +2459,7 @@ def hrr_data(user,start_date):
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
 				data_id = int(meta['activityIds'][0])
-				if id_act == data_id:
+				if data_id in id_act:
 					hrr.append(tmp)
 				elif data_id in workout_id:
 					workout.append(tmp)
@@ -2291,7 +2595,7 @@ def hrr_data(user,start_date):
 			pure_1min_heart_beats = 0
 		pure_time_99 = time_99 + diff_actity_hrr
 		
-		if Did_heartrate_reach_99 == 'no':
+		if Did_heartrate_reach_99 == 'no' and garmin_data_daily:
 			if daily_starttime:
 				daily_start_time = end_time_activity - daily_starttime
 				make_to_daily_key = (daily_start_time) % 15
@@ -2317,6 +2621,11 @@ def hrr_data(user,start_date):
 				
 		if diff_actity_hrr > 120:
 			# -1 represents the pure time to 99 did not reach never
+			pure_time_99 = -1
+			pure_1min_heart_beats = None
+		if end_heartrate_activity < 99:
+			# -1 represents the HRR activty started before 99
+			time_99 = -1
 			pure_time_99 = -1
 			pure_1min_heart_beats = None
 

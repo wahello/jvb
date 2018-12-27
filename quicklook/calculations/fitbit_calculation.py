@@ -1,4 +1,4 @@
-from datetime import datetime,timedelta,date,timezone, time
+from datetime import datetime,timedelta,timezone
 import ast
 import pytz
 import json
@@ -29,19 +29,15 @@ from fitbit.models import (
 	UserFitbitDatafoods
 )
 
-from garmin.models import (
-	UserGarminDataActivity,
-	UserGarminDataManuallyUpdated
-	)
-
 from user_input.models import DailyUserInputStrong
 from user_input.models import DailyUserInputOptional
 
-from .converter.fitbit_to_garmin_converter import fitbit_to_garmin_sleep
-from .converter.fitbit_to_garmin_converter import fitbit_to_garmin_activities
+from .converter.fitbit_to_garmin_converter import fitbit_to_garmin_sleep,\
+	fitbit_to_garmin_activities,\
+	fitbit_to_garmin_epoch
 
-
-def get_fitbit_model_data(model,user,start_date, end_date, order_by = None):
+def get_fitbit_model_data(model,user,start_date, end_date,
+		order_by = None, group_by_date=False):
 
 	date_field = None
 	data_field = None
@@ -71,11 +67,15 @@ def get_fitbit_model_data(model,user,start_date, end_date, order_by = None):
 			summaries = model.objects.filter(
 					**lookup_kwargs,
 					user = user).order_by(order_by)
-			return [q.data for q in summaries]
 		else:
 			summaries = model.objects.filter(
 				**lookup_kwargs,
 				user = user)
+
+		if group_by_date:
+			return {q.__dict__.get(date_field)
+			: q.__dict__.get(data_field) for q in summaries}
+		else:
 			return [q.__dict__.get(data_field) for q in summaries]
 	else:
 		return None
@@ -131,11 +131,11 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 		"light_sleep": '',
 		"awake_time": '',
 		"rem_sleep":'',
-		"restless":'',
+		"restless_sleep":'',
 		"sleep_bed_time": '',
 		"sleep_awake_time": '',
 		"sleep_per_wearable":'',
-		"sleep_per_userinput":''
+		"sleep_per_userinput":'',
 	}
 	have_userinput_sleep = False
 	trans_sleep_data = None
@@ -209,10 +209,10 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 		sleep_stats["rem_sleep"] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
 			trans_sleep_data['remSleepInSeconds'],include_sec = False
 		)
-		# sleep_stats["restless"] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
-		# 	trans_sleep_data['restlessDurationInSeconds'],
-		# 	include_sec = False
-		# )
+		sleep_stats["restless_sleep"] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
+			trans_sleep_data['restlessDurationInSeconds'],
+		 	include_sec = False
+		 )
 		sleep_stats["sleep_per_wearable"] = quicklook.calculations.garmin_calculation.sec_to_hours_min_sec(
 			(trans_sleep_data['durationInSeconds'] 
 			- trans_sleep_data['awakeDurationInSeconds']
@@ -252,16 +252,12 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 	return sleep_stats
 
 
-def fitbit_steps_data(user,current_date):
+def fitbit_steps_data(todays_steps_data):
 
 	''' This function is refer for fitbit_steps_data using this function
  we have to displaying the fitbit_stepsdata in Raw data.
  '''
-	todays_steps_data = get_fitbit_model_data(
-			UserFitbitDataSteps,user,current_date.date(),current_date.date())
 	if todays_steps_data:
-		todays_steps_data = ast.literal_eval(todays_steps_data[0].replace(
-				"'steps_fitbit': {...}","'steps_fitbit': {}"))
 		total_steps = todays_steps_data['activities-steps'][0]['value']
 	else:
 		total_steps = 0	
@@ -276,10 +272,12 @@ def fitbit_heartrate_data(user,current_date):
 		todays_heartrate_data = todays_heartrate_data['activities-heart']
 		if todays_heartrate_data:
 			heartrate_value = todays_heartrate_data[0].get("value")
-			if heartrate_value:
+			if heartrate_value and isinstance(heartrate_value,dict):
+				# for the case when user have no intraday access
 				resting_heartrate = heartrate_value.get("restingHeartRate",0)
 			else:
-				resting_heartrate = 0
+				# If user have intraday access
+				resting_heartrate = todays_heartrate_data[0].get("restingHeartRate",0)
 		else:
 			resting_heartrate = 0
 	else:
@@ -402,6 +400,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 	SERIALIZED_DATA = []
 	user_age = user.profile.age()
 	while current_date <= to_dt:
+		tomorrow_date = current_date + timedelta(days=1)
 		last_seven_days_date = current_date - timedelta(days=6)
 		start_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
 		end_epoch = start_epoch + 86400
@@ -415,14 +414,45 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		food_calculated_data = quicklook.calculations.garmin_calculation.get_blank_model_fields("food")
 		alcohol_calculated_data = quicklook.calculations.garmin_calculation.get_blank_model_fields("alcohol")
 
-		todays_sleep_data = get_fitbit_model_data(
-				UserFitbitDataSleep,user,current_date.date(),current_date.date())
+		todays_sleep_data = None
+		tomorrow_sleep_data = None
+		sleep_data = get_fitbit_model_data(
+				UserFitbitDataSleep,user,current_date.date(),
+				tomorrow_date.date(),group_by_date=True)
+		if sleep_data:
+			todays_sleep_data = sleep_data.get(current_date.strftime('%Y-%m-%d'))
+			tomorrow_sleep_data = sleep_data.get(tomorrow_date.strftime('%Y-%m-%d'))
+			if todays_sleep_data:
+				todays_sleep_data = ast.literal_eval(todays_sleep_data.replace(
+					"'sleep_fitbit': {...}","'sleep_fitbit': {}"))
+			if tomorrow_sleep_data:
+				tomorrow_sleep_data = ast.literal_eval(tomorrow_sleep_data.replace(
+					"'sleep_fitbit': {...}","'sleep_fitbit': {}"))
+
+		todays_epoch_data = []
+		todays_steps_data = get_fitbit_model_data(
+			UserFitbitDataSteps,user,current_date.date(),current_date.date())
+		if todays_steps_data:
+			todays_steps_data = ast.literal_eval(todays_steps_data[0].replace(
+					"'steps_fitbit': {...}","'steps_fitbit': {}"))
+			if todays_steps_data.get("activities-steps-intraday"):
+				intraday_steps = todays_steps_data.get("activities-steps-intraday")
+				interval_duration = (intraday_steps.get('datasetInterval',15)*60)
+				for step in intraday_steps.get('dataset',[]):
+					todays_epoch_data.append(fitbit_to_garmin_epoch(
+						step,current_date.date(),interval_duration))
+
 		try:
-			todays_user_input = UserDailyInput.objects.select_related(
+			user_inputs_qs = UserDailyInput.objects.select_related(
 				'strong_input','encouraged_input','optional_input').filter(
-				created_at = current_date.date(), user=user)
+				created_at__range = (current_date,tomorrow_date),user=user)
+			user_inputs = {q.created_at.strftime("%Y-%m-%d"):q for q in user_inputs_qs}
+			todays_user_input = user_inputs.get(current_date.strftime("%Y-%m-%d"))
+			tomorrows_user_input = user_inputs.get(tomorrow_date.strftime("%Y-%m-%d"))
 		except UserDailyInput.DoesNotExist:
 			todays_user_input = None
+			tomorrows_user_input = None
+
 
 		# pull data for past 7 days (incuding today)
 		daily_strong = list(DailyUserInputStrong.objects.filter(
@@ -458,8 +488,6 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			todays_activity_data = ast.literal_eval(todays_activity_data[0].replace(
 				"'activity_fitbit': {...}","'activity_fitbit': {}"))
 			todays_activity_data = todays_activity_data['activities']
-		else:
-			todays_activity_data = None
 
 		if todays_activity_data:
 			todays_activity_data = list(map(fitbit_to_garmin_activities,
@@ -499,11 +527,10 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 
 		# calling the resting hearate from fitbit models
 		resting_heartrate = fitbit_heartrate_data(user,current_date)
-		#passing resting heart rate value to exercise dictionary
+		# passing resting heart rate value to exercise dictionary
 		exercise_calculated_data['resting_hr_last_night'] = resting_heartrate
 
 		if todays_user_input:
-			todays_user_input = todays_user_input[0]
 			ui_bedtime = todays_user_input.strong_input.sleep_bedtime
 			ui_awaketime = todays_user_input.strong_input.sleep_awake_time
 			ui_timezone = todays_user_input.timezone
@@ -599,27 +626,35 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			get_user_input_total_sleep(
 				todays_daily_strong,todays_daily_optional)
 
-		if todays_sleep_data:
-			todays_sleep_data = ast.literal_eval(todays_sleep_data[0].replace(
-				"'sleep_fitbit': {...}","'sleep_fitbit': {}"))
-		else:
-			todays_sleep_data = None
 		sleep_stats = get_sleep_stats(todays_sleep_data,
 			ui_bedtime = ui_bedtime,ui_awaketime = ui_awaketime, 
-			ui_sleep_duration = ui_sleep_duration,ui_timezone = ui_timezone)
+			ui_sleep_duration = ui_sleep_duration,
+			ui_timezone = ui_timezone,str_date=False)
+
+		sleep_bed_time = sleep_stats['sleep_bed_time']
+		sleep_awake_time = sleep_stats['sleep_awake_time']
+		if sleep_bed_time:
+			sleep_bed_time = sleep_bed_time.strftime("%I:%M %p")
+		else:
+			sleep_bed_time = ''
+
+		if sleep_awake_time:
+			sleep_awake_time = sleep_awake_time.strftime("%I:%M %p")
+		else:
+			sleep_awake_time = ''
 
 		sleeps_calculated_data['deep_sleep'] = sleep_stats['deep_sleep']
 		sleeps_calculated_data['light_sleep'] = sleep_stats['light_sleep']
 		sleeps_calculated_data['rem_sleep'] = sleep_stats['rem_sleep']
 		sleeps_calculated_data['awake_time'] = sleep_stats['awake_time']
-		sleeps_calculated_data['sleep_bed_time'] = sleep_stats['sleep_bed_time']
-		sleeps_calculated_data['sleep_awake_time'] = sleep_stats['sleep_awake_time']
+		sleeps_calculated_data['sleep_bed_time'] = sleep_bed_time
+		sleeps_calculated_data['sleep_awake_time'] = sleep_awake_time
 		sleeps_calculated_data['sleep_per_wearable'] = sleep_stats['sleep_per_wearable']
 		sleeps_calculated_data['sleep_per_user_input'] = (ui_sleep_duration 
 			if ui_sleep_duration else "")
 		sleeps_calculated_data['sleep_comments'] = ui_sleep_comment
 		sleeps_calculated_data['sleep_aid'] = ui_sleep_aid
-		#sleeps_calculated_data['restless'] = sleep_stats['restless']
+		sleeps_calculated_data['restless_sleep'] = sleep_stats['restless_sleep']
 
 		# Sleep grade point calculation
 		sleep_grade_point = get_avg_sleep_grade(
@@ -651,7 +686,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 				,user_did_workout=ui_did_workout)
 		
 		# Steps calculation
-		daily_total_steps = fitbit_steps_data(user,current_date)
+		daily_total_steps = fitbit_steps_data(todays_steps_data)
 		exercise_steps,non_exercise_steps,total_steps = quicklook.calculations.\
 			garmin_calculation.cal_exercise_steps_total_steps(
 				int(daily_total_steps),
@@ -683,18 +718,89 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		grades_calculated_data['overall_health_grade'] = overall_grade_pt[0]
 		grades_calculated_data['overall_health_gpa'] = overall_grade_pt[1]
 
+		# Movement consistency and movement consistency grade calculation
+		# Time user go to bed last night
+		yesterday_bedtime = sleep_stats['sleep_bed_time']
+		# Time user wake up today
+		today_awake_time = sleep_stats['sleep_awake_time']
+		# Time user went to bed again today
+		today_bedtime = None
+		strength_start_time = None
+		strength_end_time = None
+		nap_start_time = None
+		nap_end_time = None
+		tomorrows_user_input_tz = None
+
+		if tomorrows_user_input and tomorrows_user_input.strong_input:
+			today_bedtime = tomorrows_user_input.strong_input.sleep_bedtime
+			tomorrows_user_input_tz = tomorrows_user_input.timezone
+
+		if (today_bedtime and tomorrows_user_input_tz):
+			target_tz = pytz.timezone(tomorrows_user_input_tz)
+			today_bedtime = today_bedtime.astimezone(target_tz).replace(tzinfo=None)
+		else:
+			tomorrow_sleep_stats = get_sleep_stats(tomorrow_sleep_data,str_date=False)
+			today_bedtime = tomorrow_sleep_stats['sleep_bed_time']
+
+		if todays_user_input:
+			ui_strength_start_time = todays_user_input.strong_input.strength_workout_start
+			ui_strength_end_time = todays_user_input.strong_input.strength_workout_end
+			if ui_strength_start_time and ui_strength_end_time:
+				strength_start_time = quicklook.calculations.garmin_calculation\
+					._str_duration_to_dt(current_date,ui_strength_start_time)
+				strength_end_time = quicklook.calculations.garmin_calculation\
+					._str_duration_to_dt(current_date,ui_strength_end_time)
+
+			ui_nap_start_time = todays_user_input.optional_input.nap_start_time
+			ui_nap_end_time = todays_user_input.optional_input.nap_end_time
+			if ui_nap_start_time and ui_nap_end_time:
+				nap_start_time = quicklook.calculations.garmin_calculation\
+					._str_duration_to_dt(current_date,ui_nap_start_time)
+				nap_end_time = quicklook.calculations.garmin_calculation\
+					._str_duration_to_dt(current_date,ui_nap_end_time)
+
+		movement_consistency = quicklook.calculations.garmin_calculation\
+			.cal_movement_consistency_summary(
+				user,
+				current_date,
+				todays_epoch_data,
+				yesterday_bedtime = yesterday_bedtime,
+				today_awake_time = today_awake_time,
+				combined_user_activities = combined_user_activities,
+				today_bedtime = today_bedtime,
+				user_input_strength_start_time = strength_start_time,
+		  		user_input_strength_end_time = strength_end_time,
+		  		nap_start_time = nap_start_time,
+		  		nap_end_time = nap_end_time
+			)
+
+		if movement_consistency:
+			steps_calculated_data['movement_consistency'] = json.dumps(movement_consistency)
+			inactive_hours = movement_consistency.get("inactive_hours")
+			grade = quicklook.calculations.garmin_calculation\
+				.cal_movement_consistency_grade(inactive_hours)
+			grades_calculated_data['movement_consistency_grade'] = grade
+
 		# If quick look for provided date exist then update it otherwise
 		# create new quicklook instance 
 		try:
 			user_ql = UserQuickLook.objects.get(user=user,created_at = current_date.date())
-			quicklook.calculations.garmin_calculation.update_helper(user_ql.grades_ql,grades_calculated_data)
-			quicklook.calculations.garmin_calculation.update_helper(user_ql.exercise_reporting_ql, exercise_calculated_data)
-			quicklook.calculations.garmin_calculation.update_helper(user_ql.swim_stats_ql, swim_calculated_data)
-			quicklook.calculations.garmin_calculation.update_helper(user_ql.bike_stats_ql, bike_calculated_data)
-			quicklook.calculations.garmin_calculation.update_helper(user_ql.steps_ql, steps_calculated_data)
-			quicklook.calculations.garmin_calculation.update_helper(user_ql.sleep_ql, sleeps_calculated_data)
-			quicklook.calculations.garmin_calculation.update_helper(user_ql.food_ql, food_calculated_data)
-			quicklook.calculations.garmin_calculation.update_helper(user_ql.alcohol_ql, alcohol_calculated_data)
+			quicklook.calculations.garmin_calculation\
+				.update_helper(user_ql.grades_ql,grades_calculated_data)
+			quicklook.calculations.garmin_calculation\
+				.update_helper(user_ql.exercise_reporting_ql, exercise_calculated_data)
+			quicklook.calculations.garmin_calculation\
+				.update_helper(user_ql.swim_stats_ql, swim_calculated_data)
+			quicklook.calculations.garmin_calculation\
+				.update_helper(user_ql.bike_stats_ql, bike_calculated_data)
+			quicklook.calculations.garmin_calculation\
+				.update_helper(user_ql.steps_ql, steps_calculated_data)
+			quicklook.calculations.garmin_calculation\
+				.update_helper(user_ql.sleep_ql, sleeps_calculated_data)
+			quicklook.calculations.garmin_calculation\
+				.update_helper(user_ql.food_ql, food_calculated_data)
+			quicklook.calculations.garmin_calculation\
+				.update_helper(user_ql.alcohol_ql, alcohol_calculated_data)
 
 		except UserQuickLook.DoesNotExist:
 			user_ql = UserQuickLook.objects.create(user = user,created_at=current_date.date())

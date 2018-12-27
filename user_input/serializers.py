@@ -241,23 +241,38 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 			activities_model_objects = []
 			for activity in activities:
 				activity_stats = copy.deepcopy(activity)
-				activity_weather = {}
-				activity_weather = json.dumps(activity_weather)
+				weather_stats = {}
+				if activity.get('weather_stats',None):
+					weather_stats = activity.get('weather_stats')
+				weather_stats = json.dumps(weather_stats)
 				start_time = activity_stats['startTimeInSeconds'] + \
 									activity_stats['startTimeOffsetInSeconds']
-				del(activity_stats['comments'],
-					activity_stats['steps_type'],
-					activity_stats['can_update_steps_type'],
-					activity_stats['duplicate'],
-					activity_stats['deleted'])
-				activity_stats.pop('activity_weather', None)
+				keys_to_remove = ('comments', 'steps_type', 'can_update_steps_type', 'duplicate', 'deleted', 'temperature_feels_like', 'weather_condition', 'humidity', 'dewPoint', 'wind', 'temperature')
+				for k in keys_to_remove:
+					activity_stats.pop(k, None)
+
+				temperature_feels_like = activity.get('temperature_feels_like')
+				humidity = activity.get('humidity')
+				dewPoint = activity.get('dewPoint')
+				wind = activity.get('wind')
+				temperature = activity.get('temperature')
+				weather_condition = activity.get('weather_condition')
+
+				weather_attrs = {
+					'temperature_feels_like': {'value': temperature_feels_like, 'units': 'fahrenheit'},
+					'humidity': {'value': humidity, 'units': 'percentage'},
+					'dewPoint': {'value': dewPoint, 'units': 'fahrenheit'},
+					'wind': {'value': wind, 'units': 'miles/hour'},
+					'temperature': {'value': temperature, 'units': 'fahrenheit'},
+					'weather_condition': weather_condition
+				}
 				act_obj = DailyActivity(
 					user = user,
 					activity_id = activity['summaryId'],
 					created_at = creation_date,
 					activity_data = activity_stats,
 					start_time_in_seconds  = start_time,
-					activity_weather = activity_weather, 
+					activity_weather = weather_attrs,
 					can_update_steps_type = activity.get(
 						'can_update_steps_type',True),
 					steps_type = activity.get('steps_type'),
@@ -269,7 +284,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 				if todays_activity:
 					todays_activity.__dict__.update(
 						activity_data = activity_stats,
-						activity_weather = activity_weather, 
+						activity_weather = weather_attrs,
 						start_time_in_seconds  = start_time,
 						can_update_steps_type = activity.get(
 							'can_update_steps_type',True),
@@ -280,7 +295,6 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 					todays_activity.save()
 				else:
 					activities_model_objects.append(act_obj)
-			print ('#############', activities_model_objects)
 			DailyActivity.objects.bulk_create(activities_model_objects)
 
 

@@ -208,3 +208,8 @@ ELASTIC_APM = {
 	'SERVER_URL': 'http://13.232.104.156:8200',
 	'DEBUG': True,
 }
+
+# Fitbit
+FITBIT_CONSUMER_ID = '22CN2D'
+FITBIT_CONSUMER_SECRET = 'e83ed7f9b5c3d49c89d6bdd0b4671b2b'
+FITBIT_REDIRECT_URL = 'https://app.jvbwellness.com/callbacks/fitbit' 
