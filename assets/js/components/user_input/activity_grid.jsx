@@ -50,6 +50,8 @@ const activites = { "":"Select",
 "MOUNTAINEERING":"MOUNTAINEERING",
 "OPEN_WATER_SWIMMING":"OPEN WATER SWIMMING",
 "PADDLING":"PADDLING",
+"PELOTON_BIKE":"PELOTON (BIKE)",
+"PELOTON_TREADMILL":"PELOTON (TREADMILL)",
 "PILATES":"PILATES",
 "PIYO-PILATES/YOGA":"PIYO-PILATES/YOGA",
 "RECESS_PLAYING":"RECESS PLAYING",
@@ -1119,8 +1121,9 @@ handleChange(event){
     }
     else if(name == "modal_activity_heart_rate"){
         let actType = this.state.modal_activity_type;
-        let actAvgHeartRate = this.state.modal_activity_heart_rate;
-        let steps_type = this.getActivityCategory(actType,parseInt(actAvgHeartRate));
+        let actAvgHeartRate = parseInt(value);
+        let steps_type = this.getActivityCategory(actType,actAvgHeartRate);
+
         this.setState({
             [name]: parseInt(value),
              modal_exercise_steps_status:steps_type
@@ -2634,7 +2637,7 @@ return(
                         </tr>
                         <tr>
                             <td>
-                                Activity (Exercise) File
+                                Activity (Exercise) File (Except Walk/Walking Activity Type)
                             </td>
                             <td>
                                 Default: Exercise steps
@@ -2675,11 +2678,6 @@ return(
                             <td>
                                 Default: Non Exercise steps
                                 <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colSpan="5">
-                                 If multiple activities, a user must characterize one activity as “exercise steps”
                             </td>
                         </tr>
                         </tbody>
