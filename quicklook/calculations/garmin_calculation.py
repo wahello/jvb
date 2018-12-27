@@ -1019,11 +1019,10 @@ def get_filtered_activity_stats(activities_json,user_age,
 
 	for act in filtered_activities:
 		if act['summaryId'] in act_renamed_to_hrr:
+			act['activityType'] = 'HEART_RATE_RECOVERY'
 			act_category = get_activity_exercise_non_exercise_category(act,
 				user_age)
 			act['steps_type'] = act_category
-			act['activityType'] = 'HEART_RATE_RECOVERY'
-
 
 	deleted_activities = []
 	duplicate_activities = []
