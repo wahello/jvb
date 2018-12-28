@@ -743,13 +743,25 @@ class ProgressReport():
 							current_data.cum_non_exercise_steps,alias
 						)
 					)[0]
+					
+				elif key == 'exercise_steps':
+					total_steps = self._get_average_for_duration(
+						todays_data.cum_total_steps,
+						current_data.cum_total_steps,alias)
+					non_exec_steps = self._get_average_for_duration(
+						todays_data.cum_non_exercise_steps,
+						current_data.cum_non_exercise_steps,alias)
+					exercise_steps = total_steps - non_exec_steps
+					return int(Decimal(exercise_steps).quantize(0,ROUND_HALF_UP))
+
 			return None
 
 		calculated_data = {
 			'non_exercise_steps':{d:None for d in self.duration_type},
 			'movement_non_exercise_step_grade':{d:None for d in self.duration_type},
 			'non_exericse_steps_gpa':{d:None for d in self.duration_type},
-			'total_steps':{d:None for d in self.duration_type}
+			'total_steps':{d:None for d in self.duration_type},
+			'exercise_steps':{d:None for d in self.duration_type}
 		}
 		summary_type = "non_exercise_steps_cum"
 
