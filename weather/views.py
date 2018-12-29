@@ -10,7 +10,8 @@ from garmin.models import UserGarminDataActivity
 from user_input.views.garmin_views import _get_activities_data
 from quicklook.calculations.garmin_calculation import get_filtered_activity_stats
 from user_input.utils.daily_activity import get_daily_activities_in_base_format
-
+from weather.utils.weather_helper import weather_report_dict
+from django.conf import settings
 class ActivityWeatherView(APIView):
 
     def get(self, request):
@@ -40,18 +41,13 @@ class ActivityWeatherView(APIView):
 
                     weather_data[activity['summaryId']] = {**activity_weather}
                 else:
-                    weather_report = {'dewPoint': {'value': None, 'units': None},
-                                'humidity': {'value': None, 'units': None},
-                                'temperature':{'value': None, 'units': None},
-                                'wind': {'value': None, 'units': None},
-                                'temperature_feels_like':{'value': None, 'units': None},
-                                'weather_condition': None}
-                    weather_data[activity['summaryId']] = {**weather_report}
+                    weather_data[activity['summaryId']] = weather_report_dict(None)
             else:
                 # weather_report = get_weather_info_using_garmin_activity(
                 #                                 user, epoch_time, activity['summaryId'])
                 # weather_data[activity['summaryId']] = {**weather_report}
-                weather_keys = ("dewPoint", "humidity", "temperature", "wind", "temperature_feels_like")
+                weather_keys = list(weather_report_dict().keys())
+                weather_keys.remove('weather_condition')
                 weather_report = {}
                 for key in weather_keys:
                     weather_report[key] = activity[key]
@@ -60,12 +56,7 @@ class ActivityWeatherView(APIView):
 
 
 def get_weather_info_using_garmin_activity(user, epoch_time, summaryId):
-    weather_report = {'dewPoint': {'value': None, 'units': None},
-                                'humidity': {'value': None, 'units': None},
-                                'temperature':{'value': None, 'units': None},
-                                'wind': {'value': None, 'units': None},
-                                'temperature_feels_like':{'value': None, 'units': None},
-                                'weather_condition': None}
+    weather_report =  weather_report_dict(None)
     try:
         garmin_activity = UserGarminDataActivity.objects.get(user=user, summary_id=summaryId)
         garmin_activity_data = ast.literal_eval(garmin_activity.data)
@@ -75,7 +66,6 @@ def get_weather_info_using_garmin_activity(user, epoch_time, summaryId):
 
             activity_weather = get_weather_response_as_required(
                                     latitude, longitude, epoch_time)
-            print("............:::", activity_weather)
             weather_report.update({**activity_weather})
         return weather_report
     except UserGarminDataActivity.DoesNotExist:
@@ -86,24 +76,21 @@ def get_weather_response_as_required(latitude, longitude, epoch_time):
     dewPoint_value = round((weather_info['currently']['dewPoint'] * 9/5)+ 32)
     temperature_value = round((weather_info['currently']['temperature'] * 9/5)+ 32)
     temperature_feels_like_value = round((weather_info['currently']['apparentTemperature'] * 9/5)+ 32)
-    humidity_value = weather_info['currently']['humidity']*100
+    humidity_value = round(float(weather_info['currently']['humidity']*100))
     wind_value = round(weather_info['currently']['windSpeed']*2.237)
-                    
-    activity_weather = {'dewPoint': {#'value': weather_info['currently']['dewPoint'], 'units': 'celsius'},
-                                            'value': dewPoint_value, 'units': 'fahrenheit'},
-                'humidity': {'value': humidity_value, 'units': 'percentage'},
-                'temperature':{#'value': weather_info['currently']['temperature'], 'units': 'celsius'},
-                                'value': temperature_value, 'units': 'fahrenheit'},
-                'wind': {'value': wind_value, 'units': 'miles/hour'},
-                'temperature_feels_like':{#'value': weather_info['currently']['apparentTemperature'], 'units': 'celsius'},
-                                    'value': temperature_feels_like_value, 'units': 'fahrenheit'},
+    weather_info = {'dewPoint': dewPoint_value,
+                'humidity': humidity_value,
+                'temperature': temperature_value,
+                'wind': wind_value,
+                'temperature_feels_like': temperature_feels_like_value,
                 'weather_condition': weather_info['currently']['icon']}
+    activity_weather = weather_report_dict(weather_info)
     return activity_weather
 
 
 def get_weather_info_using_lat_lng_time(latitude, longitude, epoch_time, unit='si',include_block=['currently']):
 
-    KEY = '52871e89c8acb84e7c8b8bc8ac5ba307'
+    KEY = settings.WEATHER_KEY
     POSSIBLE_DATA_BLOCK = ['currently', 'minutely','hourly', 'daily', 'alerts','flags'] 
     UNITS = ['si', 'auto', 'ca', 'uk2', 'us']
 
@@ -131,6 +118,6 @@ def get_weather_info_using_lat_lng_time(latitude, longitude, epoch_time, unit='s
 def has_weather_data(activity):
     ''' Returns Boolean type. Returns True if there is all weather column values are none in the database else returns False'''
     dictfilt = lambda x, y: dict([(i, x[i]) for i in x if i in set(y)])
-    weather_keys = ("dewPoint", "humidity","temperature","wind","temperature_feels_like","weather_condition")
+    weather_keys = list(weather_report_dict(None).keys())
     weather_keys_values = dictfilt(activity, weather_keys)
     return True if all(value == None for value in weather_keys_values.values()) else False
