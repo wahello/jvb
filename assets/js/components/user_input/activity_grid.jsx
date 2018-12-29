@@ -8,6 +8,7 @@ import 'moment-timezone';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; 
 import { ToastContainer, toast } from 'react-toastify';
+import {getUserProfile} from '../../network/auth';
 
 const activites = { "":"Select",
 "OTHER":"OTHER",
@@ -49,6 +50,8 @@ const activites = { "":"Select",
 "MOUNTAINEERING":"MOUNTAINEERING",
 "OPEN_WATER_SWIMMING":"OPEN WATER SWIMMING",
 "PADDLING":"PADDLING",
+"PELOTON_BIKE":"PELOTON (BIKE)",
+"PELOTON_TREADMILL":"PELOTON (TREADMILL)",
 "PILATES":"PILATES",
 "PIYO-PILATES/YOGA":"PIYO-PILATES/YOGA",
 "RECESS_PLAYING":"RECESS PLAYING",
@@ -138,6 +141,8 @@ this.infoPrint = this.infoPrint.bind(this);
 this.activityStepsTypeModalToggle = this.activityStepsTypeModalToggle.bind(this);
 this.toggleInfo_activitySteps = this.toggleInfo_activitySteps.bind(this);
 this.toggleInfo_stepsType =this.toggleInfo_stepsType.bind(this);
+this.successProfile=this.successProfile.bind(this);
+this.calculateZone = this.calculateZone.bind(this);
 this.editToggleHandler_weather = this.editToggleHandler_weather.bind(this);
 this.handleChange_weather = this.handleChange_weather.bind(this);
 
@@ -196,7 +201,10 @@ this.state ={
     infoButton_activitySteps:'',
     infoButton_duplicate:false,
     infoButton_delete:false,
-    isActivityStepsTypeOpen:false
+    isActivityStepsTypeOpen:false ,
+    age:"",
+    selectedDate:new Date() ,
+    avg_hr: ''
 }
 }
 
@@ -258,6 +266,8 @@ componentWillReceiveProps(nextProps) {
     }
 }
 
+
+
 addingCommaToSteps(value){
     value += '';
     var x = value.split('.');
@@ -269,6 +279,16 @@ addingCommaToSteps(value){
     }
     return x1 + x2;
 }
+successProfile(data){
+    let today_date = new Date();
+    let date_of_birth = moment(data.data.date_of_birth);
+    let today_date1 = moment(moment(today_date).format('YYYY-MM-DD'));
+    let age = Math.abs(today_date1.diff(date_of_birth, 'years'));
+    this.setState({
+        age:age
+    })
+}
+
 setActivitiesEditModeFalse(){
     //it will do set the state true to false of activity.
     //it will do hide the fields when you click on the
@@ -819,40 +839,78 @@ editToggleHandlerDuration(event){
             this.props.updateParentActivities(this.state.activites);
         });
     }
+}
+
+calculateZone(){
+    let age = this.state.age;
+    let aerobic_zone = 180-age-29;
+    let anaerobic_zone = 180-age+5;
+
+    return {
+        aerobic_zone: aerobic_zone ,
+        anaerobic_zone: anaerobic_zone
+    };
 }   
 
+getActivityCategory = (activityType,heartrate) => {
+    const EXERCISE = 'exercise';
+    if(activityType){
+        let hrzone = this.calculateZone();
+        const NON_EXERCISE = 'non_exercise';
+        const HEART_RATE_RECOVERY = 'heart_rate_recovery'
+        const WALK = "walk";
+
+        if(activityType.toLowerCase() == HEART_RATE_RECOVERY){
+            return NON_EXERCISE;
+        }
+        else if(activityType.toLowerCase().includes(WALK)){
+            if(!heartrate || heartrate < hrzone['aerobic_zone'])
+                return NON_EXERCISE;
+            return EXERCISE;
+        }
+        else{
+            return EXERCISE;
+        }
+    }
+    return EXERCISE;
+}
+
 handleChange_activity(event){
-  const target = event.target;
-  const value = target.value;
-  const selectedActivityId = target.getAttribute('data-name');
-  let activity_data = this.state.activites[selectedActivityId];
-  activity_data['activityType'] = value;
+    const target = event.target;
+    const value = target.value;
+    const selectedActivityId = target.getAttribute('data-name');
+    let activity_data = this.state.activites[selectedActivityId];
+    activity_data['activityType'] = value;
 
-  this.setState({
-  activites:{...this.state.activites,
-  [selectedActivityId]:activity_data
-  }
-     });
- 
-  $('#comments_id').css('display','none');
-   if(value == "OTHER"){
-  this.setState({
-[selectedActivityId]: value,
-"modal_activity_type":""
-  });
-  }
-  else if(name == "activity_display_name"){
-  this.setState({
-[selectedActivityId]: value,
-"modal_activity_type":value
-  });
-
-  }
-  else{
-  this.setState({
-[selectedActivityId]: value
-  });
-  }
+    /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
+    let avg_hr = activity_data['averageHeartRateInBeatsPerMinute'];
+    let steps_type = this.getActivityCategory(value,avg_hr);
+    activity_data['steps_type'] = steps_type;
+    /************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
+    this.setState({
+    activites:{
+        ...this.state.activites,
+        [selectedActivityId]:activity_data
+    }
+    });
+    $('#comments_id').css('display','none');
+    if(value == "OTHER"){
+        this.setState({
+        [selectedActivityId]: value,
+        "modal_activity_type":""
+        });
+    }
+    else if(name == "activity_display_name"){
+        this.setState({
+        [selectedActivityId]: value,
+        "modal_activity_type":value
+        });
+    }
+    else{
+        this.setState({
+        [selectedActivityId]: value
+        });
+    } 
 }
 
 handleChange_time(event){
@@ -889,12 +947,18 @@ handleChange_heartrate(event){
     const selectedActivityId = target.getAttribute('data-name');
     let activity_data = this.state.activites[selectedActivityId];
     activity_data['averageHeartRateInBeatsPerMinute'] = parseInt(value);
+    /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
+    let act_type = activity_data['activityType'];
+    let steps_type = this.getActivityCategory(act_type,parseInt(value));
+    activity_data['steps_type'] = steps_type;
+    /************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
     this.setState({
         activites:{
             ...this.state.activites,
             [selectedActivityId]:activity_data
         }
     });
+    
 }
 handleChange_weather(key, event) {
     const target = event.target;
@@ -1180,26 +1244,52 @@ EndTimeInSecondsSaveCalender(event){
   })
 }
 
+
+
 handleChange(event){
     const target = event.target;
     const value = target.value;
     const name = target.name;//modal_duplicate_info_status
-    if(value== "OTHER"){
+
+ /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
+    let actType = this.state.modal_activity_type;
+    let actAvgHeartRate = this.state.modal_activity_heart_rate;
+    let steps_type = this.getActivityCategory(actType,parseInt(actAvgHeartRate));
+/************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
+
+    if(value == "OTHER"){
+        let actType = value;
+        let actAvgHeartRate = this.state.modal_activity_heart_rate;
+        let steps_type = this.getActivityCategory(actType,parseInt(actAvgHeartRate));
         this.setState({
             [name]: value,
-            "modal_activity_type":""
+            modal_activity_type:"",
+            modal_exercise_steps_status:steps_type
         });
     }
     else if(name == "activity_display_name"){
+        let actType = value;
+        let actAvgHeartRate = this.state.modal_activity_heart_rate;
+        let steps_type = this.getActivityCategory(actType,parseInt(actAvgHeartRate));
         this.setState({
             [name]: value,
-            "modal_activity_type":value
+            modal_activity_type:value,
+            modal_exercise_steps_status:steps_type
         });
     }
-    else if (name == "modal_activity_heart_rate"
-        || name == "modal_exercise_steps"){
+    else if(name == "modal_activity_heart_rate"){
+        let actType = this.state.modal_activity_type;
+        let actAvgHeartRate = parseInt(value);
+        let steps_type = this.getActivityCategory(actType,actAvgHeartRate);
+
         this.setState({
-            [name]: parseInt(value)
+            [name]: parseInt(value),
+             modal_exercise_steps_status:steps_type
+        });
+    }
+    else if (name == "modal_exercise_steps"){
+        this.setState({
+            [name]: parseInt(value) 
         });
     }
     else if (name == "modal_duplicate_info_status"){
@@ -2353,6 +2443,14 @@ renderEditActivityModal(){
                 return modal;
           }
     }
+
+
+    
+componentDidMount(){
+    getUserProfile(this.successProfile);
+}
+
+
 render(){
 
 return(
@@ -2395,7 +2493,7 @@ return(
     </span>
 </td>
 <td id = "add_button" className="add_button_back">
-    Steps Type 
+          Exercise or Non-Exercise? / Exercise or Non-Exercise Steps
     <span id="stepsTypeInfoModalWindow" onClick={this.toggleInfo_stepsType}>
         <a  className="infoBtn"> 
             <FontAwesome style={{fontSize:"16px"}}
@@ -2548,7 +2646,7 @@ return(
        <span>
         <a href="#" onClick={() => this.infoPrint("steps_type_info_modal_body")} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
             &nbsp;
-            Steps Type
+            Exercise or Non-Exercise? / Exercise or Non-Exercise Steps
         </span>
         </ModalHeader>
           <ModalBody className="modalcontent" id="steps_type_info_modal_body">
@@ -2574,7 +2672,7 @@ return(
                             <td>
                                 Exercise/Non-Exercise Steps Characterization
                             </td>
-                            <td colSpan="3">
+                            <td colSpan="4">
                                 If the average heart rate of an activity file is
                             </td>
                         </tr>
@@ -2591,6 +2689,9 @@ return(
                             <td>
                                 Anaerobic zone
                             </td>
+                            <td>
+                                 Not Recorded
+                            </td>
                         </tr>
                         <tr>
                             <td>
@@ -2602,16 +2703,45 @@ return(
                             </td>
                             <td>
                                 Default: Non-Exercise steps
-                                <br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
                             </td>
                             <td>
                                 Default: Non-Exercise steps
                                 <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
                             </td>
+                            <td>
+                                Default: Non-Exercise steps
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
+                            </td>
+
+
                         </tr>
                         <tr>
                             <td>
-                                Activity (Exercise) File
+                                Activity (Exercise) File (Except Walk/Walking Activity Type)
+                            </td>
+                            <td>
+                                Default: Exercise steps
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps:  Yes
+                            </td>
+                            <td>
+                                Default: Exercise steps
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
+                            </td>
+                            <td>
+                                Default: Exercise steps
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps:  No
+                            </td>
+
+                            <td>
+                                Default: Exercise steps
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                 Activity (Exercise) File:  Walk/Walking Activity Type
                             </td>
                             <td>
                                 Default: Non Exercise steps
@@ -2619,20 +2749,45 @@ return(
                             </td>
                             <td>
                                 Default: Exercise steps
-                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes*
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
                             </td>
                             <td>
                                 Default: Exercise steps
                                 <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps:  No
                             </td>
-                        </tr>
-                        <tr>
-                            <td colSpan="4">
-                                 *If multiple activities, a user must characterize one activity as “exercise steps”
+
+                            <td>
+                                Default: Non Exercise steps
+                                <br /><br />Allow User to Characterize as Exercise or Non Exercise Steps: Yes
                             </td>
                         </tr>
-                    </tbody>
+                        </tbody>
                 </table>
+                        
+                            
+                            We differentiate between Exercise and Not Exercise (Movement).  Both are important.  In general, we define exercise as 
+                            <ol>
+                                <li>when one elevates his/her average heart rate to an aerobic or anaerobic zone over the course of the workout; and </li>
+                                
+                                 <li> during strength training or other activities that are clearly exercise but may or may not elevate one's average heart rate over the course of the workout to an aerobic or anaerobic zone </li>
+                            </ol>
+
+                           <p> We define "Exercise Steps" ("Activity Steps") as those steps accumulated during exercise, generally when a person's heart rate is elevated consistently to the aerobic or anaerobic zone; conversely, we define non exercise steps generally as those steps accumulated when moving around throughout the day (MOVEMENT!) when not exercising, and therefore one's heart rate is lower and therefore we consider it to be movement, not exercise </p>
+
+
+                            <p> We receive and/or have written proprietary algorithms to arrive at 'Exercise Steps"/“Activity Steps” from various wearable devices and use the logic to characterize steps as “exercise” or “non exercise” steps (and this characterization also determines the “Non Exercise Steps” grade on our site as well as other stats we provide). We give you the ability to recharacterize your steps as “exercise” or “non exercise” steps in certain scenarios, as you may create an activity file on your wearable device (we encourage this) that you may characterize differently than the logic we use below. To recharacterize your steps between exercise and non exercise steps, select the toggle button in the “Steps Type” column.  </p>
+
+                            <p> NOTE 1:  IF ONE CHARACTERIZES STEPS AS "NON EXERCISE STEPS", THEN THE "Exercise or Not Exercise (Movement)" CLASSIFICATION MUST BE "NOT EXERCISE (MOVEMENT)" (AND VICE VERSA).   THIS ENSURES THAT USERS WILL NOT DOUBLE DIP BY GETTING CREDIT FOR BOTH EXERCISE WHILE AT THE SAME TIME ACCUMULATING NON EXERCISE STEPS </p>
+
+                            <p> NOTE 2: USERS CAN NOT CHANGE EXERCISE STEPS TO NON EXERCISE STEPS IF THE ACTIVITY FILE HAS AN AVERAGE HEART RATE IN THE ANAEROBIC ZONE, AS IN ALL CASES WE CONSIDER THIS EXERCISE (AND NOT MOVEMENT) </p>
+
+                            <p>If you’d like to recharacterize AN EXERCISE ACTIVITY AS EXERCISE OR NOT EXERCISE (MOVEMENT) and are unable to do so on the site, email us at info@jvbwellness.com to request what you would like to do and explain why </p>
+                            
+                        
+                        
+
+                       
+                   
             </div>
         </ModalBody>
     </Modal>

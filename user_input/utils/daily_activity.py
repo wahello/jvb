@@ -15,7 +15,7 @@ def get_activity_base_format(activity):
             activity["activity_weather"], activity['activity_id'])
     weather_keys = ('temperature_feels_like', 'humidity', 'dewPoint', 'wind', 'temperature')
     activity_weathers = {}
-    for k  in weather_keys:
+    for k in weather_keys:
         if activity_weather_dict and activity_weather_dict[k]:
             activity_weathers[k] = activity_weather_dict[k]['value']
     activity_weathers['weather_condition'] = activity_weather_dict['weather_condition']

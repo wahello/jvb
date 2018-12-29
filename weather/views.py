@@ -1,11 +1,7 @@
 import ast
-import json
 import requests
-import time
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth.models import User
-from user_input.models import DailyActivity
 from garmin.models import UserGarminDataActivity
 from user_input.views.garmin_views import _get_activities_data
 from quicklook.calculations.garmin_calculation import get_filtered_activity_stats
@@ -25,13 +21,15 @@ class ActivityWeatherView(APIView):
         garmin_list, manually_edited_list = _get_activities_data(user, date)
         manually_edited = {dic['summaryId']:dic for dic in manually_edited_list}
 
-        filtered_activities_list = get_filtered_activity_stats(activities_json=garmin_list,
+        filtered_activities_list = get_filtered_activity_stats(
+                            activities_json=garmin_list,
+                            user_age = user.profile.age(),
                             manually_updated_json=manually_edited,
                             userinput_activities=activities)
         weather_data = {}
         for activity in filtered_activities_list:
             epoch_time = activity['startTimeInSeconds']+activity['startTimeOffsetInSeconds']
-            if has_weather_data(activity):
+            if not has_weather_data(activity):
                 if 'startingLatitudeInDegree' in activity:
                     latitude = activity['startingLatitudeInDegree']
                     longitude = activity['startingLongitudeInDegree']
@@ -43,15 +41,11 @@ class ActivityWeatherView(APIView):
                 else:
                     weather_data[activity['summaryId']] = weather_report_dict(None)
             else:
-                # weather_report = get_weather_info_using_garmin_activity(
-                #                                 user, epoch_time, activity['summaryId'])
-                # weather_data[activity['summaryId']] = {**weather_report}
                 weather_keys = list(weather_report_dict().keys())
                 weather_keys.remove('weather_condition')
                 weather_report = {}
                 for key in weather_keys:
                     weather_report[key] = activity[key]
-                # weather_report["weather_condition"] = activity["weather_condition"]
         return Response(weather_data)
 
 
@@ -88,7 +82,8 @@ def get_weather_response_as_required(latitude, longitude, epoch_time):
     return activity_weather
 
 
-def get_weather_info_using_lat_lng_time(latitude, longitude, epoch_time, unit='si',include_block=['currently']):
+def get_weather_info_using_lat_lng_time(latitude, longitude,
+    epoch_time, unit='si',include_block=['currently']):
 
     KEY = settings.WEATHER_KEY
     POSSIBLE_DATA_BLOCK = ['currently', 'minutely','hourly', 'daily', 'alerts','flags'] 
@@ -116,8 +111,13 @@ def get_weather_info_using_lat_lng_time(latitude, longitude, epoch_time, unit='s
         return ()
 
 def has_weather_data(activity):
-    ''' Returns Boolean type. Returns True if there is all weather column values are none in the database else returns False'''
+    '''
+    Check if activity has weather information or not 
+    Returns True if activity has any one of the 
+    weather information othewise False
+    '''
     dictfilt = lambda x, y: dict([(i, x[i]) for i in x if i in set(y)])
     weather_keys = list(weather_report_dict(None).keys())
     weather_keys_values = dictfilt(activity, weather_keys)
-    return True if all(value == None for value in weather_keys_values.values()) else False
+    return False if all(
+        value == None for value in weather_keys_values.values()) else True
