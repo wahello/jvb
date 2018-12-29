@@ -420,7 +420,7 @@ class UserAA_whole_day(generics.ListCreateAPIView):
 			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
 			if device_type == 'fitbit':
 				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
-				fitbit_hr_difference = fitbit_aa.fitbit_aa_chart_four_new(user_get,start_date)
+				fitbit_hr_difference = fitbit_aa.fitbit_aa_chart_five(user_get,start_date)
 				if fitbit_hr_difference.get('total_time'):
 					try:
 						user_aa = AAWholeDay.objects.get(
