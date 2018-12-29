@@ -116,15 +116,18 @@ def get_hr_timediff(hr_dataset,start_date,end_date,log_id):
 	single_activity_dic[log_id] = {}
 	single_activity_dic[log_id]["time_diff"] = hr_time_diff
 	single_activity_dic[log_id]["hr_values"] = hr
+	
 	return single_activity_dic
 
-def get_hrr_timediff(hr_dataset,start_date):
+def get_hrr_timediff(hr_dataset):
 	'''
 		Return dict which containes hr values as list and hr time difference as list
 		example {logid:{hr_vlaues:[],hr_diff:[]}}
 	'''
-	# start_date_time_obj = convert_timestr_time(start_date)
-	# end_date_time_obj = convert_timestr_time(end_date)
+	start_date = '00:00:00'
+	end_date = '23:59:59'
+	start_date_time_obj = convert_timestr_time(start_date)
+	end_date_time_obj = convert_timestr_time(end_date)
 	dummydate = date(2000,1,1)
 	diff_index = 0
 	end_activty_time = 1
@@ -134,16 +137,16 @@ def get_hrr_timediff(hr_dataset,start_date):
 	hr = []
 	for index,single_time in enumerate(hr_dataset):
 		dataset_time = single_time["time"]
-		# dateset_time_obj = convert_timestr_time(dataset_time)
-		diff_start_date = get_diff_time(start_date,dataset_time)
+		dateset_time_obj = convert_timestr_time(dataset_time)
+		diff_start_date = get_diff_time(start_date_time_obj,dateset_time_obj)
 		diff_start_date = diff_start_date.seconds
 		if diff_start_date <= 30:
 			diff_index = index
 			while start_activty_time:
 				diff_index = diff_index + 1
 				time_near_start = hr_dataset[diff_index]["time"]
-				# dateset_time_obj = convert_timestr_time(time_near_start)
-				diff_start_date = get_diff_time(start_date,time_near_start)
+				dateset_time_obj = convert_timestr_time(time_near_start)
+				diff_start_date = get_diff_time(start_date_time_obj,dateset_time_obj)
 				if diff_start_date.seconds == 0 or diff_start_date.days == -1:
 					# print(dateset_time_obj,"Start date")
 					start_activty_time = 0
@@ -159,19 +162,21 @@ def get_hrr_timediff(hr_dataset,start_date):
 				diff_times = get_diff_time(act_pre_interval_time_obj,act_interval_time_obj)
 				hr_time_diff.append(diff_times.seconds)
 				hr.append(act_interval_hr)
-				# diff_times_end_act = get_diff_time(end_date_time_obj,act_interval_time_obj)
-				# if diff_times_end_act.seconds == 0 or diff_times_end_act.days == -1:
-				# 	# print(act_interval_time_obj,"End date")
-				# 	end_activty_time = 0
-				# 	diff_index = 0
-				# 	hr_time_diff = hr_time_diff[1:-4]
-				# 	hr = hr[1:-4]
+				diff_times_end_act = get_diff_time(end_date_time_obj,act_interval_time_obj)
+				if diff_times_end_act.seconds == 0 or diff_times_end_act.days == -1:
+					# print(act_interval_time_obj,"End date")
+					end_activty_time = 0
+					diff_index = 0
+					hr_time_diff = hr_time_diff[1:-4]
+					hr = hr[1:-4]
 
 	single_activity_dic = {}
 	single_activity_dic["time_diff"] = hr_time_diff
 	single_activity_dic["hr_values"] = hr
-	return single_activity_dic
 
+	print (hr_time_diff)
+	print (hr,'?????????????')
+	return single_activity_dic
 
 def fitbit_aa_chart_one(user_get,start_date):
 	'''
@@ -239,7 +244,6 @@ def fitbit_hr_diff_calculation(user_get,start_date):
 	# for i,qs in enumerate(hr_qs):
 	# 	heartrate_data = ast.literal_eval(qs)
 	# 	hr_dataset = heartrate_data.get('activities-heart-intraday').get('dataset')
-	print (start_date)
 	hr_dataset = get_fitbit_hr_data(user_get,start_date)
 	activities_start_end_time_list = fitbit_aa_chart_one(user_get,start_date)
 	for index,single_activity in enumerate(activities_start_end_time_list):
@@ -248,9 +252,7 @@ def fitbit_hr_diff_calculation(user_get,start_date):
 		end_date = single_activity[single_activity_id[0]]["act_end"]
 		log_id = single_activity[single_activity_id[0]]["log_id"]
 		single_activity_hr_time = get_hr_timediff(hr_dataset,start_date,end_date,log_id)
-		print (start_date, end_date)
 		activity_hr_time.append(single_activity_hr_time)
-	print(activity_hr_time)
 
 	return activity_hr_time
 
@@ -268,7 +270,7 @@ def fitbit_hrr_diff_calculation(user_get,start_date):
 	# 	hr_dataset = heartrate_data.get('activities-heart-intraday').get('dataset')
 	hr_dataset = get_fitbit_hr_data(user_get,start_date)
 	# activities_start_end_time_list = fitbit_aa_chart_one(user_get,start_date)
-	print ('@@@@@@@@@@@@@@@22', hr_dataset)
+	day_hr_time = get_hrr_timediff(hr_dataset)
 	# for index,single_activity in enumerate(activities_start_end_time_list):
 	# 	single_activity_id = list(single_activity.keys())
 	# 	start_date = single_activity[single_activity_id[0]]["act_start"]
@@ -279,7 +281,6 @@ def fitbit_hrr_diff_calculation(user_get,start_date):
 	single_activity_hr_time['time_diff'] = 222
 	activity_hr_time.append(single_activity_hr_time)
 
-	print(activity_hr_time)
 	return activity_hr_time
 
 def all_activities_hr_and_time_diff(hr_time_diff):
@@ -446,8 +447,7 @@ def fitbit_aa_chart_one_new(user_get,start_date,user_input_activities=None):
 
 def fitbit_aa_chart_four_new(user_get,start_date,user_input_activities=None):
 	hr_time_diff = fitbit_hrr_diff_calculation(user_get,start_date)
-	print ('>>>>>>>>>>>>>>>>>>>>>', hr_time_diff)
-	all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(hr_time_diff)
+	# all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(hr_time_diff)
 	# print(sum(all_activities_timestamp_list),"all_activities_timestamp_list")
 	if user_input_activities:
 		user_input_activities = delete_activity(user_input_activities)
