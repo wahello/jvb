@@ -28,6 +28,17 @@ class UserProfileSerializer(serializers.ModelSerializer):
 	   		raise serializers.ValidationError("Username already exist")
 	   return username
 
+	def validate_email(self,email):
+	   '''
+		Make a case insensitive check to determine uniqueness of email
+	   '''
+	   UserModel = get_user_model()
+	   case_insensitive_email_field = "{}__iexact".format(UserModel.EMAIL_FIELD)
+	   if (email and UserModel._default_manager.filter(
+			**{case_insensitive_email_field:email}).exists()):
+	   		raise serializers.ValidationError("Email already exist")
+	   return email
+
 	class Meta:
 		model = Profile
 		fields = ('id','username','email','password','first_name','last_name',

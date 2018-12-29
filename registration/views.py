@@ -1,18 +1,21 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import generics
-from rest_framework.authentication import SessionAuthentication
-
 
 from .serializers import UserSerializer, UserProfileSerializer
-from .models import Profile,TermsConditions,TermsConditionsText
+from .models import Profile,\
+	TermsConditions,\
+	TermsConditionsText,\
+	Invitation
 from .custom_signals import post_registration_notify
+from .decorators import invitation_required
 
 # class UserList(generics.ListAPIView):
 #     queryset = User.objects.all()
@@ -40,6 +43,7 @@ class Logout(APIView):
 		logout(request)
 		return Response(status=status.HTTP_200_OK)
 
+@method_decorator(invitation_required, name="dispatch")
 class UserCreate(APIView):
 	def post(self, request, format="json"):
 		serializer = UserProfileSerializer(data=request.data)
@@ -93,3 +97,17 @@ class AccepteTermsCondition(APIView):
 		else:
 			return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+class IsUserInvited(APIView):
+	'''
+	Check if user is invited to register
+	'''
+	def get(self, request, format="json"):
+		email = request.query_params.get('email')
+		res = {"email":email}
+		try:
+			Invitation.objects.get(email=email)
+			res['is_invited'] = True
+		except Invitation.DoesNotExist as e:
+			res['is_invited'] = False
+
+		return Response(res,status=status.HTTP_200_OK)
