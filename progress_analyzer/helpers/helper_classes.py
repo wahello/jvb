@@ -743,7 +743,7 @@ class ProgressReport():
 							current_data.cum_non_exercise_steps,alias
 						)
 					)[0]
-					
+
 				elif key == 'exercise_steps':
 					total_steps = self._get_average_for_duration(
 						todays_data.cum_total_steps,
@@ -996,6 +996,9 @@ class ProgressReport():
 							return value
 						else:
 							return "Not Reported"
+				elif key == "sleep_active_min":
+					pass
+				
 				elif key == "active_minutes_without_sleep":
 					if todays_meta_data and current_meta_data:
 						mc_days = (
@@ -1151,11 +1154,13 @@ class ProgressReport():
 			'movement_consistency_grade':{d:None for d in self.duration_type},
 			'movement_consistency_gpa':{d:None for d in self.duration_type},
 			'total_active_minutes':{d:None for d in self.duration_type},
+			'sleep_active_min':{d:None for d in self.duration_type},
+			'exercise_active_min':{d:None for d in self.duration_type},
 			'total_active_minutes_prcnt':{d:None for d in self.duration_type},
 			'active_minutes_without_sleep':{d:None for d in self.duration_type},
 			'active_minutes_without_sleep_prcnt':{d:None for d in self.duration_type},
 			'active_minutes_without_sleep_exercise':{d:None for d in self.duration_type},
-			'active_minutes_without_sleep_exercise_prcnt':{d:None for d in self.duration_type}
+			'active_minutes_without_sleep_exercise_prcnt':{d:None for d in self.duration_type},
 		}
 		summary_type = "movement_consistency_cum"
 

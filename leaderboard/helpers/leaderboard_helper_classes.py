@@ -168,7 +168,9 @@ class LeaderboardCategories(object):
 			"active_min_exclude_sleep":("Active Minute Per Day "
 				+"(Excludes Active Minutes When Sleeping)"),
 			"active_min_exclude_sleep_exercise":("Active Minute Per Day "+
-				"(Excludes Active Minutes When Sleeping and Exercising)")
+				"(Excludes Active Minutes When Sleeping and Exercising)"),
+			"exercise_duration": "Exercise Duration",
+			"exercise_steps":"Exercise Steps"
 		}
 
 		# default score value for each leader board category
@@ -191,7 +193,9 @@ class LeaderboardCategories(object):
 			'pure_beat_lowered':self.DEFAULT_MINIMUM_SCORE,
 			'active_min_total':self.DEFAULT_MINIMUM_SCORE,
 			'active_min_exclude_sleep':self.DEFAULT_MINIMUM_SCORE,
-			'active_min_exclude_sleep_exercise':self.DEFAULT_MINIMUM_SCORE
+			'active_min_exclude_sleep_exercise':self.DEFAULT_MINIMUM_SCORE,
+			'exercise_duration': self.DEFAULT_MINIMUM_SCORE,
+			'exercise_steps':self.DEFAULT_MINIMUM_SCORE
 		}
 
 		# Verbose name for score of certain category
@@ -216,7 +220,9 @@ class LeaderboardCategories(object):
 			'active_min_exclude_sleep':'Time Moving / Active '\
 				+'(when not sleeping) (hh:mm)',
 			'active_min_exclude_sleep_exercise':'Time Moving / Active '\
-				+'(when not sleeping and exercising)'
+				+'(when not sleeping and exercising)',
+			'exercise_duration': "Exercise Duration",
+			'exercise_steps':"Exercise Steps"
 		}
 		self.category_score_priority = self.__get_catg_score_priority()
 
@@ -366,7 +372,8 @@ class RankedScore(object):
 			or score == self.category_meta.DEFAULT_MINIMUM_SCORE):
 			# Change default score to 'N/A'
 			score = "N/A"
-		elif self.category in ["awake_time","deep_sleep","time_99","pure_time_99"]:
+		elif self.category in ["awake_time","deep_sleep",
+			"time_99","pure_time_99","exercise_duration"]:
 			score = _hours_to_hours_min(score)
 
 		other_scores = self.other_scores
@@ -943,6 +950,13 @@ class LeaderboardOverview(object):
 						category_wise_data[catg][dtype].append(
 							RankedScore(self.user,user,catg,score,other_scores=other_scores)
 						)
+					elif catg == 'exercise_duration':
+						score = data['exercise']['workout_duration_hours_min'][dtype]
+						score = _str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
+					elif catg == 'exercise_steps':
+						score = data['non_exercise']['exercise_steps'][dtype]
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 
 
 				if self.custom_ranges:
@@ -1074,6 +1088,15 @@ class LeaderboardOverview(object):
 							category_wise_data[catg]['custom_range'][str_range].append(
 								RankedScore(self.user,user,catg,score,other_scores=other_scores)
 							)
+						elif catg == 'exercise_duration':
+							score = data['exercise']['workout_duration_hours_min']['custom_range'][str_range]['data']
+							score = _str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score))
+						elif catg == 'exercise_steps':
+							score = data['non_exercise']['exercise_steps']['custom_range'][str_range]['data']
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score))
 		return category_wise_data
 
 	def _get_category_leaderboard(self,category,format):
