@@ -2564,7 +2564,10 @@ def hrr_data(user,start_date):
 			lowest_hrr_1min = b[0]
 		except IndexError:
 			lowest_hrr_1min = 99
-		time_99 = sum(time_toreach_99[:-1])
+		if Did_heartrate_reach_99 == 'yes':
+			time_99 = sum(time_toreach_99[:-1])
+		else:
+			time_99 = None
 		if workout:
 			no_workouts = len(workout)
 		else:
@@ -2612,11 +2615,14 @@ def hrr_data(user,start_date):
 			pure_1min_heart_beats = abs(end_heartrate_activity - hrr_no_fitfile)
 		else:
 			pure_1min_heart_beats = 0
-		pure_time_99 = time_99 + diff_actity_hrr
+		if time_99:
+			pure_time_99 = time_99 + diff_actity_hrr
+		else:
+			pure_time_99 = -1
 		
 		if Did_heartrate_reach_99 == 'no' and garmin_data_daily:
 			if daily_starttime:
-				daily_start_time = end_time_activity - daily_starttime
+				daily_start_time = HRR_activity_start_time - daily_starttime
 				make_to_daily_key = (daily_start_time) % 15
 				if make_to_daily_key > 7:
 					daily_key = str(int(daily_start_time + make_to_daily_key))
@@ -2633,7 +2639,10 @@ def hrr_data(user,start_date):
 						Did_heartrate_reach_99 == 'yes'
 					if daily_diff_data_99 == None or daily_diff_data_99 == 99:
 						break
-				time_99 = (int(daily_key_copy) - int(daily_key)) + time_99
+				if time_99:
+					time_99 = (int(daily_key_copy) - int(daily_key)) + time_99
+				else:
+					time_99 = (int(daily_key_copy) - int(daily_key))
 				pure_time_99 = time_99 + diff_actity_hrr
 			else:
 				time_99 = None
