@@ -1073,9 +1073,12 @@ class ProgressReport():
 									act_min_without_sleep_today,
 									act_min_without_sleep_currently,
 									mc_days))
-
-						active_prcnt = round((
-							value/total_mins_without_sleep)*100)
+						try:
+							active_prcnt = round((
+								value/total_mins_without_sleep)*100)
+						except ZeroDivisionError:
+							active_prcnt = 0
+							
 						if mc_days:
 							return active_prcnt
 						else:
@@ -1118,9 +1121,11 @@ class ProgressReport():
 									act_min_without_sleep_exercise_today,
 									act_min_without_sleep_exercise_currently,
 									mc_days))
-						
-						active_prcnt = round(
-							(value/total_mins_without_sleep_exercise)*100)
+						try:
+							active_prcnt = round(
+								(value/total_mins_without_sleep_exercise)*100)
+						except ZeroDivisionError:
+							active_prcnt = 0
 
 						if mc_days:
 							return active_prcnt

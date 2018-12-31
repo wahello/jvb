@@ -343,7 +343,7 @@ def get_exercise_consistency_grade(user,current_date,user_age):
 	weekly_combined_activities = quicklook.calculations.\
 		garmin_calculation.get_weekly_combined_activities(
 			formated_data,{},weekly_daily_strong,
-			last_seven_days_date,current_date)
+			last_seven_days_date,current_date,user_age)
 	exe_consistency_grade,exe_consistency_point = quicklook.calculations.\
 		garmin_calculation.get_exercise_consistency_grade(
 			weekly_daily_strong,weekly_combined_activities,7,user_age)
@@ -493,9 +493,12 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			todays_activity_data = list(map(fitbit_to_garmin_activities,
 				todays_activity_data))
 
-		combined_user_activities = quicklook.calculations.garmin_calculation.\
-			get_filtered_activity_stats(
-				todays_activity_data,{},userinput_activities)
+		combined_user_exercise_activities,combined_user_exec_non_exec_activities =\
+			quicklook.calculations.garmin_calculation.\
+				get_filtered_activity_stats(
+					todays_activity_data,user_age,
+					userinput_activities = userinput_activities,
+					provide_all=True)
 
 		ui_bedtime = None
 		ui_awaketime = None
@@ -618,7 +621,10 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 
 		# Penalties
 		if todays_daily_strong:
-			penalties = get_penality_grades(ui_smoking_penalty,ui_controlled_substance_penalty,ui_sleep_aid_penalty)
+			penalties = get_penality_grades(
+				ui_smoking_penalty,
+				ui_controlled_substance_penalty,
+				ui_sleep_aid_penalty)
 			grades_calculated_data["sleep_aid_penalty"] = penalties['sleep_aid_penalty']
 			grades_calculated_data['ctrl_subs_penalty'] = penalties['ctrl_subs_penalty']
 			grades_calculated_data['smoke_penalty'] = penalties['smoke_penalty']
@@ -674,7 +680,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 
 		# Exercise/Activity Calculations
 		activity_stats = quicklook.calculations.garmin_calculation.get_activity_stats(
-			combined_user_activities,user_age)
+			combined_user_exercise_activities,user_age)
 		exercise_calculated_data['did_workout'] = activity_stats['have_activity']
 		exercise_calculated_data['distance_run'] = activity_stats['distance_run_miles']
 		exercise_calculated_data['distance_bike'] = activity_stats['distance_bike_miles']
@@ -695,7 +701,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		exercise_steps,non_exercise_steps,total_steps = quicklook.calculations.\
 			garmin_calculation.cal_exercise_steps_total_steps(
 				int(daily_total_steps),
-				combined_user_activities,
+				combined_user_exec_non_exec_activities,
 				user_age
 			)	
 		steps_calculated_data['non_exercise_steps'] = non_exercise_steps
@@ -766,7 +772,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 				todays_epoch_data,
 				yesterday_bedtime = yesterday_bedtime,
 				today_awake_time = today_awake_time,
-				combined_user_activities = combined_user_activities,
+				combined_user_activities = combined_user_exercise_activities,
 				today_bedtime = today_bedtime,
 				user_input_strength_start_time = strength_start_time,
 		  		user_input_strength_end_time = strength_end_time,

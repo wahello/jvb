@@ -65,3 +65,14 @@ class TermsConditions(models.Model):
 
     def __str__(self):
         return self.user.username
+
+class Invitation(models.Model):
+    email = models.EmailField()
+    invited = models.BooleanField(default=True)
+    invited_on = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('invited_on',)
+
+    def __str__(self):
+        return self.email

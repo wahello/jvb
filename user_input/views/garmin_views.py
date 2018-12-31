@@ -22,8 +22,6 @@ from fitbit.models import UserFitbitDataSleep,UserFitbitDataActivities
 from garmin.models import GarminFitFiles
 from hrr.calculation_helper import fitfile_parse
 
-from user_input.models import DailyUserInputStrong
-
 def _get_activities_data(user,target_date):
 	current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
 	current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
@@ -57,10 +55,7 @@ def _create_activity_stat(user,activity_obj,current_date):
 		which are to be shown in activity grid
 	'''
 	user_age = user.profile.age()
-	
-	below_aerobic_value = 180-user_age-30
 	anaerobic_value = 180-user_age+5
-
 	if activity_obj:
 		activity_keys = {
 				"summaryId":"",
@@ -81,19 +76,15 @@ def _create_activity_stat(user,activity_obj,current_date):
 				activity_keys[k] = v
 				avg_hr = activity_keys.get("averageHeartRateInBeatsPerMinute",0)
 				avg_hr = int(avg_hr) if avg_hr else 0
-				# If there is no average HR information, then consider
-				# steps as "exercise steps"
-				if ((avg_hr and avg_hr < below_aerobic_value) or
-					activity_keys.get("activityType","") == "HEART_RATE_RECOVERY"):
-					activity_keys["steps_type"] = "non_exercise"
-				else:
-					activity_keys["steps_type"] = "exercise"
-				if avg_hr > anaerobic_value:
-					activity_keys["can_update_steps_type"] = False
-
+				if avg_hr >= anaerobic_value:
+					if activity_keys.get("activityType","") == "HEART_RATE_RECOVERY":
+						activity_keys["can_update_steps_type"] = True
+					else:
+						activity_keys["can_update_steps_type"] = False
 		return {activity_obj['summaryId']:activity_keys}
 
 def _get_activities(user,target_date):
+	user_age = user.profile.age()
 	current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
 	current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
 
@@ -155,10 +146,11 @@ def _get_activities(user,target_date):
 	epoch_summaries = [ast.literal_eval(dic) for dic in epoch_summaries]
 	combined_activities = quicklook.calculations.garmin_calculation\
 	.get_filtered_activity_stats(
-		activity_data, manually_updated_act_data,
+		activity_data,user_age,manually_updated_act_data,
 		include_duplicate=True,include_deleted=True,
-		epoch_summaries = epoch_summaries
+		include_non_exercise = True,epoch_summaries = epoch_summaries
 	)
+
 	for single_activity in combined_activities:
 		if fitfiles:
 			# print(final_heart_rate,"final_heart_rate")
@@ -177,6 +169,7 @@ def _get_activities(user,target_date):
 						hrr_difference = 0
 					if hrr_difference > 10:
 						single_activity["activityType"] = "HEART_RATE_RECOVERY"
+						single_activity["steps_type"] = 'non_exercise'
 				else:
 					pass
 			finall = _create_activity_stat(user,single_activity,current_date)
@@ -202,9 +195,15 @@ def _get_fitbit_activities_data(user,target_date):
 				fitbit_to_garmin_converter.fitbit_to_garmin_activities(act)
 			for act in activity_data]
 
+		combined_user_activities = quicklook.calculations.garmin_calculation.\
+				get_filtered_activity_stats(
+					activity_data,user.profile.age(),
+					include_duplicate = True,include_deleted=True,
+					include_non_exercise = True)
+
 		activity_data = [
 			_create_activity_stat(user,act,current_date)[act['summaryId']]
-			for act in activity_data
+			for act in combined_user_activities
 		]
 
 	activity_data = {act.get('summaryId'):act for act in activity_data}
@@ -289,9 +288,9 @@ class GarminData(APIView):
 		if target_date:
 			sleep_stats = self._get_sleep_stats(target_date)
 			activites = self.get_all_activities_data(target_date)
-			# have_activities = quicklook.calculations.garmin_calculation.\
-			# 	do_user_has_exercise_activity(activites.values(),request.user.profile.age())
-			have_activities = True if activites else False
+			have_activities = quicklook.calculations.garmin_calculation.\
+				do_user_has_exercise_activity(activites.values(),request.user.profile.age())
+			# have_activities = True if activites else False
 			weight = self._get_weight(target_date)
 			data = {
 				"sleep_stats":sleep_stats,
