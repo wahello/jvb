@@ -103,9 +103,10 @@ class IsUserInvited(APIView):
 	'''
 	def get(self, request, format="json"):
 		email = request.query_params.get('email')
+		case_insensitive_email_field = "{}__iexact".format('email')
 		res = {"email":email}
 		try:
-			Invitation.objects.get(email=email)
+			Invitation.objects.get(**{case_insensitive_email_field:email})
 			res['is_invited'] = True
 		except Invitation.DoesNotExist as e:
 			res['is_invited'] = False
