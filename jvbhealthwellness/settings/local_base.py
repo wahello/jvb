@@ -115,7 +115,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        # "LOCATION":"redis://ec2-54-236-243-32.compute-1.amazonaws.com:6379/1",
+        # "LOCATION":"redis://ec2-18-234-139-92.compute-1.amazonaws.com:6379/1",
         "LOCATION": "redis://127.0.0.1:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",

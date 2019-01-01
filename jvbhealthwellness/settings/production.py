@@ -50,8 +50,8 @@ CSRF_COOKIE_HTTPONLY = True
 WEBPACK_LOADER['DEFAULT']['CACHE'] = True
 
 # Celery
-CELERY_BROKER_URL = 'redis://ec2-54-236-243-32.compute-1.amazonaws.com:6379'
-CELERY_RESULT_BACKEND = 'redis://ec2-54-236-243-32.compute-1.amazonaws.com:6379'
+CELERY_BROKER_URL = 'redis://ec2-18-234-139-92.compute-1.amazonaws.com:6379'
+CELERY_RESULT_BACKEND = 'redis://ec2-18-234-139-92.compute-1.amazonaws.com:6379'
 CELERY_SEND_TASK_ERROR_EMAILS = True
 CELERY_TIMEZONE = 'America/New_York'
 CELERY_BEAT_SCHEDULE = {
@@ -190,7 +190,7 @@ LOGGING = {
 CACHES = {
 	"default": {
 		"BACKEND": "django_redis.cache.RedisCache",
-		"LOCATION": "redis://ec2-54-236-243-32.compute-1.amazonaws.com:6379/1",
+		"LOCATION": "redis://ec2-18-234-139-92.compute-1.amazonaws.com:6379/1",
 		"OPTIONS": {
 			"CLIENT_CLASS": "django_redis.client.DefaultClient"
 		},
