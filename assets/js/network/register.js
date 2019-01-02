@@ -35,3 +35,20 @@ class RegisterNetwork {
 }
 
 export default RegisterNetwork;
+
+export const CheckInvitation = (email,onSuccess) => {
+	const URL = "/api/users/isinvited/";
+	let config = {
+		method:"get",
+		url:URL,
+		params:{
+			email:email
+		}
+	}
+	axios(config).then((response)=>{
+		onSuccess(response.data);
+	})
+	.catch((error) => {
+		console.log(error);
+	})
+} 

@@ -38,16 +38,51 @@ from progress_analyzer.tasks import (
 	generate_cumulative_instances_custom_range,
 	set_pa_report_update_date
 )
-from . import views
-
+from django.conf import settings
 from quicklook.calculations.converter.fitbit_to_garmin_converter import get_epoch_offset_from_timestamp
+
+redirect_uri = settings.FITBIT_REDIRECT_URL
+
+def get_client_id_secret(user):
+	'''
+		This function get the client id and client secret from databse for respective use
+		if not then provide jvb app client id,secret
+	'''
+	try:
+		user_app_tokens = UserAppTokens.objects.get(user=user)
+		client_id = user_app_tokens.user_client_id
+		client_secret = user_app_tokens.user_client_secret
+	except:
+		client_id = settings.FITBIT_CONSUMER_ID
+		client_secret = settings.FITBIT_CONSUMER_SECRET
+	return client_id,client_secret
+
+
+def include_resting_hr(heartrate_fitbit_intraday,heartrate_fitbit):
+	try:
+		heartrate_fitbit_intraday_json = ''
+		heartrate_fitbit_json = ''
+		if heartrate_fitbit_intraday:
+			heartrate_fitbit_intraday_json = heartrate_fitbit_intraday.json()
+		if heartrate_fitbit:
+			heartrate_fitbit_json = heartrate_fitbit.json()
+		if heartrate_fitbit_intraday_json and heartrate_fitbit_json:
+			if heartrate_fitbit_json['activities-heart'][0]["value"].get("restingHeartRate"):
+				heartrate_fitbit_intraday_json['activities-heart'][0]["restingHeartRate"] = heartrate_fitbit_json['activities-heart'][0]["value"].get("restingHeartRate")
+			return heartrate_fitbit_intraday_json
+		elif heartrate_fitbit_json:
+			return heartrate_fitbit_json
+		else:
+			return {}
+	except:
+		return {}
 
 def refresh_token_for_notification(user):
 	'''
 	This function updates the expired tokens in database
 	Return: refresh token and access token
 	'''
-	client_id,client_secret = views.get_client_id_secret(user)
+	client_id,client_secret = get_client_id_secret(user)
 	# client_id='22CN2D'
 	# client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
 	access_token_url='https://api.fitbit.com/oauth2/token'
@@ -80,7 +115,7 @@ def session_fitbit(user):
 	'''
 	return the session 
 	'''
-	client_id,client_secret = views.get_client_id_secret(user)
+	client_id,client_secret = get_client_id_secret(user)
 	service = OAuth2Service(
 					 client_id=client_id,
 					 client_secret=client_secret,
@@ -146,19 +181,19 @@ def call_push_api(data):
 			check_token_expire = (datetime_obj_utc - token_updated_time).total_seconds()
 			session = service.get_session(access_token)
 			if check_token_expire < 28800:
-				while no_days_diff != -1:
+				while no_days_diff >= 0:
 					print(date_obj,"date_obj")
 					call_api_data =call_api(date_obj,user_id,data_type,user,session,create_notification)
 					create_notification = None
 					date_obj = date_obj - timedelta(days=1)
-					no_days_diff = no_days_diff + -1
+					no_days_diff = no_days_diff - 1
 			else:
 				session = get_session_and_access_token(user)
-				while no_days_diff != -1:
+				while no_days_diff >= 0:
 					call_api_data =call_api(date_obj,user_id,data_type,user,session,create_notification)
 					create_notification = None
 					date_obj = date_obj - timedelta(days=1)
-					no_days_diff = no_days_diff + -1
+					no_days_diff = no_days_diff - 1
 
 			if call_api_data:
 				activities_data = call_api_data.get('activities')	
@@ -287,7 +322,7 @@ def call_api(date,user_id,data_type,user,session,create_notification=None):
 			pass
 		heartrate_fitbit_normal = session.get(
 			"https://api.fitbit.com/1/user/{}/activities/heart/date/{}/1d.json".format(user_id,date))
-		heartrate_fitbit = views.include_resting_hr(heartrate_fitbit_intraday,heartrate_fitbit_normal)
+		heartrate_fitbit = include_resting_hr(heartrate_fitbit_intraday,heartrate_fitbit_normal)
 		try:
 			steps_fitbit = session.get(
 			"https://api.fitbit.com/1/user/{}/activities/steps/date/{}/1d/15min/time/00:00/23:59.json".format(user_id,date))

@@ -995,10 +995,6 @@ def get_filtered_activity_stats(activities_json,user_age,
 
 			if userinput_activities:
 				obj.update(userinput_edited(obj))
-
-			act_category = get_activity_exercise_non_exercise_category(obj,
-				user_age)
-			obj['steps_type'] = act_category
 			filtered_activities.append(obj)
 
 	# merge user created manual activities which are not provided by garmin
@@ -1016,14 +1012,12 @@ def get_filtered_activity_stats(activities_json,user_age,
 			calendar_date = kwargs.get('calendar_date'),
 			activities = filtered_activities
 		)
-
 	for act in filtered_activities:
 		if act['summaryId'] in act_renamed_to_hrr:
-			act_category = get_activity_exercise_non_exercise_category(act,
-				user_age)
-			act['steps_type'] = act_category
 			act['activityType'] = 'HEART_RATE_RECOVERY'
-
+		act_category = get_activity_exercise_non_exercise_category(act,
+				user_age)
+		act['steps_type'] = act_category
 
 	deleted_activities = []
 	duplicate_activities = []
@@ -2908,6 +2902,9 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 													 			"fitnessAge", 0)
 		exercise_calculated_data['heartrate_variability_stress'] = safe_get_dict(dailies_json,
 														'averageStressLevel',-1)
+		exercise_calculated_data['nose_breath_prcnt_workout'] = safe_get(
+			daily_encouraged,
+			"workout_that_user_breathed_through_nose",0)
 		
 		# Steps
 		steps_calculated_data['floor_climed'] = safe_get_dict(dailies_json,"floorsClimbed",0)

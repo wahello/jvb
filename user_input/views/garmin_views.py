@@ -56,7 +56,6 @@ def _create_activity_stat(user,activity_obj,current_date):
 	'''
 	user_age = user.profile.age()
 	anaerobic_value = 180-user_age+5
-
 	if activity_obj:
 		activity_keys = {
 				"summaryId":"",
@@ -170,6 +169,7 @@ def _get_activities(user,target_date):
 						hrr_difference = 0
 					if hrr_difference > 10:
 						single_activity["activityType"] = "HEART_RATE_RECOVERY"
+						single_activity["steps_type"] = 'non_exercise'
 				else:
 					pass
 			finall = _create_activity_stat(user,single_activity,current_date)
