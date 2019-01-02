@@ -6,12 +6,24 @@ import { Container, Row, Col, Card,CardTitle,
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
-import RegisterNetwork from '../../network/register';
+import RegisterNetwork,{CheckInvitation} from '../../network/register';
 import NavbarMenu from '../navbar';
 import WizardAccountPage from './WizardAccountPage';
 import WizardPersonalPage from './WizardPersonalPage';
-import { Collapse,Navbar,NavbarToggler,NavbarBrand,Nav,NavItem,NavLink,UncontrolledDropdown,
-	     DropdownToggle,DropdownMenu,DropdownItem } from 'reactstrap';
+import UserNotInvited from './UserNotInvited';
+
+import {
+	Collapse,
+	Navbar,
+	NavbarToggler,
+	NavbarBrand,
+	Nav,
+	NavItem,
+	NavLink,
+	UncontrolledDropdown,
+	DropdownToggle,
+	DropdownMenu,
+	DropdownItem } from 'reactstrap';
 
 class Register extends Component {
 
@@ -21,18 +33,22 @@ class Register extends Component {
 		this.previousPage = this.previousPage.bind(this);
 		this.onSubmit = this.onSubmit.bind(this);
 		this.onRegisterSuccess = this.onRegisterSuccess.bind(this);
-		 this.toggle = this.toggle.bind(this);
+		this.toggle = this.toggle.bind(this);
 		this.state = {
 			page:1,
 			progress:20,
-			 isOpen: false
+			isOpen: false,
+			checkingInvitation:false,
+			isUserInvited:false
 		};
 	}
-toggle() {
-    this.setState({
-      isOpen: !this.state.isOpen
-    });
-  }
+
+	toggle() {
+	    this.setState({
+	      isOpen: !this.state.isOpen
+	    });
+	}
+
 	onRegisterSuccess(response){
 		this.setState({
 			progress: this.state.progress + 50
@@ -62,6 +78,33 @@ toggle() {
 		});
 	}
 
+	nextPageWithInvitationCheck = data => {
+		if(data.is_invited){
+			this.setState({
+				isUserInvited:true,
+				checkingInvitation:false,
+			});
+			this.nextPage()
+		}else{
+			this.setState({
+				page:0
+			})
+		}
+	}
+
+	isUserInvited = (values) => {
+		let email = values['email'];
+		if(!this.state.isUserInvited){
+			this.setState({
+				checkingInvitation:true
+			},()=>{
+				CheckInvitation(email,this.nextPageWithInvitationCheck);
+			})
+		}else{
+			this.nextPage()
+		}
+	}
+
 	previousPage(){
 		this.setState({
 			page: this.state.page - 1,
@@ -74,30 +117,7 @@ toggle() {
 		const class_account = `f-cp-icon ${page === 1 ? 'active':''}`;
 		const class_personal = `f-cp-icon ${page === 2 ? 'active':''}`;
 
-		return(
-			<div >
-			 <Navbar color="faded" light expand="md"  >
-
-              <div className="navbar_div" > 
-			 <div className=" brand" >
-                 <img className="img-fluid"
-               style={{maxWidth:"200px"}}
-               src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"/>
-           
-			 </div>
-
-
-			 <div className=" registration" >
-              Registration
-			 </div>
-			 <div className=" home">
-			   <Link id="logout"className="nav-link color_home" to='/'>Home</Link>
-			   </div>
-            </div>
-       
-          
-
-        </Navbar>
+		let regForm = (
 			<div className="form-container" id="form_margin">
 				<Container className="h-100" id="reg-form">
 					<Row className="justify-content-center align-items-center h-100">
@@ -125,7 +145,11 @@ toggle() {
 									</div>
 								</CardHeader>
 								<CardBody>
-									{page === 1 && <WizardAccountPage onSubmit = {this.nextPage} />}
+									{page === 1 && 
+										<WizardAccountPage
+										checkingInvitation = {this.state.checkingInvitation} 
+										onSubmit = {this.isUserInvited} 
+									/>}
 									{page === 2 &&
 									 <WizardPersonalPage 
 											onSubmit = {this.onSubmit}
@@ -145,6 +169,31 @@ toggle() {
 					closeOnClick
 				/>
 			</div>
+		)
+
+		if(this.state.page == 0){
+			regForm = <UserNotInvited />
+		}
+
+		return(
+			<div >
+				<Navbar color="faded" light expand="md"  >
+					<div className="navbar_div" > 
+						<div className=" brand" >
+							<img className="img-fluid"
+								style={{maxWidth:"200px"}}
+								src="//static1.squarespace.com/static/535dc0f7e4b0ab57db48c65c/t/5942be8b893fc0b88882a5fb/1504135828049/?format=1500w"
+							/>
+						</div>
+						<div className=" registration" >
+							Registration
+						</div>
+						<div className=" home">
+							<Link id="logout"className="nav-link color_home" to='/'>Home</Link>
+						</div>
+					</div>
+				</Navbar>
+				{regForm}
 			</div>
 		);
 	}
