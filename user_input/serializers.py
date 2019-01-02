@@ -248,7 +248,11 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 				weather_stats = json.dumps(weather_stats)
 				start_time = activity_stats['startTimeInSeconds'] + \
 									activity_stats['startTimeOffsetInSeconds']
-				keys_to_remove = ('comments', 'steps_type', 'can_update_steps_type', 'duplicate', 'deleted', 'temperature_feels_like', 'weather_condition', 'humidity', 'dewPoint', 'wind', 'temperature')
+				keys_to_remove = (
+					'comments', 'steps_type', 'can_update_steps_type',
+					'duplicate', 'deleted', 'temperature_feels_like',
+					'weather_condition', 'humidity', 'dewPoint', 'wind',
+					'temperature')
 				for k in keys_to_remove:
 					activity_stats.pop(k, None)
 
