@@ -30,7 +30,8 @@ from .models import FitbitConnectToken,\
 					FitbitNotifications,\
 					UserFitbitDatabody,\
 					UserFitbitDatafoods,\
-					UserFitbitLastSynced
+					UserFitbitLastSynced,\
+					UserAppTokens
 
 from quicklook.tasks import generate_quicklook
 from garmin.garmin_push import _get_data_start_end_time
