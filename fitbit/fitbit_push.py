@@ -30,7 +30,8 @@ from .models import FitbitConnectToken,\
 					FitbitNotifications,\
 					UserFitbitDatabody,\
 					UserFitbitDatafoods,\
-					UserFitbitLastSynced
+					UserFitbitLastSynced,\
+					UserAppTokens
 
 from quicklook.tasks import generate_quicklook
 from garmin.garmin_push import _get_data_start_end_time
@@ -38,17 +39,53 @@ from progress_analyzer.tasks import (
 	generate_cumulative_instances_custom_range,
 	set_pa_report_update_date
 )
-from . import views
-
+from django.conf import settings
 from quicklook.calculations.converter.fitbit_to_garmin_converter import get_epoch_offset_from_timestamp
+
+redirect_uri = settings.FITBIT_REDIRECT_URL
+
+def get_client_id_secret(user):
+	'''
+		This function get the client id and client secret from databse for respective use
+		if not then provide jvb app client id,secret
+	'''
+	try:
+		user_app_tokens = UserAppTokens.objects.get(user=user)
+		client_id = user_app_tokens.user_client_id
+		client_secret = user_app_tokens.user_client_secret
+	except:
+		client_id = settings.FITBIT_CONSUMER_ID
+		client_secret = settings.FITBIT_CONSUMER_SECRET
+	return client_id,client_secret
+
+
+def include_resting_hr(heartrate_fitbit_intraday,heartrate_fitbit):
+	try:
+		heartrate_fitbit_intraday_json = ''
+		heartrate_fitbit_json = ''
+		if heartrate_fitbit_intraday:
+			heartrate_fitbit_intraday_json = heartrate_fitbit_intraday.json()
+		if heartrate_fitbit:
+			heartrate_fitbit_json = heartrate_fitbit.json()
+		if heartrate_fitbit_intraday_json and heartrate_fitbit_json:
+			if heartrate_fitbit_json['activities-heart'][0]["value"].get("restingHeartRate"):
+				heartrate_fitbit_intraday_json['activities-heart'][0]["restingHeartRate"] = heartrate_fitbit_json['activities-heart'][0]["value"].get("restingHeartRate")
+			return heartrate_fitbit_intraday_json
+		elif heartrate_fitbit_json:
+			return heartrate_fitbit_json
+		else:
+			return {}
+	except:
+		return {}
 
 def refresh_token_for_notification(user):
 	'''
 	This function updates the expired tokens in database
 	Return: refresh token and access token
 	'''
-	client_id='22CN2D'
-	client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
+	client_id,client_secret = get_client_id_secret(user)
+	# client_id='22CN2D'
+	# client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b'
 	access_token_url='https://api.fitbit.com/oauth2/token'
 	token = FitbitConnectToken.objects.get(user = user)
 	refresh_token_acc = token.refresh_token
@@ -75,18 +112,25 @@ def refresh_token_for_notification(user):
 	if token_object:
 		return (request_data_json['refresh_token'],request_data_json['access_token'])
 
-def session_fitbit():
+def session_fitbit(user):
 	'''
 	return the session 
 	'''
+	client_id,client_secret = get_client_id_secret(user)
 	service = OAuth2Service(
-					 client_id='22CN2D',
-					 client_secret='e83ed7f9b5c3d49c89d6bdd0b4671b2b',
+					 client_id=client_id,
+					 client_secret=client_secret,
 					 access_token_url='https://api.fitbit.com/oauth2/token',
 					 authorize_url='https://www.fitbit.com/oauth2/authorize',
 					 base_url='https://fitbit.com/api')
 	return service
+def convert_str_date_obj(date):
+	date_obj = datetime.strptime(date, '%Y-%m-%d').date()
+	return date_obj
 
+def diff_two_dates(date1,date2):
+	diff_dates = date1-date2
+	return diff_dates.days
 
 def call_push_api(data):
 	'''
@@ -105,11 +149,22 @@ def call_push_api(data):
 				user = FitbitConnectToken.objects.get(user_id_fitbit=user_id).user
 			except FitbitConnectToken.DoesNotExist as e:
 				user = None
+			last_notfy = FitbitNotifications.objects.filter(
+				user=user,collection_type=data_type).last()
+			if last_notfy:
+				last_notfy_date = last_notfy.notification_date
+			else:
+				last_notfy_date = None
+			date_obj = convert_str_date_obj(date)
+			if last_notfy_date:
+				no_days_diff = diff_two_dates(date_obj,last_notfy_date)
+			else:
+				no_days_diff = 0
 			if user:
 				create_notification = FitbitNotifications.objects.create(
 					user=user,collection_type=data_type,
 					notification_date=date,state="unprocessed",notification= notification)
-			service = session_fitbit()
+			service = session_fitbit(user)
 			tokens = FitbitConnectToken.objects.get(user = user)
 			access_token = tokens.access_token
 			'''
@@ -127,16 +182,26 @@ def call_push_api(data):
 			check_token_expire = (datetime_obj_utc - token_updated_time).total_seconds()
 			session = service.get_session(access_token)
 			if check_token_expire < 28800:
-				call_api_data = call_api(date,user_id,data_type,user,session,create_notification)
+				while no_days_diff >= 0:
+					print(date_obj,"date_obj")
+					call_api_data =call_api(date_obj,user_id,data_type,user,session,create_notification)
+					create_notification = None
+					date_obj = date_obj - timedelta(days=1)
+					no_days_diff = no_days_diff - 1
 			else:
 				session = get_session_and_access_token(user)
-				call_api_data =call_api(date,user_id,data_type,user,session,create_notification)
+				while no_days_diff >= 0:
+					call_api_data =call_api(date_obj,user_id,data_type,user,session,create_notification)
+					create_notification = None
+					date_obj = date_obj - timedelta(days=1)
+					no_days_diff = no_days_diff - 1
+
 			if call_api_data:
-				activities_data = call_api_data['activities']
+				activities_data = call_api_data.get('activities')	
 			else:
 				activities_data = None
 			if activities_data:
-				activity_fitbit = activities_data['activity_summary']
+				activity_fitbit = activities_data.get('activity_summary')
 			else:
 				activity_fitbit = None
 			if (user and data_type == 'activities'
@@ -170,12 +235,12 @@ def fitbit_create_update_sync_time(user, fitbit_sync_time, offset):
 
 def get_session_and_access_token(user):
 	refresh_token,access_token = refresh_token_for_notification(user)
-	service = session_fitbit()
+	service = session_fitbit(user)
 	access_token = access_token
 	session = service.get_session(access_token)	
 	return session
 
-def call_api(date,user_id,data_type,user,session,create_notification):
+def call_api(date,user_id,data_type,user,session,create_notification=None):
 	'''
 		This function call push notification messages and then store in to the 
 		database
@@ -227,8 +292,9 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 		# print(foods_water_logs, "water11111111111111111111")
 
 	if data_type == 'sleep':
-		create_notification.state = "processing"
-		create_notification.save()
+		if create_notification:
+			create_notification.state = "processing"
+			create_notification.save()
 		sleep_fitbit = session.get(
 			"https://api.fitbit.com/1.2/user/{}/{}/date/{}.json".format(
 			user_id,data_type,date))
@@ -237,24 +303,39 @@ def call_api(date,user_id,data_type,user,session,create_notification):
 		fitbit_pull_data['sleep'] = sleep_fitbit
 		return fitbit_pull_data
 	elif data_type == 'activities':
-		create_notification.state = "processing"
-		create_notification.save()
+		if create_notification:
+			create_notification.state = "processing"
+			create_notification.save()
+		fitbit_pull_data['activities'] = {}
 		activity_fitbit = session.get(
 		"https://api.fitbit.com/1/user/{}/activities/list.json?afterDate={}&sort=asc&limit=10&offset=0".format(
-			user_id,date))
-		heartrate_fitbit = session.get(
-		"https://api.fitbit.com/1/user/{}/activities/heart/date/{}/1d.json".format(
-			user_id,date))
-		steps_fitbit = session.get(
-		"https://api.fitbit.com/1/user/{}/activities/steps/date/{}/1d.json".format(
-			user_id,date))
+			user_id,date)) 
+		# heartrate_fitbit = session.get(
+		# "https://api.fitbit.com/1/user/{}/activities/heart/date/{}/1d.json".format(
+		# 	user_id,date))
+		# steps_fitbit = session.get(
+		# "https://api.fitbit.com/1/user/{}/activities/steps/date/{}/1d.json".format(
+		# 	user_id,date))
+		try:
+			heartrate_fitbit_intraday = session.get(
+		"https://api.fitbit.com/1/user/{}/activities/heart/date/{}/1d/1sec/time/00:00/23:59.json".format(user_id,date))
+		except:
+			pass
+		heartrate_fitbit_normal = session.get(
+			"https://api.fitbit.com/1/user/{}/activities/heart/date/{}/1d.json".format(user_id,date))
+		heartrate_fitbit = include_resting_hr(heartrate_fitbit_intraday,heartrate_fitbit_normal)
+		try:
+			steps_fitbit = session.get(
+			"https://api.fitbit.com/1/user/{}/activities/steps/date/{}/1d/15min/time/00:00/23:59.json".format(user_id,date))
+		except:
+			steps_fitbit = session.get(
+			"https://api.fitbit.com/1/user/{}/activities/steps/date/{}/1d.json".format(user_id,date))
 		if activity_fitbit:
 			activity_fitbit = activity_fitbit.json()
 			store_data(activity_fitbit,user,date,create_notification,data_type="activity_fitbit")
-			fitbit_pull_data['activities'] = {}
 			fitbit_pull_data['activities']['activity_summary'] = activity_fitbit
 		if heartrate_fitbit:
-			heartrate_fitbit = heartrate_fitbit.json()
+			# heartrate_fitbit = heartrate_fitbit.json()
 			store_data(heartrate_fitbit,user,date,create_notification,data_type="heartrate_fitbit")
 			fitbit_pull_data['activities']['heartrate'] = heartrate_fitbit
 		if steps_fitbit:
@@ -273,8 +354,11 @@ def update_fitbit_data(user,date,create_notification,data,collection_type):
 		UserFitbitDataActivities.objects.filter(user=user,
 			date_of_activities=date).update(activities_data=data)
 	elif collection_type == "sleep_fitbit":
-		UserFitbitDataSleep.objects.filter(user=user,
-			date_of_sleep=date).update(sleep_data=data)
+		sleep_instance = UserFitbitDataSleep.objects.filter(user=user,
+			date_of_sleep=date)
+		sleep_instance.sleep_data = data
+		# UserFitbitDataSleep.objects.filter(user=user,
+		# 	date_of_sleep=date).update(sleep_data=data)
 	elif collection_type == "heartrate_fitbit":
 		UserFitbitDataHeartRate.objects.filter(user=user,
 			date_of_heartrate=date).update(heartrate_data=data)
@@ -308,23 +392,28 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 		  inside dict 
 		  user name,start data
 	Return: None
-	''' 
-	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+	'''
+	try:
+		start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+	except:
+		pass
 	if data_type:
 		fitbit_all_data[data_type] = fitbit_all_data
 	for key,value in fitbit_all_data.items():
 		try:
 			if "sleep_fitbit" == key:
 				date_of_sleep = value['sleep'][0]['dateOfSleep']
-				try:
-					sleep_obj = UserFitbitDataSleep.objects.get(user=user,
+				sleep_obj = UserFitbitDataSleep.objects.filter(user=user,
 					created_at=start_date)
+				if sleep_obj:
+					# sleep_obj = UserFitbitDataSleep.objects.filter(user=user,
+					# created_at=start_date)
 					update_fitbit_data(user,date_of_sleep,create_notification,value,key)
 					print("Updated sleep-Fitbit successfully")
 					if create_notification != None:
 						create_notification.state = "processed"
 						create_notification.save()
-				except UserFitbitDataSleep.DoesNotExist:
+				else:
 					UserFitbitDataSleep.objects.create(user=user,
 					date_of_sleep=date_of_sleep,
 					sleep_data=value,created_at=start_date)
@@ -352,14 +441,14 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 				# else:
 				# 	fitbit_date_obj = 0
 				# if fitbit_date_obj == start_date:
-				try:
-					activity_obj = UserFitbitDataActivities.objects.get(user=user,created_at=start_date)
+				activity_obj = UserFitbitDataActivities.objects.filter(user=user,created_at=start_date)
+				if activity_obj:
 					update_fitbit_data(user,date_of_activity,create_notification,value,key)
 					print("Updated Activity-Fitbit successfully")
 					if create_notification != None:
 						create_notification.state = "processed"
 						create_notification.save()
-				except UserFitbitDataActivities.DoesNotExist:
+				else:
 					UserFitbitDataActivities.objects.create(user=user,
 					date_of_activities=date_of_activity,
 					activities_data=value,created_at=start_date)
@@ -377,12 +466,12 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 		try:
 			if "heartrate_fitbit" == key:
 				date_of_heartrate = value['activities-heart'][0]['dateTime']
-				try:
-					heartrate_obj = UserFitbitDataHeartRate.objects.get(user=user,
+				heartrate_obj = UserFitbitDataHeartRate.objects.filter(user=user,
 					created_at=start_date)
+				if heartrate_obj:
 					update_fitbit_data(user,date_of_heartrate,create_notification,value,key)
 					print("Updated Heartrate-Fitbit successfully")
-				except UserFitbitDataHeartRate.DoesNotExist:
+				else:
 					UserFitbitDataHeartRate.objects.create(user=user,
 					date_of_heartrate=date_of_heartrate,
 					heartrate_data=value,created_at=start_date)
@@ -394,12 +483,12 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 		try:
 			if "steps_fitbit" == key:
 				date_of_steps = value['activities-steps'][0]['dateTime']
-				try:
-					steps_obj = UserFitbitDataSteps.objects.get(user=user,
+				steps_obj = UserFitbitDataSteps.objects.filter(user=user,
 					created_at=start_date)
+				if steps_obj:
 					update_fitbit_data(user,date_of_steps,create_notification,value,key)
 					print("Updated steps-Fitbit successfully")
-				except UserFitbitDataSteps.DoesNotExist:
+				else:
 					UserFitbitDataSteps.objects.create(user=user,
 					date_of_steps=date_of_steps,
 					steps_data=value,created_at=start_date)
@@ -410,15 +499,15 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 		try:
 			if "body_fat_fitbit" == key:
 				date_of_body = value['fat'][0]['date']
-				try:
-					body_obj = UserFitbitDatabody.objects.get(user=user,
+				body_obj = UserFitbitDatabody.objects.filter(user=user,
 					created_at=date_of_body)
+				if body_obj:
 					update_fitbit_data(user,date_of_body,create_notification,value,key)
 					if create_notification != None:
 						create_notification.state = "processed"
 						create_notification.save()
 					print("Updated body_fat_fitbit successfully")
-				except UserFitbitDatabody.DoesNotExist:
+				else:
 					UserFitbitDatabody.objects.create(user=user,
 					date_of_body=date_of_body,
 					body_data=value,created_at=date_of_body)
@@ -435,15 +524,15 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 		try:
 			if "foods_goal_logs" == key:
 				# date_of_foods = value['activities-steps'][0]['dateTime']
-				try:
-					foods_obj = UserFitbitDatafoods.objects.get(user=user,
+				foods_obj = UserFitbitDatafoods.objects.filter(user=user,
 					created_at=datetime.now())
+				if foods_obj:
 					update_fitbit_data(user,date.today(),create_notification,value,key)
 					print("Updated foods_goal_logs successfully")
 					if create_notification != None:
 						create_notification.state = "processed"
 						create_notification.save()
-				except UserFitbitDatafoods.DoesNotExist:
+				else:
 					UserFitbitDatafoods.objects.create(user=user,
 					date_of_foods=date.today(),
 					foods_data=value,created_at=datetime.now())

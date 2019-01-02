@@ -1,6 +1,7 @@
 from datetime import timezone,timedelta
 import ast
 import json
+import time
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -13,14 +14,13 @@ import quicklook.calculations.calculation_driver
 from garmin.models import (UserGarminDataSleep,
 	UserGarminDataActivity,
 	UserGarminDataBodyComposition,
-	UserGarminDataManuallyUpdated)
+	UserGarminDataManuallyUpdated,
+	UserGarminDataEpoch)
 
 from fitbit.models import UserFitbitDataSleep,UserFitbitDataActivities
 
 from garmin.models import GarminFitFiles
 from hrr.calculation_helper import fitfile_parse
-
-from user_input.models import DailyUserInputStrong
 
 def _get_activities_data(user,target_date):
 	current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
@@ -55,10 +55,7 @@ def _create_activity_stat(user,activity_obj,current_date):
 		which are to be shown in activity grid
 	'''
 	user_age = user.profile.age()
-	
-	below_aerobic_value = 180-user_age-30
 	anaerobic_value = 180-user_age+5
-
 	if activity_obj:
 		activity_keys = {
 				"summaryId":"",
@@ -79,37 +76,33 @@ def _create_activity_stat(user,activity_obj,current_date):
 				activity_keys[k] = v
 				avg_hr = activity_keys.get("averageHeartRateInBeatsPerMinute",0)
 				avg_hr = int(avg_hr) if avg_hr else 0
-				# If there is no average HR information, then consider
-				# steps as "exercise steps"
-				if ((avg_hr and avg_hr < below_aerobic_value) or
-					activity_keys.get("activityType","") == "HEART_RATE_RECOVERY"):
-					activity_keys["steps_type"] = "non_exercise"
-				else:
-					activity_keys["steps_type"] = "exercise"
-				if avg_hr > anaerobic_value:
-					activity_keys["can_update_steps_type"] = False
-
+				if avg_hr >= anaerobic_value:
+					if activity_keys.get("activityType","") == "HEART_RATE_RECOVERY":
+						activity_keys["can_update_steps_type"] = True
+					else:
+						activity_keys["can_update_steps_type"] = False
 		return {activity_obj['summaryId']:activity_keys}
 
 def _get_activities(user,target_date):
+	user_age = user.profile.age()
 	current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
-	# hrr_data = Hrr.objects.filter(user_hrr = self.request.user, created_at = current_date)
-	# if hrr_data:
-	# 	measure_hrr = [tmp.Did_you_measure_HRR for tmp in hrr_data]
+	current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
+
+	start_epoch = current_date_epoch
+	end_epoch = current_date_epoch + 86399
 	act_data = _get_activities_data(user,target_date)
 	activity_data = act_data[0]
 	manually_updated_act_data = act_data[1]
 
 	final_act_data = {}
-	comments = {}
 	manually_updated_act_data = {dic['summaryId']:dic for dic in manually_updated_act_data}
-	act_obj = {}
 	start = current_date
 	end = current_date + timedelta(days=3)
-	fitfiles = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=current_date.date())
-	if not fitfiles:
-		fitfiles = GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 
+	activity_files_qs=UserGarminDataActivity.objects.filter(user=user,start_time_in_seconds__range=[start_epoch,end_epoch])
+	fitfiles = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=current_date.date())	
+	if not fitfiles or len(activity_files_qs) != len(fitfiles):
+		fitfiles = GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 
 	all_activities_heartrate = []
 	all_activities_timestamp = []
@@ -124,8 +117,6 @@ def _get_activities(user,target_date):
 			all_activities_heartrate.append(workout_final_heartrate)
 			all_activities_timestamp.append(workout_final_timestamp)
 	
-	# heart_rate = [x for x in all_activities_heartrate if x != []]
-	# time_stamp = [x for x in all_activities_timestamp if x != []]
 	sum_timestamp = []
 	for single_timestamp in all_activities_timestamp:
 		if single_timestamp:
@@ -135,7 +126,7 @@ def _get_activities(user,target_date):
 		sum_timestamp.append(total_time)
 	final_heart_rate=[]
 	index = ''
-
+	# print(all_activities_heartrate,"all_activities_heartrate")
 	for single_heartrate,single_time in zip(all_activities_heartrate,sum_timestamp):
 		if single_time:
 			for i,value in enumerate(single_time):
@@ -146,13 +137,23 @@ def _get_activities(user,target_date):
 		else:
 			final_heart_rate.append([])
 
+
+	current_date_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
+	epoch_summaries = quicklook.calculations.garmin_calculation\
+		.get_garmin_model_data(UserGarminDataEpoch,user,
+			current_date_epoch,current_date_epoch+86400,
+			order_by = '-id')
+	epoch_summaries = [ast.literal_eval(dic) for dic in epoch_summaries]
 	combined_activities = quicklook.calculations.garmin_calculation\
 	.get_filtered_activity_stats(
-		activity_data, manually_updated_act_data,
-		include_duplicate=True,include_deleted=True
+		activity_data,user_age,manually_updated_act_data,
+		include_duplicate=True,include_deleted=True,
+		include_non_exercise = True,epoch_summaries = epoch_summaries
 	)
+
 	for single_activity in combined_activities:
 		if fitfiles:
+			# print(final_heart_rate,"final_heart_rate")
 			for single_fitfiles,single_heartrate in zip(fitfiles,final_heart_rate):
 				meta = single_fitfiles.meta_data_fitfile
 				meta = ast.literal_eval(meta)
@@ -160,6 +161,7 @@ def _get_activities(user,target_date):
 				if (((single_activity.get("summaryId",None) == str(data_id)) and 
 					(single_activity.get("durationInSeconds",0) <= 1200) and 
 					(single_activity.get("distanceInMeters",0) <= 1287.48)) and single_heartrate):
+					# print(single_heartrate,"single activity")
 					least_hr = min(single_heartrate)
 					if least_hr and single_heartrate:
 						hrr_difference = single_heartrate[0] - least_hr
@@ -167,6 +169,7 @@ def _get_activities(user,target_date):
 						hrr_difference = 0
 					if hrr_difference > 10:
 						single_activity["activityType"] = "HEART_RATE_RECOVERY"
+						single_activity["steps_type"] = 'non_exercise'
 				else:
 					pass
 			finall = _create_activity_stat(user,single_activity,current_date)
@@ -192,9 +195,15 @@ def _get_fitbit_activities_data(user,target_date):
 				fitbit_to_garmin_converter.fitbit_to_garmin_activities(act)
 			for act in activity_data]
 
+		combined_user_activities = quicklook.calculations.garmin_calculation.\
+				get_filtered_activity_stats(
+					activity_data,user.profile.age(),
+					include_duplicate = True,include_deleted=True,
+					include_non_exercise = True)
+
 		activity_data = [
 			_create_activity_stat(user,act,current_date)[act['summaryId']]
-			for act in activity_data
+			for act in combined_user_activities
 		]
 
 	activity_data = {act.get('summaryId'):act for act in activity_data}
@@ -281,6 +290,7 @@ class GarminData(APIView):
 			activites = self.get_all_activities_data(target_date)
 			have_activities = quicklook.calculations.garmin_calculation.\
 				do_user_has_exercise_activity(activites.values(),request.user.profile.age())
+			# have_activities = True if activites else False
 			weight = self._get_weight(target_date)
 			data = {
 				"sleep_stats":sleep_stats,

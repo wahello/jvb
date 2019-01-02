@@ -27,6 +27,7 @@ class AllRank_Data1 extends Component{
         this.scrollCallback = this.scrollCallback.bind(this);
         this.renderScoreHeader = this.renderScoreHeader.bind(this);
         this.renderScoreHeader1 = this.renderScoreHeader1.bind(this);
+        this.MinToHours = this.MinToHours.bind(this);
     }
      handleLogout(){
         this.props.logoutUser(this.onLogoutSuccess);
@@ -119,6 +120,38 @@ renderScoreHeader1(otherScoreObject){
     return name;
   }
 
+  MinToHours(score){
+  let time;// undefined
+      if(score != null && score != undefined && score != "" && score != "N/A"){
+        if (score == -1){
+          time = "Never"
+        }
+        else{
+          let hours = parseInt(score/60);//3
+          let minutes = (score % 60);//9
+          if(hours < 10){// 3<10 
+            hours = "0" + hours;  //time = 03
+          }
+          else{
+            hours = hours; // time = 03 
+          }
+          if(minutes < 10){// 9<10 
+            time = hours + ":0" + minutes; // time = 03:09
+          }
+          else{
+            time = hours + ":" + minutes;// time = 3:9
+          }
+        }
+      }
+      else{
+        time = "N/A"
+      }
+      if (score == null || score == 0){
+        time = "N/A"
+      }
+      return time;
+    }// time = 03:09
+
     renderTable(data,a_username,c_name){
       let rowData = [];
       let category = ["rank","username","score","other_scores"];
@@ -136,7 +169,14 @@ renderScoreHeader1(otherScoreObject){
               values.push(null);
             }
             else{
-              let value = value1[cat].value;
+              //let value = value1[cat].value;
+              let value;
+              if(c_name == "Active Minute Per Day (24 hours)" || c_name == "Active Minute Per Day (Excludes Active Minutes When Sleeping)" || c_name == "Active Minute Per Day (Excludes Active Minutes When Sleeping and Exercising)"){
+                  value = this.MinToHours(value1[cat].value);
+              }
+              else{
+                value = value1[cat].value;
+              }
               if(value != undefined){
                 value += '';
                 var x = value.split('.');
@@ -175,6 +215,12 @@ renderScoreHeader1(otherScoreObject){
                           }
                         }
                         //if(o_score.value != null && o_score.value != undefined && o_score.value != "") {
+                          /*if(c_name == "Active Minute Per Day (24 hours)" || c_name == "Active Minute Per Day (Excludes Active Minutes When Sleeping)" || c_name == "Active Minute Per Day (Excludes Active Minutes When Sleeping and Exercising)")
+                          {
+                            values.push(<td className = "myranking_all">{this.props.MinToHours(value1[cat])}</td>);
+                          }else{
+                            values.push(<td className = "myranking_all">{value1[cat]}</td>);
+                          }*/
                           values[key3]["scores"].push(<td className = "myranking_all">{o_score.value}</td>);
                         
                       }

@@ -28,16 +28,26 @@ class UserProfileSerializer(serializers.ModelSerializer):
 	   		raise serializers.ValidationError("Username already exist")
 	   return username
 
+	def validate_email(self,email):
+	   '''
+		Make a case insensitive check to determine uniqueness of email
+	   '''
+	   UserModel = get_user_model()
+	   case_insensitive_email_field = "{}__iexact".format(UserModel.EMAIL_FIELD)
+	   if (email and UserModel._default_manager.filter(
+			**{case_insensitive_email_field:email}).exists()):
+	   		raise serializers.ValidationError("Email already exist")
+	   return email
+
 	class Meta:
 		model = Profile
 		fields = ('id','username','email','password','first_name','last_name',
-				  'gender','height','weight','date_of_birth','sleep_goals','goals',
+				  'gender','height','weight','date_of_birth',
 				  'created_at','updated_at','terms_conditions')
 		
 	def create(self,validated_data):
 		user_data = validated_data.pop('user')
 		user = User.objects.create_user(**user_data)
-		validated_data['goals'] = Profile.GOALS_CHOICE[0][1]
 		profile = Profile.objects.create(user=user,**validated_data)
 		if validated_data['terms_conditions']:
 			terms = TermsConditionsText.objects.get(version='1.0')
@@ -55,8 +65,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		instance.height = validated_data.get('height', instance.height)
 		instance.weight = validated_data.get('weight', instance.weight)
 		instance.date_of_birth = validated_data.get('date_of_birth',instance.date_of_birth)
-		instance.sleep_goals = validated_data.get('sleep_goals',instance.sleep_goals)
-		instance.goals = validated_data.get('goals',instance.goals)
 		instance.save()
 		return instance
 		

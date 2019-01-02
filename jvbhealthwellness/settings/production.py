@@ -50,8 +50,8 @@ CSRF_COOKIE_HTTPONLY = True
 WEBPACK_LOADER['DEFAULT']['CACHE'] = True
 
 # Celery
-CELERY_BROKER_URL = 'redis://ec2-34-239-176-5.compute-1.amazonaws.com:6379'
-CELERY_RESULT_BACKEND = 'redis://ec2-34-239-176-5.compute-1.amazonaws.com:6379'
+CELERY_BROKER_URL = 'redis://ec2-18-234-139-92.compute-1.amazonaws.com:6379'
+CELERY_RESULT_BACKEND = 'redis://ec2-18-234-139-92.compute-1.amazonaws.com:6379'
 CELERY_SEND_TASK_ERROR_EMAILS = True
 CELERY_TIMEZONE = 'America/New_York'
 CELERY_BEAT_SCHEDULE = {
@@ -190,7 +190,7 @@ LOGGING = {
 CACHES = {
 	"default": {
 		"BACKEND": "django_redis.cache.RedisCache",
-		"LOCATION": "redis://ec2-34-239-176-5.compute-1.amazonaws.com:6379/1",
+		"LOCATION": "redis://ec2-18-234-139-92.compute-1.amazonaws.com:6379/1",
 		"OPTIONS": {
 			"CLIENT_CLASS": "django_redis.client.DefaultClient"
 		},
@@ -208,3 +208,8 @@ ELASTIC_APM = {
 	'SERVER_URL': 'http://13.232.104.156:8200',
 	'DEBUG': True,
 }
+
+# Fitbit
+FITBIT_CONSUMER_ID = '22CN2D'
+FITBIT_CONSUMER_SECRET = 'e83ed7f9b5c3d49c89d6bdd0b4671b2b'
+FITBIT_REDIRECT_URL = 'https://app.jvbwellness.com/callbacks/fitbit' 

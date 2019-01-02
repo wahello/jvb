@@ -9,20 +9,11 @@ class RegisterNetwork {
 
 	register(post_data, callback=undefined, err_callback=undefined){
 		post_data['terms_conditions'] = true;
-		post_data['height'] = post_data['feet']+"'"+post_data['inches']+"\"";
-		post_data['sleep_goals'] = post_data['sleep_hours']+":"+post_data['sleep_minutes'];
 		let new_date_of_birth = post_data['dob_year']+"-"+post_data['dob_month']+"-"+post_data['dob_day'];
 		post_data['date_of_birth']=new_date_of_birth;
-
-		delete post_data['feet'];
-		delete post_data['inches'];
-		delete post_data['sleep_hours'];
-		delete post_data['sleep_minutes'];
-		delete post_data['goals'];
 		delete post_data['dob_day'];
 		delete post_data['dob_month'];
 		delete post_data['dob_year'];
-		// console.log(post_data);
 		const URL = "/api/users/";
 		var config = {
 			method: 'post',
@@ -44,3 +35,20 @@ class RegisterNetwork {
 }
 
 export default RegisterNetwork;
+
+export const CheckInvitation = (email,onSuccess) => {
+	const URL = "/api/users/isinvited/";
+	let config = {
+		method:"get",
+		url:URL,
+		params:{
+			email:email
+		}
+	}
+	axios(config).then((response)=>{
+		onSuccess(response.data);
+	})
+	.catch((error) => {
+		console.log(error);
+	})
+} 

@@ -53,6 +53,7 @@ class AllRank_Data extends Component{
 					for (let cat of category){
 						if(cat == "score"){
 							let value = value1[cat];
+							
 							if(value != undefined){
 				                value += '';
 				                var x = value.split('.');
