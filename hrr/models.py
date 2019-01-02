@@ -121,7 +121,7 @@ class AA(models.Model):
 			models.Index(fields=['created_at']),
 		]
 
-class AAWholeDay(models.Model):
+class TwentyfourHourAA(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	created_at = models.DateField()
 	updated_at = models.DateTimeField(auto_now=True)

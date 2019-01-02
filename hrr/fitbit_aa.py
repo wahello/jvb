@@ -31,7 +31,8 @@ from fitbit.models import FitbitConnectToken,\
 from hrr.models import (AaCalculations,
 					TimeHeartZones,
 					AaWorkoutCalculations,
-					AA)
+					AA, TwentyfourHourAA, 
+					TwentyfourHourTimeHeartZones)
 
 import quicklook.calculations.converter
 from quicklook.calculations.converter.fitbit_to_garmin_converter import fitbit_to_garmin_activities
@@ -407,7 +408,7 @@ def fitbit_aa_twentyfour_hour_chart_one(user_get,start_date,user_input_activitie
 		user_input_activities = delete_activity(user_input_activities)
 	data = cal_aa1_data(
 		user_get,all_activities_heartrate_list,all_activities_timestamp_list)
-	AA_data = AA.objects.filter(user=user_get,created_at=start_date)
+	AA_data = AAWholeDay.objects.filter(user=user_get,created_at=start_date)
 	cal_aa1_data(
 		user_get,all_activities_heartrate_list,all_activities_timestamp_list)
 	if not user_input_activities and not AA_data:
@@ -928,11 +929,11 @@ def calculate_AA3(user,start_date,user_input_activities):
 	return {}
 	
 def calculate_twentyfour_hour_AA3(user,start_date,user_input_activities):
-	hr_time_diff = fitbit_hrr_diff_calculation(user_get,start_date)
+	hr_time_diff = fitbit_hrr_diff_calculation(user,start_date)
 	all_activities_heartrate_list = hr_time_diff['hr_values']
 	all_activities_timestamp_list = hr_time_diff['time_diff']
 
-	AA_data = TimeHeartZones.objects.filter(user=user,created_at=start_date)
+	AA_data = TwentyfourHourTimeHeartZones.objects.filter(user=user,created_at=start_date)
 	if user_input_activities:
 		user_input_activities = delete_activity(user_input_activities)
 	if not user_input_activities and not AA_data:

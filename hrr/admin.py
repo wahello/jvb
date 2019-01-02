@@ -4,7 +4,8 @@ from .models import Hrr,\
 					TimeHeartZones,\
 					AaWorkoutCalculations,\
 					AA,\
-					AAWholeDay
+					TwentyfourHourAA, \
+					TwentyfourHourTimeHeartZones
 # Register your models here.
 
 class HrrAdmin(admin.ModelAdmin):
@@ -37,7 +38,13 @@ class AAAdmin(admin.ModelAdmin):
 	search_fields = ('user__username','user__email',
 		'user__first_name','user__last_name',)
 
-class AAWholeDayAdmin(admin.ModelAdmin):
+class TwentyfourHourAAAdmin(admin.ModelAdmin):
+	list_display = ('user','created_at','updated_at')
+
+	search_fields = ('user__username','user__email',
+		'user__first_name','user__last_name',)
+
+class TwentyfourHourTimeHeartZonesAdmin(admin.ModelAdmin):
 	list_display = ('user','created_at','updated_at')
 
 	search_fields = ('user__username','user__email',
@@ -49,4 +56,5 @@ admin.site.register(AaCalculations,AaCalculationsAdmin)
 admin.site.register(TimeHeartZones,TimeHeartZonesAdmin)
 admin.site.register(AaWorkoutCalculations,AaWorkoutCalculationsAdmin)
 admin.site.register(AA,AAAdmin)
-admin.site.register(AAWholeDay, AAWholeDayAdmin)
+admin.site.register(TwentyfourHourAA, TwentyfourHourAAAdmin)
+admin.site.register(TwentyfourHourTimeHeartZones, TwentyfourHourTimeHeartZonesAdmin)

@@ -40,7 +40,8 @@ from hrr.models import Hrr,\
 						TimeHeartZones,\
 						AaWorkoutCalculations,\
 						AA, \
-						AAWholeDay
+						TwentyfourHourAA, \
+						TwentyfourHourTimeHeartZones
 import pprint
 from hrr import fitbit_aa
 from hrr.calculation_helper import week_date,\
