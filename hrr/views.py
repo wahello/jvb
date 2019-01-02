@@ -401,7 +401,7 @@ class UserAA_low_high_values(generics.ListCreateAPIView):
 			queryset = TimeHeartZones.objects.all()
 		return queryset
 
-class UserAA_whole_day(generics.ListCreateAPIView):
+class UserAA_twentyfour_hour(generics.ListCreateAPIView):
 	'''
 		- Create the AAWholeDay instance
 		- List all the AAWholeDay instance
@@ -420,7 +420,7 @@ class UserAA_whole_day(generics.ListCreateAPIView):
 			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
 			if device_type == 'fitbit':
 				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
-				fitbit_hr_difference = fitbit_aa.fitbit_aa_chart_five(user_get,start_date)
+				fitbit_hr_difference = fitbit_aa.fitbit_aa_twentyfour_hour_chart_one(user_get,start_date)
 				if fitbit_hr_difference.get('total_time'):
 					try:
 						user_aa = AAWholeDay.objects.get(
@@ -447,6 +447,60 @@ class UserAA_whole_day(generics.ListCreateAPIView):
 							  user=user).values()
 		else:
 			queryset = AAWholeDay.objects.all()
+		return queryset
+
+class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
+	'''
+		- Create the AA_low_high_values instance
+		- List all the AA_low_high_values instance
+		- If query parameters "start_date" is provided
+		  then filter the AA_low_high_values data for provided date interval
+		  and return the list
+	'''
+	permission_classes = (IsAuthenticated,)
+
+	def calculate_aa_data(self,aa_data_set,user_get,start_dt):
+		if aa_data_set:
+			final_query = aa_data_set[0]
+			return final_query
+		else:
+			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
+			if device_type == 'fitbit':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				fitbit_aa3 = fitbit_aa.calculate_twentyfour_hour_AA3(user_get,start_date,
+												user_input_activities=None)
+				if fitbit_aa3:
+					try:
+						user_obj = TwentyfourHourTimeHeartZones.objects.get(
+						user=user_get, created_at=start_date)
+						user_obj.data = fitbit_aa3
+						user_obj.save()
+					except TwentyfourHourTimeHeartZones.DoesNotExist:
+						create_time_heartzone_instance(user_get, fitbit_aa3, start_date)
+				else:
+					fitbit_aa3 = {}
+				return fitbit_aa3
+
+	def get(self,request,format="json"):
+		user_get = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		querset= self.get_queryset()
+		aa_low_high_values = self.calculate_aa_data(querset,user_get,start_dt)
+
+		if aa_low_high_values.get('data'):
+			aa_low_high_values_json = ast.literal_eval(aa_low_high_values.get('data'))
+			return Response(aa_low_high_values_json, status=status.HTTP_200_OK)
+		else:
+			return Response(aa_low_high_values, status=status.HTTP_200_OK)
+
+	def get_queryset(self):
+		user = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		if start_dt:
+			queryset = TwentyfourHourTimeHeartZones.objects.filter(created_at=start_dt,
+							  user=user).values()
+		else:
+			queryset = TwentyfourHourTimeHeartZones.objects.all()
 		return queryset
 
 # Parse the fit files and return the heart beat and timstamp
@@ -2367,6 +2421,10 @@ def update_heartzone_instance(user, start_date,data):
 def create_heartzone_instance(user, data, start_date):
 	created_at = start_date
 	TimeHeartZones.objects.create(user = user,created_at = created_at,data=data)
+
+def create_time_heartzone_instance(user, data, start_date):
+	created_at = start_date
+	TwentyfourHourTimeHeartZones.objects.create(user = user,created_at = created_at,data=data)
 
 def aa_low_high_end_calculations(request):
 	start_date_get = request.GET.get('start_date',None)

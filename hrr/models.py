@@ -149,3 +149,19 @@ class AAWholeDay(models.Model):
 			models.Index(fields=['user', '-created_at']),
 			models.Index(fields=['created_at']),
 		]
+
+class TwentyfourHourTimeHeartZones(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	created_at = models.DateField()
+	updated_at = models.DateTimeField(auto_now=True)
+	data = models.TextField(blank=True,null=True)
+
+	def __str__(self):
+		return str((self.user))
+
+	class Meta:
+		unique_together = ("user", "created_at")
+		indexes = [
+			models.Index(fields=['user', '-created_at']),
+			models.Index(fields=['created_at']),
+		]
