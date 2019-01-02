@@ -706,7 +706,6 @@ def aa_data(user,start_date):
 		elif ui_data_single.get("duplicate") == False:
 				summaryId = ui_data_single['summaryId'] 
 				ui_data_keys_test.append(summaryId)
-	# print(ui_data_keys_test,"ui_data_keys_test")
 	data = {"total_time":None,
 			"aerobic_zone":None,
 			"anaerobic_zone":None,
@@ -755,6 +754,9 @@ def aa_data(user,start_date):
 			else:
 				user_input_workout_keys.append(filtered_activities_files[i]['summaryId'])
 				user_input_workout_data.append(filtered_activities_files[i])
+	else:
+		for i,k in enumerate(filtered_activities_files):
+			user_input_keys.append(filtered_activities_files[i]['summaryId'])
 	user_created_activity = list(set(user_input_workout_keys)-set(activities_summary_id))
 	# garmin_workout_keys = set(activities_summary_id) - set(activities_hrr)
 	user_created_activity_list = []
@@ -764,7 +766,8 @@ def aa_data(user,start_date):
 				if single_activity_key == single_activity['summaryId']:
 					user_created_activity_list.append(single_activity)
 	remove_in_workout = []
-	for i,single_actiivty in enumerate(garmin_list):
+	# print(filtered_activities_files,"filtered_activities_files")
+	for i,single_actiivty in enumerate(filtered_activities_files):
 		if single_actiivty.get("manual",0) == True:
 			created_activity_dict[single_actiivty.get('summaryId',0)] = single_actiivty
 			if user_input_strong:
@@ -802,7 +805,6 @@ def aa_data(user,start_date):
 					if (garmin_id == ui_id) and ((not garmin_hr and ui_hr) or (garmin_hr != ui_hr)):
 						user_created_activity_list.append(k)
 						remove_in_workout.append(int(k["summaryId"]))
-
 	for single_activity in created_activity_dict.values():
 		if single_activity.get('averageHeartRateInBeatsPerMinute',0) == 0 or single_activity.get('averageHeartRateInBeatsPerMinute',0) == '':
 			if activities_dic:
@@ -833,11 +835,10 @@ def aa_data(user,start_date):
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
-			if str(data_id) in ui_data_keys_test:
+			if str(data_id) in user_input_keys:
 				workout.append(tmp)
 			elif str(data_id) in ui_data_hrr:
-				hrr.append(tmp)
-				
+				hrr.append(tmp)		
 	user_age = user.profile.age()
 	below_aerobic_value = 180-user_age-30
 	anaerobic_value = 180-user_age+5
@@ -1584,7 +1585,6 @@ def daily_aa_data(user, start_date):
 	hrr_recorded = []
 	avg_hrr_list = []
 	max_hrr_list = []
-	
 	data = {"avg_heart_rate":0.0,
 			"max_heart_rate":0.0,
 			"total_duration":0.0,
@@ -1676,13 +1676,13 @@ def daily_aa_data(user, start_date):
 	data_summaryid = [str(summaryid) for summaryid in data_summaryid]
 	no_hrr_actvities = list(set(ui_data_keys) - set(data_summaryid))
 	no_hrr_actvities = list(set(no_hrr_actvities) - set(activities_hrr))
+	# if garmin_workout and no_hrr_actvities:
+	# 	for single_activity in garmin_workout:
+	# 		for single_activity_key in no_hrr_actvities:
+	# 			single_activity_key == single_activity['summaryId']
+	# 			if single_activity_key and single_activity_key not in deleted_act:
+	# 				user_created_activity_list.append(single_activity)
 	
-	if garmin_workout and no_hrr_actvities:
-		for single_activity in garmin_workout:
-			for single_activity_key in no_hrr_actvities:
-				single_activity_key == single_activity['summaryId']
-				if single_activity_key and single_activity_key not in deleted_act:
-					user_created_activity_list.append(single_activity)
 	profile = Profile.objects.filter(user=user)
 	if hrr_not_recorded_list:
 		for tm in hrr_not_recorded_list:
@@ -2110,7 +2110,7 @@ def aa_low_high_end_data(user,start_date):
 					user_created_activity_list.append(single_activity)
 
 	remove_in_workout = []
-	for i,single_actiivty in enumerate(garmin_list):
+	for i,single_actiivty in enumerate(filtered_activities_files):
 		if (single_actiivty.get("manual",0) == True 
 			and activities_dic
 			and activities_dic.get(single_actiivty["summaryId"])):
@@ -2177,7 +2177,7 @@ def aa_low_high_end_data(user,start_date):
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
-			if str(data_id) in ui_data_keys_test:
+			if str(data_id) in workout_summary_id:
 				workout.append(tmp)
 			elif str(data_id) in ui_data_hrr:
 				hrr.append(tmp)				
