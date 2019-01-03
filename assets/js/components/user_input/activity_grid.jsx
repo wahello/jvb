@@ -1597,7 +1597,7 @@ renderTable(){
                                         onBlur={this.editToggleHandler_heartrate.bind(this)}>
                                         
                                         <option key="hours" value=" ">Select</option>
-                                    {this.createSleepDropdown_heartrate(90,220)}  
+                                    {this.createSleepDropdown_heartrate(60,220)}  
                                       </Input>: hr}
                                        {this.props.editable && !isActivityDeleted &&
                                         <span data-name = {summaryId} onClick={this.editToggleHandler_heartrate.bind(this)}
@@ -2115,7 +2115,7 @@ renderEditActivityModal(){
                           value={this.state.modal_activity_heart_rate}                               
                           onChange={this.handleChange}>
                           <option key="hours" value="">Select</option>
-                        {this.createSleepDropdown_heartrate(90,220)}     
+                        {this.createSleepDropdown_heartrate(60,220)}     
                         </Input>
                             </div> 
                             </FormGroup>                               
