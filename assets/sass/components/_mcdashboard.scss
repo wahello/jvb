@@ -18,9 +18,9 @@
 //   .mcs-dashboard td{
 //      min-width: 199px !important;
 //    }
-//  .table_content th{
-//      min-width: 182px !important;
-//   }  
+ .table_content th{
+     min-width: 177px !important;
+   }  
 @media (min-width: 321px) and  (max-width: 480px) {
 	.arrow{
 		font-size: 20px;
@@ -171,6 +171,10 @@
   padding-right: 6px;
 }
 
+.table_content th{
+  min-width: 44px !important;
+} 
+
 
 }
 
@@ -191,6 +195,10 @@
   .table td {
     padding: 0rem;
   }
+
+  .table_content th{
+    min-width: 50px !important;
+  } 
 }
 
 @media (min-width:322px) and (max-width: 480px)
@@ -221,7 +229,9 @@
 @media(min-width:380px) and (max-width:390px){
 
   .table_content th {
-    min-width: 50px !important;
+    min-width: 50px !important; 
+    padding: 0.2rem !important;
+
 }
 
 }
@@ -383,6 +393,15 @@
   }
 }
 
+
+@media (min-width: 720px) and (max-width: 860px){
+  
+
+  .table_content th{
+    min-width: 76px !important;
+  } 
+  }
+
 @media(min-width:900px) and (max-width: 1023px){
   .table_content th {
     min-width: 129px !important;
@@ -417,22 +436,6 @@
 
 }
 
-// @media(min-width:1260px) and (max-width:1360px){
-
-//   .table_content th{
-//     min-width: 172px !important;
-  
-//     } 
-//   .mcs-dashboard td{
-//          min-width: 199px !important;
-//          max-width: 200px !important;
-//        }
- 
-//  .table_pro{
-//        table-layout: fixed;
-//          }
-
-// }
 
 
 @media(min-width:1361px) and (max-width:1400px){
