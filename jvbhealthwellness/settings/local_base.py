@@ -29,6 +29,7 @@ AUTH_PASSWORD_VALIDATORS = []  # allow easy passwords only on local
 # CELERY_TASK_ALWAYS_EAGER = False
 # CELERY_BROKER_URL = "redis://ec2-3-83-166-190.compute-1.amazonaws.com:6379"
 # CELERY_RESULT_BACKEND = "redis://ec2-3-83-166-190.compute-1.amazonaws.com:6379"
+
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
