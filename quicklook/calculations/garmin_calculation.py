@@ -703,14 +703,14 @@ def is_potential_hrr_activity(activity):
 		2) Not created manually by user from activity grid
 		3) Not yet submitted from the user input. How to check?
 			Any activity file submitted from user input activity grid 
-			will have "comments" key.  
+			will have "duplicate" key.  
 		4) Duration in seconds is greater than or equal to 1200 seconds
 		5) Distance in meters is greater than or equal to 1287.48 (0.8 miles) 
 	'''
 	if(activity 
 		and activity.get('activityType') != "HEART_RATE_RECOVERY"
 		and not activity.get('created_manually',False) # not manually created by user 
-		and not "comments" in activity # not edited by user yet 
+		and not "duplicate" in activity # not edited by user yet 
 		and activity.get("durationInSeconds",0) <= 1200
 		and activity.get("distanceInMeters",0) <= 1287.48):
 		return True
@@ -1013,7 +1013,15 @@ def get_filtered_activity_stats(activities_json,user_age,
 			activities = filtered_activities
 		)
 	for act in filtered_activities:
-		if act['summaryId'] in act_renamed_to_hrr:
+		# If any activity is categorized as HRR as per our logic but
+		# user decided to change it to something else, in that case
+		# do not rename it to HRR
+		is_edited_by_user = False
+		if userinput_activities:
+			is_edited_by_user = (True 
+				if userinput_activities.get(act.get('summaryId'),None) else False)
+			
+		if act['summaryId'] in act_renamed_to_hrr and not is_edited_by_user:
 			act['activityType'] = 'HEART_RATE_RECOVERY'
 		act_category = get_activity_exercise_non_exercise_category(act,
 				user_age)
