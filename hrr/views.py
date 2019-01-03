@@ -196,6 +196,13 @@ class UserAA(generics.ListCreateAPIView):
 			elif device_type == 'fitbit':
 				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
 				fitbit_hr_difference = fitbit_aa.fitbit_aa_chart_one_new(user_get,start_date)
+				if fitbit_hr_difference.get('total_time'):
+					try:
+						user_aa = AA.objects.get(
+						user=user_get, created_at=start_date)
+						aa_update_instance(user_aa, fitbit_hr_difference)
+					except AA.DoesNotExist:
+						aa_create_instance(user_get, fitbit_hr_difference, start_date)
 				return fitbit_hr_difference
 
 	def get(self,request,format="json"):
@@ -250,6 +257,16 @@ class UserAA_workout(generics.ListCreateAPIView):
 			elif device_type == 'fitbit':
 				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
 				fitbit_aa2_workout = fitbit_aa.calculate_AA2_workout(user_get,start_date)
+				if fitbit_aa2_workout:
+					try:
+						user_obj = AaWorkoutCalculations.objects.get(
+						user_aa_workout=user_get, created_at=start_date)
+						user_obj.data = fitbit_aa2_workout
+						user_obj.save()
+					except AaWorkoutCalculations.DoesNotExist:
+						create_workout_instance(user_get, fitbit_aa2_workout, start_date)
+				else:
+					fitbit_aa2_workout = {}
 				return fitbit_aa2_workout
 
 
@@ -375,6 +392,16 @@ class UserAA_low_high_values(generics.ListCreateAPIView):
 			elif device_type == 'fitbit':
 				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
 				fitbit_aa3 = fitbit_aa.calculate_AA3(user_get,start_date,user_input_activities=None)
+				if fitbit_aa3:
+					try:
+						user_obj = TimeHeartZones.objects.get(
+						user=user_get, created_at=start_date)
+						user_obj.data = fitbit_aa3
+						user_obj.save()
+					except TimeHeartZones.DoesNotExist:
+						create_heartzone_instance(user_get, fitbit_aa3, start_date)
+				else:
+					fitbit_aa3 = {}
 				return fitbit_aa3
 
 	def get(self,request,format="json"):
@@ -3105,7 +3132,6 @@ def weekly_workout_summary(request):
 	start_date = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 	complete_data = weekly_workout_helper(request.user,start_date)
-
 	return JsonResponse(complete_data)
 
 def weekly_workout_helper(user,start_date):

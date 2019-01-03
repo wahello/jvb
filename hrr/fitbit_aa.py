@@ -148,10 +148,10 @@ def fitbit_aa_chart_one(user_get,start_date):
 					act_start_srt = get_time_from_timestamp(act_start_timestamp)
 					act_end_srt = get_time_from_timestamp(act_end_timestamp)
 					act_start_end_dict = {}
-					act_start_end_dict[act_id] = {}
-					act_start_end_dict[act_id]["act_start"] = act_start_srt
-					act_start_end_dict[act_id]["act_end"] = act_end_srt
-					act_start_end_dict[act_id]["log_id"] = act_id
+					act_start_end_dict[str(act_id)] = {}
+					act_start_end_dict[str(act_id)]["act_start"] = act_start_srt
+					act_start_end_dict[str(act_id)]["act_end"] = act_end_srt
+					act_start_end_dict[str(act_id)]["log_id"] = str(act_id)
 					activities_start_end_time.append(act_start_end_dict)
 			
 	# print(activities_start_end_time,"activities_start_end_time")
