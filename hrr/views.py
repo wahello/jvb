@@ -58,7 +58,6 @@ from hrr.calculation_helper import week_date,\
 
 from .serializers import AaSerializer,HeartzoneSerializer
 from .serializers import HrrSerializer
-from fitbit.models import UserFitbitDataHeartRate
 
 class UserHrrView(generics.ListCreateAPIView):
 	'''
@@ -404,10 +403,10 @@ class UserAA_low_high_values(generics.ListCreateAPIView):
 
 class UserAA_twentyfour_hour(generics.ListCreateAPIView):
 	'''
-		- Create the AAWholeDay instance
-		- List all the AAWholeDay instance
+		- Create the TwentyfourHourAA instance
+		- List all the TwentyfourHourAA instance
 		- If query parameters "from" is provided
-		  then filter the AAWholeDay data for provided date interval
+		  then filter the TwentyfourHourAA data for provided date interval
 		  and return the list
 	'''
 	permission_classes = (IsAuthenticated,)
@@ -420,16 +419,26 @@ class UserAA_twentyfour_hour(generics.ListCreateAPIView):
 			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
 			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
 			if device_type == 'fitbit':
-				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
-				fitbit_hr_difference = fitbit_aa.fitbit_aa_twentyfour_hour_chart_one(user_get,start_date)
+				fitbit_hr_difference = fitbit_aa.fitbit_aa_twentyfour_hour_chart_one_new(user_get,start_date)
 				if fitbit_hr_difference.get('total_time'):
 					try:
-						user_aa = AAWholeDay.objects.get(
+						user_aa = TwentyfourHourAA.objects.get(
 						user=user_get, created_at=start_date)
 						aa_whole_day_update_instance(user_aa, fitbit_hr_difference)
-					except AAWholeDay.DoesNotExist:
+					except TwentyfourHourAA.DoesNotExist:
 						aa_whole_day_create_instance(user_get, fitbit_hr_difference, start_date)
 				return fitbit_hr_difference
+			elif device_type == 'garmin':
+				final_query = twentyfour_hour_aa_data(user_get,start_date)
+				if final_query.get('total_time'):
+					print (final_query.get('total_time'))
+					try:
+						user_aa = TwentyfourHourAA.objects.get(
+						user=user_get, created_at=start_date)
+						aa_whole_day_update_instance(user_aa, final_query)
+					except TwentyfourHourAA.DoesNotExist:
+						aa_whole_day_create_instance(user_get, final_query, start_date)
+				return final_query
 
 	def get(self,request,format="json"):
 		user_get = self.request.user
@@ -444,10 +453,10 @@ class UserAA_twentyfour_hour(generics.ListCreateAPIView):
 		start_dt = self.request.query_params.get('start_date', None)
 
 		if start_dt:
-			queryset = AAWholeDay.objects.filter(created_at=start_dt,
+			queryset = TwentyfourHourAA.objects.filter(created_at=start_dt,
 							  user=user).values()
 		else:
-			queryset = AAWholeDay.objects.all()
+			queryset = TwentyfourHourAA.objects.all()
 		return queryset
 
 class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
@@ -503,6 +512,57 @@ class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
 		else:
 			queryset = TwentyfourHourTimeHeartZones.objects.all()
 		return queryset
+
+def twentyfour_hour_aa_data(user_get,start_date,user_input_activities=None):
+	hr_dataset = get_garmin_hr_data(user_get,start_date)
+	start_dt = 0
+	end_dt = 86400
+	hrr_data = get_garmin_hrr_timediff(hr_dataset,start_dt,end_dt)
+	garmin_hr_difference = fitbit_aa.fitbit_aa_twentyfour_hour_chart_one(user_get,start_date, hrr_data)
+	return garmin_hr_difference
+
+def get_garmin_hrr_timediff(hr_dataset,start_date,end_date):
+	hr = []
+	hr_time_diff = []
+	hr_dataset = sorted(hr_dataset, key = lambda i: i['time'])
+	print(hr_dataset, '??????????????????')
+	for index, single_time in enumerate(hr_dataset):
+		act_interval_time = hr_dataset[index]["time"]
+		act_interval_hr = hr_dataset[index]["value"]
+
+		if index == 0:
+			diff_times = act_interval_time - start_date
+			hr_time_diff.append(diff_times)
+
+		elif index == len(hr_dataset)-1:
+			diff_times = end_date - act_interval_time
+			hr_time_diff.append(diff_times)
+
+		else:
+			act_pre_interval_time = hr_dataset[index+1]["time"]
+			diff_times = act_pre_interval_time - act_interval_time
+			hr_time_diff.append(diff_times)
+		hr.append(act_interval_hr)
+		index += 1
+
+	return {'time_diff': hr_time_diff, 'hr_values': hr}
+
+def get_garmin_hr_data(user_get,start_date):
+	hr_dataset = []
+	date_format ='%Y-%m-%d'
+	start_dt = start_date.strftime('%Y-%m-%d')
+	start_date_time_obj = int(time.mktime(time.strptime(start_dt,date_format)))
+	hr_qs = UserGarminDataDaily.objects.filter(
+							start_time_in_seconds=start_date_time_obj,
+							user=user_get).last()
+
+	hrr_qs = ast.literal_eval(hr_qs.data)
+	hr_data = hrr_qs['timeOffsetHeartRateSamples']
+	for keys in hr_data:
+		act_interval_time = ast.literal_eval(keys)
+		act_interval_hr = hr_data[keys]
+		hr_dataset.append({'time': act_interval_time, 'value':act_interval_hr})
+	return hr_dataset
 
 # Parse the fit files and return the heart beat and timstamp
 def fitfile_parse(obj,offset,start_date_str):
@@ -1083,18 +1143,17 @@ def aa_create_instance(user, data, start_date):
 	created_at = start_date
 	AA.objects.create(user = user,created_at = created_at,**data)
 
-# update AAWholeDay table
+# update TwentyfourHourAA table
 
 def aa_whole_day_update_instance(instance, data):
 	aa_update_helper(instance, data)
 
 
-#creating AAWholeDay table
+#creating TwentyfourHourAA table
 
 def aa_whole_day_create_instance(user, data, start_date):
 	created_at = start_date
-	AAWholeDay.objects.create(user = user,created_at = created_at,**data)
-
+	TwentyfourHourAA.objects.create(user = user,created_at = created_at,**data)
 
 def aa_calculations(request):
 	start_date_get = request.GET.get('start_date',None)

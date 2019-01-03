@@ -363,6 +363,7 @@ def fitbit_aa_chart_one_new(user_get,start_date,user_input_activities=None):
 	hr_time_diff = fitbit_hr_diff_calculation(user_get,start_date)
 	all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(hr_time_diff)
 	# print(sum(all_activities_timestamp_list),"all_activities_timestamp_list")
+	
 	if user_input_activities:
 		user_input_activities = delete_activity(user_input_activities)
 	data = cal_aa1_data(
@@ -399,16 +400,21 @@ def fitbit_aa_chart_one_new(user_get,start_date,user_input_activities=None):
 	else:
 		return {}
 
-def fitbit_aa_twentyfour_hour_chart_one(user_get,start_date,user_input_activities=None):
+def fitbit_aa_twentyfour_hour_chart_one_new(user_get,start_date,user_input_activities=None):
 	hr_time_diff = fitbit_hrr_diff_calculation(user_get,start_date)
+	response = fitbit_aa_twentyfour_hour_chart_one(user_get,start_date, hr_time_diff)
+	return response
+
+def fitbit_aa_twentyfour_hour_chart_one(user_get,start_date,hr_time_diff, user_input_activities=None):
+	# hr_time_diff = fitbit_hrr_diff_calculation(user_get,start_date)
 	all_activities_heartrate_list = hr_time_diff['hr_values']
 	all_activities_timestamp_list = hr_time_diff['time_diff']
-	# print(sum(all_activities_timestamp_list),"all_activities_timestamp_list")
+	print(sum(all_activities_timestamp_list),"all_activities_timestamp_list")
 	if user_input_activities:
 		user_input_activities = delete_activity(user_input_activities)
 	data = cal_aa1_data(
 		user_get,all_activities_heartrate_list,all_activities_timestamp_list)
-	AA_data = AAWholeDay.objects.filter(user=user_get,created_at=start_date)
+	AA_data = TwentyfourHourAA.objects.filter(user=user_get,created_at=start_date)
 	cal_aa1_data(
 		user_get,all_activities_heartrate_list,all_activities_timestamp_list)
 	if not user_input_activities and not AA_data:
@@ -896,10 +902,7 @@ def get_aa3_data(user,hr_list,timediff_list):
 
 	return data2
 
-def calculate_AA3(user,start_date,user_input_activities):
-	hr_time_diff = fitbit_hr_diff_calculation(user,start_date)
-	all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(hr_time_diff)
-	AA_data = TimeHeartZones.objects.filter(user=user,created_at=start_date)
+def calculate_AA_chart3(user,start_date,user_input_activities,AA_data):
 	if user_input_activities:
 		user_input_activities = delete_activity(user_input_activities)
 	if not user_input_activities and not AA_data:
@@ -927,6 +930,42 @@ def calculate_AA3(user,start_date,user_input_activities):
 				user,all_activities_heartrate_list,all_activities_timestamp_list)
 			return final_data
 	return {}
+
+def calculate_AA3(user,start_date,user_input_activities):
+	hr_time_diff = fitbit_hr_diff_calculation(user,start_date)
+	all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(hr_time_diff)
+	AA_data = TimeHeartZones.objects.filter(user=user,created_at=start_date)
+	
+	response = calculate_AA_chart3(user,start_date,user_input_activities,AA_data)
+	
+	return response
+	# if user_input_activities:
+	# 	user_input_activities = delete_activity(user_input_activities)
+	# if not user_input_activities and not AA_data:
+	# 	data = get_aa3_data(
+	# 	user,all_activities_heartrate_list,all_activities_timestamp_list)
+	# 	return data
+	# elif  not user_input_activities and AA_data:
+	# 	data = get_aa3_data(
+	# 	user,all_activities_heartrate_list,all_activities_timestamp_list)
+	# 	return data
+	# elif ((user_input_activities and not AA_data) or
+	# 		(user_input_activities and AA_data)):
+	# 	ui_act_ids = list(user_input_activities.keys())
+	# 	fibit_act = fitbit_aa_chart_one(user,start_date)
+	# 	if len(ui_act_ids) == len(fibit_act):
+	# 		data = get_aa3_data(
+	# 	user,all_activities_heartrate_list,all_activities_timestamp_list)
+	# 		return data
+	# 	else:
+	# 		activity_hr_time = get_user_created_activity(user,start_date,user_input_activities,fibit_act)
+	# 		act_hr_list,act_time_list = all_activities_hr_and_time_diff(activity_hr_time)
+	# 		all_activities_heartrate_list.extend(act_hr_list)
+	# 		all_activities_timestamp_list.extend(act_time_list)
+	# 		final_data = get_aa3_data(
+	# 			user,all_activities_heartrate_list,all_activities_timestamp_list)
+	# 		return final_data
+	# return {}
 	
 def calculate_twentyfour_hour_AA3(user,start_date,user_input_activities):
 	hr_time_diff = fitbit_hrr_diff_calculation(user,start_date)
@@ -934,30 +973,7 @@ def calculate_twentyfour_hour_AA3(user,start_date,user_input_activities):
 	all_activities_timestamp_list = hr_time_diff['time_diff']
 
 	AA_data = TwentyfourHourTimeHeartZones.objects.filter(user=user,created_at=start_date)
-	if user_input_activities:
-		user_input_activities = delete_activity(user_input_activities)
-	if not user_input_activities and not AA_data:
-		data = get_aa3_data(
-		user,all_activities_heartrate_list,all_activities_timestamp_list)
-		return data
-	elif  not user_input_activities and AA_data:
-		data = get_aa3_data(
-		user,all_activities_heartrate_list,all_activities_timestamp_list)
-		return data
-	elif ((user_input_activities and not AA_data) or
-			(user_input_activities and AA_data)):
-		ui_act_ids = list(user_input_activities.keys())
-		fibit_act = fitbit_aa_chart_one(user,start_date)
-		if len(ui_act_ids) == len(fibit_act):
-			data = get_aa3_data(
-		user,all_activities_heartrate_list,all_activities_timestamp_list)
-			return data
-		else:
-			activity_hr_time = get_user_created_activity(user,start_date,user_input_activities,fibit_act)
-			act_hr_list,act_time_list = all_activities_hr_and_time_diff(activity_hr_time)
-			all_activities_heartrate_list.extend(act_hr_list)
-			all_activities_timestamp_list.extend(act_time_list)
-			final_data = get_aa3_data(
-				user,all_activities_heartrate_list,all_activities_timestamp_list)
-			return final_data
-	return {}
+
+	response = calculate_AA_chart3(user,start_date,user_input_activities,AA_data)
+
+	return response
