@@ -79,7 +79,6 @@ class UserHrrView(generics.ListCreateAPIView):
 						user_hrr=user_get, created_at=start_date)
 					update_hrr_instance(user_hrr, final_query)
 				except Hrr.DoesNotExist:
-					pass
 					create_hrr_instance(user_get, final_query, start_date)
 		return final_query
 
