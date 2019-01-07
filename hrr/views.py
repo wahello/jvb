@@ -431,7 +431,6 @@ class UserAA_twentyfour_hour(generics.ListCreateAPIView):
 			elif device_type == 'garmin':
 				final_query = twentyfour_hour_aa_data(user_get,start_date)
 				if final_query.get('total_time'):
-					print (final_query.get('total_time'))
 					try:
 						user_aa = TwentyfourHourAA.objects.get(
 						user=user_get, created_at=start_date)
@@ -475,8 +474,8 @@ class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
 			return final_query
 		else:
 			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
+			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
 			if device_type == 'fitbit':
-				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
 				fitbit_aa3 = fitbit_aa.calculate_twentyfour_hour_AA3(user_get,start_date,
 												user_input_activities=None)
 				if fitbit_aa3:
@@ -490,6 +489,21 @@ class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
 				else:
 					fitbit_aa3 = {}
 				return fitbit_aa3
+			elif device_type == 'garmin':
+				final_query = calculate_garmin_twentyfour_hour_AA3(user_get,start_date,
+												user_input_activities=None)
+				if final_query:
+					try:
+						user_obj = TwentyfourHourTimeHeartZones.objects.get(
+						user=user_get, created_at=start_date)
+						user_obj.data = final_query
+						user_obj.save()
+					except TwentyfourHourTimeHeartZones.DoesNotExist:
+						create_time_heartzone_instance(user_get, final_query, start_date)
+				else:
+					final_query = {}
+				return final_query
+
 
 	def get(self,request,format="json"):
 		user_get = self.request.user
@@ -513,10 +527,25 @@ class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
 			queryset = TwentyfourHourTimeHeartZones.objects.all()
 		return queryset
 
+def calculate_garmin_twentyfour_hour_AA3(user,start_date,user_input_activities):
+	hr_dataset = get_garmin_hr_data(user,start_date)
+	start_dt = 0
+	end_dt = 86400
+	hr_time_diff = get_garmin_hrr_timediff(hr_dataset,start_dt,end_dt)
+	all_activities_heartrate_list = hr_time_diff['hr_values']
+	all_activities_timestamp_list = hr_time_diff['time_diff']
+
+	AA_data = TwentyfourHourTimeHeartZones.objects.filter(user=user,created_at=start_date)
+	response = fitbit_aa.calculate_AA_chart3(user,start_date,user_input_activities,\
+									AA_data,all_activities_heartrate_list,
+									all_activities_timestamp_list)
+
+	return response
+
 def twentyfour_hour_aa_data(user_get,start_date,user_input_activities=None):
 	hr_dataset = get_garmin_hr_data(user_get,start_date)
 	start_dt = 0
-	end_dt = 86400
+	end_dt = 86339
 	hrr_data = get_garmin_hrr_timediff(hr_dataset,start_dt,end_dt)
 	garmin_hr_difference = fitbit_aa.fitbit_aa_twentyfour_hour_chart_one(user_get,start_date, hrr_data)
 	return garmin_hr_difference
@@ -525,16 +554,16 @@ def get_garmin_hrr_timediff(hr_dataset,start_date,end_date):
 	hr = []
 	hr_time_diff = []
 	hr_dataset = sorted(hr_dataset, key = lambda i: i['time'])
-	print(hr_dataset, '??????????????????')
 	for index, single_time in enumerate(hr_dataset):
 		act_interval_time = hr_dataset[index]["time"]
 		act_interval_hr = hr_dataset[index]["value"]
 
-		if index == 0:
-			diff_times = act_interval_time - start_date
-			hr_time_diff.append(diff_times)
+		# if index == 0:
+		# 	# diff_times = act_interval_time - start_date
+		# 	diff_times = 15
+		# 	hr_time_diff.append(diff_times)
 
-		elif index == len(hr_dataset)-1:
+		if index == len(hr_dataset)-1:
 			diff_times = end_date - act_interval_time
 			hr_time_diff.append(diff_times)
 
