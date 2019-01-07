@@ -1016,11 +1016,11 @@ class LeaderboardOverview(object):
 						other_scores = {
 							'active_min_sleep':{
 								"value":data['mc']['sleep_active_minutes'][dtype],
-								"Verbose_name":"Time Moving / Active When Sleeping"
+								"verbose_name":"Time Moving / Active When Sleeping"
 							},
 							'active_min_exercise':{
 								"value":data['mc']['exercise_active_minutes'][dtype],
-								"Verbose_name":"Time Moving / Active When Exercising"
+								"verbose_name":"Time Moving / Active When Exercising"
 							}
 						}
 						category_wise_data[catg][dtype].append(
@@ -1164,11 +1164,11 @@ class LeaderboardOverview(object):
 							other_scores = {
 								'active_min_sleep':{
 									"value":data['mc']['sleep_active_minutes']['custom_range'][str_range]['data'],
-									"Verbose_name":"Time Moving / Active When Sleeping"
+									"verbose_name":"Time Moving / Active When Sleeping"
 								},
 								'active_min_exercise':{
 									"value":data['mc']['exercise_active_minutes']['custom_range'][str_range]['data'],
-									"Verbose_name":"Time Moving / Active When Exercising"
+									"verbose_name":"Time Moving / Active When Exercising"
 								}
 							}
 							category_wise_data[catg]['custom_range'][str_range].append(
