@@ -527,11 +527,10 @@ class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
 			queryset = TwentyfourHourTimeHeartZones.objects.all()
 		return queryset
 
-def calculate_garmin_twentyfour_hour_AA3(user,start_date,user_input_activities):
+def calculate_garmin_twentyfour_hour_AA3(user,start_date,user_input_activities=None):
 	hr_dataset = get_garmin_hr_data(user,start_date)
 	start_dt = 0
-	end_dt = 86400
-	hr_time_diff = get_garmin_hrr_timediff(hr_dataset,start_dt,end_dt)
+	hr_time_diff = get_garmin_hrr_timediff(hr_dataset,start_dt)
 	all_activities_heartrate_list = hr_time_diff['hr_values']
 	all_activities_timestamp_list = hr_time_diff['time_diff']
 
@@ -540,30 +539,51 @@ def calculate_garmin_twentyfour_hour_AA3(user,start_date,user_input_activities):
 									AA_data,all_activities_heartrate_list,
 									all_activities_timestamp_list)
 
+	total_time = 86400
+	heartrate_not_recorded = response['heartrate_not_recorded']
+	
+	heartrate_not_recorded['time_in_zone'] = total_time-response['total']['total_duration']
+	
+	percent_hrr_not_recorded = (heartrate_not_recorded['time_in_zone']/total_time)*100
+	percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+
+	heartrate_not_recorded['prcnt_total_duration_in_zone'] = percent_hrr_not_recorded
+	response['total']['total_duration'] = total_time
+
 	return response
 
 def twentyfour_hour_aa_data(user_get,start_date,user_input_activities=None):
 	hr_dataset = get_garmin_hr_data(user_get,start_date)
 	start_dt = 0
-	end_dt = 86339
-	hrr_data = get_garmin_hrr_timediff(hr_dataset,start_dt,end_dt)
+	hrr_data = get_garmin_hrr_timediff(hr_dataset,start_dt)
 	garmin_hr_difference = fitbit_aa.fitbit_aa_twentyfour_hour_chart_one(user_get,start_date, hrr_data)
+	total_time = 86400
+	garmin_hr_difference['hrr_not_recorded']=total_time-garmin_hr_difference['total_time']
+	
+	percent_below_aerobic = (garmin_hr_difference['below_aerobic_zone']/total_time)*100
+	percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
+
+	percent_hrr_not_recorded = (garmin_hr_difference['hrr_not_recorded']/total_time)*100
+	percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+
+	garmin_hr_difference['percent_hrr_not_recorded'] = percent_hrr_not_recorded
+	garmin_hr_difference['percent_below_aerobic'] = percent_below_aerobic
+	
+	garmin_hr_difference['total_time'] = total_time
+	
 	return garmin_hr_difference
 
-def get_garmin_hrr_timediff(hr_dataset,start_date,end_date):
+def get_garmin_hrr_timediff(hr_dataset,start_date):
 	hr = []
 	hr_time_diff = []
 	hr_dataset = sorted(hr_dataset, key = lambda i: i['time'])
+	
 	for index, single_time in enumerate(hr_dataset):
 		act_interval_time = hr_dataset[index]["time"]
 		act_interval_hr = hr_dataset[index]["value"]
 
-		# if index == 0:
-		# 	# diff_times = act_interval_time - start_date
-		# 	diff_times = 15
-		# 	hr_time_diff.append(diff_times)
-
 		if index == len(hr_dataset)-1:
+			end_date = hr_dataset[len(hr_dataset)-1]["time"]
 			diff_times = end_date - act_interval_time
 			hr_time_diff.append(diff_times)
 
