@@ -12,19 +12,18 @@ import NavbarMenu from './navbar';
 import {renderOverallHrr1FetchOverlay,renderOverallHrr2FetchOverlay,renderOverallHrr3FetchOverlay,renderOverallHrrSelectedDateFetchOverlay} from './leaderboard_healpers';
 import { getGarminToken,logoutUser} from '../network/auth';
 import fetchLeaderBoard from '../network/leaderBoard';
-import HrrLeaderboard from "./Hrr_leaderboard";
 
 var CalendarWidget = require('react-calendar-widget');  
 var ReactDOM = require('react-dom');
 const duration = ["week","today","yesterday","year","month","custom_range"];
 let durations_captilize = {"today":"Today","yesterday":"Yesterday","week":"Week","month":"Month","year":"Year",};
-const overallHrrcategory = ["overall_hrr"];
-class OverallRank extends Component{
+const overallMovementcategory = ["overall_hrr"];
+class OverallMovementRank extends Component{
 	constructor(props){
 		super(props);
-		let overallHrrrankInitialState = {}
-	    for (let catg of overallHrrcategory){
-	        let hrrInitialState = {}
+		let overallMovementrankInitialState = {}
+	    for (let catg of overallMovementcategory){
+	        let movementInitialState = {}
 	        for(let dur of duration){
 		          let userRank = {
 		            'user_rank':{
@@ -33,13 +32,13 @@ class OverallRank extends Component{
 		            "all_rank":[
 		            ]
 		        };
-	         hrrInitialState[dur] = userRank;
+	         movementInitialState[dur] = userRank;
 	        }
-	        overallHrrrankInitialState[catg] = hrrInitialState;
+	        overallMovementrankInitialState[catg] = movementInitialState;
 	    };
 
 		this.state = {
-			Hrr_data:overallHrrrankInitialState,
+			Movement_data:overallMovementrankInitialState,
 			selectedDate:new Date(),
 			lb1_start_date:'',
 	        lb1_end_date:'',
@@ -59,8 +58,8 @@ class OverallRank extends Component{
 	        Movement_view:false,
 	        active_view:true,
 			btnView:false,
-	        all_hrr_rank_data:'',
-	        Hrr_username:"",
+	        all_movement_rank_data:'',
+	        Movement_username:"",
 	        duration_date:{
 				"week":"",
 				"today":"",
@@ -74,9 +73,9 @@ class OverallRank extends Component{
 			dropdownOpen: false,
 		}
 		this.toggleCalendar = this.toggleCalendar.bind(this);
-		this.renderOverallHrrTable = this.renderOverallHrrTable.bind(this);
-		this.successOverallHrrRank = this.successOverallHrrRank.bind(this);
-		this.errorOverallHrrRank = this.errorOverallHrrRank.bind(this);
+		this.renderOverallMovementTable = this.renderOverallMovementTable.bind(this);
+		this.successOverallMovementRank = this.successOverallMovementRank.bind(this);
+		this.errorOverallMovementRank = this.errorOverallMovementRank.bind(this);
 		this.processDate = this.processDate.bind(this);
 		this.toggle1 = this.toggle1.bind(this);
 		this.toggleDate1 = this.toggleDate1.bind(this);
@@ -97,12 +96,12 @@ class OverallRank extends Component{
 		// this.doResizeCode = this.doResizeCode.bind(this);
 		// this.doOnOrientationChange = this.doOnOrientationChange.bind(this);
 	}
-	successOverallHrrRank(data){
+	successOverallMovementRank(data){
 		let date = this.renderDate(data.data.overall_hrr,data.data.duration_date);
 		this.setState({
-			Hrr_data:data.data.overall_hrr,
+			Movement_data:data.data.overall_hrr,
 			duration_date:data.data.duration_date,
-			all_hrr_rank_data:data.data.overall_hrr.today.all_rank,
+			all_movement_rank_data:data.data.overall_hrr.today.all_rank,
 			date:moment(date).format("MMM D, YYYY"),
 			capt:"Today",
 			fetching_hrr1:false,
@@ -117,7 +116,7 @@ class OverallRank extends Component{
 	// doResizeCode(){
 	// 	window.addEventListener('orientationchange', this.doOnOrientationChange);
 	// }
-	errorOverallHrrRank(error){
+	errorOverallMovementRank(error){
 		console.log(error.message);
 		this.setState({
 			fetching_hrr1:false,
@@ -131,14 +130,14 @@ class OverallRank extends Component{
 			selectedDate:selectedDate,
 			fetching_hrr4:true,
 			calendarOpen:!this.state.calendarOpen,
-		},()=>{fetchLeaderBoard(this.successOverallHrrRank,this.errorOverallHrrRank,this.state.selectedDate);
+		},()=>{fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate);
 		});
 	}
 	componentDidMount(){
 		this.setState({
 			fetching_hrr4:true,
 		});
-		fetchLeaderBoard(this.successOverallHrrRank,this.errorOverallHrrRank,this.state.selectedDate,true);
+		fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,true);
 	}
 	toggle(){
 		this.setState({
@@ -163,7 +162,7 @@ class OverallRank extends Component{
         }
         custom_ranges.push(this.state.lb1_start_date);
         custom_ranges.push(this.state.lb1_end_date);
-      fetchLeaderBoard(this.successOverallHrrRank,this.errorOverallHrrRank,this.state.selectedDate,custom_ranges);
+      fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,custom_ranges);
     });
   }
    onSubmitDate2(event){
@@ -185,7 +184,7 @@ class OverallRank extends Component{
 
         custom_ranges.push(this.state.lb2_start_date);
         custom_ranges.push(this.state.lb2_end_date);
-      fetchLeaderBoard(this.successOverallHrrRank,this.errorOverallHrrRank,this.state.selectedDate,custom_ranges);
+      fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,custom_ranges);
     });
   }
  onSubmitDate3(event){
@@ -206,7 +205,7 @@ class OverallRank extends Component{
         }
         custom_ranges.push(this.state.lb3_start_date);
         custom_ranges.push(this.state.lb3_end_date);
-      fetchLeaderBoard(this.successOverallHrrRank,this.errorOverallHrrRank,this.state.selectedDate,custom_ranges);
+      fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,custom_ranges);
     });
   }
   handleChange(event){
@@ -228,7 +227,7 @@ class OverallRank extends Component{
 	    });
   	}
   	toggleDate1(){
-	    this.setState({
+	    this.setState({ 
 	      dateRange1:!this.state.dateRange1
 	    });
    	}
@@ -242,7 +241,7 @@ class OverallRank extends Component{
 	      dateRange3:!this.state.dateRange3
 	    });
    	}
-   	headerDates(value){
+   	headerDates(value){ 
    	   let str = value;
        let d = str.split(" ");
        let d1 = d[0];
@@ -267,7 +266,7 @@ class OverallRank extends Component{
   		}
   		return date;
   	}
-   	renderOverallHrrTable(value,value5){
+   	renderOverallMovementTable(value,value5){
 		let category = "";
 	  	let durations = [];
 	  	let scores = [];
@@ -346,8 +345,8 @@ class OverallRank extends Component{
 	}
 	reanderAllHrr(all_data,value1,capt,date){
 		this.setState({
-			all_hrr_rank_data:all_data,
-			Hrr_username:value1,
+			all_movement_rank_data:all_data,
+			Movement_username:value1,
 			date:date,
 			capt:capt,
 			Movement_view:!this.state.Movement_view,
@@ -544,14 +543,14 @@ class OverallRank extends Component{
 					          Select Range
 					        </DropdownToggle>
 					        <DropdownMenu>
-					          {this.renderOverallHrrTable(this.state.Hrr_data,this.state.duration_date)}
+					          {this.renderOverallMovementTable(this.state.Movement_data,this.state.duration_date)}
 					        </DropdownMenu>
 					      </Dropdown>
 					      
 				      	<span className = "weekdate"><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span>
 			        </div>
-		  		<HrrLeaderboard Hrr_data = {this.state.all_hrr_rank_data}
-	  							Hrr_username = {this.state.Hrr_username}/>
+		  		<HrrLeaderboard Movement_data = {this.state.all_movement_rank_data}
+	  							Movement_username = {this.state.Movement_username}/>
 				
                 </div>
                 {this.renderOverallHrrSelectedDateFetchOverlay()}
@@ -563,4 +562,4 @@ class OverallRank extends Component{
 			);
 	}
 }
-export default OverallRank;
+export default OverallMovementRank;
