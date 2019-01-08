@@ -302,7 +302,7 @@ class MovementLeaderboard2 extends Component{
 		return(
 				<div className = "container-fluid">		   
 					<div className = "hrr_table" ref="hrr_table">
-						{this.renderTable()}	
+						{this.renderTable(this.props.Movement_data,this.props.Movement_username)}	
 					</div>	
 				</div>
 			);

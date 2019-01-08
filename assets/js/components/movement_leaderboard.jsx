@@ -18,7 +18,7 @@ var CalendarWidget = require('react-calendar-widget');
 var ReactDOM = require('react-dom');
 const duration = ["week","today","yesterday","year","month","custom_range"];
 let durations_captilize = {"today":"Today","yesterday":"Yesterday","week":"Week","month":"Month","year":"Year",};
-const overallMovementcategory = ["overall_hrr"];
+const overallMovementcategory = ["movement"];
 class MovementLeaderboard extends Component{
 	constructor(props){
 		super(props);
@@ -98,17 +98,19 @@ class MovementLeaderboard extends Component{
 		// this.doOnOrientationChange = this.doOnOrientationChange.bind(this);
 	}
 	successOverallMovementRank(data){
-		let date = this.renderDate(data.data.overall_hrr,data.data.duration_date);
+		let date = this.renderDate(data.data.movement,data.data.duration_date);
 		this.setState({
-			Movement_data:data.data.overall_hrr,
+			Movement_data:data.data.movement,
 			duration_date:data.data.duration_date,
-			all_movement_rank_data:data.data.overall_hrr.today.all_rank,
+			all_movement_rank_data:data.data.movement.today.all_rank,
 			date:moment(date).format("MMM D, YYYY"),
 			capt:"Today",
 			fetching_hrr1:false,
 	        fetching_hrr2:false,
 	        fetching_hrr3:false,
 	        fetching_hrr4:false,
+		},()=>{
+			// console.log("*********************** state data",this.state.Movement_data);
 		})
 	}
 	// doOnOrientationChange() {
@@ -353,6 +355,8 @@ class MovementLeaderboard extends Component{
 			Movement_view:!this.state.Movement_view,
 			active_view:!this.state.active_view,
 			btnView:!this.state.btnView2,
+		},()=>{
+			console.log("*************************** all rank data",this.state.all_movement_rank_data);
 		});
 	}
 
