@@ -849,6 +849,7 @@ def get_aa3_data(user,hr_list,timediff_list):
 
 	below_aerobic_value = 180-user_age-30
 	anaerobic_value = 180-user_age+5
+	above_220 = 220
 	data2 = {}
 	classification_dic = {}
 	low_end_values = [-131,-120,-110,-100,-90,-80,-70,-60,-55,-50,-45,
@@ -866,6 +867,8 @@ def get_aa3_data(user,hr_list,timediff_list):
 			classification_dic[a] = 'anaerobic_zone'
 		elif a and b < below_aerobic_value:
 			classification_dic[a] = 'below_aerobic_zone'
+		elif a > above_220:
+			classification_dic[a] = 'above_220'
 		else:
 			classification_dic[a] = 'aerobic_zone'
 
@@ -894,6 +897,8 @@ def get_aa3_data(user,hr_list,timediff_list):
 				classification_dic[a] = 'anaerobic_zone'
 			elif a and b < below_aerobic_value:
 				classification_dic[a] = 'below_aerobic_zone'
+			elif a > above_220:
+				classification_dic[a] = 'above_220'
 			else:
 				classification_dic[a] = 'aerobic_zone'
 			try:
@@ -920,6 +925,11 @@ def get_aa3_data(user,hr_list,timediff_list):
 		data2["heartrate_not_recorded"]["prcnt_total_duration_in_zone"] = 0
 		data2["heartrate_not_recorded"]["time_in_zone"] = 0
 		data2["heartrate_not_recorded"]["classificaton"] = "heart_rate_not_recorded"
+
+		data2["above_220"] = {}
+		data2["above_220"]["prcnt_total_duration_in_zone"] = 0
+		data2["above_220"]["time_in_zone"] = 0
+		data2["above_220"]["classificaton"] = "above_220"
 
 	return data2
 
