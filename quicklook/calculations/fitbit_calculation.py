@@ -34,7 +34,8 @@ from user_input.models import DailyUserInputOptional
 
 from .converter.fitbit_to_garmin_converter import fitbit_to_garmin_sleep,\
 	fitbit_to_garmin_activities,\
-	fitbit_to_garmin_epoch
+	fitbit_to_garmin_epoch,\
+	steps_minutly_to_quartly
 
 def get_fitbit_model_data(model,user,start_date, end_date,
 		order_by = None, group_by_date=False):
@@ -438,7 +439,10 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			if todays_steps_data.get("activities-steps-intraday"):
 				intraday_steps = todays_steps_data.get("activities-steps-intraday")
 				interval_duration = (intraday_steps.get('datasetInterval',15)*60)
-				for step in intraday_steps.get('dataset',[]):
+				quarterly_dataset = steps_minutly_to_quartly(
+					current_date.date(),
+					intraday_steps.get('dataset',[]))
+				for step in quarterly_dataset:
 					todays_epoch_data.append(fitbit_to_garmin_epoch(
 						step,current_date.date(),interval_duration))
 
