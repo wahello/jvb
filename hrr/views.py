@@ -39,7 +39,9 @@ from hrr.models import Hrr,\
 						AaCalculations,\
 						TimeHeartZones,\
 						AaWorkoutCalculations,\
-						AA
+						AA, \
+						TwentyfourHourAA, \
+						TwentyfourHourTimeHeartZones
 import pprint
 from hrr import fitbit_aa
 from hrr.calculation_helper import week_date,\
@@ -425,6 +427,218 @@ class UserAA_low_high_values(generics.ListCreateAPIView):
 		else:
 			queryset = TimeHeartZones.objects.all()
 		return queryset
+
+class UserAA_twentyfour_hour(generics.ListCreateAPIView):
+	'''
+		- Create the TwentyfourHourAA instance
+		- List all the TwentyfourHourAA instance
+		- If query parameters "from" is provided
+		  then filter the TwentyfourHourAA data for provided date interval
+		  and return the list
+	'''
+	permission_classes = (IsAuthenticated,)
+
+	def calculate_aa_data(self,aa_data_set,user_get,start_dt):
+		if aa_data_set:
+			final_query = aa_data_set[0]
+			return final_query
+		else:
+			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
+			if device_type == 'fitbit':
+				fitbit_hr_difference = fitbit_aa.fitbit_aa_twentyfour_hour_chart_one_new(user_get,start_date)
+				if fitbit_hr_difference.get('total_time'):
+					try:
+						user_aa = TwentyfourHourAA.objects.get(
+						user=user_get, created_at=start_date)
+						aa_whole_day_update_instance(user_aa, fitbit_hr_difference)
+					except TwentyfourHourAA.DoesNotExist:
+						aa_whole_day_create_instance(user_get, fitbit_hr_difference, start_date)
+				return fitbit_hr_difference
+			elif device_type == 'garmin':
+				final_query = twentyfour_hour_aa_data(user_get,start_date)
+				if final_query.get('total_time'):
+					try:
+						user_aa = TwentyfourHourAA.objects.get(
+						user=user_get, created_at=start_date)
+						aa_whole_day_update_instance(user_aa, final_query)
+					except TwentyfourHourAA.DoesNotExist:
+						aa_whole_day_create_instance(user_get, final_query, start_date)
+				return final_query
+
+	def get(self,request,format="json"):
+		user_get = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		querset= self.get_queryset()
+		aa_data = self.calculate_aa_data(querset,user_get,start_dt)
+		return Response(aa_data, status=status.HTTP_200_OK)
+
+	def get_queryset(self):
+		user = self.request.user
+
+		start_dt = self.request.query_params.get('start_date', None)
+
+		if start_dt:
+			queryset = TwentyfourHourAA.objects.filter(created_at=start_dt,
+							  user=user).values()
+		else:
+			queryset = TwentyfourHourAA.objects.all()
+		return queryset
+
+class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
+	'''
+		- Create the AA_low_high_values instance
+		- List all the AA_low_high_values instance
+		- If query parameters "start_date" is provided
+		  then filter the AA_low_high_values data for provided date interval
+		  and return the list
+	'''
+	permission_classes = (IsAuthenticated,)
+
+	def calculate_aa_data(self,aa_data_set,user_get,start_dt):
+		if aa_data_set:
+			final_query = aa_data_set[0]
+			return final_query
+		else:
+			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
+			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+			if device_type == 'fitbit':
+				fitbit_aa3 = fitbit_aa.calculate_twentyfour_hour_AA3(user_get,start_date,
+												user_input_activities=None)
+				if fitbit_aa3:
+					try:
+						user_obj = TwentyfourHourTimeHeartZones.objects.get(
+						user=user_get, created_at=start_date)
+						user_obj.data = fitbit_aa3
+						user_obj.save()
+					except TwentyfourHourTimeHeartZones.DoesNotExist:
+						create_time_heartzone_instance(user_get, fitbit_aa3, start_date)
+				else:
+					fitbit_aa3 = {}
+				return fitbit_aa3
+			elif device_type == 'garmin':
+				final_query = calculate_garmin_twentyfour_hour_AA3(user_get,start_date,
+												user_input_activities=None)
+				if final_query:
+					try:
+						user_obj = TwentyfourHourTimeHeartZones.objects.get(
+						user=user_get, created_at=start_date)
+						user_obj.data = final_query
+						user_obj.save()
+					except TwentyfourHourTimeHeartZones.DoesNotExist:
+						create_time_heartzone_instance(user_get, final_query, start_date)
+				else:
+					final_query = {}
+				return final_query
+
+
+	def get(self,request,format="json"):
+		user_get = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		querset= self.get_queryset()
+		aa_low_high_values = self.calculate_aa_data(querset,user_get,start_dt)
+
+		if aa_low_high_values.get('data'):
+			aa_low_high_values_json = ast.literal_eval(aa_low_high_values.get('data'))
+			return Response(aa_low_high_values_json, status=status.HTTP_200_OK)
+		else:
+			return Response(aa_low_high_values, status=status.HTTP_200_OK)
+
+	def get_queryset(self):
+		user = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		if start_dt:
+			queryset = TwentyfourHourTimeHeartZones.objects.filter(created_at=start_dt,
+							  user=user).values()
+		else:
+			queryset = TwentyfourHourTimeHeartZones.objects.all()
+		return queryset
+
+def calculate_garmin_twentyfour_hour_AA3(user,start_date,user_input_activities=None):
+	hr_dataset = get_garmin_hr_data(user,start_date)
+	start_dt = 0
+	hr_time_diff = get_garmin_hrr_timediff(hr_dataset,start_dt)
+	all_activities_heartrate_list = hr_time_diff['hr_values']
+	all_activities_timestamp_list = hr_time_diff['time_diff']
+
+	AA_data = TwentyfourHourTimeHeartZones.objects.filter(user=user,created_at=start_date)
+	response = fitbit_aa.calculate_AA_chart3(user,start_date,user_input_activities,\
+									AA_data,all_activities_heartrate_list,
+									all_activities_timestamp_list)
+
+	total_time = 86400
+	heartrate_not_recorded = response['heartrate_not_recorded']
+	
+	heartrate_not_recorded['time_in_zone'] = total_time-response['total']['total_duration']
+	
+	percent_hrr_not_recorded = (heartrate_not_recorded['time_in_zone']/total_time)*100
+	percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+
+	heartrate_not_recorded['prcnt_total_duration_in_zone'] = percent_hrr_not_recorded
+	response['total']['total_duration'] = total_time
+
+	return response
+
+def twentyfour_hour_aa_data(user_get,start_date,user_input_activities=None):
+	hr_dataset = get_garmin_hr_data(user_get,start_date)
+	start_dt = 0
+	hrr_data = get_garmin_hrr_timediff(hr_dataset,start_dt)
+	garmin_hr_difference = fitbit_aa.fitbit_aa_twentyfour_hour_chart_one(user_get,start_date, hrr_data)
+	total_time = 86400
+	garmin_hr_difference['hrr_not_recorded']=total_time-garmin_hr_difference['total_time']
+	
+	percent_below_aerobic = (garmin_hr_difference['below_aerobic_zone']/total_time)*100
+	percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
+
+	percent_hrr_not_recorded = (garmin_hr_difference['hrr_not_recorded']/total_time)*100
+	percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+
+	garmin_hr_difference['percent_hrr_not_recorded'] = percent_hrr_not_recorded
+	garmin_hr_difference['percent_below_aerobic'] = percent_below_aerobic
+	
+	garmin_hr_difference['total_time'] = total_time
+	
+	return garmin_hr_difference
+
+def get_garmin_hrr_timediff(hr_dataset,start_date):
+	hr = []
+	hr_time_diff = []
+	hr_dataset = sorted(hr_dataset, key = lambda i: i['time'])
+	
+	for index, single_time in enumerate(hr_dataset):
+		act_interval_time = hr_dataset[index]["time"]
+		act_interval_hr = hr_dataset[index]["value"]
+
+		if index == len(hr_dataset)-1:
+			end_date = hr_dataset[len(hr_dataset)-1]["time"]
+			diff_times = end_date - act_interval_time
+			hr_time_diff.append(diff_times)
+
+		else:
+			act_pre_interval_time = hr_dataset[index+1]["time"]
+			diff_times = act_pre_interval_time - act_interval_time
+			hr_time_diff.append(diff_times)
+		hr.append(act_interval_hr)
+		index += 1
+
+	return {'time_diff': hr_time_diff, 'hr_values': hr}
+
+def get_garmin_hr_data(user_get,start_date):
+	hr_dataset = []
+	date_format ='%Y-%m-%d'
+	start_dt = start_date.strftime('%Y-%m-%d')
+	start_date_time_obj = int(time.mktime(time.strptime(start_dt,date_format)))
+	hr_qs = UserGarminDataDaily.objects.filter(
+							start_time_in_seconds=start_date_time_obj,
+							user=user_get).last()
+
+	hrr_qs = ast.literal_eval(hr_qs.data)
+	hr_data = hrr_qs['timeOffsetHeartRateSamples']
+	for keys in hr_data:
+		act_interval_time = ast.literal_eval(keys)
+		act_interval_hr = hr_data[keys]
+		hr_dataset.append({'time': act_interval_time, 'value':act_interval_hr})
+	return hr_dataset
 
 # Parse the fit files and return the heart beat and timstamp
 def fitfile_parse(obj,offset,start_date_str):
@@ -1009,6 +1223,17 @@ def aa_create_instance(user, data, start_date):
 	created_at = start_date
 	AA.objects.create(user = user,created_at = created_at,**data)
 
+# update TwentyfourHourAA table
+
+def aa_whole_day_update_instance(instance, data):
+	aa_update_helper(instance, data)
+
+
+#creating TwentyfourHourAA table
+
+def aa_whole_day_create_instance(user, data, start_date):
+	created_at = start_date
+	TwentyfourHourAA.objects.create(user = user,created_at = created_at,**data)
 
 def aa_calculations(request):
 	start_date_get = request.GET.get('start_date',None)
@@ -2341,6 +2566,10 @@ def update_heartzone_instance(user, start_date,data):
 def create_heartzone_instance(user, data, start_date):
 	created_at = start_date
 	TimeHeartZones.objects.create(user = user,created_at = created_at,data=data)
+
+def create_time_heartzone_instance(user, data, start_date):
+	created_at = start_date
+	TwentyfourHourTimeHeartZones.objects.create(user = user,created_at = created_at,data=data)
 
 def aa_low_high_end_calculations(request):
 	start_date_get = request.GET.get('start_date',None)
