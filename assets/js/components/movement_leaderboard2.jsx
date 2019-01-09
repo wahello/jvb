@@ -198,82 +198,72 @@ class MovementLeaderboard2 extends Component{
 
 	renderTable(Movement_data,Movement_username){
 		let operationCount = 0;
-		// let td_rows = [];
-		// let keys = ["rank","username","time_99","beat_lowered","pure_time_99","pure_beat_lowered","total_hrr_rank_point"];
-		// objectLength = Object.keys(Movement_data).length;
-		// for(let[key,value] of Object.entries(Movement_data)){
-		// 	let td_values = [];
-		// 	 let currentUser = '';
-		// 	for(let key1 of keys){
-		// 		if(key1 == "rank"|| key1 == "total_hrr_rank_point"){
-		// 			td_values.push(<td className ="overall_rank_value">{value[key1]}</td>);
-		// 		}
-		// 		else if(key1 == "username"){
-		// 			let user = value[key1];
-		// 			if(user == Movement_username){
-		// 				td_values.push(<td className ="overall_rank_value">{user}</td>);
-		// 				currentUser = user;
-		// 			}
-		// 			else{
-		// 				td_values.push(<td className ="overall_rank_value">{user}</td>);
-		// 				currentUser = '';
-		// 			}
-		// 		}
+		let td_rows = [];
+		let keys = ["rank","username","nes","exercise_steps","total_steps","mc","exercise_duration","active_min_total","active_min_sleep","active_min_exclude_sleep","active_min_exercise","active_min_exclude_sleep_exercise","total_movement_rank_point"];
+		objectLength = Object.keys(Movement_data).length;
+		for(let[key,value] of Object.entries(Movement_data)){
+			console.log("********************** real",value);
+			let td_values = [];
+			 let currentUser = '';
+			for(let key1 of keys){
+				if(key1 == "rank"){
+					td_values.push(<td className ="overall_rank_value">{value[key1]}</td>);
+				}
+				else if(key1 == "username"){
+					let user = value[key1];
+					if(user == Movement_username){
+						td_values.push(<td className ="overall_rank_value">{user}</td>);
+						currentUser = user;
+					}
+					else{
+						td_values.push(<td className ="overall_rank_value">{user}</td>);
+						currentUser = '';
+					}
+				}
+				else if(key1 == "nes"){
+					td_values.push(<td className ="overall_rank_value">{value[key1].rank}</td>);
+				}
+				else if(key1 == "exercise_steps"){
+					td_values.push(<td className ="overall_rank_value">{value[key1].score.value}</td>);
+				}
+				else if(key1 == "total_steps"){
+					td_values.push(<td className ="overall_rank_value">{value[key1].score.value}</td>);
+				}
+				else if(key1 == "mc"){
+					td_values.push(<td className ="overall_rank_value"><span>{value[key1].score.value}</span><span style = {{paddingLeft:"8px"}}>({value[key1].rank})</span></td>);
+				}
+				else if(key1 == "exercise_duration"){
+					td_values.push(<td className ="overall_rank_value"><span>{value[key1].score.value}</span><span style = {{paddingLeft:"8px"}}>({value[key1].rank})</span></td>);	
+				}
+				else if(key1 == "active_min_total"){
+					td_values.push(<td className ="overall_rank_value"><span>{value[key1].score.value}</span></td>);	
+				}
+				//   else if(key1 == "active_min_sleep"){
+				// 	td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.active_min_sleep.value}</span></td>);
+				//  	td_values.push(<td className ="overall_rank_value"><span>{value[key1].score.value}</span></td>);	
+				// }
+				else if(key1 == "active_min_exclude_sleep"){
+					td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.sleep_duration.value}</span></td>);
+					td_values.push(<td className ="overall_rank_value"><span>{value[key1].score.value}</span></td>);	
+				}
+			    //  else if(key1 == "active_min_exercise"){
+				// td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.active_min_exercise.value}</span></td>);
+				// td_values.push(<td className ="overall_rank_value"><span>{value[key1].score.value}</span></td>);	
+			    //  }
+                else if(key1 == "active_min_exclude_sleep_exercise"){
+					td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.sleep_duration.value}</span></td>);
+					td_values.push(<td className ="overall_rank_value"><span>{value[key1].score.value}</span></td>);	
+				}
+				else if (key1 == "total_movement_rank_point"){
+					td_values.push(<td className ="overall_rank_value"><span>{value[key1]}</span></td>);
+				}
 
-		// 		else if(key1 == "beat_lowered" || key1 == "pure_beat_lowered"){
-		// 			let tempRank = null;
-		// 			let tempScore = null;
-		// 			for(let key3 of ['score','rank']){
-		// 				let value4 = value[key1][key3];
-		// 				if(key3 == "rank" && tempRank == null){
-		// 					tempRank = value4;
-		// 				}
-		// 				else if(key3 == "score" && tempScore == null){
-		// 					tempScore = value4.value;
-		// 				}
-		// 			}
-		// 			if(tempRank != null && tempScore != null)
-		// 			{
-		// 				td_values.push(this.heartBeatsColors(tempScore, tempRank));
-		// 			}
-					
-		// 		}
-				
-		// 		else if(key1 == "time_99" || key1 == "pure_time_99"){
-		// 			let tempRank = null;
-		// 			let tempScore = null;
-		// 			let tempValue = null;
-		// 			for(let key3 of ['score','rank']){
-		// 				let value4 = value[key1][key3];
-		// 				if(key3 == "rank" && tempRank == null){
-		// 					tempRank = value4;
-		// 				}
-		// 				else if(key3 == "score" && tempScore == null){
-		// 					//tempScore = this.time99Colors(value4.value,value[key1].other_scores.points, tempRank);
-		// 					tempScore = value4.value;
-		// 					tempValue = value[key1].other_scores.points;
-		// 				}
-		// 			}
-		// 			if(tempRank != null && tempScore != null)
-		// 				td_values.push(this.time99Colors(tempScore, tempValue, tempRank));
-		// 		}
-		// 		else{
-		// 			for(let key3 of ['score','rank']){
-		// 				if(key3 == "rank"){
-		// 					let value4 = value[key1][key3];
-		// 					td_values.push(<td className ="overall_rank_value">{value4}</td>);
-		// 				}
-		// 				else if(key3 == "score"){
-		// 					td_values.push(<td className ="overall_rank_value">{value4.value}</td>);
+			}
 
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-		// 	++operationCount;
-  //               this.scrollCallback(operationCount);
-		// 	td_rows.push(<tr id={(currentUser) ? 'my-row' : ''}>{td_values}</tr>);	
-		// }
+			++operationCount;
+                this.scrollCallback(operationCount);
+			td_rows.push(<tr id={(currentUser) ? 'my-row' : ''}>{td_values}</tr>);	
+		}
 		let table = <div className = "table table-responsive table-bordered">
 			          	    <table id="my-table" className = "table table-striped">
 								<tr ref="table_header_hrr">
@@ -292,7 +282,7 @@ class MovementLeaderboard2 extends Component{
 									<th>Overall Movement Rank Points (Rank)</th>
 								</tr>
 								<tbody>
-								{/*{td_rows}*/}
+								{td_rows}
 								</tbody>
 							</table>
 						</div>

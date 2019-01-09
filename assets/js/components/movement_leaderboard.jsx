@@ -284,7 +284,8 @@ class MovementLeaderboard extends Component{
 	  				durations.push(range);
 	  				for(let [c_key,c_rankData] of Object.entries(value1)){
 		  				if(c_key == "all_rank"){
-		  					//userName = c_rankData.username;
+		  					userName = c_rankData.username;
+		  					console.log("************* custom",userName)
 			  		 		ranks.push(c_rankData);
 		  		 		}
 	  				}
@@ -295,7 +296,9 @@ class MovementLeaderboard extends Component{
 			  		durations.push(duration);
 			  		for (let [key,rankData] of Object.entries(val)){
 			  		 	if(key == "all_rank"){
-			  		 		// userName = rankData.username;
+			  		 		console.log("******************",rankData);
+			  		 		 userName = rankData.username;
+			  		 		 console.log("**************** single",userName);
 			  		 		ranks.push(rankData);
 			  		 	}	
 			  		}
