@@ -3,8 +3,7 @@ import { withRouter, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
-import fetchHeartRateData, {fetchHeartRateData_fitbit}  from '../network/heratrateOperations';
-import axios from 'axios';
+import fetchHeartRateData  from '../network/heratrateOperations';
 import axiosRetry from 'axios-retry';
 import moment from 'moment';
 import _ from 'lodash';
@@ -30,7 +29,6 @@ class HeartRate extends Component{
 		super(props);
 	    this.processDate = this.processDate.bind(this);
 	    this.successHeartRate = this.successHeartRate.bind(this);
-	    this.successHeartRate_fitbit = this.successHeartRate_fitbit.bind(this);
 	    this.errorHeartRate = this.errorHeartRate.bind(this);
 	    this.renderTime = this.renderTime.bind(this);
 	    this.toggleCalendar = this.toggleCalendar.bind(this);
@@ -70,7 +68,6 @@ class HeartRate extends Component{
 			hr_zone:{},
 	    };
 	}
-
 	successHeartRate(data){
 		this.setState({
 	    	aerobic_zone:data.data.aerobic_zone,
@@ -90,33 +87,11 @@ class HeartRate extends Component{
 		});
 	}
 
-	successHeartRate_fitbit(data){
-		data=JSON.stringfy(data.data);
-		console.log(data);
-		// this.setState({
-	 //    	aerobic_zone:data.data.aerobic_zone,
-  //           anaerobic_zone:data.data.anaerobic_zone,
-  //           below_aerobic_zone:data.data.below_aerobic_zone,
-  //           aerobic_range:data.data.aerobic_range,
-  //           anaerobic_range:data.data.anaerobic_range,
-  //           below_aerobic_range:data.data.below_aerobic_range,
-  //           hrr_not_recorded:data.data.hrr_not_recorded,
-  //           percent_hrr_not_recorded:data.data.percent_hrr_not_recorded,
-		// 	total_time:data.data.total_time,
-		// 	percent_aerobic:data.data.percent_aerobic,
-		// 	percent_below_aerobic:data.data.percent_below_aerobic,
-		// 	percent_anaerobic:data.data.percent_anaerobic,
-		// 	total_percent:data.data.total_percent,
-		// 	fetching_aerobic:false,
-		//});	
-	}
-
 	toggleCalendar(){
 	    this.setState({
 	    	calendarOpen:!this.state.calendarOpen
 	    });
     }
-
     successHeartrateZone(data){
 	  	this.setState({
 	  		hr_zone:data.data,
@@ -308,8 +283,6 @@ class HeartRate extends Component{
 			fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
 			fetchAaWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
 			fetchHeartrateZoneData(this.successHeartrateZone,this.errorHeartrateZone,this.state.selectedDate);
-			
-			fetchHeartRateData_fitbit(this.successHeartRate_fitbit,this.errorHeartRate_fitbit,this.state.selectedDate_fitbit);
 		});
 	}
 	renderRemoveDate(){
@@ -339,8 +312,6 @@ class HeartRate extends Component{
 			fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
 			fetchAaWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
 			fetchHeartrateZoneData(this.successHeartrateZone,this.errorHeartrateZone,this.state.selectedDate);
-
-			fetchHeartRateData_fitbit(this.successHeartRate_fitbit,this.errorHeartRate_fitbit,this.state.selectedDate_fitbit);
 		});
 	}
 	processDate(selectedDate){
@@ -369,11 +340,9 @@ class HeartRate extends Component{
 			fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
 			fetchAaWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
 			fetchHeartrateZoneData(this.successHeartrateZone,this.errorHeartrateZone,this.state.selectedDate);
-
-			fetchHeartRateData_fitbit(this.successHeartRate_fitbit,this.errorHeartRate_fitbit,this.state.selectedDate_fitbit);
-		});	
+		});
+		
 	}
-
 	renderHrrZoneTable(data){
 		// This function create the dynamic table data
 		// and table rows for the Time of heart rate zone 
@@ -496,8 +465,6 @@ class HeartRate extends Component{
 		fetchWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
 		fetchAaWorkoutData(this.successWorkout,this.errorWorkout,this.state.selectedDate);
 		fetchHeartrateZoneData(this.successHeartrateZone,this.errorHeartrateZone,this.state.selectedDate);
-
-		fetchHeartRateData_fitbit(this.successHeartRate_fitbit,this.errorHeartRate_fitbit,this.state.selectedDate_fitbit);
 	}
 
 	render(){
@@ -585,52 +552,6 @@ class HeartRate extends Component{
 			          	    </div>
 		          	    </div>
 		          	  
-<div className = "row justify-content-center hr_table_padd">
-			          	    <div className = "table table-responsive">
-				          	    <table className = "table table-striped table-bordered ">
-					          	    <thead className = "hr_table_style_rows">
-						          	    <th className = "hr_table_style_rows">Ranges</th>
-						          	    <th className = "hr_table_style_rows">Heart Rate Range</th>
-						          	    <th className = "hr_table_style_rows">Time in Zone (hh:mm:ss)</th>
-						          	    <th className = "hr_table_style_rows">% of Time in Zone</th>
-					          	    </thead>  
-					          	    <tbody>   
-						          	    <tr className = "hr_table_style_rows">   
-							          	    <td className = "hr_table_style_rows">Aerobic Range</td>    
-							          	    <td className = "hr_table_style_rows">{(this.state.aerobic_range)}</td>
-							          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.aerobic_zone)}</td>
-							          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_aerobic)}</td>
-						          	    </tr>
-						          	    <tr className = "hr_table_style_rows">
-							          	    <td className = "hr_table_style_rows">Anaerobic Range</td>
-							          	    <td className = "hr_table_style_rows">{(this.state.anaerobic_range)}</td>
-							          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.anaerobic_zone)}</td>
-							          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_anaerobic)}</td>
-						          	    </tr>
-						          	    <tr className = "hr_table_style_rows">
-							          	    <td className = "hr_table_style_rows">Below Aerobic Range</td>
-							          	    <td className = "hr_table_style_rows">{(this.state.below_aerobic_range)}</td>
-							          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.below_aerobic_zone)}</td>
-							          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_below_aerobic)}</td>
-						          	    </tr>
-						          	    <tr className = "hr_table_style_rows">
-							          	    <td className = "hr_table_style_rows">Heart Rate Not Recorded</td>
-							          	    <td className = "hr_table_style_rows">{(this.state.empty)}</td>
-							          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.hrr_not_recorded)}</td>
-							          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.percent_hrr_not_recorded)}</td>
-						          	    </tr>
-						          	    <tr className = "hr_table_style_rows">
-							          	    <td className = "hr_table_style_rows">Total Workout Duration</td>
-											<td className = "hr_table_style_rows">{(this.state.empty)}</td>
-							          	    <td className = "hr_table_style_rows">{this.renderTime(this.state.total_time)}</td>
-							          	    <td className = "hr_table_style_rows">{this.renderpercentage(this.state.total_percent)}</td>
-						          	    </tr>
-					          	    </tbody>
-				          	    </table>   
-			          	    </div>
-		          	    </div>
-		          	  
-
 			      	    <div className = "row justify-content-center hr_table_padd">
 							<div className = "table table-responsive">
 				          	    <table className = "table table-striped table-bordered ">
