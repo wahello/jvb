@@ -22,9 +22,133 @@ class MovementLeaderboard2 extends Component{
 		//this.heartBeatsColors = this.heartBeatsColors.bind(this);
 		this.scrollCallback = this.scrollCallback.bind(this);
 		this.doOnOrientationChange = this.doOnOrientationChange.bind(this);
+		this.renderStepsColor = this.renderStepsColor.bind(this);
+		this.renderCommaSteps = this.renderCommaSteps.bind(this);
+		this.renderGetColors = this.renderGetColors.bind(this);
+		this.strToSecond = this.strToSecond.bind(this);
+		this.getStylesForExerciseduration   = this.getStylesForExerciseduration.bind(this);
+		this.secondsToHms = this.secondsToHms.bind(this);
+
 		//this.time99Colors = this.time99Colors.bind(this);
 		
 	}
+	secondsToHms(value) {
+    
+	var time;
+	if(value){
+		if(value>0){
+			var sec_num = parseInt(value); 
+			var hours   = Math.floor(sec_num / 3600);
+			var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+			var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+			if (hours   < 10) {hours   = "0"+hours;}
+			if (minutes < 10) {minutes = "0"+minutes;}
+			if (seconds < 10) {seconds = "0"+seconds;}
+			time = hours+':'+minutes+':'+seconds;
+		}
+	}
+	else if(value == 0 || value == null){
+		time = "00:00:00";
+	}
+	return time;
+	}
+	
+	strToSecond(value){
+	    let time = value.split(':');
+	    let hours = parseInt(time[0])*3600;
+	    let min = parseInt(time[1])*60;
+	    let s_time = hours + min;
+	    return s_time;
+ 	}
+	getStylesForExerciseduration(value1,rank){
+		let value = this.strToSecond(value1);
+		let background = "";
+		let color = "";
+		if(value == this.strToSecond("0:00")){
+			background = "red";
+		    color = "black";
+		}
+		else if(this.strToSecond("0:01") <= value && value < this.strToSecond("15:00")){
+			background = "orange";
+	        color = "white";
+	    }
+		else if(this.strToSecond("15:00")<=value && value<this.strToSecond("30:00")){
+			background = "yellow";
+	        color = "white";
+	    }
+		else if((this.strToSecond("30:00")<=value && value<this.strToSecond("60:00"))){
+			background = "lightgreen";
+	        color = "white";
+	    }
+		else if(this.strToSecond("60:00")<=value){
+			background = "green";
+	        color = "white";
+	    }
+	    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{value1}</span><span style = {{paddingLeft:"8px"}}>({rank})</span></td>
+	}
+
+	renderCommaSteps(value){
+		value += '';
+     	var x = value.split('.');
+    	var x1 = x[0];
+        var x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+	}
+	renderGetColors(hours_inactive,rank){
+		let background = "";
+		let color = "";
+	    if (hours_inactive <= 4.5){
+	        background = "green";
+	        color = "white";
+	    }
+	    else if (hours_inactive > 4.5 && hours_inactive <= 6){
+	       background = "#32CD32";
+	        color = "white";
+	    }
+	    else if (hours_inactive > 6 && hours_inactive <= 7){
+	       background = "yellow";
+	        color = "white";
+	    }
+	    else if (hours_inactive > 7 && hours_inactive <= 10){
+	       background = "#FF8C00";
+	        color = "white";
+	    }
+	    else if (hours_inactive > 10){
+	        background = "red";
+	        color = "white";
+	    }
+	    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{hours_inactive}</span><span style = {{paddingLeft:"8px"}}>({rank})</span></td>
+  }
+	renderStepsColor(steps,rank){
+		let background = "";
+		let color = "";
+		if (steps >= 10000){
+	        background = "green";
+	        color = "white";
+		}
+	    else if (steps <= 9999 && steps >= 7500){
+	       background = "#32CD32";
+	       color = "white";
+	    }
+	    else if (steps <= 7499 && steps >= 5000){
+	      background = "yellow";
+	       color = "white";
+	    }
+	    else if (steps <= 4999 && steps >= 3500){
+	       background = "#FF8C00";
+	       color = "white";
+	    }
+	    else if (steps < 3500){
+	        background = "red";
+	       color = "black";
+	    }
+	    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{this.renderCommaSteps(steps)}</span><span style = {{paddingLeft:"8px"}}>({rank})</span></td>
+  }
 	// heartBeatsColors(score, rank){
  //  		/* Applying the colors for the table cells depends upon their heart beat ranges*/
  //  		let background = "";
@@ -92,6 +216,8 @@ class MovementLeaderboard2 extends Component{
 	 //        }
   // 		return <td style ={{background:background,color:color}} className ="overall_rank_value">{score + " (" + rank + ")"}</td>
   // 	}
+
+
   	scrollCallback(operationCount) {
       if (objectLength === operationCount) {
           setTimeout(function () {
@@ -221,38 +347,50 @@ class MovementLeaderboard2 extends Component{
 					}
 				}
 				else if(key1 == "nes"){
-					td_values.push(<td className ="overall_rank_value">{value[key1].rank}</td>);
+					td_values.push(this.renderStepsColor(value[key1].score.value,value[key1].rank));
 				}
 				else if(key1 == "exercise_steps"){
-					td_values.push(<td className ="overall_rank_value">{value[key1].score.value}</td>);
+					td_values.push(<td className ="overall_rank_value">{this.renderCommaSteps(value[key1].score.value)}</td>);
 				}
 				else if(key1 == "total_steps"){
-					td_values.push(<td className ="overall_rank_value">{value[key1].score.value}</td>);
+					td_values.push(<td className ="overall_rank_value">{this.renderCommaSteps(value[key1].score.value)}</td>);
 				}
 				else if(key1 == "mc"){
-					td_values.push(<td className ="overall_rank_value"><span>{value[key1].score.value}</span><span style = {{paddingLeft:"8px"}}>({value[key1].rank})</span></td>);
+					td_values.push(this.renderGetColors(value[key1].score.value,value[key1].rank));
 				}
 				else if(key1 == "exercise_duration"){
-					td_values.push(<td className ="overall_rank_value"><span>{value[key1].score.value}</span><span style = {{paddingLeft:"8px"}}>({value[key1].rank})</span></td>);	
+					td_values.push(this.getStylesForExerciseduration(value[key1].score.value,value[key1].rank));	
 				}
 				else if(key1 == "active_min_total"){
-					td_values.push(<td className ="overall_rank_value"><span>{value[key1].score.value}</span></td>);	
+					td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value[key1].score.value)}</span></td>);
+					// if(value[key1].other_scores != null) {
+					// 	td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.active_min_exercise.value}</span></td>);
+					// 	td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.active_min_sleep.value}</span></td>);
+					// }
+					//td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.active_min_sleep.value}</span></td>);
 				}
-				//   else if(key1 == "active_min_sleep"){
-				// 	td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.active_min_sleep.value}</span></td>);
-				//  	td_values.push(<td className ="overall_rank_value"><span>{value[key1].score.value}</span></td>);	
-				// }
+				  else if(key1 == "active_min_sleep"){
+				  	if(value["active_min_total"].other_scores != null) {
+						td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value["active_min_total"].other_scores.active_min_sleep.value)}</span></td>);
+					}
+					//td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.active_min_sleep.value}</span></td>);
+				 	//td_values.push(<td className ="overall_rank_value"><span>{value[key1].score.value}</span></td>);	
+				}
 				else if(key1 == "active_min_exclude_sleep"){
-					td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.sleep_duration.value}</span></td>);
-					td_values.push(<td className ="overall_rank_value"><span>{value[key1].score.value}</span></td>);	
+					td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value[key1].score.value)}</span></td>);	
 				}
-			    //  else if(key1 == "active_min_exercise"){
+			     else if(key1 == "active_min_exercise"){
+			     	if(value["active_min_total"].other_scores != null) {
+						td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value["active_min_total"].other_scores.active_min_exercise.value)}</span></td>);
+					}
 				// td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.active_min_exercise.value}</span></td>);
 				// td_values.push(<td className ="overall_rank_value"><span>{value[key1].score.value}</span></td>);	
-			    //  }
+			     }
+			 //    else if(key1 == "active_min_total"){
+				// 		td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.active_min_exercise.value}</span></td>);
+				// }
                 else if(key1 == "active_min_exclude_sleep_exercise"){
-					td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.sleep_duration.value}</span></td>);
-					td_values.push(<td className ="overall_rank_value"><span>{value[key1].score.value}</span></td>);	
+					td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value[key1].score.value)}</span></td>);	
 				}
 				else if (key1 == "total_movement_rank_point"){
 					td_values.push(<td className ="overall_rank_value"><span>{value[key1]}</span></td>);
