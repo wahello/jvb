@@ -27,8 +27,9 @@ AUTH_PASSWORD_VALIDATORS = []  # allow easy passwords only on local
 
 # Celery
 # CELERY_TASK_ALWAYS_EAGER = False
-# CELERY_BROKER_URL = 'redis://ec2-52-3-232-117.compute-1.amazonaws.com:6379'
-# CELERY_RESULT_BACKEND = 'redis://ec2-52-3-232-117.compute-1.amazonaws.com:6379'
+# CELERY_BROKER_URL = "redis://ec2-3-83-166-190.compute-1.amazonaws.com:6379"
+# CELERY_RESULT_BACKEND = "redis://ec2-3-83-166-190.compute-1.amazonaws.com:6379"
+
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
@@ -115,7 +116,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        # "LOCATION":"redis://ec2-52-3-232-117.compute-1.amazonaws.com:6379/1",
+        # "LOCATION":"redis://ec2-3-83-166-190.compute-1.amazonaws.com:6379/1",
         "LOCATION": "redis://127.0.0.1:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",

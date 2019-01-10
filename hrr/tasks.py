@@ -48,7 +48,7 @@ def create_only_hrrdata(user_id,from_date,to_date):
 		# start_date = datetime(2018,7,10,0,0,0)
 		# from_date = start_date.strftime("%Y-%m-%d")
 		# to_date = from_date
-		store_hhr(user,from_date,to_date)
+		store_hhr(user,from_date,to_date,type_data='dailies')
 	except Exception as e:
 		logger.error(e,exc_info=True)
 

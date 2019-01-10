@@ -128,32 +128,31 @@ def fitbit_aa_chart_one(user_get,start_date):
 									user=user_get).values()
 	activities_start_end_time = []
 	if activity_qs:
-		for i in range(0,len(activity_qs)):
-			activity_data = ast.literal_eval(activity_qs[i]['activities_data'].replace(
-				"'activity_fitbit': {...}","'activity_fitbit': {}"))
-			#duration_in_milli_seconds = activity_queryset_data['activities'][0]['originalDuration']
-			#duration_in_hr_min_sec = convertMillis(duration_in_milli_seconds)
-			for key,activity_list in activity_data.items():
-				for index,single_activity in enumerate(activity_list): 
-				# print(single_activity,"single_activity")
-				# print(index,"index")
-					act_duration = activity_data['activities'][index]['originalDuration']
-					act_start = activity_data['activities'][index]['originalStartTime']
-					act_id = activity_data['activities'][index]['logId']
-					activity_start_data,offset = quicklook.calculations.converter.fitbit_to_garmin_converter.get_epoch_offset_from_timestamp(
-													act_start)
-					act_start_timestamp = activity_start_data + offset
-					act_end_timestamp = act_start_timestamp + (act_duration/1000)
+		activity_data = ast.literal_eval(activity_qs[0]['activities_data'].replace(
+			"'activity_fitbit': {...}","'activity_fitbit': {}"))
+		#duration_in_milli_seconds = activity_queryset_data['activities'][0]['originalDuration']
+		#duration_in_hr_min_sec = convertMillis(duration_in_milli_seconds)
+		for key,activity_list in activity_data.items():
+			for index,single_activity in enumerate(activity_list): 
+			# print(single_activity,"single_activity")
+			# print(index,"index")
+				act_duration = activity_data['activities'][index]['originalDuration']
+				act_start = activity_data['activities'][index]['originalStartTime']
+				act_id = activity_data['activities'][index]['logId']
+				activity_start_data,offset = quicklook.calculations.converter.fitbit_to_garmin_converter.get_epoch_offset_from_timestamp(
+												act_start)
+				act_start_timestamp = activity_start_data + offset
+				act_end_timestamp = act_start_timestamp + (act_duration/1000)
 
-					act_start_srt = get_time_from_timestamp(act_start_timestamp)
-					act_end_srt = get_time_from_timestamp(act_end_timestamp)
-					act_start_end_dict = {}
-					act_start_end_dict[act_id] = {}
-					act_start_end_dict[act_id]["act_start"] = act_start_srt
-					act_start_end_dict[act_id]["act_end"] = act_end_srt
-					act_start_end_dict[act_id]["log_id"] = act_id
-					activities_start_end_time.append(act_start_end_dict)
-			
+				act_start_srt = get_time_from_timestamp(act_start_timestamp)
+				act_end_srt = get_time_from_timestamp(act_end_timestamp)
+				act_start_end_dict = {}
+				act_start_end_dict[str(act_id)] = {}
+				act_start_end_dict[str(act_id)]["act_start"] = act_start_srt
+				act_start_end_dict[str(act_id)]["act_end"] = act_end_srt
+				act_start_end_dict[str(act_id)]["log_id"] = str(act_id)
+				activities_start_end_time.append(act_start_end_dict)
+		
 	# print(activities_start_end_time,"activities_start_end_time")
 	return activities_start_end_time
 		
