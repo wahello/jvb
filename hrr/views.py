@@ -197,6 +197,13 @@ class UserAA(generics.ListCreateAPIView):
 			elif device_type == 'fitbit':
 				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
 				fitbit_hr_difference = fitbit_aa.fitbit_aa_chart_one_new(user_get,start_date)
+				if fitbit_hr_difference.get('total_time'):
+					try:
+						user_aa = AA.objects.get(
+						user=user_get, created_at=start_date)
+						aa_update_instance(user_aa, fitbit_hr_difference)
+					except AA.DoesNotExist:
+						aa_create_instance(user_get, fitbit_hr_difference, start_date)
 				return fitbit_hr_difference
 
 	def get(self,request,format="json"):
@@ -251,6 +258,16 @@ class UserAA_workout(generics.ListCreateAPIView):
 			elif device_type == 'fitbit':
 				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
 				fitbit_aa2_workout = fitbit_aa.calculate_AA2_workout(user_get,start_date)
+				if fitbit_aa2_workout:
+					try:
+						user_obj = AaWorkoutCalculations.objects.get(
+						user_aa_workout=user_get, created_at=start_date)
+						user_obj.data = fitbit_aa2_workout
+						user_obj.save()
+					except AaWorkoutCalculations.DoesNotExist:
+						create_workout_instance(user_get, fitbit_aa2_workout, start_date)
+				else:
+					fitbit_aa2_workout = {}
 				return fitbit_aa2_workout
 
 
@@ -376,6 +393,16 @@ class UserAA_low_high_values(generics.ListCreateAPIView):
 			elif device_type == 'fitbit':
 				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
 				fitbit_aa3 = fitbit_aa.calculate_AA3(user_get,start_date,user_input_activities=None)
+				if fitbit_aa3:
+					try:
+						user_obj = TimeHeartZones.objects.get(
+						user=user_get, created_at=start_date)
+						user_obj.data = fitbit_aa3
+						user_obj.save()
+					except TimeHeartZones.DoesNotExist:
+						create_heartzone_instance(user_get, fitbit_aa3, start_date)
+				else:
+					fitbit_aa3 = {}
 				return fitbit_aa3
 
 	def get(self,request,format="json"):
@@ -810,6 +837,7 @@ def aa_data(user,start_date):
 					if (garmin_id == ui_id) and ((not garmin_hr and ui_hr) or (garmin_hr != ui_hr)):
 						user_created_activity_list.append(k)
 						remove_in_workout.append(int(k["summaryId"]))
+
 	for single_activity in created_activity_dict.values():
 		if single_activity.get('averageHeartRateInBeatsPerMinute',0) == 0 or single_activity.get('averageHeartRateInBeatsPerMinute',0) == '':
 			if activities_dic:
@@ -2126,6 +2154,7 @@ def aa_low_high_end_data(user,start_date):
 		if (single_actiivty.get("manual",0) == True 
 			and activities_dic
 			and activities_dic.get(single_actiivty["summaryId"])):
+
 			user_created_activity_list.append(
 				activities_dic.get(single_actiivty["summaryId"]))
 			for i,k in enumerate(filtered_activities_files):
@@ -2146,6 +2175,7 @@ def aa_low_high_end_data(user,start_date):
 				if (garmin_id == ui_id) and ((garmin_hr != ui_hr) or (garmin_duration != ui_duration)):
 					user_created_activity_list.append(k)
 					remove_in_workout.append(int(k["summaryId"]))
+
 		elif (single_actiivty.get("manual",0) != True 
 			and activities_dic
 			and activities_dic.get(single_actiivty["summaryId"])):
@@ -2539,8 +2569,7 @@ def hrr_data(user,start_date):
 			if heartrate_hrr >= 99:
 				time_toreach_99.append(timestamp_hrr)
 			if(heartrate_hrr == 99) or (heartrate_hrr < 99):
-				break
-					
+				break		
 		new_L = [sum(hrr_final_timestamp[:i+1]) for i in range(len(hrr_final_timestamp))]
 		min_heartrate = []
 		for i,k in zip(hrr_final_heartrate,new_L):
@@ -2870,7 +2899,20 @@ def update_data_as_per_userinput_form(user,data,current_date):
 
 	return data
 
-def store_hhr(user,from_date,to_date):
+def hrr_only_store(user,current_date):
+	data = hrr_data(user,current_date)
+	if data.get('Did_you_measure_HRR'):
+		data = update_data_as_per_userinput_form(user,data,current_date)
+		print("HRR calculations creating")
+		try:
+			user_hrr = Hrr.objects.get(user_hrr=user, created_at=current_date)
+			update_hrr_instance(user_hrr, data)
+		except Hrr.DoesNotExist:
+			create_hrr_instance(user, data, current_date)
+	else:
+		print("NO HRR")
+
+def store_hhr(user,from_date,to_date,type_data=None):
 	'''
 	This function takes user start date and end date, calculate the HRR calculations 
 	then stores in Data base
@@ -2884,17 +2926,14 @@ def store_hhr(user,from_date,to_date):
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
 	while (current_date >= from_date_obj):
-		data = hrr_data(user,current_date)
-		if data.get('Did_you_measure_HRR'):
-			data = update_data_as_per_userinput_form(user,data,current_date)
-			print("HRR calculations creating")
-			try:
-				user_hrr = Hrr.objects.get(user_hrr=user, created_at=current_date)
-				update_hrr_instance(user_hrr, data)
-			except Hrr.DoesNotExist:
-				create_hrr_instance(user, data, current_date)
-		else:
-			print("NO HRR")
+		try:
+			hrr_obj = Hrr.objects.get(user_hrr=user,created_at=current_date)
+		except:
+			hrr_obj = None
+		if type_data == 'dailies' or not hrr_obj or hrr_obj.Did_you_measure_HRR == 'no':	 
+			hrr_only_store(user,current_date)
+		elif not type_data:
+			hrr_only_store(user,current_date)
 		current_date -= timedelta(days=1)
 	print("HRR calculations got finished")
 	return None
@@ -3110,7 +3149,6 @@ def weekly_workout_summary(request):
 	start_date = request.GET.get('start_date',None)
 	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 	complete_data = weekly_workout_helper(request.user,start_date)
-
 	return JsonResponse(complete_data)
 
 def weekly_workout_helper(user,start_date):

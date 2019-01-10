@@ -37,7 +37,9 @@ const activites = { "":"Select",
 "GYM CLASS":"GYM CLASS",
 "GYMNASTICS":"GYMNASTICS",
 "HIKING":"HIKING",
+"HOCKEY_ICE": "HOCKEY(ICE)",
 "HORSEBACK_RIDING":"HORSEBACK RIDING",
+"ICE_SKATING": "ICE SKATING",
 "INDOOR_CARDIO":"INDOOR CARDIO",
 "INDOOR_CYCLING":"INDOOR CYCLING",
 "INDOOR_ROWING":"INDOOR ROWING",
@@ -87,7 +89,8 @@ const activites = { "":"Select",
 "WALKING":"WALKING",
 "WHITEWATER_RAFTING_KAYAKING":"WHITE WATER RAFTING KAYAKING",
 "WIND_KITE_SURFING":"WIND KITE SURFING",
-"YOGA":"YOGA"
+"YOGA":"YOGA",
+"ZUMBA":"ZUMBA"
 };
 
 export default class ActivityGrid extends Component{
@@ -2062,7 +2065,7 @@ renderEditActivityModal(){
                           value={this.state.modal_activity_heart_rate}                               
                           onChange={this.handleChange}>
                           <option key="hours" value="">Select</option>
-                        {this.createSleepDropdown_heartrate(90,220)}     
+                        {this.createSleepDropdown_heartrate(60,220)}     
                         </Input>
                             </div> 
                             </FormGroup>                               
