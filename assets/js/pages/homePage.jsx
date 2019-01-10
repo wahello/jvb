@@ -41,6 +41,7 @@ import WorkoutDashboard from '../components/weekly_workout_dashboard';
 import OverallRank from '../components/overall_hrr_rank';
 import ProgressDashboard from '../components/progressanalyzer_dashboard';
 import ActiveDashboard from '../components/Active_dashboard';
+import MovementLeaderboard from '../components/movement_leaderboard';
 
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
@@ -97,6 +98,7 @@ function initializeLocalState(){
 					<Route path='/overall_hrr_rank' component={OverallRank}/>
 					<Route path='/progressanalyzer_dashboard' component={ProgressDashboard}/>
 					<Route path='/active_dahsboard' component={ActiveDashboard}/>
+					<Route path='/movement_leaderboard' component={RequireAuth(MovementLeaderboard)}/>
 				</Switch>
 			  </BrowserRouter>
 			</Provider> 
