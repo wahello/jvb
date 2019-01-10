@@ -2142,8 +2142,8 @@ def aa_low_high_end_data(user,start_date):
 		if (single_actiivty.get("manual",0) == True 
 			and activities_dic
 			and activities_dic.get(single_actiivty["summaryId"])):
-			user_created_activity_list.append(
-				activities_dic.get(single_actiivty["summaryId"]))
+			# user_created_activity_list.append(
+			# 	activities_dic.get(single_actiivty["summaryId"]))
 			if user_input_strong:
 				for i,k in enumerate(filtered_activities_files):
 					garmin_id = single_actiivty.get("summaryId")
