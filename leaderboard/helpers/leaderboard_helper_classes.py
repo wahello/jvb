@@ -398,7 +398,8 @@ class RankedScore(object):
 			},
 			'other_scores':other_scores,
 			'category':verbose_category[self.category],
-			'rank':self.rank
+			'rank':self.rank,
+			'user_id':self.user.id
 		}
 		return data
 
