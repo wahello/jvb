@@ -23,7 +23,7 @@ export default function fetchHeartRateData(successHeartRate,errorHeartRate,selec
 
 }
 
-export function fetchHeartRateData_fitbit(successHeartRate_fitbit,errorHeartRate_fitbit,selectedDate_fitbit){   
+export function fetchHeartRateData_TwentyFourHour(successHeartRate_TwentyFourHour,errorHeartRate_TwentyFourHour,selectedDate){   
   selectedDate = moment(selectedDate);
   const URL=`/hrr/aa_twentyfour_hour_calculations`;
   const config={
@@ -35,9 +35,9 @@ export function fetchHeartRateData_fitbit(successHeartRate_fitbit,errorHeartRate
    withCredentials: true
   };
   axios(config).then((response)=>{
-   successHeartRate_fitbit(response);
+   successHeartRate_TwentyFourHour(response.data);
   }).catch(function(error){
-    errorHeartRate_fitbit(error);
+    errorHeartRate_TwentyFourHour(error);
   });
 
 }
