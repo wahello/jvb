@@ -16,6 +16,8 @@ import {updateHeartData} from '../../network/heart_cal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import {renderHrrSelectedDateFetchOverlay} from '../dashboard_healpers';
+//import HeartRateCal from './heart_rate_calculation';
+
 
 class No_Hrr_Data extends Component{
 
@@ -100,7 +102,7 @@ class No_Hrr_Data extends Component{
 			no_file_beats_recovered:props.hrr.no_file_beats_recovered,
 			end_time_activity:props.hrr.end_time_activity,
 			no_fitfile_hrr_time_reach_99:props.hrr.no_fitfile_hrr_time_reach_99,
-
+            //update_toggle:false,
 		 }
 		 return initialState;
     }
@@ -131,7 +133,9 @@ class No_Hrr_Data extends Component{
 	 	this.successHeart = this.successHeart.bind(this);
 		this.errorHeart = this.errorHeart.bind(this);
 		this.renderHrrSelectedDateFetchOverlay = renderHrrSelectedDateFetchOverlay.bind(this);
+	    //this.update_toggle = this.update_toggle.bind(this); 
 	}
+	
 	forceUpdateHandler(){
 	    this.forceUpdate();
 	};
@@ -215,15 +219,21 @@ class No_Hrr_Data extends Component{
 					lowest_hrr_no_fitfile:lowest_hrr_no_fitfile,
 					no_file_beats_recovered:no_file_beats_recovered,
 					end_time_activity:nextProps.hrr.end_time_activity,
-					no_fitfile_hrr_time_reach_99:nextProps.hrr.no_fitfile_hrr_time_reach_99
+					no_fitfile_hrr_time_reach_99:nextProps.hrr.no_fitfile_hrr_time_reach_99,
+			       
 				});
         }  
-  	}
+	  }
+	  
+	// update_toggle(){
+	// 	this.setState({
+	// 		update_toggle:!this.state.update_toggle
+	// 	})}
   	/*componentDidUpdate(nextProps) {
   		console.log( 'INSIDE ComponentDidUpdate ======> this.state ::: ' + JSON.stringify( this.state ) );
   		console.log( 'INSIDE ComponentDidUpdate ======> this.props ::: ' + JSON.stringify( this.props ) );
   		
-  	}*/
+	  }*/
 	editEndTimeActivity(){
 		this.setState({
 			editable_end_time_activity:!this.state.editable_end_time_activity,
@@ -279,6 +289,8 @@ class No_Hrr_Data extends Component{
 			editable_end_time_activity:!this.state.editable_end_time_activity
 		})
 	}
+	
+
 	createSleepDropdown(start_num , end_num, mins=false, step=1){
 	    let elements = [];
 	    let i = start_num;
@@ -452,7 +464,15 @@ class No_Hrr_Data extends Component{
 			"end_heartrate_activity":this.state.end_heartrate_activity,
 			"lowest_hrr_no_fitfile":this.state.lowest_hrr_no_fitfile,
 			"no_file_beats_recovered":this.state.no_file_beats_recovered,
+			/* chnages made here */
+			"update_toggle":!this.props.update_toggle,
+		    
+			/* changes made here */
 		},() => {
+			/* changes made here */
+			this.props.updateToggleButton(this.state.update_toggle);
+			
+			/*changes made here */
 			let data = {
 				"end_time_activity":endTimeActivity.utc().valueOf(),
 				"Did_you_measure_HRR":this.state.Did_you_measure_HRR,
