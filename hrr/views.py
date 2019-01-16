@@ -538,8 +538,15 @@ def calculate_garmin_twentyfour_hour_AA3(user,start_date,user_input_activities=N
 	response = fitbit_aa.calculate_AA_chart3(user,start_date,user_input_activities,\
 									AA_data,all_activities_heartrate_list,
 									all_activities_timestamp_list)
+	print (response, type(response))
 
 	total_time = 86400
+
+	for key,value in response.items():
+		if key != 'total':
+			prcnt_total_duration_in_zone = (response[key]['time_in_zone']/total_time)*100
+			response[key]['prcnt_total_duration_in_zone'] = int(Decimal(prcnt_total_duration_in_zone).quantize(0,ROUND_HALF_UP))
+
 	heartrate_not_recorded = response['heartrate_not_recorded']
 	
 	heartrate_not_recorded['time_in_zone'] = total_time-response['total']['total_duration']
