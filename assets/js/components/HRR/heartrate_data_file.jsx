@@ -14,6 +14,8 @@ import {updateHeartData} from '../../network/heart_cal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import {renderHrrSelectedDateFetchOverlay} from '../dashboard_healpers';
+import HeartRateCal from './heart_rate_calculation';
+
 
 class Heartrate_Data extends Component{
 	constructor(props){
@@ -234,8 +236,14 @@ class Heartrate_Data extends Component{
   			let sec = parseInt(this.state.time_99_sec);
   			let time = mins + sec;
   			this.setState({
-  				fetching_hrr:true
+				  fetching_hrr:true,
+				  "update_toggle":!this.state.update_toggle,
+				  "toggle_text":!this.state.toggle_text,
+				  
+				  
   			}, () => {
+				  this.props.updateToggleButton(this.state.update_toggle);
+				  this.props.updateToggleButton(this.state.toggle_text);
   				let data = {
 	  				Did_you_measure_HRR:this.state.Did_you_measure_HRR,
 			    	Did_heartrate_reach_99:this.state.Did_heartrate_reach_99,
@@ -244,7 +252,7 @@ class Heartrate_Data extends Component{
 			    	lowest_hrr_1min:parseInt(this.state.lowest_hrr_1min),
 			    	No_beats_recovered:parseInt(this.state.No_beats_recovered),
 			    };
-			    
+		
 	  			updateHeartData(data, this.props.selectedDate, this.successHeart, this.errorHeart);
 	  			
   			})
