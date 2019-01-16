@@ -565,8 +565,15 @@ def calculate_garmin_twentyfour_hour_AA3(user,start_date,user_input_activities=N
 	response = fitbit_aa.calculate_AA_chart3(user,start_date,user_input_activities,\
 									AA_data,all_activities_heartrate_list,
 									all_activities_timestamp_list)
+	print (response, type(response))
 
 	total_time = 86400
+
+	for key,value in response.items():
+		if key != 'total':
+			prcnt_total_duration_in_zone = (response[key]['time_in_zone']/total_time)*100
+			response[key]['prcnt_total_duration_in_zone'] = int(Decimal(prcnt_total_duration_in_zone).quantize(0,ROUND_HALF_UP))
+
 	heartrate_not_recorded = response['heartrate_not_recorded']
 	
 	heartrate_not_recorded['time_in_zone'] = total_time-response['total']['total_duration']
@@ -587,15 +594,23 @@ def twentyfour_hour_aa_data(user_get,start_date,user_input_activities=None):
 	total_time = 86400
 	garmin_hr_difference['hrr_not_recorded']=total_time-garmin_hr_difference['total_time']
 	
+	percent_anaerobic = (garmin_hr_difference['anaerobic_zone']/total_time)*100
+	percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
+
+	percent_aerobic = (garmin_hr_difference['aerobic_zone']/total_time)*100
+	percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
+
 	percent_below_aerobic = (garmin_hr_difference['below_aerobic_zone']/total_time)*100
 	percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
 
 	percent_hrr_not_recorded = (garmin_hr_difference['hrr_not_recorded']/total_time)*100
 	percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
 
+	garmin_hr_difference['percent_anaerobic'] = percent_anaerobic
 	garmin_hr_difference['percent_hrr_not_recorded'] = percent_hrr_not_recorded
 	garmin_hr_difference['percent_below_aerobic'] = percent_below_aerobic
-	
+	garmin_hr_difference['percent_aerobic'] = percent_aerobic
+
 	garmin_hr_difference['total_time'] = total_time
 	
 	return garmin_hr_difference
@@ -604,7 +619,6 @@ def get_garmin_hrr_timediff(hr_dataset,start_date):
 	hr = []
 	hr_time_diff = []
 	hr_dataset = sorted(hr_dataset, key = lambda i: i['time'])
-	
 	for index, single_time in enumerate(hr_dataset):
 		act_interval_time = hr_dataset[index]["time"]
 		act_interval_hr = hr_dataset[index]["value"]
