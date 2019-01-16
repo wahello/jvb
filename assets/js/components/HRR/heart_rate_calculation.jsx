@@ -20,9 +20,11 @@ import Heartrate_Data from './heartrate_data_file';
 import Other_Hrr_Data from './heart_rate_other_data_file';
 import No_Hrr_Data from './heart_rate_no_data.jsx'; 
 
+
 axiosRetry(axios, { retries: 3});
 var CalendarWidget = require('react-calendar-widget');
 var ReactDOM = require('react-dom');
+
 
 class HeartRateCal extends Component{
 	
@@ -32,8 +34,16 @@ class HeartRateCal extends Component{
 					    	calendarOpen:false,
 						    isOpen:false,
 						    fetching_hrr:false,
-						    editable : false,
-						    selectedDate:new Date(),
+							editable : false,
+							selectedDate:new Date(),
+                            /**changes made here **/            
+							update_toggle:false,
+							
+							another_toggle:true,
+						
+							inculde_hrr:"",
+							/**changes made here **/
+
 				   			"Did_you_measure_HRR":"",
 							"Did_heartrate_reach_99":"",
 							"time_99":"",
@@ -72,8 +82,12 @@ class HeartRateCal extends Component{
 			this.renderSecToMin = this.renderSecToMin.bind(this);
 			this.renderNoworkout = this.renderNoworkout.bind(this);
 			this.captilizeYes = this.captilizeYes.bind(this);
-			this.hrr_data_measured = this.hrr_data_measured.bind(this);
+			this.hrr_data_measured = this.hrr_data_measured.bind(this);/*Changes made here*/ 
+			this.updateToggleButton = this.updateToggleButton.bind(this);
+			/*changes made here */
 			//this.hrrRefreshData = this.hrrRefreshData.bind(this);
+			//this.handleChange=this.handleChange.bind(this);
+			//this.renderText = this.renderText.bind(this);
   	}
   	
 	successHeart(data){
@@ -120,6 +134,10 @@ class HeartRateCal extends Component{
 		this.setState({
 			selectedDate:tomorrow.toDate(),
 			fetching_hrr:true,
+			/* changes made here*/
+			update_toggle:false,
+	        
+			/*changes made here */
 			"Did_you_measure_HRR":"",
 			"Did_heartrate_reach_99":"",
 			"time_99":"",
@@ -153,6 +171,10 @@ class HeartRateCal extends Component{
 		this.setState({
 			selectedDate:yesterday.toDate(),
 			fetching_hrr:true,
+			/*changes made here */
+			update_toggle:false,
+		
+			/*changes made here */
 			"Did_you_measure_HRR":"",
 			"Did_heartrate_reach_99":"",
 			"time_99":"",
@@ -184,6 +206,10 @@ class HeartRateCal extends Component{
 			selectedDate:selectedDate,
 			calendarOpen:!this.state.calendarOpen,
 			fetching_hrr:true,
+			/* changes made here */
+			update_toggle:false,
+			
+			/*changes made here */
 			"Did_you_measure_HRR":"",
 			"Did_heartrate_reach_99":"",
 			"time_99":"",
@@ -335,11 +361,11 @@ class HeartRateCal extends Component{
 	  	}
   		return time;
   	}
-  	toggleCalendar(){
-	    this.setState({
-	    	calendarOpen:!this.state.calendarOpen
-	    });
-    }
+  	// toggleCalendar(){
+	    // this.setState({
+	    	// calendarOpen:!this.state.calendarOpen
+	    // });
+    // }
     toggleEditForm(){
        this.setState({
          editable:!this.state.editable
@@ -351,10 +377,27 @@ class HeartRateCal extends Component{
     	}, () => {
     		console.log("From parent");
     	})
-    }
+	}
+/* changes made here */
+	updateToggleButton(toggle_button){
+		console.log("Inside updateToggleButton");
+		// this.setState({
+		// 	update_toggle:toggle_button,
+	
+			
+		// 	})
+	}
+	
+	/*renderText(){
+      this.setState({
+		toggle_text:'Its Updated'
+	  })
+	}*/
+
     
   render(){
-  	const {fix} = this.props;
+	  const {fix} = this.props;
+	     
   	return(
   		<div className = "container-fluid">
 		        <NavbarMenu title = {"Heartrate Recovery"} />
@@ -389,8 +432,43 @@ class HeartRateCal extends Component{
                               onClick={this.toggleEditForm}
                               className="btn hidden-sm-up">
                               {this.state.editable ? 'View Hrr Data' : 'Edit Hrr Data'}
-                        </Button>			      
-                	</span>
+                        </Button>`
+						</span>
+						
+						
+						<label>Use Updated HRR stats</label>
+						<span>
+						
+                              <label className="switch">
+							  <input type="checkbox"
+										   id="text_area" 
+										  className="form-control"
+										checked={this.state.update_toggle}
+										disabled={!this.state.update_toggle}/>
+						        <span className="slider round"></span>
+								
+                                </label>
+                        </span>
+
+                           
+							
+							<label style={{marginLeft:"20px"}}>Exclude/Include</label>
+						  <span>
+                                <label className="switch" >
+								
+
+                                    <input type="checkbox"
+                                           id="text_area"
+										  className="form-control"
+									       
+							checked={this.state.another_toggle}
+										  />
+										  
+                                    <span className="slider round"></span>
+                                </label>
+                            </span>
+						
+                
 	            	
                 	{/*<span className = "button_padding">
                     	<Button id="nav-btn" className="btn" onClick = {this.hrrRefreshData}>Refresh Hrr Data</Button>			      
@@ -416,6 +494,11 @@ class HeartRateCal extends Component{
 						"lowest_hrr_1min":this.state.lowest_hrr_1min,
 						"No_beats_recovered":this.state.No_beats_recovered}}
 						selectedDate = {this.state.selectedDate}
+						/* changes made here  */
+						update_toggle={this.state.update_toggle}
+						toggle_text={this.state.toggle_text}
+						updateToggleButton={this.updateToggleButton}
+						/*changes made here*/
 						HRR_measured = {this.hrr_data_measured}
 						renderHrrData = {this.renderHrrData.bind(this)}/>
           		}
@@ -432,6 +515,10 @@ class HeartRateCal extends Component{
 					"pure_1min_heart_beats":this.state.pure_1min_heart_beats,
 					"pure_time_99":this.state.pure_time_99}}
 					selectedDate = {this.state.selectedDate}
+                    /*changes made here */
+					update_toggle={this.state.update_toggle}
+					updateToggleButton={this.updateToggleButton}
+					/* changes made here */
 					HRR_measured = {this.hrr_data_measured}
 					renderHrrData = {this.renderHrrData1.bind(this)}/>
           	}
@@ -447,8 +534,16 @@ class HeartRateCal extends Component{
 					"lowest_hrr_no_fitfile":this.state.lowest_hrr_no_fitfile,
 					"end_heartrate_activity":this.state.end_heartrate_activity,
 					"created_at":this.state.created_at,
-					"no_file_beats_recovered":this.state.no_file_beats_recovered}}
-          			selectedDate = {this.state.selectedDate}
+					"no_file_beats_recovered":this.state.no_file_beats_recovered,
+					
+
+				    }}
+					  selectedDate = {this.state.selectedDate}
+					  /*changes made here*/
+					  update_toggle={this.state.update_toggle}
+					  
+					  updateToggleButton={this.updateToggleButton}
+					  /* changes made here*/
           			HRR_measured = {this.hrr_data_measured}
           			renderHrrData = {this.renderHrrNoData.bind(this)}
           			/>   
