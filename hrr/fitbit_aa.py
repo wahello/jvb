@@ -902,8 +902,10 @@ def determine_hhr_activity(user,start_date,fitbit_activities):
 						hrr_difference = 0
 					if hrr_difference > 10:
 						single_activity_dict["activityType"] = "HEART_RATE_RECOVERY"
-						single_activity_dict["steps_type"] = 'non_exercise'
+						single_activity_dict["can_update_steps_type"] = True
 	return fitbit_activities
+
+
 
 
 
