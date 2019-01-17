@@ -1,3 +1,5 @@
+from datetime import datetime,timezone,timedelta
+
 from django.db.models import Q
 from django.db import IntegrityError
 
@@ -9,8 +11,11 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework import status
 
 from user_input.serializers import UserDailyInputSerializer, DailyActivitySerializer
-
 from user_input.models import UserDailyInput, DailyActivity
+from garmin.models import UserGarminDataEpoch,\
+    UserGarminDataDaily
+from quicklook.calculations.calculation_driver import which_device
+from quicklook.calculations.garmin_calculation import get_garmin_model_data
 
 # https://stackoverflow.com/questions/30871033/django-rest-framework-remove-csrf
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -142,12 +147,88 @@ class DailyActivityView(generics.ListCreateAPIView):
         start_dt = self.request.query_params.get('start_date', None)
         end_dt = self.request.query_params.get('end_date', None)
 
-        if start_dt and end_date:
+        if start_dt and end_dt:
             return DailyActivity.objects.filter(
-                created_at__range=(start_dt,end_date), user=user)
+                created_at__range=(start_dt,end_dt), user=user)
         elif start_dt:
             return DailyActivity.objects.filter(
                 created_at=start_dt, user=user)
         else:
             return DailyActivity.objects.all()
 
+class GetManualActivityInfo(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def __get_nearest_sec(self,sec):
+        '''get nearest sec which is multiple of 15'''
+        diff = sec % 15
+        if(diff > 7):
+            return sec + (15-diff)
+        else:
+            return sec - diff
+
+    def get_heartrate(self,act_date,act_start_epoch,act_end_epoch,utc_offset=0):
+        avg_heartrate = None
+        if which_device(self.request.user) == 'garmin':
+            act_dt = datetime.strptime(act_date,"%Y-%m-%d")
+            act_date_epoch = int(act_dt.replace(tzinfo=timezone.utc).timestamp())
+            dailies_data = get_garmin_model_data(
+                UserGarminDataDaily,self.request.user,
+                act_date_epoch,act_date_epoch+86400,
+                order_by = '-start_time_duration_in_seconds'
+            )
+            if(dailies_data):
+                dailies_data = dailies_data[0]
+                act_start_dt = datetime.utcfromtimestamp(act_start_epoch+utc_offset)
+                act_end_dt = datetime.utcfromtimestamp(act_end_epoch+utc_offset)
+                act_start_sec_from_midnight = self.__get_nearest_sec(
+                    (act_start_dt - act_dt).seconds)
+                act_end_sec_from_midnight = self.__get_nearest_sec(
+                    (act_end_dt - act_dt).seconds)
+                if dailies_data.get('timeOffsetHeartRateSamples',None):
+                    hr = []
+                    hr_samples = dailies_data.get('timeOffsetHeartRateSamples')
+                    for sec in range(act_start_sec_from_midnight,act_end_sec_from_midnight+1):
+                        hr.append(hr_samples.get(sec))
+                    hr = filter(lambda x:x is not None, hr)
+                    try:
+                        avg_heartrate = sum(hr)/len(hr)
+                    except ZeroDivisionError:
+                        avg_heartrate = None
+            print("Average HR:",avg_heartrate)
+            return avg_heartrate
+
+        elif which_device == 'fitbit':
+            pass
+
+        return None
+
+    def get_steps(self):
+        pass
+
+    def get_exercise_type(self):
+        pass
+
+    def get_req_params(self):
+        act_date = self.request.query_params.get('date')
+        act_start_epoch = self.request.query_params.get('act_start_epoch')
+        if(act_start_epoch):
+            act_start_epoch = int(act_start_epoch)
+        act_end_epoch = self.request.query_params.get('act_end_epoch')
+        if(act_end_epoch):
+            act_end_epoch = int(act_end_epoch)
+        act_type = self.request.query_params.get('act_type')
+        utc_offset = self.request.query_params.get('utc_offset')
+        if(utc_offset):
+            utc_offset = int(utc_offset)
+        return (act_date,act_start_epoch,act_end_epoch,act_type,utc_offset)
+
+    def get(self, request, format="json"):
+        user = request.user
+        act_date,act_start_epoch,act_end_epoch,act_type,utc_offset = self.get_req_params()
+        if(act_date,act_start_epoch,act_end_epoch,act_type):
+            self.get_heartrate(act_date,act_start_epoch,act_end_epoch,utc_offset)
+            return Response({},status=status.HTTP_200_OK)
+        else:
+            response = {}
+            return Response(response, status=status.HTTP_400_BAD_REQUEST)
