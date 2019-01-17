@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Toggle from "react-toggle-component";
 import { withRouter, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -36,6 +35,7 @@ class HeartRate extends Component{
 	    this.errorHeartRate24Hour = this.errorHeartRate24Hour.bind(this);
 	    this.renderTime = this.renderTime.bind(this); 
 	    this.toggleCalendar = this.toggleCalendar.bind(this);
+	    this.toggleUpdate= this.toggleUpdate.bind(this);
 	    this.renderpercentage = this.renderpercentage.bind(this);
 		this.toggle = this.toggle.bind(this);
 		this.renderTable = this.renderTable.bind(this);
@@ -53,16 +53,17 @@ class HeartRate extends Component{
 		this.renderRemoveDate = this.renderRemoveDate.bind(this);
 	    this.state = {
 	    	mode:'workout',
-	    	selectedDate:new Date(),
+	        selectedDate:new Date(),
 	    	calendarOpen:false,
 	    	isOpen:false,
 	    	fetching_aerobic:false,
-			hr_summary:{},
+			hr_summary:{}, // Workout chart 1
 			empty:"",
-			aa_data:{},//chart 2
-			hr_zone:{}, //chart 3
+			aa_data:{}, // chart 2
+			hr_zone:{}, // Workout chart 3
 			hr_summary_24_hour:{}, // 24 hour chart 1
-			hr_zone_24_hour:{} //24 hour chart 3
+			hr_zone_24_hour:{},//24 hour chart 3
+			updateButton:false,
 	    };
 	}
 
@@ -200,6 +201,14 @@ class HeartRate extends Component{
 	      	isOpen: !this.state.isOpen,
 	    });
   	}
+
+  	toggleUpdate(mode){
+  		console.log("Mode:",mode);
+  		this.setState({
+  			mode: mode,
+  		});
+  	}
+
   	renderNullValue(value){
   		// This function will add the (-) for when the values get null
   		let values;
@@ -363,6 +372,9 @@ class HeartRate extends Component{
 						else if(keyvalue == "anaerobic_zone"){
 							 td_values.push(<td>Anaerobic Range</td>);
 						}
+						else if(keyvalue == 'above_220'){
+							td_values.push(<td>HR Above 220</td>);
+						}
 						else{
 							td_values.push(<td>Heart rate not recorded</td>);
 						}
@@ -496,7 +508,6 @@ class HeartRate extends Component{
 		                        size = "2x"
 			                />
 						</span> 
-						
 		            	<Popover
 				            placement="bottom"
 				            isOpen={this.state.calendarOpen}
@@ -510,9 +521,23 @@ class HeartRate extends Component{
 
 		        </div>
 		       
+		       			<h3><span style = {{fontSize:"22px",fontWeight:"bold"}}>Heart Rate Data</span></h3>
+		       			<label style={{marginLeft:"20px"}}>Workout Aerobic/Anaerobic Ranges</label>
+						<span>
+							<label className="switch" >
+                                <input type="checkbox" onChange={() => this.toggleUpdate('workout')} id="text_area" className="form-control" checked={this.state.mode === 'workout'}></input>
+                                <span className="slider round"></span>
+                            </label>
+                        </span>
+                        <label style={{marginLeft:"20px"}}>24 HourAerobic/Anaerobic Ranges </label>
+						<span>
+							<label className="switch" >
+                                <input type="checkbox" onChange={() => this.toggleUpdate('24hour')} id="text_area" className="form-control" checked={this.state.mode === '24hour'}></input>
+                                <span className="slider round"></span>
+                            </label>
+                        </span>
 		          	    <div className = "row justify-content-center hr_table_padd">
 			          	    <div className = "table table-responsive">
-			          	     <h3><span style = {{fontSize:"22px",fontWeight:"bold"}}>Heart Rate Data</span></h3>
 				          	    <table className = "table table-striped table-bordered ">
 					          	    <thead className = "hr_table_style_rows">
 						          	    <th className = "hr_table_style_rows">Ranges</th>
@@ -547,7 +572,7 @@ class HeartRate extends Component{
 							          	    <td className = "hr_table_style_rows">Heart Rate Not Recorded</td>
 							          	    <td className = "hr_table_style_rows">{(this.state.empty)}</td>
 							          	    <td className = "hr_table_style_rows">{this.renderTime(hrSummary.hrr_not_recorded)}</td>
-							          	    <td className = "hr_table_style_rows">{this.renderpercentage(hrSummary.hrr_not_recorded)}</td>
+							          	    <td className = "hr_table_style_rows">{this.renderpercentage(hrSummary.percent_hrr_not_recorded)}</td>
 						      
 						          	    </tr>
 						          	    <tr className = "hr_table_style_rows">
@@ -589,9 +614,9 @@ class HeartRate extends Component{
 							</div>
 						</div>
 
+						<h3><span style = {{fontSize:"22px",fontWeight:"bold"}}>Heart Rate Zone Data</span></h3>
 						<div className = "row justify-content-center hr_table_padd">
 		          	    	<div className = "table table-responsive">
-		          	    		<h3><span style = {{fontSize:"22px",fontWeight:"bold"}}>Heart Rate Zone Data</span></h3>
 			          	    	<table className = "table table-striped table-bordered ">
 				          	    	<thead>
 					          	    	<th>Heart Rate Zone Low End</th>
