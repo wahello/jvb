@@ -846,4 +846,66 @@ def calculate_AA3(user,start_date,user_input_activities):
 				user,all_activities_heartrate_list,all_activities_timestamp_list)
 			return final_data
 	return {}
-	
+
+
+def sum_list_seq(act_hr_timediff,key):
+	'''
+		This function will return sum of sequential items in list
+	'''
+	sum_timestamp = []
+	single_timestamp = act_hr_timediff.get(key).get('time_diff')
+	if single_timestamp:
+		total_time = [sum(
+			single_timestamp[:i+1]) for i in range(len(single_timestamp))]
+	else:
+			total_time = []
+	sum_timestamp.append(total_time)
+	return sum_timestamp
+
+def hr_2_min(act_hr_timediff,key,sum_timestamp):
+	final_heart_rate = []
+	all_activities_heartrate = act_hr_timediff.get(key).get('hr_values')
+	for single_heartrate,single_time in zip(all_activities_heartrate,sum_timestamp):
+		if single_time:
+			for i,value in enumerate(single_time):
+				if value <= 120:
+					index = single_time.index(value)
+			if index:
+				final_heart_rate.append(all_activities_heartrate[:index])
+		else:
+			final_heart_rate.append([])
+	return final_heart_rate
+
+def determine_hhr_activity(user,start_date,fitbit_activities):
+	'''
+		This functin will detrmine which activity is HRR activity
+	'''
+	activities_start_end_time_list = fitbit_aa_chart_one(user,start_date)
+	# print(activities_start_end_time_list,"activities_start_end_time_list")
+	# print(fitbit_activities,"fitbit_activities")
+	hr_dataset = get_fitbit_hr_data(user,start_date)
+	for index,single_activity_list in enumerate(activities_start_end_time_list):
+		for key,single_activity_dict in fitbit_activities.items():
+			if single_activity_list.get(key):
+				log_id = single_activity_list[key]['log_id']
+				act_start = activities_start_end_time_list[index][key]['act_start']
+				act_end = activities_start_end_time_list[index][key]['act_end']
+				act_hr_timediff = get_hr_timediff(hr_dataset,act_start,act_end,log_id)
+				sequential_list = sum_list_seq(act_hr_timediff,key)
+				hr_in_first_2_mins = hr_2_min(act_hr_timediff,key,sequential_list)
+				if (single_activity_dict.get('durationInSeconds',0) <= 1200 and
+					(single_activity_dict.get("distanceInMeters",0) <= 1287.48)) and hr_in_first_2_mins:
+					lowest_hr = min(hr_in_first_2_mins[0])
+					if lowest_hr:
+						hrr_difference = hr_in_first_2_mins[0][0] - lowest_hr
+					else:
+						hrr_difference = 0
+					if hrr_difference > 10:
+						single_activity_dict["activityType"] = "HEART_RATE_RECOVERY"
+						single_activity_dict["steps_type"] = 'non_exercise'
+	return fitbit_activities
+
+
+
+
+

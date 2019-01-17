@@ -21,6 +21,7 @@ from fitbit.models import UserFitbitDataSleep,UserFitbitDataActivities
 
 from garmin.models import GarminFitFiles
 from hrr.calculation_helper import fitfile_parse
+from hrr.fitbit_aa import determine_hhr_activity
 
 def _get_activities_data(user,target_date):
 	current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
@@ -281,7 +282,9 @@ class GarminData(APIView):
 		if device_type == 'garmin':
 			return _get_activities(user,target_date)
 		elif device_type == 'fitbit':
-			return _get_fitbit_activities_data(user,target_date)
+			fitbit_activities = _get_fitbit_activities_data(user,target_date)
+			hrr_determined_activities = determine_hhr_activity(user,target_date,fitbit_activities)		
+			return hrr_determined_activities
 
 	def get(self, request, format = "json"):
 		target_date = request.query_params.get('date',None)
@@ -291,6 +294,7 @@ class GarminData(APIView):
 			have_activities = quicklook.calculations.garmin_calculation.\
 				do_user_has_exercise_activity(activites.values(),request.user.profile.age())
 			# have_activities = True if activites else False
+			# print(activites,"activities")
 			weight = self._get_weight(target_date)
 			data = {
 				"sleep_stats":sleep_stats,
