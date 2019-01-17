@@ -2,6 +2,7 @@ from datetime import timezone,timedelta
 import ast
 import json
 import time
+import logging
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -283,7 +284,12 @@ class GarminData(APIView):
 			return _get_activities(user,target_date)
 		elif device_type == 'fitbit':
 			fitbit_activities = _get_fitbit_activities_data(user,target_date)
-			hrr_determined_activities = determine_hhr_activity(user,target_date,fitbit_activities)		
+			try:
+				hrr_determined_activities = determine_hhr_activity(
+					user,target_date,fitbit_activities)
+			except:
+				hrr_determined_activities = fitbit_activities
+				logging.exception("message")
 			return hrr_determined_activities
 
 	def get(self, request, format = "json"):
