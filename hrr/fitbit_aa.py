@@ -404,25 +404,26 @@ def fitbit_aa_twentyfour_hour_chart_one_new(user_get,start_date,user_input_activ
 	hr_time_diff = fitbit_hrr_diff_calculation(user_get,start_date)
 	response = fitbit_aa_twentyfour_hour_chart_one(user_get,start_date, hr_time_diff)
 	total_time = 86400
-	response['hrr_not_recorded'] = total_time-response['total_time']
+	if response['total_time']:
+		response['hrr_not_recorded'] = total_time-response['total_time']
 
-	percent_anaerobic = (response['anaerobic_zone']/total_time)*100
-	percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
+		percent_anaerobic = (response['anaerobic_zone']/total_time)*100
+		percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
 
-	percent_below_aerobic = (response['below_aerobic_zone']/total_time)*100
-	percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
+		percent_below_aerobic = (response['below_aerobic_zone']/total_time)*100
+		percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
 
-	percent_aerobic = (response['aerobic_zone']/total_time)*100
-	percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
+		percent_aerobic = (response['aerobic_zone']/total_time)*100
+		percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
 
-	percent_hrr_not_recorded = (response['hrr_not_recorded']/total_time)*100
-	percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
-	
-	response['percent_anaerobic'] = percent_anaerobic
-	response['percent_below_aerobic'] = percent_below_aerobic
-	response['percent_aerobic'] = percent_aerobic
-	response['percent_hrr_not_recorded'] = percent_hrr_not_recorded
-	response['total_time'] = total_time
+		percent_hrr_not_recorded = (response['hrr_not_recorded']/total_time)*100
+		percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+
+		response['percent_anaerobic'] = percent_anaerobic
+		response['percent_below_aerobic'] = percent_below_aerobic
+		response['percent_aerobic'] = percent_aerobic
+		response['percent_hrr_not_recorded'] = percent_hrr_not_recorded
+		response['total_time'] = total_time
 	
 	return response
 
@@ -1010,21 +1011,21 @@ def calculate_twentyfour_hour_AA3(user,start_date,user_input_activities):
 									all_activities_heartrate_list,
 									all_activities_timestamp_list)
 
+	if response['total']['total_duration']:
+		total_time = 86400
+		for key,value in response.items():
+			if key != 'total':
+				prcnt_total_duration_in_zone = (response[key]['time_in_zone']/total_time)*100
+				response[key]['prcnt_total_duration_in_zone'] = int(Decimal(prcnt_total_duration_in_zone).quantize(0,ROUND_HALF_UP))
 
-	total_time = 86400
-	for key,value in response.items():
-		if key != 'total':
-			prcnt_total_duration_in_zone = (response[key]['time_in_zone']/total_time)*100
-			response[key]['prcnt_total_duration_in_zone'] = int(Decimal(prcnt_total_duration_in_zone).quantize(0,ROUND_HALF_UP))
+		heartrate_not_recorded = response['heartrate_not_recorded']
 
-	heartrate_not_recorded = response['heartrate_not_recorded']
-	
-	heartrate_not_recorded['time_in_zone'] = total_time-response['total']['total_duration']
-	
-	percent_hrr_not_recorded = (heartrate_not_recorded['time_in_zone']/total_time)*100
-	percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+		heartrate_not_recorded['time_in_zone'] = total_time-response['total']['total_duration']
 
-	heartrate_not_recorded['prcnt_total_duration_in_zone'] = percent_hrr_not_recorded
-	response['total']['total_duration'] = total_time
+		percent_hrr_not_recorded = (heartrate_not_recorded['time_in_zone']/total_time)*100
+		percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+
+		heartrate_not_recorded['prcnt_total_duration_in_zone'] = percent_hrr_not_recorded
+		response['total']['total_duration'] = total_time
 	
 	return response

@@ -420,7 +420,7 @@ class UserAA_twentyfour_hour(generics.ListCreateAPIView):
 			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
 			if device_type == 'fitbit':
 				fitbit_hr_difference = fitbit_aa.fitbit_aa_twentyfour_hour_chart_one_new(user_get,start_date)
-				if fitbit_hr_difference.get('total_time'):
+				if fitbit_hr_difference:
 					try:
 						user_aa = TwentyfourHourAA.objects.get(
 						user=user_get, created_at=start_date)
@@ -430,13 +430,13 @@ class UserAA_twentyfour_hour(generics.ListCreateAPIView):
 				return fitbit_hr_difference
 			elif device_type == 'garmin':
 				final_query = twentyfour_hour_aa_data(user_get,start_date)
-				if final_query.get('total_time'):
+				if final_query:
 					try:
 						user_aa = TwentyfourHourAA.objects.get(
 						user=user_get, created_at=start_date)
 						aa_whole_day_update_instance(user_aa, final_query)
 					except TwentyfourHourAA.DoesNotExist:
-						aa_whole_day_create_instance(user_get, final_query, start_date)
+						res = aa_whole_day_create_instance(user_get, final_query, start_date)
 				return final_query
 
 	def get(self,request,format="json"):
@@ -538,24 +538,23 @@ def calculate_garmin_twentyfour_hour_AA3(user,start_date,user_input_activities=N
 	response = fitbit_aa.calculate_AA_chart3(user,start_date,user_input_activities,\
 									AA_data,all_activities_heartrate_list,
 									all_activities_timestamp_list)
-	print (response, type(response))
+	if response['total']['total_duration']:
+		total_time = 86400
 
-	total_time = 86400
+		for key,value in response.items():
+			if key != 'total':
+				prcnt_total_duration_in_zone = (response[key]['time_in_zone']/total_time)*100
+				response[key]['prcnt_total_duration_in_zone'] = int(Decimal(prcnt_total_duration_in_zone).quantize(0,ROUND_HALF_UP))
 
-	for key,value in response.items():
-		if key != 'total':
-			prcnt_total_duration_in_zone = (response[key]['time_in_zone']/total_time)*100
-			response[key]['prcnt_total_duration_in_zone'] = int(Decimal(prcnt_total_duration_in_zone).quantize(0,ROUND_HALF_UP))
+		heartrate_not_recorded = response['heartrate_not_recorded']
 
-	heartrate_not_recorded = response['heartrate_not_recorded']
-	
-	heartrate_not_recorded['time_in_zone'] = total_time-response['total']['total_duration']
-	
-	percent_hrr_not_recorded = (heartrate_not_recorded['time_in_zone']/total_time)*100
-	percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+		heartrate_not_recorded['time_in_zone'] = total_time-response['total']['total_duration']
 
-	heartrate_not_recorded['prcnt_total_duration_in_zone'] = percent_hrr_not_recorded
-	response['total']['total_duration'] = total_time
+		percent_hrr_not_recorded = (heartrate_not_recorded['time_in_zone']/total_time)*100
+		percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+
+		heartrate_not_recorded['prcnt_total_duration_in_zone'] = percent_hrr_not_recorded
+		response['total']['total_duration'] = total_time
 
 	return response
 
@@ -565,27 +564,28 @@ def twentyfour_hour_aa_data(user_get,start_date,user_input_activities=None):
 	hrr_data = get_garmin_hrr_timediff(hr_dataset,start_dt)
 	garmin_hr_difference = fitbit_aa.fitbit_aa_twentyfour_hour_chart_one(user_get,start_date, hrr_data)
 	total_time = 86400
-	garmin_hr_difference['hrr_not_recorded']=total_time-garmin_hr_difference['total_time']
-	
-	percent_anaerobic = (garmin_hr_difference['anaerobic_zone']/total_time)*100
-	percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
+	if garmin_hr_difference['total_time']:
+		garmin_hr_difference['hrr_not_recorded']=total_time-garmin_hr_difference['total_time']
 
-	percent_aerobic = (garmin_hr_difference['aerobic_zone']/total_time)*100
-	percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
+		percent_anaerobic = (garmin_hr_difference['anaerobic_zone']/total_time)*100
+		percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
 
-	percent_below_aerobic = (garmin_hr_difference['below_aerobic_zone']/total_time)*100
-	percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
+		percent_aerobic = (garmin_hr_difference['aerobic_zone']/total_time)*100
+		percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
 
-	percent_hrr_not_recorded = (garmin_hr_difference['hrr_not_recorded']/total_time)*100
-	percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
+		percent_below_aerobic = (garmin_hr_difference['below_aerobic_zone']/total_time)*100
+		percent_below_aerobic = int(Decimal(percent_below_aerobic).quantize(0,ROUND_HALF_UP))
 
-	garmin_hr_difference['percent_anaerobic'] = percent_anaerobic
-	garmin_hr_difference['percent_hrr_not_recorded'] = percent_hrr_not_recorded
-	garmin_hr_difference['percent_below_aerobic'] = percent_below_aerobic
-	garmin_hr_difference['percent_aerobic'] = percent_aerobic
+		percent_hrr_not_recorded = (garmin_hr_difference['hrr_not_recorded']/total_time)*100
+		percent_hrr_not_recorded = int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP))
 
-	garmin_hr_difference['total_time'] = total_time
-	
+		garmin_hr_difference['percent_anaerobic'] = percent_anaerobic
+		garmin_hr_difference['percent_hrr_not_recorded'] = percent_hrr_not_recorded
+		garmin_hr_difference['percent_below_aerobic'] = percent_below_aerobic
+		garmin_hr_difference['percent_aerobic'] = percent_aerobic
+
+		garmin_hr_difference['total_time'] = total_time
+
 	return garmin_hr_difference
 
 def get_garmin_hrr_timediff(hr_dataset,start_date):
@@ -618,13 +618,13 @@ def get_garmin_hr_data(user_get,start_date):
 	hr_qs = UserGarminDataDaily.objects.filter(
 							start_time_in_seconds=start_date_time_obj,
 							user=user_get).last()
-
-	hrr_qs = ast.literal_eval(hr_qs.data)
-	hr_data = hrr_qs['timeOffsetHeartRateSamples']
-	for keys in hr_data:
-		act_interval_time = ast.literal_eval(keys)
-		act_interval_hr = hr_data[keys]
-		hr_dataset.append({'time': act_interval_time, 'value':act_interval_hr})
+	if hr_qs != None:
+		hrr_qs = ast.literal_eval(hr_qs.data)
+		hr_data = hrr_qs['timeOffsetHeartRateSamples']
+		for keys in hr_data:
+			act_interval_time = ast.literal_eval(keys)
+			act_interval_hr = hr_data[keys]
+			hr_dataset.append({'time': act_interval_time, 'value':act_interval_hr})
 	return hr_dataset
 
 # Parse the fit files and return the heart beat and timstamp
