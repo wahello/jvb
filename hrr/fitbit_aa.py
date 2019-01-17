@@ -1028,4 +1028,6 @@ def calculate_twentyfour_hour_AA3(user,start_date,user_input_activities):
 		heartrate_not_recorded['prcnt_total_duration_in_zone'] = percent_hrr_not_recorded
 		response['total']['total_duration'] = total_time
 	
-	return response
+		return response
+	else:
+		return {}

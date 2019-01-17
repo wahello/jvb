@@ -420,7 +420,7 @@ class UserAA_twentyfour_hour(generics.ListCreateAPIView):
 			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
 			if device_type == 'fitbit':
 				fitbit_hr_difference = fitbit_aa.fitbit_aa_twentyfour_hour_chart_one_new(user_get,start_date)
-				if fitbit_hr_difference:
+				if fitbit_hr_difference.get('total_time'):
 					try:
 						user_aa = TwentyfourHourAA.objects.get(
 						user=user_get, created_at=start_date)
@@ -430,7 +430,7 @@ class UserAA_twentyfour_hour(generics.ListCreateAPIView):
 				return fitbit_hr_difference
 			elif device_type == 'garmin':
 				final_query = twentyfour_hour_aa_data(user_get,start_date)
-				if final_query:
+				if final_query.get('total_time'):
 					try:
 						user_aa = TwentyfourHourAA.objects.get(
 						user=user_get, created_at=start_date)
@@ -556,7 +556,9 @@ def calculate_garmin_twentyfour_hour_AA3(user,start_date,user_input_activities=N
 		heartrate_not_recorded['prcnt_total_duration_in_zone'] = percent_hrr_not_recorded
 		response['total']['total_duration'] = total_time
 
-	return response
+		return response
+	else:
+		return {}
 
 def twentyfour_hour_aa_data(user_get,start_date,user_input_activities=None):
 	hr_dataset = get_garmin_hr_data(user_get,start_date)
