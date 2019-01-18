@@ -621,6 +621,14 @@ def get_garmin_hrr_timediff(hr_dataset,start_date):
 	hr = []
 	hr_time_diff = []
 	hr_dataset = sorted(hr_dataset, key = lambda i: i['time'])
+	
+	dataset = []
+	for index, single_time in enumerate(hr_dataset):
+		if hr_dataset[index]['time'] <= 86400:
+			dataset.append({'time': hr_dataset[index]["time"], 
+							'value': hr_dataset[index]["value"]})
+	hr_dataset = dataset
+	
 	for index, single_time in enumerate(hr_dataset):
 		act_interval_time = hr_dataset[index]["time"]
 		act_interval_hr = hr_dataset[index]["value"]

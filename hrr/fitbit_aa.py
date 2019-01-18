@@ -125,15 +125,18 @@ def get_hrr_timediff(hr_dataset,start_date,end_date):
 	hr_time_diff = []
 	start_date_time_obj = convert_timestr_time(start_date)
 	end_date_time_obj = convert_timestr_time(end_date)
+
+	dataset = []
+	for index, single_time in enumerate(hr_dataset):
+		if hr_dataset[index]['time'] <= 86400:
+			dataset.append({'time': hr_dataset[index]["time"], 
+							'value': hr_dataset[index]["value"]})
+	hr_dataset = dataset
+
 	for index, single_time in enumerate(hr_dataset):
 		act_interval_time = hr_dataset[index]["time"]
 		act_interval_hr = hr_dataset[index]["value"]
 		act_interval_time_obj = convert_timestr_time(act_interval_time)
-
-		# if index == 0:
-		# 	# diff_times = get_diff_time(act_interval_time_obj, start_date_time_obj)
-		# 	diff_times = 10
-		# 	hr_time_diff.append(diff_times)
 
 		if index == len(hr_dataset)-1:
 			diff_times = get_diff_time(end_date_time_obj, act_interval_time_obj)
@@ -195,11 +198,9 @@ def get_fitbit_hr_data(user_get,start_date):
 		try:
 			heartrate_data = ast.literal_eval(qs)
 		except:
-			# print(type(qs),"vvvv")
 			qs = ast.literal_eval(qs.replace(
 				"'heartrate_fitbit': {...}","'heartrate_fitbit': {}"))
 			heartrate_data = qs
-		# print(heartrate_data,"heartrate_data")
 		hr_dataset = heartrate_data.get('activities-heart-intraday').get('dataset')
 	return hr_dataset
 
