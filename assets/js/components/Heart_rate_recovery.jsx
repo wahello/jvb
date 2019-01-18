@@ -521,7 +521,6 @@ class HeartRate extends Component{
 
 		        </div>
 		       
-		       			<h3><span style = {{fontSize:"22px",fontWeight:"bold"}}>Heart Rate Data</span></h3>
 		       			<label style={{marginLeft:"20px"}}>Workout Aerobic/Anaerobic Ranges</label>
 						<span>
 							<label className="switch" >
@@ -536,6 +535,8 @@ class HeartRate extends Component{
                                 <span className="slider round"></span>
                             </label>
                         </span>
+
+                        <h3><span style = {{fontSize:"22px",fontWeight:"bold"}}>Heart Rate Data</span></h3>
 		          	    <div className = "row justify-content-center hr_table_padd">
 			          	    <div className = "table table-responsive">
 				          	    <table className = "table table-striped table-bordered ">
@@ -586,8 +587,29 @@ class HeartRate extends Component{
 				          	    </table>   
 			          	    </div>
 		          	    </div>
-		          	  
-			      	    <div className = "row justify-content-center hr_table_padd">
+		          	 
+						<h3><span style = {{fontSize:"22px",fontWeight:"bold"}}>Heart Rate Zone - Low End & High End</span></h3>
+						<div className = "row justify-content-center hr_table_padd">
+		          	    	<div className = "table table-responsive">
+			          	    	<table className = "table table-striped table-bordered ">
+				          	    	<thead>
+					          	    	<th>Heart Rate Zone Low End</th>
+					          	    	<th>Heart Rate Zone High End</th>
+					          	    	<th>Classification</th>
+					          	    	<th>Time in Zone(hh:mm:ss)</th>
+					          	    	<th>% of Total Duration in Zone</th>
+				          	    	</thead>
+				          	    	<tbody>
+				          	    		{this.renderHrrZoneTable(hrzone)}
+				          	    	<tr></tr>
+				          	    	
+				          	    	</tbody>
+			          	    	</table>
+		          	    	</div>
+          	    		</div>
+
+          	    		<h3><span style = {{fontSize:"22px",fontWeight:"bold"}}>Heart Rate while Workout</span></h3>
+          	    		<div className = "row justify-content-center hr_table_padd">
 							<div className = "table table-responsive">
 				          	    <table className = "table table-striped table-bordered ">
 									<tr>
@@ -614,25 +636,6 @@ class HeartRate extends Component{
 							</div>
 						</div>
 
-						<h3><span style = {{fontSize:"22px",fontWeight:"bold"}}>Heart Rate Zone Data</span></h3>
-						<div className = "row justify-content-center hr_table_padd">
-		          	    	<div className = "table table-responsive">
-			          	    	<table className = "table table-striped table-bordered ">
-				          	    	<thead>
-					          	    	<th>Heart Rate Zone Low End</th>
-					          	    	<th>Heart Rate Zone High End</th>
-					          	    	<th>Classification</th>
-					          	    	<th>Time in Zone(hh:mm:ss)</th>
-					          	    	<th>% of Total Duration in Zone</th>
-				          	    	</thead>
-				          	    	<tbody>
-				          	    		{this.renderHrrZoneTable(hrzone)}
-				          	    	<tr></tr>
-				          	    	
-				          	    	</tbody>
-			          	    	</table>
-		          	    	</div>
-          	    		</div>
 		          	  	{this.renderAerobicSelectedDateFetchOverlay()}
 		          	</div>
 				</div>
