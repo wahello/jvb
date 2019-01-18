@@ -405,61 +405,76 @@ class HeartRate extends Component{
 
 	renderTable(data){
 		let td_rows = [];
+		let totals = null;
+		if(!_.isEmpty(data)){
+			totals = data.totals;
+		}
 		let keys = ["date","workout_type","duration","average_heart_rate","max_heart_rate","steps",
 		"duration_in_aerobic_range","percent_aerobic","duration_in_anaerobic_range",
 		"percent_anaerobic","duration_below_aerobic_range","percent_below_aerobic",
 		"duration_hrr_not_recorded","percent_hrr_not_recorded"];
 		for(let[key1,value] of Object.entries(data)){
-			let td_values = [];
-			for(let key of keys){
-				if(key == "duration"){
-					let keyvalue = this.renderTime(value[key]);
-				    td_values.push(<td>{keyvalue}</td>);
+			if(key1 !== "totals"){
+				let td_values = [];
+				for(let key of keys){
+					if(key == "duration"){
+						let keyvalue = this.renderTime(value[key]);
+					    td_values.push(<td>{keyvalue}</td>);
+					}
+					else if(key == "duration_hrr_not_recorded"){
+						let keyvalue =  this.renderTime(value[key]);
+					    td_values.push(<td>{keyvalue}</td>);
+					}
+					else if(key == "percent_hrr_not_recorded"){
+						let keyvalue = this.renderpercentage(value[key]);
+					    td_values.push(<td>{keyvalue}</td>);
+					}
+					else if(key == "duration_in_aerobic_range"){
+						let keyvalue = this.renderTime(value[key]);
+					    td_values.push(<td>{keyvalue}</td>);
+					}
+					else if(key == "duration_in_anaerobic_range"){
+						let keyvalue = this.renderTime(value[key]);
+					    td_values.push(<td>{keyvalue}</td>);
+					}
+					else if(key == "duration_below_aerobic_range"){
+						let keyvalue = this.renderTime(value[key]);
+					    td_values.push(<td>{keyvalue}</td>);
+					}
+					else if(key == "percent_aerobic"){
+						let keyvalue = this.renderpercentage(value[key]);
+					    td_values.push(<td>{keyvalue}</td>);
+					}
+					else if(key == "percent_anaerobic"){
+						let keyvalue = this.renderpercentage(value[key]);
+					    td_values.push(<td>{keyvalue}</td>);
+					}
+					else if(key == "percent_below_aerobic"){
+						let keyvalue = this.renderpercentage(value[key]);
+					    td_values.push(<td>{keyvalue}</td>);
+					}
+					else if(key == "steps"){
+							let keyvalue = this.stepsValue(value[key]);
+		            		td_values.push(<td>{keyvalue}</td>);
+		            	}
+					else{
+						let keyvalue = this.renderNullValue(value[key]);
+						td_values.push(<td>{keyvalue}</td>);
+					}
+					 
 				}
-				else if(key == "duration_hrr_not_recorded"){
-					let keyvalue =  this.renderTime(value[key]);
-				    td_values.push(<td>{keyvalue}</td>);
-				}
-				else if(key == "percent_hrr_not_recorded"){
-					let keyvalue = this.renderpercentage(value[key]);
-				    td_values.push(<td>{keyvalue}</td>);
-				}
-				else if(key == "duration_in_aerobic_range"){
-					let keyvalue = this.renderTime(value[key]);
-				    td_values.push(<td>{keyvalue}</td>);
-				}
-				else if(key == "duration_in_anaerobic_range"){
-					let keyvalue = this.renderTime(value[key]);
-				    td_values.push(<td>{keyvalue}</td>);
-				}
-				else if(key == "duration_below_aerobic_range"){
-					let keyvalue = this.renderTime(value[key]);
-				    td_values.push(<td>{keyvalue}</td>);
-				}
-				else if(key == "percent_aerobic"){
-					let keyvalue = this.renderpercentage(value[key]);
-				    td_values.push(<td>{keyvalue}</td>);
-				}
-				else if(key == "percent_anaerobic"){
-					let keyvalue = this.renderpercentage(value[key]);
-				    td_values.push(<td>{keyvalue}</td>);
-				}
-				else if(key == "percent_below_aerobic"){
-					let keyvalue = this.renderpercentage(value[key]);
-				    td_values.push(<td>{keyvalue}</td>);
-				}
-				else if(key == "steps"){
-						let keyvalue = this.stepsValue(value[key]);
-	            		td_values.push(<td>{keyvalue}</td>);
-	            	}
-				else{
-					let keyvalue = this.renderNullValue(value[key]);
-					td_values.push(<td>{keyvalue}</td>);
-				}
-				 
-			}
-			td_rows.push(<tr>{td_values}</tr>);
+				td_rows.push(<tr>{td_values}</tr>);
+			}	
 		}
+			if(totals){
+					let td_values = [
+						<td colSpan="3">{"Totals"}</td>,
+						<td>{this.stepsValue(totals.totals_steps)}</td>,
+						<td>{this.renderTime(totals.totals_duration)}</td>,
+						<td>{this.renderpercentage(totals.totals_percent)}</td>,
+					];
+					td_rows.push(<tr>{td_values}</tr>);
+			}
 		return td_rows;
 	}
 
