@@ -37,7 +37,7 @@ from hrr.models import (AaCalculations,
 					AaWorkoutCalculations,
 					AA)
 
-from .fitbit_push import store_data,session_fitbit
+from fitbit.fitbit_push import store_data,session_fitbit,get_client_id_secret,include_resting_hr
 import quicklook.calculations.converter
 from quicklook.calculations.converter.fitbit_to_garmin_converter import fitbit_to_garmin_activities
 from django.conf import settings
@@ -45,19 +45,19 @@ from django.conf import settings
 # Create your views here.
 redirect_uri = settings.FITBIT_REDIRECT_URL
 
-def get_client_id_secret(user):
-	'''
-		This function get the client id and client secret from databse for respective use
-		if not then provide jvb app client id,secret
-	'''
-	try:
-		user_app_tokens = UserAppTokens.objects.get(user=user)
-		client_id = user_app_tokens.user_client_id
-		client_secret = user_app_tokens.user_client_secret
-	except:
-		client_id = settings.FITBIT_CONSUMER_ID
-		client_secret = settings.FITBIT_CONSUMER_SECRET
-	return client_id,client_secret
+# def get_client_id_secret(user):
+# 	'''
+# 		This function get the client id and client secret from databse for respective use
+# 		if not then provide jvb app client id,secret
+# 	'''
+# 	try:
+# 		user_app_tokens = UserAppTokens.objects.get(user=user)
+# 		client_id = user_app_tokens.user_client_id
+# 		client_secret = user_app_tokens.user_client_secret
+# 	except:
+# 		client_id = settings.FITBIT_CONSUMER_ID
+# 		client_secret = settings.FITBIT_CONSUMER_SECRET
+# 	return client_id,client_secret
 
 class FitbitPush(APIView):
 	'''
@@ -146,24 +146,24 @@ def fitbit_user_subscriptions(user):
 		fibtbit_user_id))
 	return None
 
-def include_resting_hr(heartrate_fitbit_intraday,heartrate_fitbit):
-	try:
-		heartrate_fitbit_intraday_json = ''
-		heartrate_fitbit_json = ''
-		if heartrate_fitbit_intraday:
-			heartrate_fitbit_intraday_json = heartrate_fitbit_intraday.json()
-		if heartrate_fitbit:
-			heartrate_fitbit_json = heartrate_fitbit.json()
-		if heartrate_fitbit_intraday_json and heartrate_fitbit_json:
-			if heartrate_fitbit_json['activities-heart'][0]["value"].get("restingHeartRate"):
-				heartrate_fitbit_intraday_json['activities-heart'][0]["restingHeartRate"] = heartrate_fitbit_json['activities-heart'][0]["value"].get("restingHeartRate")
-			return heartrate_fitbit_intraday_json
-		elif heartrate_fitbit_json:
-			return heartrate_fitbit_json
-		else:
-			return {}
-	except:
-		return {}
+# def include_resting_hr(heartrate_fitbit_intraday,heartrate_fitbit):
+# 	try:
+# 		heartrate_fitbit_intraday_json = ''
+# 		heartrate_fitbit_json = ''
+# 		if heartrate_fitbit_intraday:
+# 			heartrate_fitbit_intraday_json = heartrate_fitbit_intraday.json()
+# 		if heartrate_fitbit:
+# 			heartrate_fitbit_json = heartrate_fitbit.json()
+# 		if heartrate_fitbit_intraday_json and heartrate_fitbit_json:
+# 			if heartrate_fitbit_json['activities-heart'][0]["value"].get("restingHeartRate"):
+# 				heartrate_fitbit_intraday_json['activities-heart'][0]["restingHeartRate"] = heartrate_fitbit_json['activities-heart'][0]["value"].get("restingHeartRate")
+# 			return heartrate_fitbit_intraday_json
+# 		elif heartrate_fitbit_json:
+# 			return heartrate_fitbit_json
+# 		else:
+# 			return {}
+# 	except:
+# 		return {}
 
 def api_fitbit(session,date_fitbit):
 	'''
@@ -185,7 +185,7 @@ def api_fitbit(session,date_fitbit):
 	heartrate_fitbit = include_resting_hr(heartrate_fitbit_intraday,heartrate_fitbit_normal)
 	try:
 		steps_fitbit = session.get(
-		"https://api.fitbit.com/1/user/-/activities/steps/date/{}/1d/15min/time/00:00/23:59.json".format(date_fitbit))
+		"https://api.fitbit.com/1/user/-/activities/steps/date/{}/1d/1min/time/00:00/23:59.json".format(date_fitbit))
 	except:
 		steps_fitbit = session.get(
 		"https://api.fitbit.com/1/user/-/activities/steps/date/{}/1d.json".format(date_fitbit))

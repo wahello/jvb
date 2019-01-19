@@ -39,18 +39,17 @@ class ActivityWeatherView(APIView):
 
                     weather_data[activity['summaryId']] = {**activity_weather}
                 else:
-                    weather_data[activity['summaryId']] = weather_report_dict(None)
+                    weather_data[activity['summaryId']] = weather_report_dict()
             else:
                 weather_keys = list(weather_report_dict().keys())
                 weather_keys.remove('weather_condition')
-                weather_report = {}
                 for key in weather_keys:
-                    weather_report[key] = activity[key]
+                    weather_data[key] = activity.get(key)
         return Response(weather_data)
 
 
 def get_weather_info_using_garmin_activity(user, epoch_time, summaryId):
-    weather_report =  weather_report_dict(None)
+    weather_report =  weather_report_dict()
     try:
         garmin_activity = UserGarminDataActivity.objects.get(user=user, summary_id=summaryId)
         garmin_activity_data = ast.literal_eval(garmin_activity.data)
@@ -117,7 +116,7 @@ def has_weather_data(activity):
     weather information othewise False
     '''
     dictfilt = lambda x, y: dict([(i, x[i]) for i in x if i in set(y)])
-    weather_keys = list(weather_report_dict(None).keys())
+    weather_keys = list(weather_report_dict().keys())
     weather_keys_values = dictfilt(activity, weather_keys)
     return False if all(
         value == None for value in weather_keys_values.values()) else True

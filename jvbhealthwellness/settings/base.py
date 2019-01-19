@@ -175,3 +175,6 @@ REQUEST_LOGGING_DISABLE_COLORIZE = True
 SU_LOGIN_REDIRECT_URL = "/users/dashboard"
 
 SU_LOGOUT_REDIRECT_URL = "/su/login/"
+
+# 90 days (in seconds)
+SESSION_COOKIE_AGE = 90*24*3600

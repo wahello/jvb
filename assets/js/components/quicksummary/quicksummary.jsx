@@ -156,8 +156,9 @@ class Quicklook extends Component{
 					 data.grades_ql.prcnt_unprocessed_food_consumed_gpa + data.grades_ql.alcoholic_drink_per_week_gpa +
 					 total_penalty
 				)
-			if(user_input_data){
-				let ui_sleep_duration = user_input_data.strong_input.sleep_time_excluding_awake_time;
+			
+			if(data.sleep_ql){
+				let ui_sleep_duration = data.sleep_ql.sleep_per_user_input;
 				avg_sleep_per_night = (ui_sleep_duration && ui_sleep_duration != ":"
 					&& ui_sleep_duration != "-") ? ui_sleep_duration : data.sleep_ql.sleep_per_wearable;
 			}

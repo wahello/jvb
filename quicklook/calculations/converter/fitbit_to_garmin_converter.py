@@ -1,3 +1,4 @@
+import quicklook.calculations.garmin_calculation
 from datetime import datetime,timezone,time
 import string
 import random
@@ -98,6 +99,15 @@ def generate_random_id(length=19):
 	 rid = ''.join([random.choice(string.ascii_letters+string.digits)
 	 			    for _ in range(length)])
 	 return rid
+
+def timestring_to_datetime(dt,time_string):
+	# Since fitbit do not provide the offset value like Garmin,
+	# the step summary start time is converted into the utc datetime
+	# So for example, if start time is "13:05:00", it'll be converted
+	# to utc 13:05:00 datetime object
+	h,m,s = list(map(int,time_string.split(':')))
+	start_time = datetime.combine(dt,time(h,m,s,tzinfo=timezone.utc))
+	return start_time
 
 def fitbit_to_garmin_sleep(sleep_summary):
 	garmin_sleep = {
@@ -207,13 +217,40 @@ def fitbit_to_garmin_epoch(epoch_summary,summary_date,summary_duration=900):
 		'activeKilocalories': 0,
 		'startTimeOffsetInSeconds': 0
 	}
-	h,m,s = list(map(int,epoch_summary['time'].split(':')))
-	# Since fitbit do not provide the offset value like Garmin,
-	# the step summary start time is converted into the utc datetime
-	# So for example, if start time is "13:05:00", it'll be converted
-	# to utc 13:05:00 datetime object and then converted in epoch
-	start_time_in_seconds = int(datetime.combine(
-		summary_date,time(h,m,s,tzinfo=timezone.utc)).timestamp())
+	start_time_in_seconds = timestring_to_datetime(summary_date,epoch_summary['time'])
+	start_time_in_seconds = start_time_in_seconds.timestamp()
 	garmin_epoch["startTimeInSeconds"] = start_time_in_seconds
 	garmin_epoch['steps'] = epoch_summary.get('value',0)
+	garmin_epoch['activeTimeInSeconds'] = epoch_summary.get('activeSeconds',0)
 	return garmin_epoch
+
+def steps_minutly_to_quartly(summary_date,steps):
+	quaterly_data_list = []
+	if steps:
+		quarterly_data = {}
+		for step in steps:
+			start_time_in_seconds = timestring_to_datetime(summary_date,step['time'])
+			hour = start_time_in_seconds.hour
+			quarter = quicklook.calculations.garmin_calculation.\
+				which_quarter(start_time_in_seconds)
+			if not quarterly_data.get(hour,None):
+				quarter1 = "{}:00:00".format(hour)
+				quarter2 = "{}:15:00".format(hour)
+				quarter3 = "{}:30:00".format(hour)
+				quarter4 = "{}:45:00".format(hour)
+				quarterly_data[hour] = {
+					0:{"time":quarter1, "value":0, "activeSeconds":0},
+					1:{"time":quarter2, "value":0, "activeSeconds":0},
+					2:{"time":quarter3, "value":0, "activeSeconds":0},
+					3:{"time":quarter4, "value":0, "activeSeconds":0}
+				}
+			active_seconds = 0
+			if(step.get('value',0)):
+				active_seconds = 60
+			quarterly_data[hour][quarter]["value"] += step.get('value',0)
+			quarterly_data[hour][quarter]["activeSeconds"] += active_seconds
+
+		quaterly_data_list = [quaterly for hour in quarterly_data.values()
+								   	   for quaterly in hour.values()]
+
+	return quaterly_data_list

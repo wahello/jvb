@@ -55,7 +55,7 @@ export default class FastedModal extends Component{
 				                 {
 		                              !this.props.editable &&
 		                              <div className="input">
-		                                <p>{this.state.food_ate_before_workout?this.state.food_ate_before_workout:'Nothing'}</p>
+		                                <p>{this.state.food_ate_before_workout}</p>
 		                              </div>
 		                         }        	
                           </FormGroup> 

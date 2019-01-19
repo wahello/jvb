@@ -254,10 +254,7 @@ class MCS_Dashboard extends Component{
 	    	<td style = {{background:background, color:color ,  borderColor: "#505050" ,
 			borderStyle: "solid" ,
 			borderWidth: "0 2px 2px 2px" ,
-			margin: "0 1px 1px 1px" ,
-			marginTop: "0 !important " ,
-			paddingTop: "0 !important ",
-			borderSpacing: "0 inherit inherit inherit !important " 
+			margin: "0 1px 1px 1px"  
 		    }}>
 	    	<div>
 		    	{this.stepsValueComma(score)}
@@ -391,10 +388,7 @@ class MCS_Dashboard extends Component{
 			         		 	td_values.push(<td className="mcs-dashboard"  style ={{ borderColor: "#505050" ,
 									borderStyle: "solid" ,
 									borderWidth: "0 2px 2px 2px" ,
-									margin: "0 1px 1px 1px" ,
-									marginTop: "0 !important " ,
-									paddingTop: "0 !important ",
-									borderSpacing: "0 inherit inherit inherit !important " 
+									margin: "0 1px 1px 1px"  
 								   }}>{values2[key3]}</td>);
 		          			td_rows.push(<tr className="mcs-dashboard">{td_values}</tr>);
 		         		}
@@ -455,12 +449,15 @@ class MCS_Dashboard extends Component{
 			         </div>
 			        
 			        
-		    
+		           
 			       <div className = "row justify-content-center mcs_dashboard">
-			          <div className="col-sm-9 table_process">
+			          <div className="table_process col-sm-10 col-xs-10">
 			          	   <div style={{textAlign:'center'}}className="steps_count">{this.renderSteps(this.state.exercise_steps,this.state.non_exercise_steps,this.state.total_steps)}</div>          	
-	          	    	  <table className = "table table-striped  tableContent  border_spacing">
-		          	    	<tr className="table_content">
+						   <table className = "table tableContent table_one table-condensed  justify-content-center" >
+							<div className="table-condensed">
+							<tbody className="tbody tbody_content">
+					        
+		          	    	<tr className="table_content ">
 			          	    	<th className="table_size">12 - 12:59 AM</th>
 			          	    	<th className="table_size">1 - 1:59 AM</th> 
 			          	    	<th className="table_size">2 - 2:59 AM</th>
@@ -469,10 +466,15 @@ class MCS_Dashboard extends Component{
 			          	    	<th className="table_size">5 - 5:59 AM</th>
 			          	 
 		          	    	</tr>
-		          	    	<tbody className="tbody">
-		          	    		{this.renderTable(this.state.mc_data)}
 
-		          	    </tbody>
+		          	    		{this.renderTable(this.state.mc_data)}
+                             
+		          	      </tbody>
+						 </div>	
+
+						 <div className="table-condensed">
+
+						 <tbody className="tbody tbody_content">
 		          	    	<tr className="table_content">
 		          	    		<th className="table_size">6 - 6:59 AM</th>
 			          	    	<th className="table_size">7 - 7:59 AM</th>
@@ -481,9 +483,14 @@ class MCS_Dashboard extends Component{
 			          	    	<th className="table_size">10 - 10:59 AM</th>
 			          	    	<th className="table_size">11 - 11:59 AM</th>
 		          	    	</tr>
-		          	    	<tbody className="tbody">
+		          	    	
 		          	    		{this.renderTablecolumn(this.state.mc_data)}
 		          	    </tbody>
+						</div>
+
+						<div class="table-condensed">
+
+						  <tbody className="tbody tbody_content">
 		          	    	<tr className="table_content">
 			          	    	<th className="table_size">12 - 12:59 PM</th>
 			          	    	<th className="table_size">1 - 1:59 PM</th>
@@ -492,9 +499,12 @@ class MCS_Dashboard extends Component{
 			          	    	<th className="table_size">4 - 4:59 PM</th>
 			          	    	<th className="table_size">5 - 5:59 PM</th>
 		          	    	</tr>
-		          	    	<tbody className="tbody">
+		          	    	
 		          	    		{this.renderTabledata(this.state.mc_data)}
 		          	    </tbody>
+						</div>
+                        <div className="table-condensed">
+						  <tbody className="tbody tbody_content">
 		          	    	 <tr className="table_content">
 		          	    		<th className="table_size">6 - 6:59 PM</th>
 			          	    	<th className="table_size">7 - 7:59 PM</th>
@@ -503,17 +513,18 @@ class MCS_Dashboard extends Component{
 			          	    	<th className="table_size">10 - 10:59 PM</th>
 			          	    	<th className="table_size">11 - 11:59 PM</th>
 		          	    	</tr>
-		          	    	<tbody className="tbody">
+		          	    	
 		          	    		{this.renderTablecolumndata(this.state.mc_data)}
 		          	    </tbody>
-		          	</table>
+						</div>
+		          	  </table>
 	          	</div>
 		     </div>
 
 		          <div className = "row justify-content-center table_size1">
-		          	<div className = "col-sm-9">
+		          	<div className = "col-sm-10">
 		          	<div className="table_pro">
-		          	    <table className="table table-striped  border_spacing">
+		          	    <table className="table border_spacing table-condensed table_pro">
 		          	    	<tr>
 		          	    		<th className="mcs-dashboard mcs_th" style={{background:'rgb(0,176,240)',color:'black' , borderColor: '#505050',
                                            borderStyle: 'solid' , borderWidth: '2px 2px 0 2px !important ' }}>Sleeping Hours</th>
@@ -534,8 +545,10 @@ class MCS_Dashboard extends Component{
 								
 		          	    	</tr>
 		          	    	<tbody>
-		          	    		{this.renderTablestatus(this.state.mc_data)}
+								  {this.renderTablestatus(this.state.mc_data)}			  
 		          	    	</tbody>
+
+							  
 		            </table>
 		            </div>
 		            </div>
@@ -556,8 +569,8 @@ class MCS_Dashboard extends Component{
 		       				<p className="mcs_content" style={{marginLeft:"15px"}}>Nap Hours = Any portion of an hour user taking nap</p>
 		       		</div>
 		       		</div>
-     							
-     </div>
+     				</div>
+					
 
       	  
       
