@@ -41,10 +41,14 @@ class ActivityWeatherView(APIView):
                 else:
                     weather_data[activity['summaryId']] = weather_report_dict()
             else:
-                weather_keys = list(weather_report_dict().keys())
-                weather_keys.remove('weather_condition')
+                weather = weather_report_dict()
+                weather_keys = list(weather.keys())
                 for key in weather_keys:
-                    weather_data[key] = activity.get(key)
+                    if(key == 'weather_condition'):
+                         weather[key] = activity.get(key)
+                    else:
+                        weather[key]['value'] = activity.get(key)
+                weather_data[activity['summaryId']] = weather
         return Response(weather_data)
 
 
