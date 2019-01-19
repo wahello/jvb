@@ -14,6 +14,7 @@ from .models import UserDailyInput,\
 					InputsChangesFromThirdSources,\
 					Goals,\
 					DailyActivity
+from weather.utils.weather_helper import weather_report_dict
 
 
 class DailyUserInputStrongSerializer(serializers.ModelSerializer):
@@ -251,28 +252,22 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 				for k in keys_to_remove:
 					activity_stats.pop(k, None)
 
-				temperature_feels_like = activity.get('temperature_feels_like')
-				humidity = activity.get('humidity')
-				dewPoint = activity.get('dewPoint')
-				wind = activity.get('wind')
-				temperature = activity.get('temperature')
-				weather_condition = activity.get('weather_condition')
-
 				weather_attrs = {
-					'temperature_feels_like': {'value': temperature_feels_like, 'units': 'fahrenheit'},
-					'humidity': {'value': humidity, 'units': 'percentage'},
-					'dewPoint': {'value': dewPoint, 'units': 'fahrenheit'},
-					'wind': {'value': wind, 'units': 'miles/hour'},
-					'temperature': {'value': temperature, 'units': 'fahrenheit'},
-					'weather_condition': weather_condition
+					'temperature_feels_like': activity.get('temperature_feels_like'),
+					'humidity': activity.get('humidity'),
+					'dewPoint': activity.get('dewPoint'),
+					'wind': activity.get('wind'),
+					'temperature': activity.get('temperature'),
+					'weather_condition': activity.get('weather_condition')
 				}
+				weather_attrs_with_units = weather_report_dict(weather_attrs)
 				act_obj = DailyActivity(
 					user = user,
 					activity_id = activity['summaryId'],
 					created_at = creation_date,
 					activity_data = activity_stats,
 					start_time_in_seconds  = start_time,
-					activity_weather = weather_attrs,
+					activity_weather = weather_attrs_with_units,
 					can_update_steps_type = activity.get(
 						'can_update_steps_type',True),
 					steps_type = activity.get('steps_type'),
@@ -284,7 +279,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 				if todays_activity:
 					todays_activity.__dict__.update(
 						activity_data = activity_stats,
-						activity_weather = weather_attrs,
+						activity_weather = weather_attrs_with_units,
 						start_time_in_seconds  = start_time,
 						can_update_steps_type = activity.get(
 							'can_update_steps_type',True),

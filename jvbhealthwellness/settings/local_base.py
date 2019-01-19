@@ -106,7 +106,7 @@ LOGGING = {
     }
 }
 
-# CORS 
+# CORS
 CORS_ORIGIN_ALLOW_ALL = True
 
 # Cache configuration
@@ -127,4 +127,5 @@ CACHES = {
 # Fitbit
 FITBIT_CONSUMER_ID = '22CN46'
 FITBIT_CONSUMER_SECRET = '94d717c6ec36c270ed59cc8b5564166f'
-FITBIT_REDIRECT_URL = 'http://127.0.0.1:8000/callbacks/fitbit' 
+FITBIT_REDIRECT_URL = 'http://127.0.0.1:8000/callbacks/fitbit'
+WEATHER_KEY = '52871e89c8acb84e7c8b8bc8ac5ba307'

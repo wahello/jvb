@@ -318,8 +318,11 @@ def update_fitbit_data(user,date,create_notification,data,collection_type):
 		UserFitbitDataActivities.objects.filter(user=user,
 			date_of_activities=date).update(activities_data=data)
 	elif collection_type == "sleep_fitbit":
-		UserFitbitDataSleep.objects.filter(user=user,
-			date_of_sleep=date).update(sleep_data=data)
+		sleep_instance = UserFitbitDataSleep.objects.filter(user=user,
+			date_of_sleep=date)
+		sleep_instance.sleep_data = data
+		# UserFitbitDataSleep.objects.filter(user=user,
+		# 	date_of_sleep=date).update(sleep_data=data)
 	elif collection_type == "heartrate_fitbit":
 		UserFitbitDataHeartRate.objects.filter(user=user,
 			date_of_heartrate=date).update(heartrate_data=data)
@@ -364,15 +367,17 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 		try:
 			if "sleep_fitbit" == key:
 				date_of_sleep = value['sleep'][0]['dateOfSleep']
-				try:
-					sleep_obj = UserFitbitDataSleep.objects.filter(user=user,
+				sleep_obj = UserFitbitDataSleep.objects.filter(user=user,
 					created_at=start_date)
+				if sleep_obj:
+					# sleep_obj = UserFitbitDataSleep.objects.filter(user=user,
+					# created_at=start_date)
 					update_fitbit_data(user,date_of_sleep,create_notification,value,key)
 					print("Updated sleep-Fitbit successfully")
 					if create_notification != None:
 						create_notification.state = "processed"
 						create_notification.save()
-				except UserFitbitDataSleep.DoesNotExist:
+				else:
 					UserFitbitDataSleep.objects.create(user=user,
 					date_of_sleep=date_of_sleep,
 					sleep_data=value,created_at=start_date)
@@ -400,14 +405,14 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 				# else:
 				# 	fitbit_date_obj = 0
 				# if fitbit_date_obj == start_date:
-				try:
-					activity_obj = UserFitbitDataActivities.objects.filter(user=user,created_at=start_date)
+				activity_obj = UserFitbitDataActivities.objects.filter(user=user,created_at=start_date)
+				if activity_obj:
 					update_fitbit_data(user,date_of_activity,create_notification,value,key)
 					print("Updated Activity-Fitbit successfully")
 					if create_notification != None:
 						create_notification.state = "processed"
 						create_notification.save()
-				except UserFitbitDataActivities.DoesNotExist:
+				else:
 					UserFitbitDataActivities.objects.create(user=user,
 					date_of_activities=date_of_activity,
 					activities_data=value,created_at=start_date)
@@ -425,12 +430,12 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 		try:
 			if "heartrate_fitbit" == key:
 				date_of_heartrate = value['activities-heart'][0]['dateTime']
-				try:
-					heartrate_obj = UserFitbitDataHeartRate.objects.filter(user=user,
+				heartrate_obj = UserFitbitDataHeartRate.objects.filter(user=user,
 					created_at=start_date)
+				if heartrate_obj:
 					update_fitbit_data(user,date_of_heartrate,create_notification,value,key)
 					print("Updated Heartrate-Fitbit successfully")
-				except UserFitbitDataHeartRate.DoesNotExist:
+				else:
 					UserFitbitDataHeartRate.objects.create(user=user,
 					date_of_heartrate=date_of_heartrate,
 					heartrate_data=value,created_at=start_date)
@@ -442,12 +447,12 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 		try:
 			if "steps_fitbit" == key:
 				date_of_steps = value['activities-steps'][0]['dateTime']
-				try:
-					steps_obj = UserFitbitDataSteps.objects.filter(user=user,
+				steps_obj = UserFitbitDataSteps.objects.filter(user=user,
 					created_at=start_date)
+				if steps_obj:
 					update_fitbit_data(user,date_of_steps,create_notification,value,key)
 					print("Updated steps-Fitbit successfully")
-				except UserFitbitDataSteps.DoesNotExist:
+				else:
 					UserFitbitDataSteps.objects.create(user=user,
 					date_of_steps=date_of_steps,
 					steps_data=value,created_at=start_date)
@@ -458,15 +463,15 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 		try:
 			if "body_fat_fitbit" == key:
 				date_of_body = value['fat'][0]['date']
-				try:
-					body_obj = UserFitbitDatabody.objects.filter(user=user,
+				body_obj = UserFitbitDatabody.objects.filter(user=user,
 					created_at=date_of_body)
+				if body_obj:
 					update_fitbit_data(user,date_of_body,create_notification,value,key)
 					if create_notification != None:
 						create_notification.state = "processed"
 						create_notification.save()
 					print("Updated body_fat_fitbit successfully")
-				except UserFitbitDatabody.DoesNotExist:
+				else:
 					UserFitbitDatabody.objects.create(user=user,
 					date_of_body=date_of_body,
 					body_data=value,created_at=date_of_body)
@@ -483,15 +488,15 @@ def store_data(fitbit_all_data,user,start_date,create_notification,data_type=Non
 		try:
 			if "foods_goal_logs" == key:
 				# date_of_foods = value['activities-steps'][0]['dateTime']
-				try:
-					foods_obj = UserFitbitDatafoods.objects.filter(user=user,
+				foods_obj = UserFitbitDatafoods.objects.filter(user=user,
 					created_at=datetime.now())
+				if foods_obj:
 					update_fitbit_data(user,date.today(),create_notification,value,key)
 					print("Updated foods_goal_logs successfully")
 					if create_notification != None:
 						create_notification.state = "processed"
 						create_notification.save()
-				except UserFitbitDatafoods.DoesNotExist:
+				else:
 					UserFitbitDatafoods.objects.create(user=user,
 					date_of_foods=date.today(),
 					foods_data=value,created_at=datetime.now())

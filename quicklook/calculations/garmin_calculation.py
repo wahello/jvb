@@ -867,10 +867,51 @@ def activity_step_from_epoch(act_start, act_end, epochs):
 			steps += epoch_steps
 	return steps
 
+def get_zones_cutoff(age):
+	'''
+	calculate the aerobic and anaerobic zone
+	start heartbeat
+	'''
+	if age:
+		return {
+			"aerobic_zone":180-age-29,
+			"anaerobic_zone":180-age+5
+		}
+	return None
 
-def get_filtered_activity_stats(activities_json,manually_updated_json,
-		userinput_activities = None,include_duplicate = False,
-		include_deleted = False,**kwargs):
+def get_activity_exercise_non_exercise_category(activity,user_age):
+	'''
+	Determine the category of provided activity summary. Possible
+	categories are "exercise" and "non-exercise"
+	'''
+	EXERCISE = 'exercise'
+	NON_EXERCISE = 'non_exercise'
+	HEART_RATE_RECOVERY = 'heart_rate_recovery'
+
+	zones = get_zones_cutoff(user_age)
+	if activity.get("steps_type"):
+		return activity.get("steps_type")
+
+	if activity.get('activityType','').lower() == HEART_RATE_RECOVERY:
+		return NON_EXERCISE
+	elif 'walk' in activity.get('activityType','').lower():
+		avg_hr = activity.get("averageHeartRateInBeatsPerMinute",0)
+		# If average heart rate in beats per minute is not submitted by user
+		# then it would be by default empty string. In that case default it to 0 
+		if not avg_hr:
+			avg_hr = 0
+		if(not avg_hr or avg_hr < zones['aerobic_zone']):
+			return NON_EXERCISE
+		else:
+			return EXERCISE
+	else:
+		return EXERCISE
+
+
+def get_filtered_activity_stats(activities_json,user_age,
+		manually_updated_json={},userinput_activities = None,
+		include_duplicate = False,include_deleted = False,
+		include_non_exercise = False,provide_all=False,**kwargs):
 	
 	'''
 	Combine activities, manually edited activities and user input activities
@@ -881,20 +922,34 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 
 	Args:
 		activities_json (list): List of  activities
-		manually_updated_json (list): List of manually edited activities
+		user_age(int): Age of the user 
+		manually_updated_json (dict): Dictionary of manually edited activities.
+			Key is activity id and value is activity data. Default to empty
+			dictionary
 		userinput_activities (dict): dictionary of user created/modified
 			activities. Key is activity id and value is complete activity data 
 		include_duplicate (bool): Include duplicate activity summaries in the
 			final activities list if set to True. Default to False
 		include_deleted (bool): Include deleted activity summaries in the
-			final activities list if set to True. Default to False
+			final activities list if set to True. Default to False,
+		include_non_exercise(bool): Include non exercise activitity sumamaries
+			in the final activities list if set to True. Default to False.
+		provide_all(bool): Return separately both exercise and non-exercise
+			activity summaries. Default to False 
+
+		Return:
+			list: List of all exercise activities if "include_non_exercise" is 
+				False else list of all exercise and non-exercise activities
+			tuple(list,list): Tuple having list of exercise activitities and
+				list of both exercise and non-exercise activities as first
+				and second item if "provide_all" is true
 	'''
 
 	activities_json = copy.deepcopy(activities_json)
 	userinput_activities = copy.deepcopy(userinput_activities)
 	manually_updated_json = copy.deepcopy(manually_updated_json)
 	epoch_summaries = kwargs.get('epoch_summaries')
-
+	
 	# If same id exist in user submited activities, give it more preference
 	# than manually edited activities
 	def userinput_edited(obj):
@@ -959,66 +1014,115 @@ def get_filtered_activity_stats(activities_json,manually_updated_json,
 			calendar_date = kwargs.get('calendar_date'),
 			activities = filtered_activities
 		)
-
 	for act in filtered_activities:
 		if act['summaryId'] in act_renamed_to_hrr:
 			act['activityType'] = 'HEART_RATE_RECOVERY'
-
+		act_category = get_activity_exercise_non_exercise_category(act,
+				user_age)
+		act['steps_type'] = act_category
 
 	deleted_activities = []
 	duplicate_activities = []
 	dup_del_activities = []
 	non_dup_non_del_activities = []
 
+	deleted_non_exec_activities = []
+	duplicate_non_exec_activities = []
+	dup_del_non_exec_activities = []
+	non_dup_non_del_non_exec_activities = []
+
 	for act in filtered_activities:
 		duplicate = is_duplicate_activity(act,filtered_activities)
 		deleted = act.get('deleted',False)
-		if not duplicate and not deleted:
-			act['duplicate'] = False
-			act['deleted'] = False
-			non_dup_non_del_activities.append(act)
-		elif duplicate and deleted:
-			act['duplicate'] = True
-			dup_del_activities.append(act)
-		elif duplicate and not deleted:
-			act['duplicate'] = True
-			act['deleted'] = False
-			duplicate_activities.append(act)
-		elif deleted and not duplicate:
-			deleted_activities.append(act)
+		activity_category = act.get('steps_type')
+		if activity_category == 'non_exercise':
+			if not duplicate and not deleted:
+				act['duplicate'] = False
+				act['deleted'] = False
+				non_dup_non_del_non_exec_activities.append(act)
+			elif duplicate and deleted:
+				act['duplicate'] = True
+				dup_del_non_exec_activities.append(act)
+			elif duplicate and not deleted:
+				act['duplicate'] = True
+				act['deleted'] = False
+				duplicate_non_exec_activities.append(act)
+			elif deleted and not duplicate:
+				deleted_non_exec_activities.append(act)
+		else:
+			if not duplicate and not deleted:
+				act['duplicate'] = False
+				act['deleted'] = False
+				non_dup_non_del_activities.append(act)
+			elif duplicate and deleted:
+				act['duplicate'] = True
+				dup_del_activities.append(act)
+			elif duplicate and not deleted:
+				act['duplicate'] = True
+				act['deleted'] = False
+				duplicate_activities.append(act)
+			elif deleted and not duplicate:
+				deleted_activities.append(act)
 
-	final_activities = []
+	# Have both exercise and non-exercise activity
+	final_all_activities = []
+	if(provide_all or include_non_exercise):
+		if include_duplicate and include_deleted:
+			final_all_activities = (
+				non_dup_non_del_activities + non_dup_non_del_non_exec_activities
+				+ duplicate_activities + duplicate_non_exec_activities
+				+ deleted_activities + deleted_non_exec_activities
+				+ dup_del_activities + dup_del_non_exec_activities)
+		elif not include_duplicate and not include_deleted:
+			final_all_activities = (
+				non_dup_non_del_activities 
+				+ non_dup_non_del_non_exec_activities)
+		elif include_duplicate:
+			final_all_activities = (
+				non_dup_non_del_activities + non_dup_non_del_non_exec_activities
+				+ duplicate_activities + duplicate_non_exec_activities)
+		elif include_deleted:
+			final_all_activities = (
+				non_dup_non_del_activities + non_dup_non_del_non_exec_activities
+				+ deleted_activities + deleted_non_exec_activities)
+		else:
+			final_all_activities = filtered_activities
+	
+	final_exercise_activities = []
 	if include_duplicate and include_deleted:
-		final_activities = filtered_activities
+		final_exercise_activities = (
+			non_dup_non_del_activities
+			+ duplicate_activities
+			+ deleted_activities
+			+ dup_del_activities)
 	elif not include_duplicate and not include_deleted:
-		final_activities = non_dup_non_del_activities
+		final_exercise_activities = non_dup_non_del_activities
 	elif include_duplicate:
-		final_activities = non_dup_non_del_activities+duplicate_activities
+		final_exercise_activities = non_dup_non_del_activities+duplicate_activities
 	elif include_deleted:
-		final_activities = non_dup_non_del_activities+deleted_activities
+		final_exercise_activities = non_dup_non_del_activities+deleted_activities
 	else:
-		final_activities = filtered_activities
-	return final_activities
+		final_exercise_activities = filtered_activities
+
+	if provide_all and include_non_exercise:
+		return (final_all_activities,final_all_activities)
+	elif provide_all:
+		return (final_exercise_activities,final_all_activities)
+	elif include_non_exercise:
+		return final_all_activities
+	else:
+		return final_exercise_activities
+	
 
 def do_user_has_exercise_activity(combined_user_activities,user_age):
-	aerobic_range = 180-user_age-30
 	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
 	have_activities = False
 	if combined_user_activities:
 		for act in combined_user_activities:
 			if act.get("activityType","") not in IGNORE_ACTIVITY:
-				act_hr = act.get('averageHeartRateInBeatsPerMinute',0)
-				if not act_hr:
-					act_hr = 0
 				act_steps_type = act.get("steps_type","")
-				if not act_steps_type:
-					if(act_hr > aerobic_range):
-						act_steps_type = 'exercise'
-					else:
-						act_steps_type = 'non_exercise'
-				if not have_activities:
-					if act_steps_type == 'exercise' or not act_hr:
-						have_activities = True
+				if not have_activities and act_steps_type == 'exercise':
+					have_activities = True
 
 	return have_activities
 
@@ -1124,7 +1228,6 @@ def get_activity_stats(combined_user_activities,user_age):
 		activity_stats['pace'] = meter_per_sec_to_pace_per_mile(avg_run_speed_mps) 
 
 		activity_stats['activities_duration'] = json.dumps(activities_duration)
-	#print('filtered:',filtered_activities,'\n','user:',userinput_activities)
 	return activity_stats
 
 def _get_avg_hr_points_range(age,workout_easy_hard):
@@ -1825,7 +1928,6 @@ def cal_exercise_steps_total_steps(total_daily_steps,combined_user_activities,ag
 	'''
 		Calculate exercise steps and total steps
 	'''	
-
 	IGNORE_ACTIVITY = ["HEART_RATE_RECOVERY"]
 
 	garmin_total_steps = 0
@@ -1835,30 +1937,16 @@ def cal_exercise_steps_total_steps(total_daily_steps,combined_user_activities,ag
 	manual_exec_steps = 0
 	manual_non_exec_steps = 0
 
-	aerobic_zone = 180 - age - 30
 	if len(combined_user_activities):
 		for obj in combined_user_activities:
-			avg_hr = obj.get("averageHeartRateInBeatsPerMinute",0)
-			# If average heart rate in beats per minute is not submitted by user
-			# then it would be by default empty string. In that case default it to 0 
-			if not avg_hr:
-				avg_hr = 0
-
 			steps = obj.get("steps",0)
 			if not steps:
 				# In case of user created manual activity, if user does not submit steps data
 				# then by default it would be empty string. In that case, default it to 0
 				steps = 0
 
-			if ((avg_hr >= aerobic_zone 
-					and obj.get('activityType') not in IGNORE_ACTIVITY
-					and obj.get("steps_type","") != "non_exercise")
-					or obj.get("steps_type","") == "exercise"
-					or(not avg_hr and obj.get("steps_type","") != "non_exercise")):
-				# If activity heart rate is above or in aerobic zone and it's not HRR 
-				# then only activity is considered as an exercise and steps are included.
-				# If no avg heartrate information, simply treat activity steps as 
-				# exercise steps 
+			if(obj.get('activityType') not in IGNORE_ACTIVITY
+				and obj.get("steps_type","") == "exercise"):
 				if obj.get('created_manually',False):
 					manual_exec_steps += steps
 				else:
@@ -2564,7 +2652,7 @@ def get_weight(bodycmp_data,daily_optional):
 
 def get_weekly_combined_activities(weekly_activities,
 	weekly_manully_edited_activities, weekly_user_input_activities,
-	week_start_date, week_end_date):
+	week_start_date, week_end_date,user_age):
 	weekly_combined_activities = OrderedDict()
 	current_date = week_start_date
 	while(current_date <= week_end_date):
@@ -2589,7 +2677,8 @@ def get_weekly_combined_activities(weekly_activities,
 			manually_edited_activities = {}
 
 		combined_user_activities = get_filtered_activity_stats(
-			activities,manually_edited_activities,userinput_activities)
+			activities,user_age,manually_edited_activities,
+			userinput_activities)
 
 		if combined_user_activities:
 			weekly_combined_activities[current_date_str] = (
@@ -2676,7 +2765,7 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 
 		weekly_combined_activities = get_weekly_combined_activities(
 			weekly_activities,weekly_manual_activities,weekly_daily_strong,
-			last_seven_days_date,current_date, )
+			last_seven_days_date,current_date,user_age)
 
 		try:
 			tomorrow_date = current_date + timedelta(days=1)
@@ -2741,11 +2830,12 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		# Combined user activities (Garmin and user manually created activity)
 		# Some activities are automatically renamed to "HEART RATE RECOVERY",
 		# but not necessarily 
-		combined_user_activities = get_filtered_activity_stats(
-			todays_activities_json,todays_manually_updated_json,
-			userinput_activities,user = user, calendar_date = current_date,
-			epoch_summaries = epochs_json)
-		activity_stats = get_activity_stats(combined_user_activities,user_age)
+		combined_user_exercise_activities,combined_user_exec_non_exec_activities =\
+			 get_filtered_activity_stats(
+				todays_activities_json, user_age, todays_manually_updated_json,
+				userinput_activities,user = user, calendar_date = current_date,
+				epoch_summaries = epochs_json,provide_all=True)
+		activity_stats = get_activity_stats(combined_user_exercise_activities,user_age)
 		weather_data = get_weather_data(todays_daily_strong,start_epoch,activity_stats)
 
 		# Exercise Calculation
@@ -2765,9 +2855,9 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		exercise_calculated_data['activities_duration'] = activity_stats['activities_duration']
 
 		# Meters to foot and rounding half up
-		exercise_calculated_data['elevation_gain'] = int(round(safe_sum(combined_user_activities,
+		exercise_calculated_data['elevation_gain'] = int(round(safe_sum(combined_user_exercise_activities,
 													'totalElevationGainInMeters')*3.28084,1))
-		exercise_calculated_data['elevation_loss'] = int(round(safe_sum(combined_user_activities,
+		exercise_calculated_data['elevation_loss'] = int(round(safe_sum(combined_user_exercise_activities,
 													'totalElevationLossInMeters')*3.28084,1))
 		exercise_calculated_data['effort_level'] = safe_get(todays_daily_strong,
 													"workout_effort_level", 0)
@@ -2792,7 +2882,7 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 			daily_encouraged,"lowest_hr_first_minute",0)
 				
 		exercise_calculated_data['vo2_max'] = safe_get_dict(user_metrics_json,"vo2Max",0)
-		exercise_calculated_data['running_cadence'] = safe_sum(todays_activities_json,
+		exercise_calculated_data['running_cadence'] = safe_sum(combined_user_exercise_activities,
 											'averageRunCadenceInStepsPerMinute')
 		exercise_calculated_data['water_consumed_workout'] = safe_get(daily_encouraged,
 												"water_consumed_during_workout",0)
@@ -2816,6 +2906,9 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 													 			"fitnessAge", 0)
 		exercise_calculated_data['heartrate_variability_stress'] = safe_get_dict(dailies_json,
 														'averageStressLevel',-1)
+		exercise_calculated_data['nose_breath_prcnt_workout'] = safe_get(
+			daily_encouraged,
+			"workout_that_user_breathed_through_nose",0)
 		
 		# Steps
 		steps_calculated_data['floor_climed'] = safe_get_dict(dailies_json,"floorsClimbed",0)
@@ -2888,7 +2981,7 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 
 		# Average exercise heartrate grade calculation
 		avg_exercise_hr_grade_pts = get_average_exercise_heartrate_grade(
-			combined_user_activities,todays_daily_strong,user_age)
+			combined_user_exercise_activities,todays_daily_strong,user_age)
 		hr_grade = 'N/A' if not avg_exercise_hr_grade_pts[0] else avg_exercise_hr_grade_pts[0] 
 		grades_calculated_data['avg_exercise_hr_grade'] = hr_grade
 		grades_calculated_data['avg_exercise_hr_gpa'] = avg_exercise_hr_grade_pts[1]\
@@ -2971,7 +3064,7 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 			epochs_json,
 			yesterday_bedtime = yesterday_bedtime,
 			today_awake_time = today_awake_time,
-			combined_user_activities = combined_user_activities,
+			combined_user_activities = combined_user_exercise_activities,
 			today_bedtime = today_bedtime,
 		  	user_input_strength_start_time = user_input_strength_start_time,
 		  	user_input_strength_end_time = user_input_strength_end_time,
@@ -2994,7 +3087,7 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 			daily_total_steps = dailies_json[0].get('steps',0)
 		exercise_steps,non_exercise_steps,total_steps = cal_exercise_steps_total_steps(
 			daily_total_steps,
-			combined_user_activities,
+			combined_user_exec_non_exec_activities,
 			user_age
 		)	
 		steps_calculated_data['non_exercise_steps'] = non_exercise_steps
