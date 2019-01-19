@@ -429,66 +429,74 @@ class UserAA_low_high_values(generics.ListCreateAPIView):
 
 # Parse the fit files and return the heart beat and timstamp
 def fitfile_parse(obj,offset,start_date_str):
-	heartrate_complete = []
-	timestamp_complete = []
+	try:
+		heartrate_complete = []
+		timestamp_complete = []
 
-	obj_start_year = int(start_date_str.split('-')[0])
-	obj_start_month = int(start_date_str.split('-')[1])
-	obj_start_date = int(start_date_str.split('-')[2])
-	
-	x = [(FitFile(x.fit_file)).get_messages('record') for x in obj]
-	for record in x:
-		# print(type(record)) # generator
-		for record_data in record:
-			# print(type(record_data)) # <class 'fitparse.records.DataMessage'>
-			for single_record in record_data:
-				# print(type(ss)) # <class 'fitparse.records.FieldData'>
-				if(single_record.name=='heart_rate'):
-					single_heartrate_value = single_record.value
-					if single_heartrate_value:
-						heartrate_complete.extend([single_heartrate_value])
+		obj_start_year = int(start_date_str.split('-')[0])
+		obj_start_month = int(start_date_str.split('-')[1])
+		obj_start_date = int(start_date_str.split('-')[2])
+		
+		x = [(FitFile(x.fit_file)).get_messages('record') for x in obj]
+		for record in x:
+			# print(type(record)) # generator
+			for record_data in record:
+				# print(type(record_data)) # <class 'fitparse.records.DataMessage'>
+				for single_record in record_data:
+					# print(type(ss)) # <class 'fitparse.records.FieldData'>
+					if(single_record.name=='heart_rate'):
+						single_heartrate_value = single_record.value
+						if single_heartrate_value:
+							heartrate_complete.extend([single_heartrate_value])
 
-				if(single_record.name=='timestamp'):
-					single_timestamp_vale = single_record.value
-					timestamp_complete.extend([single_timestamp_vale])
-	# print(timestamp_complete,"timestamp_complete")
-	heartrate_selected_date = []
-	timestamp_selected_date = []
-	
-	start_date_obj = datetime(obj_start_year,obj_start_month,obj_start_date,0,0,0)
-	end_date_obj = start_date_obj + timedelta(days=1)
-	
-	for heart,timeheart in zip(heartrate_complete,timestamp_complete):
-		timeheart_str = timeheart.strftime("%Y-%m-%d %H:%M:%S")
-		timeheart_utc = int(time.mktime(datetime.strptime(timeheart_str, "%Y-%m-%d %H:%M:%S").timetuple()))+offset
-		timeheart_utc = datetime.utcfromtimestamp(timeheart_utc)
-		if timeheart_utc >= start_date_obj and timeheart_utc <= end_date_obj and heart:
-			heartrate_selected_date.extend([heart])
-			timestamp_selected_date.extend([timeheart])
-	# print(timestamp_selected_date,"timestamp_selected_date")
-	to_timestamp = []
-	for i,k in enumerate(timestamp_selected_date):
-		dtt = k.timetuple()
-		ts = time.mktime(dtt)
-		ts = ts+offset
-		to_timestamp.extend([ts])
-	# print(to_timestamp,"to_timestamp")
-	timestamp_difference = []
-	for i,k in enumerate(to_timestamp):
-		try:
-			dif_tim = to_timestamp[i+1] - to_timestamp[i]
-			timestamp_difference.extend([dif_tim])
-		except IndexError:
-			timestamp_difference.extend([1])
+					if(single_record.name=='timestamp'):
+						single_timestamp_vale = single_record.value
+						timestamp_complete.extend([single_timestamp_vale])
+		# print(timestamp_complete,"timestamp_complete")
+		heartrate_selected_date = []
+		timestamp_selected_date = []
+		
+		start_date_obj = datetime(obj_start_year,obj_start_month,obj_start_date,0,0,0)
+		end_date_obj = start_date_obj + timedelta(days=1)
+		
+		for heart,timeheart in zip(heartrate_complete,timestamp_complete):
+			timeheart_str = timeheart.strftime("%Y-%m-%d %H:%M:%S")
+			timeheart_utc = int(time.mktime(datetime.strptime(timeheart_str, "%Y-%m-%d %H:%M:%S").timetuple()))+offset
+			timeheart_utc = datetime.utcfromtimestamp(timeheart_utc)
+			if timeheart_utc >= start_date_obj and timeheart_utc <= end_date_obj and heart:
+				heartrate_selected_date.extend([heart])
+				timestamp_selected_date.extend([timeheart])
+		# print(timestamp_selected_date,"timestamp_selected_date")
+		to_timestamp = []
+		for i,k in enumerate(timestamp_selected_date):
+			dtt = k.timetuple()
+			ts = time.mktime(dtt)
+			ts = ts+offset
+			to_timestamp.extend([ts])
+		# print(to_timestamp,"to_timestamp")
+		timestamp_difference = []
+		for i,k in enumerate(to_timestamp):
+			try:
+				dif_tim = to_timestamp[i+1] - to_timestamp[i]
+				timestamp_difference.extend([dif_tim])
+			except IndexError:
+				timestamp_difference.extend([1])
 
-	final_heartrate = []
-	final_timestamp = []
+		final_heartrate = []
+		final_timestamp = []
 
-	for i,k in zip(heartrate_selected_date,timestamp_difference):
-		if (k <= 200) and (k >= 0):
-			final_heartrate.extend([i])
-			final_timestamp.extend([k])
-	# print(to_timestamp,"to_timestamp") 
+		for i,k in zip(heartrate_selected_date,timestamp_difference):
+			if (k <= 200) and (k >= 0):
+				final_heartrate.extend([i])
+				final_timestamp.extend([k])
+		# print(to_timestamp,"to_timestamp") 
+
+	except:
+		final_heartrate = []
+		final_timestamp = []
+		to_timestamp = []
+		logging.exception("message")
+
 	return (final_heartrate,final_timestamp,to_timestamp)
 
 def get_fitfiles(user,start_date,start,end,start_date_timestamp=None,end_date_timestamp=None):
