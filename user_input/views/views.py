@@ -1,4 +1,5 @@
 from datetime import datetime,timezone,timedelta
+import ast
 
 from django.db.models import Q
 from django.db import IntegrityError
@@ -14,8 +15,13 @@ from user_input.serializers import UserDailyInputSerializer, DailyActivitySerial
 from user_input.models import UserDailyInput, DailyActivity
 from garmin.models import UserGarminDataEpoch,\
     UserGarminDataDaily
+from fitbit.models import UserFitbitDataHeartRate,\
+    UserFitbitDataSteps
 from quicklook.calculations.calculation_driver import which_device
-from quicklook.calculations.garmin_calculation import get_garmin_model_data
+from quicklook.calculations.garmin_calculation import get_garmin_model_data,\
+    activity_step_from_epoch,\
+    get_activity_exercise_non_exercise_category
+from quicklook.calculations.fitbit_calculation import get_fitbit_model_data
 
 # https://stackoverflow.com/questions/30871033/django-rest-framework-remove-csrf
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -167,47 +173,100 @@ class GetManualActivityInfo(APIView):
         else:
             return sec - diff
 
-    def get_heartrate(self,act_date,act_start_epoch,act_end_epoch,utc_offset=0):
+    def __cal_garmin_heartrate(self,act_date,act_start_epoch,act_end_epoch,utc_offset=0):
         avg_heartrate = None
-        if which_device(self.request.user) == 'garmin':
-            act_dt = datetime.strptime(act_date,"%Y-%m-%d")
-            act_date_epoch = int(act_dt.replace(tzinfo=timezone.utc).timestamp())
-            dailies_data = get_garmin_model_data(
-                UserGarminDataDaily,self.request.user,
-                act_date_epoch,act_date_epoch+86400,
-                order_by = '-start_time_duration_in_seconds'
-            )
-            if(dailies_data):
-                dailies_data = dailies_data[0]
-                act_start_dt = datetime.utcfromtimestamp(act_start_epoch+utc_offset)
-                act_end_dt = datetime.utcfromtimestamp(act_end_epoch+utc_offset)
-                act_start_sec_from_midnight = self.__get_nearest_sec(
-                    (act_start_dt - act_dt).seconds)
-                act_end_sec_from_midnight = self.__get_nearest_sec(
-                    (act_end_dt - act_dt).seconds)
-                if dailies_data.get('timeOffsetHeartRateSamples',None):
-                    hr = []
-                    hr_samples = dailies_data.get('timeOffsetHeartRateSamples')
-                    for sec in range(act_start_sec_from_midnight,act_end_sec_from_midnight+1):
-                        hr.append(hr_samples.get(sec))
-                    hr = filter(lambda x:x is not None, hr)
-                    try:
-                        avg_heartrate = sum(hr)/len(hr)
-                    except ZeroDivisionError:
-                        avg_heartrate = None
-            print("Average HR:",avg_heartrate)
-            return avg_heartrate
+        act_dt = datetime.strptime(act_date,"%Y-%m-%d")
+        act_date_epoch = int(act_dt.replace(tzinfo=timezone.utc).timestamp())
+        dailies_data = get_garmin_model_data(
+            UserGarminDataDaily,self.request.user,
+            act_date_epoch,act_date_epoch+86400,
+            order_by = '-start_time_duration_in_seconds'
+        )
+        if dailies_data:
+            dailies_data = ast.literal_eval(dailies_data[0])
+            act_start_dt = datetime.utcfromtimestamp(act_start_epoch+utc_offset)
+            act_end_dt = datetime.utcfromtimestamp(act_end_epoch+utc_offset)
+            act_start_sec_from_midnight = self.__get_nearest_sec(
+                (act_start_dt - act_dt).seconds)
+            act_end_sec_from_midnight = self.__get_nearest_sec(
+                (act_end_dt - act_dt).seconds)
+            if dailies_data.get('timeOffsetHeartRateSamples',None):
+                hr = []
+                hr_samples = dailies_data.get('timeOffsetHeartRateSamples')
+                for sec in range(act_start_sec_from_midnight,act_end_sec_from_midnight+1):
+                    hr.append(hr_samples.get(str(sec)))
+                hr = list(filter(lambda x:x is not None, hr))
+                try:
+                    avg_heartrate = round(sum(hr)/len(hr))
+                except ZeroDivisionError:
+                    avg_heartrate = None
+        return avg_heartrate
 
+    def __get_fitbit_hr_between_timeframe(act_start,act_end,heartrate_data):
+        hr_in_timeframe = []
+        cutoff_diff_in_seconds = 60
+        
+        return hr_in_timeframe
+
+    def __cal_fitbit_heartrate(self,act_date,act_start_epoch,act_end_epoch,utc_offset=0):
+        avg_heartrate = None
+        act_dt = datetime.strptime(act_date,"%Y-%m-%d")
+        act_start_dt = datetime.utcfromtimestamp(act_start_epoch+utc_offset)
+        act_end_dt = datetime.utcfromtimestamp(act_end_epoch+utc_offset)
+        heartrate_data = get_fitbit_model_data(
+        UserFitbitDataHeartRate,self.request.user,act_dt.date(),act_dt.date())
+        if heartrate_data:
+            heartrate_data = ast.literal_eval(heartrate_data[0].replace(
+                    "'heartrate_fitbit': {...}","'heartrate_fitbit': {}"))
+            intraday_heartrate_data = heartrate_data.get('activities-heart-intraday',None)
+            if(intraday_heartrate_data):
+                hr = []
+                intraday_heartrate_data = intraday_heartrate_data.get('dataset',[])
+                hr_in_timeframe = self.__get_fitbit_hr_between_timeframe(
+                    act_start_dt,act_end_dt,intraday_heartrate_data)
+                for hr_sample in hr_in_timeframe:
+                    hr.append(hr_sample.get('value'))
+                hr = list(filter(lambda x:x is not None, hr))
+                try:
+                    avg_heartrate = round(sum(hr)/len(hr))
+                except ZeroDivisionError:
+                    avg_heartrate = None
+        return avg_heartrate
+
+
+    def get_heartrate(self,act_date,act_start_epoch,act_end_epoch,utc_offset=0):
+        if which_device(self.request.user) == 'garmin':
+            return self.__cal_garmin_heartrate(
+                act_date,act_start_epoch,act_end_epoch,utc_offset=0)
         elif which_device == 'fitbit':
             pass
 
         return None
 
-    def get_steps(self):
-        pass
+    def __cal_garmin_steps(self,act_date,act_start_epoch,act_end_epoch,utc_offset=0):
+        steps = None
+        act_dt = datetime.strptime(act_date,"%Y-%m-%d")
+        act_date_epoch = int(act_dt.replace(tzinfo=timezone.utc).timestamp())
+        epoch_data = get_garmin_model_data(
+            UserGarminDataEpoch,self.request.user,
+            act_date_epoch,act_date_epoch+86400,
+            order_by ='-id',filter_dup = True
+        )
+        if epoch_data:
+            act_start_dt = datetime.utcfromtimestamp(act_start_epoch+utc_offset)
+            act_end_dt = datetime.utcfromtimestamp(act_end_epoch+utc_offset)
+            epoch_data = [ast.literal_eval(x) for x in epoch_data]
+            steps = activity_step_from_epoch(act_start_dt,act_end_dt,epoch_data)
+        return steps
 
-    def get_exercise_type(self):
-        pass
+    def get_steps(self,act_date,act_start_epoch,act_end_epoch,utc_offset=0):
+        if which_device(self.request.user) == 'garmin':
+            return self.__cal_garmin_steps(
+                act_date,act_start_epoch,act_end_epoch,utc_offset)
+        elif which_device == 'fitbit':
+            pass
+
+        return None
 
     def get_req_params(self):
         act_date = self.request.query_params.get('date')
@@ -227,8 +286,18 @@ class GetManualActivityInfo(APIView):
         user = request.user
         act_date,act_start_epoch,act_end_epoch,act_type,utc_offset = self.get_req_params()
         if(act_date,act_start_epoch,act_end_epoch,act_type):
-            self.get_heartrate(act_date,act_start_epoch,act_end_epoch,utc_offset)
-            return Response({},status=status.HTTP_200_OK)
+            avg_heartrate = self.get_heartrate(act_date,
+                act_start_epoch,act_end_epoch,utc_offset)
+            steps = self.get_steps(act_date,
+                act_start_epoch,act_end_epoch,utc_offset)
+            activity_category = get_activity_exercise_non_exercise_category(
+                act_type, avg_heartrate,user.profile.age())
+            response = {
+                "avg_heartrate":avg_heartrate,
+                "activity_category":activity_category,
+                "steps":steps
+            }
+            return Response(response,status=status.HTTP_200_OK)
         else:
             response = {}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
