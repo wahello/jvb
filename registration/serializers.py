@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 
@@ -16,6 +18,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 	password = serializers.CharField(source='user.password',write_only=True)
 	first_name = serializers.CharField(source='user.first_name')
 	last_name  = serializers.CharField(source='user.last_name')
+	user_age = serializers.SerializerMethodField() 
 
 	def validate_username(self,username):
 	   '''
@@ -38,6 +41,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
 			**{case_insensitive_email_field:email}).exists()):
 	   		raise serializers.ValidationError("Email already exist")
 	   return email
+
+	def get_user_age(self,obj):
+		today = date.today()
+		dob = obj.date_of_birth
+		if dob:
+			return (today.year - dob.year
+				- ((today.month, today.day) < (dob.month, dob.day)))
+		else:
+			return obj.user_age
 
 	class Meta:
 		model = Profile
