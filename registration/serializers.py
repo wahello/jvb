@@ -65,7 +65,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		instance.height = validated_data.get('height', instance.height)
 		instance.weight = validated_data.get('weight', instance.weight)
 		instance.date_of_birth = validated_data.get('date_of_birth',instance.date_of_birth)
-		instance.user_age = validated_data.get('user_age', instance.weight)
+		instance.user_age = validated_data.get('user_age', instance.user_age)
 		instance.save()
 		return instance
 		
