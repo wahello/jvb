@@ -39,7 +39,7 @@ class Profile(models.Model):
             return (today.year - dob.year
                     - ((today.month, today.day) < (dob.month, dob.day)))
         else:
-            self.user_age
+            return self.user_age
 
     def Aerobic_Heart_Rate_Zone_High_Number(self):
         age = self.age()
