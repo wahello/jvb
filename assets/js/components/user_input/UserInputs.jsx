@@ -158,7 +158,9 @@ class UserInputs extends React.Component{
 
         no_exercise_reason:'',
         no_exercise_comment:'',
-        activities:{},
+        activities:{
+          /* change 1. */
+        },
         report_type:'quick',
 
         took_nap:'no',
@@ -285,6 +287,8 @@ class UserInputs extends React.Component{
     this.renderRemoveDate = this.renderRemoveDate.bind(this);
 
     this.dateTimeValidation = this.dateTimeValidation.bind(this);
+    this.AutoPopulateActivities = this.AutoPopulateActivities.bind(this);
+    //this.AutoPopulateActTimings = this.AutoPopulateActTimings.bind(this);
  }   
     _extractDateTimeInfo(dateObj){
       let datetimeInfo = {
@@ -357,7 +361,7 @@ transformActivity(activity){
       "duplicate":false,
       "deleted":false
   }
-  for(let[key,value] of Object.entries(activity)){
+  for(let[key,value] of Object.entries(activity)){    
       defaultActivityObject[key] = value
   }
   return defaultActivityObject;
@@ -1403,7 +1407,7 @@ handleScroll() {
         }
 
         let sleep_awake_time_dt = null;
-        if (end_time_date && end_time_hours
+        if (end_time_date && end_time_hours                                           /*  changes may or may not*/
            && end_time_mins && end_time_am_pm){
           sleep_awake_time_dt = this.getDTMomentObj(end_time_date,end_time_hours,
             end_time_mins,end_time_am_pm)
@@ -1415,7 +1419,26 @@ handleScroll() {
         }
         return true;
     }
+    /* changes have been doen here*/
+    AutoPopulateActivities(workoutType,Act_start_hours,Act_start_min,Act_start_am_pm,Act_end_hours,Act_end_min,Act_end_am_pm){
+      alert(workoutType);
+      this.setState({
+                      workout_type:workoutType,
+                      strength_workout_start_hour:Act_start_hours,
+                      strength_workout_start_min:Act_start_min,
+                      strength_workout_start_am_pm:Act_start_am_pm,
+                      strength_workout_end_am_pm:Act_end_am_pm,
+                      strength_workout_end_hour:Act_end_hours,
+                      strength_workout_end_min:Act_end_min
 
+      })
+      console.log(time,"timings");
+    }
+    // AutoPopulateActTimings(ActTimings){
+    //  this.setState( {strength_workout_start_hour:ActTimings,
+    //                  strength_workout_start_min:ActTimings,
+    //                 strength_workout_start_am_pm:ActTimings, })
+    // }
     render(){
       const children = React.Children.map(this.props.children,
       (child, index) => React.cloneElement(child, {

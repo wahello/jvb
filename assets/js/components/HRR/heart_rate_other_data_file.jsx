@@ -65,7 +65,7 @@ class Other_Hrr_Data extends Component{
 			pure_time_99:"",
 			end_time_activity:"",
 			HRR_activity_start_time:"",
-            update_toggle:false
+            
 		}
 		this.renderTime = this.renderTime.bind(this);
 		this.renderSecToMin = this.renderSecToMin.bind(this);
@@ -250,6 +250,8 @@ class Other_Hrr_Data extends Component{
 					heart_rate_down_up:data.data.heart_rate_down_up,
 					pure_1min_heart_beats:data.data.pure_1min_heart_beats,
 					pure_time_99:data.data.pure_time_99,
+					in_hrr:data.data.in_hrr,
+					ex_hrr:data.data.ex_hrr,
 
 					no_fitfile_hrr_time_reach_99:data.data.no_fitfile_hrr_time_reach_99,
 					no_fitfile_hrr_reach_99:data.data.no_fitfile_hrr_reach_99,
@@ -298,14 +300,18 @@ class Other_Hrr_Data extends Component{
 				"pure_1min_heart_beats":this.state.pure_1min_heart_beats,
 				"pure_time_99":pure_time_99,
 				/*changes made here */
-				"update_toggle":!this.state.update_toggle,
+				
+				"in_hrr":!this.state.in_hrr,
+				"ex_hrr":!this.state.ex_hrr,
+                "update_hrr":!this.state.update_hrr
+		
 				/*changes made here */
 
 			},() => {
 				/*changes made here */
-                this.props.updateToggleButton(this.state.update_toggle);
-				/*changes made here */
-
+                this.props.Includehrr(this.state.in_hrr);
+				// this.props.Excludehrr(this.state.ex_hrr);
+                this.props.updateText(this.state.update_hrr);
 				let data = {
 	  				"end_time_activity":endTimeActivity.utc().valueOf(),
 					"diff_actity_hrr":diff_time,
@@ -314,12 +320,16 @@ class Other_Hrr_Data extends Component{
 					"heart_rate_down_up":parseInt(this.state.heart_rate_down_up),
 					"pure_1min_heart_beats":parseInt(this.state.pure_1min_heart_beats),
 					"pure_time_99":pure_time_99,
+					"in_hrr":this.state.in_hrr,
+					"ex_hrr":this.state.ex_hrr,
+			         "update_hrr":this.state.update_hrr
 				
+			
 				}
-            
-	  			updateHeartData(data, this.props.selectedDate, this.successHeart, this.errorHeart,HeartRateCal.handleChange);
+                 console.log(data,"data");
+	  			updateHeartData(data, this.props.selectedDate, this.successHeart, this.errorHeart);
 	  				  				  			
-	  			//this.props.renderHrrData(data);
+	  			
 			});
 
 	  			

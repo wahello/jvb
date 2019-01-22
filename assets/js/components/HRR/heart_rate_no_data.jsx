@@ -16,7 +16,7 @@ import {updateHeartData} from '../../network/heart_cal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import {renderHrrSelectedDateFetchOverlay} from '../dashboard_healpers';
-//import HeartRateCal from './heart_rate_calculation';
+import HeartRateCal from './heart_rate_calculation';
 
 
 class No_Hrr_Data extends Component{
@@ -419,6 +419,9 @@ class No_Hrr_Data extends Component{
 					heart_rate_down_up:data.data.heart_rate_down_up,
 					pure_1min_heart_beats:data.data.pure_1min_heart_beats,
 					pure_time_99:data.data.pure_time_99,
+					in_hrr:data.data.in_hrr,
+	                ex_hrr:data.data.ex_hrr,
+					update_hrr:data.data.update_hrr,
 
 					no_fitfile_hrr_time_reach_99:data.data.no_fitfile_hrr_time_reach_99,
 					no_fitfile_hrr_reach_99:data.data.no_fitfile_hrr_reach_99,
@@ -464,15 +467,18 @@ class No_Hrr_Data extends Component{
 			"end_heartrate_activity":this.state.end_heartrate_activity,
 			"lowest_hrr_no_fitfile":this.state.lowest_hrr_no_fitfile,
 			"no_file_beats_recovered":this.state.no_file_beats_recovered,
-			/* chnages made here */
-			"update_toggle":!this.props.update_toggle,
+			"in_hrr":this.state.in_hrr,
+			"ex_hrr":this.props.ex_hrr,
+			"update_hrr":!this.state.update_hrr
+
 		    
-			/* changes made here */
+
 		},() => {
-			/* changes made here */
-			this.props.updateToggleButton(this.state.update_toggle);
-			
-			/*changes made here */
+  
+		  this.props.Includehrr(this.state.in_hrr);
+		// 	this.props.Excludehrr(this.state.ex_hrr);
+			this.props.updateText(this.state.update_hrr);
+		
 			let data = {
 				"end_time_activity":endTimeActivity.utc().valueOf(),
 				"Did_you_measure_HRR":this.state.Did_you_measure_HRR,
@@ -482,9 +488,15 @@ class No_Hrr_Data extends Component{
 				"end_heartrate_activity": parseInt(this.state.end_heartrate_activity),
 				"lowest_hrr_no_fitfile": parseInt(this.state.lowest_hrr_no_fitfile),
 				"no_file_beats_recovered": parseInt(this.state.no_file_beats_recovered),
+				"in_hrr":this.props.in_hrr,
+	            "ex_hrr":this.props.ex_hrr,
+				"update_hrr":this.state.update_hrr
+	
+
 			}
+		    console.log(data,"data")
 			updateHeartData(data, this.props.selectedDate, this.successHeart, this.errorHeart);
-			//this.props.renderHrrData(data);
+		
 		});
 			
 	}

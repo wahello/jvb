@@ -475,8 +475,8 @@ handleChangeModal(event){
     activity_display_name:activityDisplayName,
     modal_activity_type:current_activity?current_activity.activityType:"",
     modal_activity_heart_rate:current_activity?current_activity.averageHeartRateInBeatsPerMinute:"",
-    modal_activity_hour:hour,
-    modal_activity_min:mins,
+    modal_activity_hour:hour,/* 1. change  */
+    modal_activity_min:mins,/* 2.change */
     modal_exercise_steps:current_activity?current_activity.steps:"",
     modal_exercise_steps_status:current_activity?current_activity.steps_type:"",
     modal_duplicate_info_status:current_activity?current_activity.duplicate:false,
@@ -1094,13 +1094,25 @@ handleChange(event){
     const target = event.target;
     const value = target.value;
     const name = target.name;//modal_duplicate_info_status
-
+    if(value.includes('STRENGTH')){
+        alert(1);
+        this.setState({
+            workout_type:'strength',
+        },()=>{
+            this.props.AutoPopulateActivities(this.state.workout_type,this.state.modalstarttime_activity_hour,
+                this.state.modalstarttime_activity_min,
+                this.state.modalstarttime_activity_ampm,
+                this.state.modalendtime_activity_hour,
+                this.state.modalendtime_activity_min,
+                this.state.modalendtime_activity_ampm);
+        })
+    }
  /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
     let actType = this.state.modal_activity_type;
     let actAvgHeartRate = this.state.modal_activity_heart_rate;
     let steps_type = this.getActivityCategory(actType,parseInt(actAvgHeartRate));
 /************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
-
+     
     if(value == "OTHER"){
         let actType = value;
         let actAvgHeartRate = this.state.modal_activity_heart_rate;
@@ -1337,6 +1349,7 @@ _extractDateTimeInfo(dateObj){
 handleChangeActivityStartEndTime(event){
   const value = event.target.value;
   const name = event.target.name;
+  
   this.setState({
     [name]: value
   });

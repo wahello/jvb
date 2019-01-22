@@ -311,6 +311,7 @@ export function renderSubmitOverlay(){
 }
 
 export function renderActivityGrid(){
+	
 	const updateParentActivities = function(activities){
 		let workout = this.state.workout;
 		if(!_.isEmpty(activities)){
@@ -327,6 +328,7 @@ export function renderActivityGrid(){
 		this.setState({
 			workout:workout,
 			activities:activities
+		
 		});
 	}.bind(this);
 	return(
@@ -337,6 +339,9 @@ export function renderActivityGrid(){
 			editable = {this.state.editable}
 			dateTimeValidation = {this.dateTimeValidation}
 			ref = "child"
+			AutoPopulateActivities = {this.AutoPopulateActivities}
+			//AutoPopulateActTimings = {this.AutoPopulateActTimings}
+			//workout_type={this.state.workout_type}
 		/>
 	);
 }
