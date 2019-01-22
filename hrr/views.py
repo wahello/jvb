@@ -494,7 +494,8 @@ def fitfile_parse(obj,offset,start_date_str):
 		final_heartrate = []
 		final_timestamp = []
 		to_timestamp = []
-		
+		logging.exception("message")
+
 	return (final_heartrate,final_timestamp,to_timestamp)
 
 def get_fitfiles(user,start_date,start,end,start_date_timestamp=None,end_date_timestamp=None):
@@ -2930,10 +2931,11 @@ def store_hhr(user,from_date,to_date,type_data=None):
 			hrr_obj = Hrr.objects.get(user_hrr=user,created_at=current_date)
 		except:
 			hrr_obj = None
-		if type_data == 'dailies' or not hrr_obj or hrr_obj.Did_you_measure_HRR == 'no':	 
-			hrr_only_store(user,current_date)
-		elif not type_data:
-			hrr_only_store(user,current_date)
+		if not hrr_obj.use_updated_hrr:
+			if type_data == 'dailies' or not hrr_obj or hrr_obj.Did_you_measure_HRR == 'no':
+				hrr_only_store(user,current_date)
+			elif not type_data:
+				hrr_only_store(user,current_date)
 		current_date -= timedelta(days=1)
 	print("HRR calculations got finished")
 	return None

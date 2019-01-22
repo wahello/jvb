@@ -31,6 +31,9 @@ class Hrr(models.Model):
 	no_file_beats_recovered = models.FloatField(blank=True,null=True)
 
 	offset = models.FloatField(blank=True,null=True)
+
+	include_hrr = models.BooleanField(default=True)
+	use_updated_hrr = models.BooleanField(default=False)
  
 	def __str__(self):
 		return str((self.user_hrr))
