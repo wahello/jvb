@@ -30,12 +30,12 @@ def generate_cumulative_instances():
 	today_local = pytz.utc.localize(today_utc).astimezone(NY_TZ)
 	yesterday = (today_local - timedelta(days=1))
 	yesterday_str = yesterday.strftime("%Y-%m-%d") 
-	try:
-		for user in get_user_model().objects.all():
+	for user in get_user_model().objects.all():
+		try:
 			create_cumulative_instance(user,from_dt=yesterday_str,to_dt=yesterday_str)
 			logger.info("Cumulative sum for user {} is generated successfully".format(user.username))
-	except Exception as e:
-		logger.error(str(e),exc_info=True)
+		except Exception as e:
+			logger.error(str(e),exc_info=True)
 
 
 @task(name="progress_analyzer.update_obsolete_pa_reports")
@@ -54,8 +54,8 @@ def update_obsolete_pa_reports():
 	today_local = pytz.utc.localize(today_utc).astimezone(NY_TZ)
 	yesterday = (today_local - timedelta(days=1))
 	yesterday_str = yesterday.strftime("%Y-%m-%d") 
-	try:
-		for dates in ProgressReportUpdateMeta.objects.all():
+	for dates in ProgressReportUpdateMeta.objects.all():
+		try:
 			from_dt = dates.requires_update_from
 			if from_dt:
 				user = dates.user
@@ -65,8 +65,8 @@ def update_obsolete_pa_reports():
 				dates.save()
 				logger.info("Progress Analyzer reports for user {} from {} is updated"+
 					"successfully".format(user.username,from_dt))
-	except Exception as e:
-		logger.error(str(e),exc_info=True)
+		except Exception as e:
+			logger.error(str(e),exc_info=True)
 
 
 @task(name="progress_analyzer.generate_cumulative_instances_custom_range")
