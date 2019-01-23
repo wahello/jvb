@@ -6,11 +6,13 @@ from rest_framework.permissions import IsAuthenticated
 
 from garmin.serializers import UserLastSyncedSerializer
 from fitbit.serializers import UserFitbitLastSyncedSerializer
-
+import json
 from garmin.models import UserLastSynced,GarminConnectToken
 from fitbit.models import UserFitbitLastSynced,FitbitConnectToken
 from users.models import GarminToken
 from quicklook.calculations.calculation_driver import which_device
+from .models import UserDataBackfillRequest
+from .serializers import UserRequestSerializer
 
 class UserLastSyncedItemview(generics.RetrieveUpdateDestroyAPIView):
 	permission_classes = (IsAuthenticated,)
@@ -74,3 +76,45 @@ class HaveTokens(APIView):
 			have_tokens['linked_devices'] = True
 
 		return Response(have_tokens,status=status.HTTP_200_OK)
+
+	
+class UserRequestView(APIView):
+
+	def get(self,request,*args,**kwargs):
+		userrequestmodel=UserDataBackfillRequest.objects.all()
+		serializer=UserRequestSerializer(userrequestmodel,many=True)
+		return Response(serializer.data)
+
+	def post(self,request,*args,**kwargs):
+		serializer = UserRequestSerializer(data=request.data)
+		if serializer.is_valid():
+			serializer.save()
+			return Response(serializer.data,status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+		# if request.method=='POST':
+		# 	post=UserRequestModel()
+		# 	post.user=User.objects.get(username=request.user)
+		# 	post.device_type=request.POST.get('device_type')
+		# 	post.start_date=request.POST.get('start_date')
+		# 	post.end_date=request.POST.get('end_date')
+		# 	post.requested_at=request.POST.get('requested_at')
+		# 	post.status=request.POST.get('status')
+
+		# 	post.save()
+
+		# 	return render(request,)
+		# else:
+
+
+
+	
+
+
+
+
+
+
+		
+
+
+
