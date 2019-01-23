@@ -675,11 +675,8 @@ def fitfile_parse(obj,offset,start_date_str):
 	
 	x = [(FitFile(x.fit_file)).get_messages('record') for x in obj]
 	for record in x:
-		# print(type(record)) # generator
 		for record_data in record:
-			# print(type(record_data)) # <class 'fitparse.records.DataMessage'>
 			for single_record in record_data:
-				# print(type(ss)) # <class 'fitparse.records.FieldData'>
 				if(single_record.name=='heart_rate'):
 					single_heartrate_value = single_record.value
 					if single_heartrate_value:
@@ -688,7 +685,6 @@ def fitfile_parse(obj,offset,start_date_str):
 				if(single_record.name=='timestamp'):
 					single_timestamp_vale = single_record.value
 					timestamp_complete.extend([single_timestamp_vale])
-	# print(timestamp_complete,"timestamp_complete")
 	heartrate_selected_date = []
 	timestamp_selected_date = []
 	
