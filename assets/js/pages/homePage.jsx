@@ -41,7 +41,7 @@ import WorkoutDashboard from '../components/weekly_workout_dashboard';
 import OverallRank from '../components/overall_hrr_rank';
 import ProgressDashboard from '../components/progressanalyzer_dashboard';
 import ActiveDashboard from '../components/Active_dashboard';
-import MovementLeaderboard from '../components/movement_leaderboard';
+import MovementLeaderboard from '../components/movement-leaderboard/movement_leaderboard';
 
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';

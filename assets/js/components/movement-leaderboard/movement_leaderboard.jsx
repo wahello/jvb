@@ -8,10 +8,10 @@ import { Collapse, Navbar, NavbarToggler,
     	Dropdown, DropdownToggle, DropdownMenu, DropdownItem} from 'reactstrap';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import NavbarMenu from './navbar';
-import {renderOverallHrr1FetchOverlay,renderOverallHrr2FetchOverlay,renderOverallHrr3FetchOverlay,renderOverallHrrSelectedDateFetchOverlay} from './leaderboard_healpers';
-import { getGarminToken,logoutUser} from '../network/auth';
-import fetchLeaderBoard from '../network/leaderBoard';
+import NavbarMenu from '../navbar';
+import {renderOverallHrr1FetchOverlay,renderOverallHrr2FetchOverlay,renderOverallHrr3FetchOverlay,renderOverallHrrSelectedDateFetchOverlay} from '../leaderboard_healpers';
+import { getGarminToken,logoutUser} from '../../network/auth';
+import fetchLeaderBoard from '../../network/leaderBoard';
 import MovementLeaderboard2 from "./movement_leaderboard2";
 
 var CalendarWidget = require('react-calendar-widget');  
@@ -285,7 +285,7 @@ class MovementLeaderboard extends Component{
 	  				for(let [c_key,c_rankData] of Object.entries(value1)){
 		  				if(c_key == "all_rank"){
 		  					userName = c_rankData.username;
-		  					console.log("************* custom",userName)
+		  					/*console.log("************* custom",userName)*/
 			  		 		ranks.push(c_rankData);
 		  		 		}
 	  				}
@@ -296,9 +296,9 @@ class MovementLeaderboard extends Component{
 			  		durations.push(duration);
 			  		for (let [key,rankData] of Object.entries(val)){
 			  		 	if(key == "all_rank"){
-			  		 		console.log("******************",rankData);
+			  		 		/*console.log("******************",rankData);*/
 			  		 		 userName = rankData.username;
-			  		 		 console.log("**************** single",userName);
+			  		 		 /*console.log("**************** single",userName);*/
 			  		 		ranks.push(rankData);
 			  		 	}	
 			  		}
@@ -359,7 +359,7 @@ class MovementLeaderboard extends Component{
 			active_view:!this.state.active_view,
 			btnView:!this.state.btnView2,
 		},()=>{
-			console.log("*************************** all rank data",this.state.all_movement_rank_data);
+			/*console.log("*************************** all rank data",this.state.all_movement_rank_data);*/
 		});
 	}
 

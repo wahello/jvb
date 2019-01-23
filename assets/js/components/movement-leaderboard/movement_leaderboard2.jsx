@@ -288,7 +288,7 @@ class MovementLeaderboard2 extends Component{
 		window.addEventListener('scroll', this.handleScroll);
 
 		/****** mobile table styles *******/
-		let getTable = this.refs.hrr_table;
+		let getTable = this.refs.mov_dashboard_table;
 
 		if(screen.width < 1023){
 			getTable.classList.add('table_padd')
@@ -300,7 +300,7 @@ class MovementLeaderboard2 extends Component{
 		/***********************/
 		let header = this.refs.table_header_hrr;		
 		if(screen.width < 650){
-			  header.classList.remove("hrr_sticky");
+			  header.classList.remove("mov_sticky");
 		}
 
 	};
@@ -314,9 +314,9 @@ class MovementLeaderboard2 extends Component{
 
 		 if(screen.width > 650){
 		 	if (window.pageYOffset > sticky) {
-		    header.classList.add("hrr_sticky");
+		    header.classList.add("mov_sticky");
 		  } else {
-		    header.classList.remove("hrr_sticky");
+		    header.classList.remove("mov_sticky");
 		  }
 		 }
 
@@ -328,7 +328,6 @@ class MovementLeaderboard2 extends Component{
 		let keys = ["rank","username","nes","exercise_steps","total_steps","mc","exercise_duration","active_min_total","active_min_sleep","active_min_exclude_sleep","active_min_exercise","active_min_exclude_sleep_exercise","total_movement_rank_point"];
 		objectLength = Object.keys(Movement_data).length;
 		for(let[key,value] of Object.entries(Movement_data)){
-			console.log("********************** real",value);
 			let td_values = [];
 			 let currentUser = '';
 			for(let key1 of keys){
@@ -418,6 +417,7 @@ class MovementLeaderboard2 extends Component{
 									<th>During Exercise Hours</th>
 									<th>Entire 24 Hour Day Excluding Sleep and Exercise</th>
 									<th>Overall Movement Rank Points (Rank)</th>
+									<th> </th>
 								</tr>
 								<tbody>
 								{td_rows}
@@ -429,7 +429,7 @@ class MovementLeaderboard2 extends Component{
 	render(){
 		return(
 				<div className = "container-fluid">		   
-					<div className = "hrr_table" ref="hrr_table">
+					<div className = "mov_dashboard_table" ref="mov_dashboard_table">
 						{this.renderTable(this.props.Movement_data,this.props.Movement_username)}	
 					</div>	
 				</div>
