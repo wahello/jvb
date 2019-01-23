@@ -8,7 +8,6 @@ class UserRequestSerializer(serializers.ModelSerializer):
 		fields='__all__'
 
 	def create(self,validated_data):
-		user = self.context['request'].user
 		instance = UserDataBackfillRequest.objects.create(**validated_data)
 		return instance
 
