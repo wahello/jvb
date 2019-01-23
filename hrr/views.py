@@ -494,7 +494,8 @@ def fitfile_parse(obj,offset,start_date_str):
 		final_heartrate = []
 		final_timestamp = []
 		to_timestamp = []
-		
+		logging.exception("message")
+
 	return (final_heartrate,final_timestamp,to_timestamp)
 
 def get_fitfiles(user,start_date,start,end,start_date_timestamp=None,end_date_timestamp=None):
