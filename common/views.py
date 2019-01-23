@@ -91,20 +91,7 @@ class UserRequestView(APIView):
 			serializer.save()
 			return Response(serializer.data,status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-		# if request.method=='POST':
-		# 	post=UserRequestModel()
-		# 	post.user=User.objects.get(username=request.user)
-		# 	post.device_type=request.POST.get('device_type')
-		# 	post.start_date=request.POST.get('start_date')
-		# 	post.end_date=request.POST.get('end_date')
-		# 	post.requested_at=request.POST.get('requested_at')
-		# 	post.status=request.POST.get('status')
-
-		# 	post.save()
-
-		# 	return render(request,)
-		# else:
-
+		
 
 
 	

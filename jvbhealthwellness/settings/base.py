@@ -16,7 +16,7 @@ SITE_ID = 1
 
 SECURE_HSTS_PRELOAD = True
 
-# DEBUG = True
+DEBUG = True
 
 ADMINS = (
     ('Admin', 'foo@example.com'),
@@ -34,7 +34,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
 
     'djangojs',
     'webpack_loader',
