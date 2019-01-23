@@ -54,9 +54,12 @@ def get_time_from_timestamp(time_stamp):
 	return "{}:{}:{}".format(hours,minutes,seconds)
 
 def convert_timestr_time(start_date):
-	hour,minute,sec = start_date.split(':')
-	time_obj = time(int(hour),int(minute),int(sec))
-	return time_obj
+	try:
+		hour,minute,sec = start_date.split(':')
+		time_obj = time(int(hour),int(minute),int(sec))
+		return time_obj
+	except AttributeError:
+		return start_date
 
 def get_diff_time(start,end):
 	dummydate = date(2000,1,1)
@@ -1019,7 +1022,72 @@ def get_latest_activity(activities_start_end_time_list):
 			data['act_start'] = start_time_obj
 			latest_activity.append(data)
 	sorted_latest_activity=sorted(latest_activity, key=itemgetter('act_start'))
-	return sorted_latest_activity[-1]
+	if sorted_latest_activity:
+		return sorted_latest_activity[-1]
+	else:
+		return []
+
+def get_time_to_99_no_hrr(act_end_time,hr_dataset):
+	'''
+		When heart beat reached 99 after end of activity when there is no HRR 
+		activity created
+	'''
+	time_to_99_time = []
+	dummydate = date(2000,1,1)
+	diff_index = 0
+	end_activty_time = 1
+	start_activty_time = 1
+	hr_time_diff = []
+	heartrate_time_diff = []
+	hr = []
+	act_end_time_obj = convert_timestr_time(act_end_time)
+	for index,single_time in enumerate(hr_dataset):
+		dataset_time = single_time["time"]
+		dateset_time_obj = convert_timestr_time(dataset_time)
+		diff_start_date = get_diff_time(act_end_time_obj,dateset_time_obj)
+		diff_start_date = diff_start_date.seconds
+		if diff_start_date <= 30:
+			diff_index = index
+			while start_activty_time:
+				diff_index = diff_index + 1
+				time_near_start = hr_dataset[diff_index]["time"]
+				dateset_time_obj = convert_timestr_time(time_near_start)
+				diff_start_date = get_diff_time(act_end_time_obj,dateset_time_obj)
+				if diff_start_date.seconds == 0 or diff_start_date.days == -1:
+					# print(dateset_time_obj,"Start date")
+					start_activty_time = 0
+		if diff_index and diff_index >= index:
+			diff_index_end_act = index
+			while end_activty_time:
+				act_interval_time = hr_dataset[diff_index_end_act]["time"]
+				act_interval_hr = hr_dataset[diff_index_end_act]["value"]
+				act_pre_interval_time = hr_dataset[diff_index_end_act+1]["time"]
+				diff_index_end_act = diff_index_end_act + 1
+				act_interval_time_obj = convert_timestr_time(act_interval_time)
+				act_pre_interval_time_obj = convert_timestr_time(act_pre_interval_time)
+				diff_times = get_diff_time(act_pre_interval_time_obj,act_interval_time_obj)
+				if diff_times.seconds >= 300:
+					Did_you_measure_HRR = "Heart rate data not provided"
+					return Did_you_measure_HRR
+				hr_time_diff.append(diff_times.seconds)
+				hr.append(act_interval_hr)
+				total_diff_times = get_diff_time(act_end_time_obj,act_interval_time_obj)
+				if act_interval_hr <= 99:
+					# print(act_interval_time_obj,"End date")
+					end_activty_time = 0
+					diff_index = 0
+					time_to_99_time.append(act_interval_time)
+					#hr_time_diff = hr_time_diff[1:-4]
+					#hr = hr[1:-4]
+	return hr_time_diff,hr,time_to_99_time
+
+def lowest_hrr_1min_no_hrr(time_diff_sum,hr):
+	one_min_hr = [] 
+	for time,hr in zip(time_diff_sum,hr):
+		if time <= 60:
+			one_min_hr.append(hr)
+	return one_min_hr
+
 
 def generate_hrr_charts(user,start_date):
 	'''
@@ -1142,8 +1210,81 @@ def generate_hrr_charts(user,start_date):
 				"offset":offset,
 				}
 	elif not hrr_act_id:
+		act_hr_time_no_hrr = None
+		no_hrr_heartrate = None
+		no_hrr_time = None
+		hr_time_diff = None
+		one_min_hr = None
+		time_to_99_time = None
+		offset = 0
 		latest_activity = get_latest_activity(activities_start_end_time_list)
-		print(latest_activity,"latest_activity")
+		if latest_activity:
+			act_hr_time_no_hrr = get_hr_timediff(hr_data_set,latest_activity.get(
+							'act_start'),latest_activity.get(
+							"act_end"),latest_activity.get("log_id"))
+			offset = get_offset_value(user,start_date,latest_activity.get("log_id"))
+		if act_hr_time_no_hrr:
+			no_hrr_heartrate,no_hrr_time = get_hr_time(act_hr_time_no_hrr)
+		if latest_activity:
+			hr_time_diff,hr,time_to_99_time = get_time_to_99_no_hrr(latest_activity.get("act_end"),hr_data_set)
+		if hr_time_diff:
+			time_diff_sum = [sum(hr_time_diff[:i+1]) for i in range(len(hr_time_diff))]
+			one_min_hr = lowest_hrr_1min_no_hrr(time_diff_sum,hr)
+		if hr_time_diff and hr:
+			Did_you_measure_HRR = 'no'
+			no_fitfile_hrr_reach_99 = "yes"
+			no_fitfile_hrr_time_reach_99 = sum(hr_time_diff[:-1])
+		else:
+			Did_you_measure_HRR = ''
+			no_fitfile_hrr_reach_99 = ''
+			no_fitfile_hrr_time_reach_99 = None
+		if one_min_hr:
+			lowest_hrr_no_fitfile = min(one_min_hr)
+		else:
+			lowest_hrr_no_fitfile = None
+		if no_hrr_heartrate:
+			end_heartrate_activity = no_hrr_heartrate[-1]
+		else:
+			end_heartrate_activity = None
+		if lowest_hrr_no_fitfile and end_heartrate_activity:
+			no_file_beats_recovered = end_heartrate_activity - lowest_hrr_no_fitfile
+		else:
+			no_file_beats_recovered = None
+		if latest_activity:
+			act_time_obj = convert_timestr_time(latest_activity.get("act_end"))
+			act_start_datetime = combine_time_date(start_date,act_time_obj)
+			end_time_activity = utc_timestamp(act_start_datetime) - offset
+		else:
+			end_time_activity = None
+		if time_to_99_time:
+			act_time_obj = convert_timestr_time(time_to_99_time[0])
+			act_start_datetime = combine_time_date(start_date,act_time_obj)
+			time_heart_rate_reached_99 = utc_timestamp(act_start_datetime) - offset
+		else:
+			time_heart_rate_reached_99 = None
+		data = {
+			"Did_heartrate_reach_99":"",
+			"time_99":None,
+			"HRR_start_beat":None,
+			"lowest_hrr_1min":None,
+			"No_beats_recovered":None,
+
+			"end_time_activity":end_time_activity,
+			"diff_actity_hrr":None,
+			"HRR_activity_start_time":None,
+			"heart_rate_down_up":None,
+			"pure_1min_heart_beats":None,
+			"pure_time_99":None,
+			"Did_you_measure_HRR":Did_you_measure_HRR,
+			"no_fitfile_hrr_reach_99":no_fitfile_hrr_reach_99,
+			"no_fitfile_hrr_time_reach_99":no_fitfile_hrr_time_reach_99,
+			"time_heart_rate_reached_99":time_heart_rate_reached_99,
+			"end_heartrate_activity":end_heartrate_activity,#same for without fitfile also with HRR File Starting Heart Rate
+			"lowest_hrr_no_fitfile":lowest_hrr_no_fitfile,
+			"no_file_beats_recovered":no_file_beats_recovered,
+
+			"offset":offset,
+			}
 	else:
 		data = {"Did_you_measure_HRR":'',
 			"Did_heartrate_reach_99":'',
