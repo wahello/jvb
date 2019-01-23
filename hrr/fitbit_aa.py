@@ -128,7 +128,11 @@ def get_hrr_timediff(hr_dataset,start_date,end_date):
 
 	dataset = []
 	for index, single_time in enumerate(hr_dataset):
-		if hr_dataset[index]['time'] <= 86400:
+
+		act_interval_time_obj = convert_timestr_time(hr_dataset[index]['time'])
+		start_time_obj = convert_timestr_time('00:00:00')
+		diff_times = get_diff_time(act_interval_time_obj, start_time_obj)
+		if  diff_times.seconds <= 86400:
 			dataset.append({'time': hr_dataset[index]["time"], 
 							'value': hr_dataset[index]["value"]})
 	hr_dataset = dataset
