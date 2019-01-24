@@ -966,19 +966,19 @@ def min_heartrate(hrr_final_heartrate,time_diff_sum):
 		if k <= 60:
 			min_heartrate.append(i)
 
-	b = []
-	a = len(hrr_final_heartrate)-len(min_heartrate)
-	if a > 0:
-		b =  hrr_final_heartrate[-a:]
-	elif a == 0:
-		b = [min(min_heartrate)]
+	min_hr = []
+	len_hr = len(hrr_final_heartrate)-len(min_heartrate)
+	if len_hr > 0:
+		min_hr =  hrr_final_heartrate[-len_hr:]
+	elif len_hr == 0:
+		min_hr = [min(min_heartrate)]
 	else:
 		min_heartrate.reverse()
-		b = min_heartrate
+		min_hr = min_heartrate
 	if min_heartrate:
-		if b and min(min_heartrate) < b[0]:
-			b = [min(min_heartrate)]
-	return b
+		if min_hr and min(min_heartrate) < min_hr[0]:
+			min_hr = [min(min_heartrate)]
+	return min_hr
 
 def combine_time_date(start_date,time_obj):
 	return datetime.combine(start_date, time_obj)
@@ -1085,6 +1085,9 @@ def get_time_to_99_no_hrr(act_end_time,hr_dataset):
 	return hr_time_diff,hr,time_to_99_time
 
 def lowest_hrr_1min_no_hrr(time_diff_sum,hr):
+	'''
+		This function will return the heart rate of first one minute
+	'''
 	one_min_hr = [] 
 	for time,hr in zip(time_diff_sum,hr):
 		if time <= 60:
