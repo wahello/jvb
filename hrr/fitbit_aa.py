@@ -938,8 +938,11 @@ def get_act_before_hrr(activities_start_end_time_list,hrr_act_id):
 					data['act_start'] = start_time_obj
 					act_before_hrr.append(data)
 	sorted_act_before_hrr=sorted(act_before_hrr, key=itemgetter('act_start'))
-	sorted_act_before_hrr[-1]['act_start'] = sorted_act_before_hrr[-1].get('act_start').strftime("%H:%M:%S")
-	return sorted_act_before_hrr[-1],hrr_act
+	if sorted_act_before_hrr:
+		sorted_act_before_hrr[-1]['act_start'] = sorted_act_before_hrr[-1].get('act_start').strftime("%H:%M:%S")
+		return sorted_act_before_hrr[-1],hrr_act
+	else:
+		return [],[]
 
 def get_hr_time(act_hr_time):
 	activty_hr = [activty for key,activty in act_hr_time.items()]
