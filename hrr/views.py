@@ -72,18 +72,32 @@ class UserHrrView(generics.ListCreateAPIView):
 	def calculate_aa_data(self,aa_data,user_get,start_dt):
 		if aa_data:
 			final_query = aa_data[0]
+			return final_query
 		else:
 			start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
 			final_query = hrr_data(user_get,start_date)
-			if final_query.get('Did_you_measure_HRR'):
-				try:
-					user_hrr = Hrr.objects.get(
-						user_hrr=user_get, created_at=start_date)
-					update_hrr_instance(user_hrr, final_query)
-				except Hrr.DoesNotExist:
-					create_hrr_instance(user_get, final_query, start_date)
-		return final_query
-
+			device_type = quicklook.calculations.calculation_driver.which_device(user_get)
+			if device_type == 'garmin':
+				if final_query.get('Did_you_measure_HRR'):
+					try:
+						user_hrr = Hrr.objects.get(
+							user_hrr=user_get, created_at=start_date)
+						update_hrr_instance(user_hrr, final_query)
+					except Hrr.DoesNotExist:
+						create_hrr_instance(user_get, final_query, start_date)
+					return final_query
+			elif device_type == 'fitbit':
+				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
+				fitbit_hrr = fitbit_aa.generate_hrr_charts(user_get,start_date)
+				if fitbit_hrr.get('Did_you_measure_HRR'):
+					try:
+						user_hrr = Hrr.objects.get(
+							user_hrr=user_get, created_at=start_date)
+						update_hrr_instance(user_hrr, fitbit_hrr)
+					except Hrr.DoesNotExist:
+						create_hrr_instance(user_get, fitbit_hrr, start_date)
+				return fitbit_hrr
+				
 	def get(self,request,format="json"):
 		user_get = self.request.user
 		start_dt = self.request.query_params.get('start_date', None)
