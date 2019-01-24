@@ -114,7 +114,7 @@ this.handleChange_end_time=this.handleChange_end_time.bind(this);
 this.createSleepDropdown = this.createSleepDropdown.bind(this);
 this.createSleepDropdown_heartrate=this.createSleepDropdown_heartrate.bind(this);
 this.renderTable = this.renderTable.bind(this);
-this.renderEditActivityModal = this.renderEditActivityModal.bind(this);
+this.renderEditActivityModal = this.renderEditActivityModal.bind(this);/*** ****************************************/
 this.handleChangeModal = this.handleChangeModal.bind(this);
 this.CreateNewActivity = this.CreateNewActivity.bind(this);
 this.activitySelectOptions = this.activitySelectOptions.bind(this);
@@ -124,16 +124,16 @@ this.toggle_starttime=this.toggle_starttime.bind(this);
 this.saveStartTimeModel=this.saveStartTimeModel.bind(this);
 this.deleteActivity=this.deleteActivity.bind(this);
 this.toggle_delete=this.toggle_delete.bind(this);
-this.editToggleHandlerStartTime = this.editToggleHandlerStartTime.bind(this);
+this.editToggleHandlerStartTime = this.editToggleHandlerStartTime.bind(this);/*** *****************************************/
 this.handleChangeActivityStartEndTime = this.handleChangeActivityStartEndTime.bind(this);
 this.handleChangeActivityDate = this.handleChangeActivityDate.bind(this);
-this.DurationOnStartEndTimeChange = this.DurationOnStartEndTimeChange.bind(this);
-this.getTotalActivityDuration = this.getTotalActivityDuration.bind(this);
-this.handleChangeModalActivityTime = this.handleChangeModalActivityTime.bind(this);
-this.handleChangeModelActivityStartTimeDate = this.handleChangeModelActivityStartTimeDate.bind(this);
-this.handleChangeModelActivityEndTimeDate = this.handleChangeModelActivityEndTimeDate.bind(this);
-this.createActivityTime = this.createActivityTime.bind(this);
-this.createStartAndEndTime = this.createStartAndEndTime.bind(this);
+this.DurationOnStartEndTimeChange = this.DurationOnStartEndTimeChange.bind(this);/*** *****************************************/
+this.getTotalActivityDuration = this.getTotalActivityDuration.bind(this);/*** */
+this.handleChangeModalActivityTime = this.handleChangeModalActivityTime.bind(this);/*** *****************************************************/
+this.handleChangeModelActivityStartTimeDate = this.handleChangeModelActivityStartTimeDate.bind(this);/*** ***********************************/
+this.handleChangeModelActivityEndTimeDate = this.handleChangeModelActivityEndTimeDate.bind(this);/*** *******************************************/
+this.createActivityTime = this.createActivityTime.bind(this);/*** *****************************************/
+this.createStartAndEndTime = this.createStartAndEndTime.bind(this);/*** *************************************************/
 this.setActivitiesEditModeFalse = this.setActivitiesEditModeFalse.bind(this);
 this.addingCommaToSteps = this.addingCommaToSteps.bind(this);
 let activities = this.props.activities;
@@ -475,8 +475,8 @@ handleChangeModal(event){
     activity_display_name:activityDisplayName,
     modal_activity_type:current_activity?current_activity.activityType:"",
     modal_activity_heart_rate:current_activity?current_activity.averageHeartRateInBeatsPerMinute:"",
-    modal_activity_hour:hour,/* 1. change  */
-    modal_activity_min:mins,/* 2.change */
+    modal_activity_hour:hour,
+    modal_activity_min:mins,
     modal_exercise_steps:current_activity?current_activity.steps:"",
     modal_exercise_steps_status:current_activity?current_activity.steps_type:"",
     modal_duplicate_info_status:current_activity?current_activity.duplicate:false,
@@ -647,6 +647,9 @@ editToggleHandler_duplicate_info(event) {
     categoryMode['duplicate'] = !categoryMode['duplicate'] 
     if(selectedActivityId){
         this.setState({
+
+
+            
             ...this.state.activities_edit_mode,
             [selectedActivityId]:categoryMode
         },()=>{
@@ -1094,19 +1097,21 @@ handleChange(event){
     const target = event.target;
     const value = target.value;
     const name = target.name;//modal_duplicate_info_status
-    if(value.includes('STRENGTH')){
-        alert(1);
-        this.setState({
-            workout_type:'strength',
-        },()=>{
-            this.props.AutoPopulateActivities(this.state.workout_type,this.state.modalstarttime_activity_hour,
-                this.state.modalstarttime_activity_min,
-                this.state.modalstarttime_activity_ampm,
-                this.state.modalendtime_activity_hour,
-                this.state.modalendtime_activity_min,
-                this.state.modalendtime_activity_ampm);
-        })
-    }
+    // if(value.includes('STRENGTH')){
+    //     alert(1);
+    //     this.setState({
+    //         workout_type:'strength',
+    //     },()=>{
+    //         this.props.AutoPopulateActivities(this.state.workout_type,
+    //             // this.state.modalstarttime_activity_hour,
+    //             // this.state.modalstarttime_activity_min,
+    //             // this.state.modalstarttime_activity_ampm,
+    //             // this.state.modalendtime_activity_hour,
+    //             // this.state.modalendtime_activity_min,
+    //             // this.state.modalendtime_activity_ampm
+    //             );
+    //     })
+    // }
  /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
     let actType = this.state.modal_activity_type;
     let actAvgHeartRate = this.state.modal_activity_heart_rate;

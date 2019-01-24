@@ -339,8 +339,8 @@ export function renderActivityGrid(){
 			editable = {this.state.editable}
 			dateTimeValidation = {this.dateTimeValidation}
 			ref = "child"
-			AutoPopulateActivities = {this.AutoPopulateActivities}
-			//AutoPopulateActTimings = {this.AutoPopulateActTimings}
+			// AutoPopulateActivities = {this.AutoPopulateActivities}
+			// AutoPopulateActTimings = {this.AutoPopulateActTimings}
 			//workout_type={this.state.workout_type}
 		/>
 	);

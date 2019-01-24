@@ -299,19 +299,12 @@ class Other_Hrr_Data extends Component{
 				"heart_rate_down_up":this.state.heart_rate_down_up,
 				"pure_1min_heart_beats":this.state.pure_1min_heart_beats,
 				"pure_time_99":pure_time_99,
-				/*changes made here */
-				
-				"in_hrr":!this.state.in_hrr,
-				"ex_hrr":!this.state.ex_hrr,
-                "update_hrr":!this.state.update_hrr
-		
-				/*changes made here */
+                "use_updated_hrr":!this.state.use_updated_hrr
 
 			},() => {
-				/*changes made here */
-                this.props.Includehrr(this.state.in_hrr);
-				// this.props.Excludehrr(this.state.ex_hrr);
-                this.props.updateText(this.state.update_hrr);
+
+                this.props.updateText(this.state.use_updated_hrr);
+				
 				let data = {
 	  				"end_time_activity":endTimeActivity.utc().valueOf(),
 					"diff_actity_hrr":diff_time,
@@ -320,11 +313,8 @@ class Other_Hrr_Data extends Component{
 					"heart_rate_down_up":parseInt(this.state.heart_rate_down_up),
 					"pure_1min_heart_beats":parseInt(this.state.pure_1min_heart_beats),
 					"pure_time_99":pure_time_99,
-					"in_hrr":this.state.in_hrr,
-					"ex_hrr":this.state.ex_hrr,
-			         "update_hrr":this.state.update_hrr
-				
-			
+			        "use_updated_hrr":this.state.use_updated_hrr,
+			        "include_hrr":this.props.shouldIncludeHRR
 				}
                  console.log(data,"data");
 	  			updateHeartData(data, this.props.selectedDate, this.successHeart, this.errorHeart);

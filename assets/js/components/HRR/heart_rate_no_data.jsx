@@ -102,7 +102,6 @@ class No_Hrr_Data extends Component{
 			no_file_beats_recovered:props.hrr.no_file_beats_recovered,
 			end_time_activity:props.hrr.end_time_activity,
 			no_fitfile_hrr_time_reach_99:props.hrr.no_fitfile_hrr_time_reach_99,
-            //update_toggle:false,
 		 }
 		 return initialState;
     }
@@ -419,9 +418,8 @@ class No_Hrr_Data extends Component{
 					heart_rate_down_up:data.data.heart_rate_down_up,
 					pure_1min_heart_beats:data.data.pure_1min_heart_beats,
 					pure_time_99:data.data.pure_time_99,
-					in_hrr:data.data.in_hrr,
-	                ex_hrr:data.data.ex_hrr,
-					update_hrr:data.data.update_hrr,
+			
+	                use_updated_hrr:data.data.use_updated_hrr,
 
 					no_fitfile_hrr_time_reach_99:data.data.no_fitfile_hrr_time_reach_99,
 					no_fitfile_hrr_reach_99:data.data.no_fitfile_hrr_reach_99,
@@ -466,19 +464,10 @@ class No_Hrr_Data extends Component{
 			"time_heart_rate_reached_99":timeHeartRateReach99.utc().valueOf(),
 			"end_heartrate_activity":this.state.end_heartrate_activity,
 			"lowest_hrr_no_fitfile":this.state.lowest_hrr_no_fitfile,
-			"no_file_beats_recovered":this.state.no_file_beats_recovered,
-			"in_hrr":this.state.in_hrr,
-			"ex_hrr":this.props.ex_hrr,
-			"update_hrr":!this.state.update_hrr
-
-		    
-
+			"no_file_beats_recovered":this.state.no_file_beats_recovered,			
+			"use_updated_hrr":!this.state.use_updated_hrr
 		},() => {
-  
-		  this.props.Includehrr(this.state.in_hrr);
-		// 	this.props.Excludehrr(this.state.ex_hrr);
-			this.props.updateText(this.state.update_hrr);
-		
+  			this.props.updateText(this.state.use_updated_hrr);
 			let data = {
 				"end_time_activity":endTimeActivity.utc().valueOf(),
 				"Did_you_measure_HRR":this.state.Did_you_measure_HRR,
@@ -488,11 +477,8 @@ class No_Hrr_Data extends Component{
 				"end_heartrate_activity": parseInt(this.state.end_heartrate_activity),
 				"lowest_hrr_no_fitfile": parseInt(this.state.lowest_hrr_no_fitfile),
 				"no_file_beats_recovered": parseInt(this.state.no_file_beats_recovered),
-				"in_hrr":this.props.in_hrr,
-	            "ex_hrr":this.props.ex_hrr,
-				"update_hrr":this.state.update_hrr
-	
-
+				"use_updated_hrr":this.state.use_updated_hrr,
+				"include_hrr":this.props.shouldIncludeHRR
 			}
 		    console.log(data,"data")
 			updateHeartData(data, this.props.selectedDate, this.successHeart, this.errorHeart);
