@@ -18,7 +18,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
 	password = serializers.CharField(source='user.password',write_only=True)
 	first_name = serializers.CharField(source='user.first_name')
 	last_name  = serializers.CharField(source='user.last_name')
-	user_age = serializers.SerializerMethodField() 
 
 	def validate_username(self,username):
 	   '''
@@ -86,3 +85,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		user = User.objects.create_user(**user_data)
 		termsconditions = TermsConditions.objects.create(user=user,**validated_data)
 		return termsconditions
+
+	def to_representation(self,instance):
+		serialized_data = super().to_representation(instance)
+		serialized_data['user_age'] = self.get_user_age(instance)
+		return serialized_data
