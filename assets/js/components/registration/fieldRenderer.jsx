@@ -144,6 +144,7 @@ export function renderSelectDate(field){
 	);
 }
 export function renderSelectYear(field){
+	const yearEnd = new Date().getFullYear()
 	const { meta: {touched, error} } = field;
 	const className = `form-group ${ touched && error ? 'has-danger' : '' }`;
 	return(
@@ -153,8 +154,30 @@ export function renderSelectYear(field){
 				required
 				{...field.input}>
 				<option value="Year">Year</option> 
-				{createDropdown(1930,2018)}
+				{createDropdown(1930,yearEnd)}
 				{touched ? field.err_callback(error) : field.err_callback('')}
 			</Input>
+	);
+}
+
+export function renderSelectAge(field){
+	const { meta: {touched, error} } = field;
+	const className = `form-group ${ touched && error ? 'has-danger' : '' }`;
+	const label = field.label != "" ? <Label>{field.label}</Label> : ""
+	return(
+			<FormGroup>
+				{label}
+				<Input 
+					type={field.type} 
+					name={field.input.name}
+					required 
+					{...field.input}
+				>
+					{createDropdown(13,120)}
+				</Input>
+				<div style={{color:"red"}}className="form-control-feedback">
+					{touched ? error : ''}
+				</div>
+			</FormGroup>
 	);
 }
