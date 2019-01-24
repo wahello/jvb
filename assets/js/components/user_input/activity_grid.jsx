@@ -1097,21 +1097,7 @@ handleChange(event){
     const target = event.target;
     const value = target.value;
     const name = target.name;//modal_duplicate_info_status
-    // if(value.includes('STRENGTH')){
-    //     alert(1);
-    //     this.setState({
-    //         workout_type:'strength',
-    //     },()=>{
-    //         this.props.AutoPopulateActivities(this.state.workout_type,
-    //             // this.state.modalstarttime_activity_hour,
-    //             // this.state.modalstarttime_activity_min,
-    //             // this.state.modalstarttime_activity_ampm,
-    //             // this.state.modalendtime_activity_hour,
-    //             // this.state.modalendtime_activity_min,
-    //             // this.state.modalendtime_activity_ampm
-    //             );
-    //     })
-    // }
+   
  /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
     let actType = this.state.modal_activity_type;
     let actAvgHeartRate = this.state.modal_activity_heart_rate;

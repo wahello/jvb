@@ -1420,25 +1420,7 @@ handleScroll() {
         return true;
     }
     
-    // AutoPopulateActivities(workoutType){
   
-    //   this.setState({
-    //                   workout_type:workoutType,
-                     
-
-    //   });
-      
-    // }
-    // AutoPopulateActTimings(Act_start_hours,Act_start_min,Act_start_am_pm,Act_end_hours,Act_end_min,Act_end_am_pm){
-    //   this.setState( {  
-    //     strength_workout_start_hour:Act_start_hours,
-    //     strength_workout_start_min:Act_start_min,
-    //     strength_workout_start_am_pm:Act_start_am_pm,
-    //     strength_workout_end_am_pm:Act_end_am_pm,
-    //     strength_workout_end_hour:Act_end_hours,
-    //     strength_workout_end_min:Act_end_min});
-    //     console.log(time,"timings");
-    // }
     render(){
       const children = React.Children.map(this.props.children,
       (child, index) => React.cloneElement(child, {
