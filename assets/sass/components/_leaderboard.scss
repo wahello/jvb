@@ -141,3 +141,52 @@
 
 
 
+
+.mov_dashboard_table{
+	padding-top:10px;
+}
+.mov_dashboard_table .mov_sticky th {
+	padding: 0.55rem;
+    vertical-align: top;
+    min-width: 75px;
+    text-align: center;
+    width:200px;
+}
+
+.mov_dashboard_table th{
+	min-width:50px;	
+	word-wrap:break-word;
+	white-space:unset !important;
+	max-width:75px;
+	font-size: 13px
+}
+
+.mov_dashboard_table .mov_sticky {
+  position: fixed;
+  top: 0;
+  width: inherit;
+  padding-right:35px;
+  background:#fff;
+  z-index:100;
+  border:none;
+}
+.mov_dashboard_table tbody td{
+	min-width:50px;	
+	word-wrap:break-word;
+	white-space:unset !important;
+	max-width:75px;
+	font-size: 13px
+}
+.mov_dashboard_table .mov_sticky + tbody td{
+	min-width:20px;
+	font-size:10px;
+	padding:0;
+	word-wrap:break-word;
+}
+
+@media screen and (max-width:649px){
+	.mov_sticky{
+		position:relative !important;
+	}
+}
+
