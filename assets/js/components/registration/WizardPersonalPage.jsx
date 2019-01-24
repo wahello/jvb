@@ -6,7 +6,14 @@ import {Field, reduxForm } from 'redux-form';
 import { Form, Label, Button, Input, FormText, FormGroup,
 		 Row, Col, Modal, ModalHeader, ModalBody,ModalFooter, Container,InputGroup} from 'reactstrap';
 
-import {renderFieldFormGroup,renderSelectFeet, renderSelectInches,renderSelectPounds,renderSelectMonth,renderSelectDate,renderSelectYear} from './fieldRenderer';
+import {renderFieldFormGroup,
+	renderSelectFeet,
+	renderSelectInches,
+	renderSelectPounds,
+	renderSelectMonth,
+	renderSelectDate,
+	renderSelectYear,
+	renderSelectAge} from './fieldRenderer';
 import { personal_validate } from './validation';
 
 class WizardPersonalPage extends Component{
@@ -118,7 +125,15 @@ class WizardPersonalPage extends Component{
 							</div>
 
 						</FormGroup>
-						 <FormGroup>
+
+						<Field
+							name = "user_age"
+							type = "select"
+							label = "How old are you today?"
+							component = {renderSelectAge}
+						/>
+
+						<FormGroup>
 					          <Label className="custom-control custom-radio">
 					            	<Field 
 					            		className="custom-control-input custom-radio custom-control-indicator"
