@@ -14,78 +14,58 @@ import moment from 'moment';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
 import {fetchData} from '../network/new_link';
+import {getInput} from './Input';  
 
 class NewLink extends Component{
 	constructor(props){
 		super(props);
 			this.errorFetch = this.errorFetch.bind(this);
-		    this.successFetch = this.successFetch.bind(this);
-		    this.processDate = this.processDate.bind(this);
-			this.toggle = this.toggle.bind(this);
+		  this.successFetch = this.successFetch.bind(this);
+      this.onSuccess = this.onSuccess.bind(this);
+      this.onFailure = this.onFailure.bind(this);
+		  this.processDate = this.processDate.bind(this);
+      this.onSubmitDate = this.onSubmitDate.bind(this);
+			this.toggleCalendar = this.toggleCalendar.bind(this);
 			this.handleChange = this.handleChange.bind(this);
+
+      let initial_state = getInput(moment().subtract(7,'days'),
+                      moment());
+
 				this.state = {
-					mode:'',
-				       tableAttrColumn: [
-				        {name: '12:00 AM - 12:59 AM'},
-				        {name: '01:00 AM - 01:59 AM'},
-				        {name: '02:00 AM - 02:59 AM'}, 
-				        {name: '03:00 AM - 03:59 AM'},
-				        {name: '04:00 AM - 04:59 AM'},        
-				        {name: '05:00 AM - 05:59 AM'},
-				        {name: '06:00 AM - 06:59 AM'},
-				        {name: '07:00 AM - 07:59 AM'},
-				        {name: '08:00 AM - 08:59 AM'},
-				        {name: '09:00 AM - 09:59 AM'},
-				        {name: '10:00 AM - 10:59 AM'},
-				        {name: '11:00 AM - 11:59 AM'},
-				        {name: '12:00 PM - 12:59 PM'},
-				        {name: '01:00 PM - 01:59 PM'},
-				        {name: '02:00 PM - 02:59 PM'},
-				        {name: '03:00 PM - 03:59 PM'},
-				        {name: '04:00 PM - 04:59 PM'},
-				        {name: '05:00 PM - 05:59 PM'},
-				        {name: '06:00 PM - 06:59 PM'},
-				        {name: '07:00 PM - 07:59 PM'},
-				        {name: '08:00 PM - 08:59 PM'},        
-				        {name: '09:00 PM - 09:59 PM'},
-				        {name: '10:00 PM - 10:59 PM'},
-				        {name: '11:00 PM - 11:59 PM'},
-				        {name: 'Active Hours'},
-				        {name: 'Inactive Hours'},
-				        {name: 'Strength Hours'},
-				        {name: 'Sleeping Hours'},
-				        {name:'Nap Hours'},
-				        {name: 'Exercise Hours'},
-				        {name: 'No Data Yet Hours'},
-				        {name: 'Time Zone Change Hours'},
-				        {name: 'Total Active Minutes'},
-				        {name: 'Total % Active'},
-				        {name: 'Total Steps *Total Steps on this chart may differ slightly from overall steps'}              
-				       ],
-        			popoverOpen: false,
-			       selectedDate: new Date()                      
+				    mode:'',
+			      today_date:moment(),
+            start_date:moment().subtract(7,'days').toDate(),
+            end_date:moment().toDate(),
+		        selected_date: new Date(),
+            calendarOpen:false,  
+            fetching_ql:false,
+            creating_ql:false,  
+            isOpen: false,
+            data:initial_state,
+            // fitbit_data:{},    
+            // garmin_data:{},              
       			};
 	}
 
-	toggle(){
-	    this.setState({
-	      popoverOpen: !this.state.popoverOpen
-	    });
-	}
-
-	processDate(selectedDate){
-	    this.setState({
-	      selectedDate: selectedDate,
-	      popoverOpen: !this.state.popoverOpen,
-	    },()=>{
-	      fetchData(this.state.selectedDate,this.successFetch,this.errorFetch);
-	    });
+	processDate(date){
+	    let end_date = moment(end_date);
+      let start_date = moment(start_date).subtract(7,'days');
+          this.setState({
+            selected_date:new Date(),
+            start_date : start_date.toDate(),
+            end_date : end_date.toDate(),
+            fetching_ql:true,
+            calendarOpen:!this.state.calendarOpen
+          },()=>{
+            fetchData(this.state.start_date, this.state.end_date, this.state.selected_date, this.successFetch,
+                    this.errorFetch);
+          });
 	}
 
 	successFetch(data){
 	    if(data.data.length){
 	      this.setState({
-	          mc_data : data.data
+	          data : data.data,
 	        });
 	    }
 	    else{
@@ -93,226 +73,122 @@ class NewLink extends Component{
 	    }
   	}
 
-
-
 	errorFetch(error){
-    const initial_data = [
-      {
-         created_at:"-",
-         movement_consistency: {
-          "12:00 AM to 12:59 AM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           },
-           "01:00 AM to 01:59 AM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           "02:00 AM to 02:59 AM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           "03:00 AM to 03:59 AM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           "04:00 AM to 04:59 AM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           "05:00 AM to 05:59 AM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           "06:00 AM to 06:59 AM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           "07:00 AM to 07:59 AM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           "08:00 AM to 08:59 AM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           "09:00 AM to 09:59 AM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           "10:00 AM to 10:59 AM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           "11:00 AM to 11:59 AM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           "12:00 PM to 12:59 PM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           "01:00 PM to 01:59 PM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           "02:00 PM to 02:59 PM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           },
-           "03:00 PM to 03:59 PM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           "04:00 PM to 04:59 PM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           },
-           "05:00 PM to 05:59 PM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           },
-           "06:00 PM to 06:59 PM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           "07:00 PM to 07:59 PM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           "08:00 PM to 08:59 PM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           },
-           "09:00 PM to 09:59 PM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           "10:00 PM to 10:59 PM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           },
-           "11:00 PM to 11:59 PM":{
-            steps:'-',
-            status:'-',
-            active_prcnt:'-',
-            active_duration:{unit: "minute", duration: '-'}
-           }, 
-           active_hours:'-',
-           inactive_hours:'-',
-           strength_hours:'-',
-           sleeping_hours:'-',
-           nap_hours:'-',
-           exercise_hours:'-',
-           no_data_hours: '-',
-           timezone_change_hours:'-',
-           total_active_minutes: '-',
-           total_active_prcnt:'-',
-           total_steps:'-'
-         }
-      }
-    ];
-  }
-  	handleChange(){
+    let initial_state = getInput(this.state.start_date,
+                           this.state.end_date);
 
-  	}
+    this.setState({
+      InputData:initial_state,
+      selected_date:this.state.selected_date, 
+    },()=>{
+      fetchData(this.state.start_date, this.state.end_date, this.state.selected_date, this.success,this.error);
+    });
+  }
+  
+  handleChange(event){
+    const target = event.target;
+    const value = target.value;
+    const name = target.name;
+    this.setState({
+      [name]: value
+    });
+  }
+
+  onSubmitDate(event){
+    event.preventDefault();
+    let start_date = moment(this.state.start_date);
+    let end_date = moment(this.state.end_date);
+    this.setState({
+      start_date : start_date.toDate(),
+      end_date : end_date.toDate(),
+      fetching_ql:true,
+      model:!this.state.model,
+    },()=>{
+      fetchData(this.state.start_date, this.state.end_date, this.SuccessFetch,
+              this.errorFetch);
+    });
+  }
+
+  toggleCalendar(){
+    this.setState({
+      calendarOpen:!this.state.calendarOpen
+    });
+  }
+
+  onSuccess(data,start_date,end_date){
+    this.success(data,start_date,end_date);
+    this.setState({
+      creating_ql:false
+    });
+  }
+
+  onFailure(error){
+    console.log(error.message);
+    this.setState({
+      creating_ql:false
+    });
+  }
 
 	componentDidMount(){
-	    fetchData(this.state.selectedDate,this.successFetch,this.errorFetch);  
+	    fetchData(this.state.start_date, this.state.end_date, this.state.selected_date, this.successFetch, this.errorFetch);  
 	}
 
 	render(){
 		const {fix} = this.props;
-		let rowsCount = this.state.tableAttrColumn.length;
+    //let this.state.mode == 'Fitbit'?this.state.fitbit_data:this.state.garmin_data;
 		return(
 			<div className = "container-fluid">
 			    <NavbarMenu title = {<span style = {{fontSize:"22px"}}>New Page</span>} />
-					<div className="col-md-12,col-sm-12,col-lg-12"></div>
-					<div className="row justify-content-center">
-					       	<span id="navlink" onClick={this.toggle} id="progress" style={{paddingRight:"20px"}}>
-				             	<FontAwesome name = "calendar" size = "2x"/>
-					  		</span>   
-					    	<Popover placement="bottom" isOpen={this.state.popoverOpen} target="progress" toggle={this.toggle}>
-					   			<PopoverBody><CalendarWidget onDaySelect={this.processDate}/></PopoverBody>
-							</Popover>
-			    	</div>
+          <div className="input" style={{marginLeft:"30px",marginTop:"30px", marginBottom:"30px"}}>
+            <Label style={{textAlign:"left", paddingBottom:"12px"}}>Select the type of data :</Label><br></br>
+            <Input type="select" 
+                   className="custom-select form-control" 
+                   id="select"
+                   name="type"
+                   style={{height:"35px", width:"220px",marginBottom:"20px", borderRadius:"7px",borderWidth:"medium", fontWeight:"bold", backgroundColor:"#E5E7E6"}}
+                   checked = {this.state.mode === ''}
+                   onChange={this.handleChange}>
+                      <option value="select">Select</option>
+                      <option value="Fitbit">Fitbit</option>
+                      <option value="Garmin">Garmin</option>                                                                                                                                                                                                      </Input>
+          </div> 
+     <Form>
+        <div style={{paddingLeft:"30px", paddingBottom:"12px"}} className="justify-content-center">
+            <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+            <Input type="date"
+                   name="start_date"
+                   value={moment(this.state.start_date).format('YYYY-MM-DD')}
+                   onChange={this.handleChange} 
+                   style={{height:"35px",width:"220px",borderRadius:"7px"}}/>
+        </div>
+        <div id="date" style={{paddingLeft:"30px"}} className="justify-content-center">
+            <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+            <Input type="date"
+                   name="end_date"
+                   value={moment(this.state.end_date).format('YYYY-MM-DD')}
+                   onChange={this.handleChange} 
+                   style={{height:"35px",width:"220px",borderRadius:"7px"}}/>
+        </div>
+        <div id="date" style={{paddingLeft:"50px", marginTop:"22px"}} className="justify-content-center">
+        <button id="nav-btn"
+                style={{backgroundColor:"#ed9507"}}
+                type="submit"
+                className="btn btn-block-lg"
+                onClick={this.onSubmitDate} 
+                style={{width:"175px"}}>SUBMIT</button>
+         </div>
+     </Form>
 
-			    	<div className = "input ">
-                            <Label check className = "btn btn-secondary fitbit_class " id = "fitbit_btn">
-                                 <Input type = "radio" 
-                                 		name = "mode"
-	                                	color = "grey"
-	                                	style = {{borderRadius:"100px"}}
-	                                    value = "fitbit"
-	                                    checked = {this.state.mode === 'fitbit'}
-	                                    onChange = {this.handleChange} />{' '}
-                                    Fitbit
-                            </Label>
-                            <Label check className = "btn btn-secondary garmin_class " id = "garmin_btn">
-                                 <Input type = "radio" 
-                                 		name = "mode" 
-	                                	color = "grey"
-	                                	size="lg"
-	                                	style = {{borderRadius:"100px"}}
-	                                    value = "garmin"
-	                                    checked = {this.state.mode === 'garmin'}
-	                                    onChange = {this.handleChange} />{' '}
-                                    Garmin
-                            </Label>
-                    </div>
+     <Popover placement="bottom"
+              isOpen={this.state.calendarOpen}
+              target="calendar"
+              toggle={this.toggleCalendar}>
+                <PopoverBody className="calendar">
+                  <CalendarWidget onDaySelect={this.processDate}/>
+                </PopoverBody>
+     </Popover>
 
-                    <div className = "Button">
-                    		<Button color = "primary" 
-                    				size="lg">Save
-                    		</Button>{' '}
-                    </div>
-	    	</div>
+</div>
 		)
 	}
 }
