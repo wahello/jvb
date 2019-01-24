@@ -19,7 +19,9 @@ class Profile(models.Model):
 
     weight = models.CharField(max_length=3,null=True, blank=True)
 
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(null=True)
+
+    user_age = models.PositiveIntegerField(null=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -33,8 +35,11 @@ class Profile(models.Model):
     def age(self):
         today = date.today()
         dob = self.date_of_birth
-        return (today.year - dob.year
-                - ((today.month, today.day) < (dob.month, dob.day)))
+        if dob:
+            return (today.year - dob.year
+                    - ((today.month, today.day) < (dob.month, dob.day)))
+        else:
+            return self.user_age
 
     def Aerobic_Heart_Rate_Zone_High_Number(self):
         age = self.age()

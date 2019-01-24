@@ -1719,7 +1719,6 @@ def daily_aa_data(user, start_date):
 	# 			if single_activity_key and single_activity_key not in deleted_act:
 	# 				user_created_activity_list.append(single_activity)
 	
-	profile = Profile.objects.filter(user=user)
 	if hrr_not_recorded_list:
 		for tm in hrr_not_recorded_list:
 			try:
@@ -1743,12 +1742,9 @@ def daily_aa_data(user, start_date):
 		max_hrr = ""
 	# print(workout,"workout")
 	# print(hrr,"hrr")
-	if profile:
-		for tmp_profile in profile:
-			user_dob = tmp_profile.date_of_birth
-		user_age = (date.today() - user_dob) // timedelta(days=365.2425)
-		below_aerobic_value = 180-user_age-30
-		anaerobic_value = 180-user_age+5
+	user_age = user.profile.age()
+	below_aerobic_value = 180-user_age-30
+	anaerobic_value = 180-user_age+5
 
 	all_activities_heartrate = []
 	all_activities_timestamp = []
@@ -2217,11 +2213,7 @@ def aa_low_high_end_data(user,start_date):
 				workout.append(tmp)
 			elif str(data_id) in ui_data_hrr:
 				hrr.append(tmp)				
-	profile = Profile.objects.filter(user=user)
-	if profile:
-		for tmp_profile in profile:
-			user_dob = tmp_profile.date_of_birth
-		user_age = (date.today() - user_dob) // timedelta(days=365.2425)
+	user_age = user.profile.age()
 	
 	data = {"heart_rate_zone_low_end":"",
 				"heart_rate_zone_high_end":"",
