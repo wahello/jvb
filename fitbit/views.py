@@ -185,7 +185,7 @@ def api_fitbit(session,date_fitbit):
 	heartrate_fitbit = include_resting_hr(heartrate_fitbit_intraday,heartrate_fitbit_normal)
 	try:
 		steps_fitbit = session.get(
-		"https://api.fitbit.com/1/user/-/activities/steps/date/{}/1d/15min/time/00:00/23:59.json".format(date_fitbit))
+		"https://api.fitbit.com/1/user/-/activities/steps/date/{}/1d/1min/time/00:00/23:59.json".format(date_fitbit))
 	except:
 		steps_fitbit = session.get(
 		"https://api.fitbit.com/1/user/-/activities/steps/date/{}/1d.json".format(date_fitbit))

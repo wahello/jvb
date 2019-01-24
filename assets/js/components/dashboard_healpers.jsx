@@ -163,7 +163,7 @@ export function renderTimeTohrrZoneSelectedDateFetchOverlay(){
 
 export function renderWeeklySummaryOverlay(){
 	if(this.state.fetching_weekly){
-		let selectedDate = moment(this.renderLastSunday(new Date(this.state.selectedDate)));
+		let selectedDate = moment(this.renderLastSunday(this.state.selectedDate,(7)));
 		return(
 			<div className="overlay d-flex justify-content-center align-items-center">
 				<div className="overlay-content">

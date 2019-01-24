@@ -164,19 +164,15 @@ class WorkoutDashboard extends Component{
 			fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
 		});
 	}
-	renderLastSunday(d){
-		let date;
-		let diff;
-  		var day = d.getDay();
-  		if(day == 0){
-  			diff = d.getDate() - day + (day == 0 ? -7:0);
-  			date = moment(new Date(d.setDate(diff))).format('MMM DD, YYYY');
-  		}
-  		else{
-	      	diff = d.getDate() - day + (day == 0 ? -6:0); // adjust when day is sunday
-	      	date = moment(new Date(d.setDate(diff))).format('MMM DD, YYYY');
-      	}
-  		return date;
+	renderLastSunday(selectedDate,day_num){
+		let tempSelectedDate = moment(selectedDate).format("dddd");
+		let date = "";
+	 	if(tempSelectedDate !== "Sunday") {
+	 		date = moment(selectedDate).weekday(day_num).format('MMM DD, YYYY');
+	 	} else {
+	 		date = moment(moment(selectedDate).subtract(1,"days")).weekday(day_num).format('MMM DD, YYYY');
+	 	}
+	 	return date;
 	}
 	toggleCalendar(){
 		//Toggle of calander icon.
@@ -650,7 +646,7 @@ renderTable(weekly_data){
 				                </PopoverBody>
 			                </Popover>
 	                	</span>
-	                	<span className="col-md-8 col-sm-8" style = {{fontWeight:"bold"}}>Weekly Workout Summary Report For The Week Ended: <span style = {{textDecoration:"underline"}}>{this.renderLastSunday(new Date(this.state.selectedDate))}</span>
+	                	<span className="col-md-8 col-sm-8" style = {{fontWeight:"bold"}}>Weekly Workout Summary Report For The Week Ended: <span style = {{textDecoration:"underline"}}>{this.renderLastSunday(this.state.selectedDate,(7))}</span>
 	                	</span>
 		        	</div>
 
