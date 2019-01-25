@@ -429,7 +429,8 @@ class HeartRateCal extends Component{
     // }
     toggleEditForm(){
        this.setState({
-         editable:!this.state.editable
+		 editable:!this.state.editable,
+		 include_hrr:!this.state.IncludeExcludeHRRToggler
        });
     }
     hrr_data_measured(newVal) {
@@ -491,11 +492,14 @@ class HeartRateCal extends Component{
                               size="sm"
                               onClick={this.toggleEditForm}
                               className="btn hidden-sm-up">
-                              {this.state.editable ? 'View Hrr Data' : 'Edit Hrr Data'}
+
+							  {this.state.editable ? 'View HRR Data' : 'Edit HRR Data'}
+							  
+							
                         </Button>`
 						</span>
                         <span>
-						<label style={{marginLeft:"150px"}}><strong>Updated Hrr :&nbsp;</strong></label>
+						<label style={{marginLeft:"150px"}}><strong>Use Updated HRR? &nbsp;</strong></label>
 			                      <span>{this.state.use_updated_hrr? 'Yes': 'No'}</span>
 				        </span>
 			
