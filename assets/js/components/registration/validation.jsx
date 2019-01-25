@@ -44,7 +44,7 @@ export function personal_validate(values){
 	// 	errors.dob_year = "year  required";
 	// }
 
-	if(!values.user_age){
+	if(!values.user_age || values.user_age === 'select_age'){
 		errors.user_age = "Age is required";
 	}
 
