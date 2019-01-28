@@ -14,6 +14,7 @@ import { Collapse, Navbar, NavbarToggler,
 import NavbarMenu from '../navbar';
 import { getGarminToken,logoutUser} from '../../network/auth';
 import fetchHeartData from '../../network/heart_cal';
+import {updateHeartData} from '../../network/heart_cal';
 //import {fetchHeartRefreshData} from '../../network/heart_cal';
 import {renderHrrSelectedDateFetchOverlay} from '../dashboard_healpers';
 import Heartrate_Data from './heartrate_data_file';
@@ -36,6 +37,7 @@ class HeartRateCal extends Component{
 			    fetching_hrr:false,
 				editable : false,
 				selectedDate:new Date(),
+	
     		
 
 	   			"Did_you_measure_HRR":"",
@@ -84,7 +86,7 @@ class HeartRateCal extends Component{
 
             this.IncludeExcludeHRRToggler = this.IncludeExcludeHRRToggler.bind(this);
 			this.updateText = this.updateText.bind(this);
-			
+			//this.nohrrdata = React.createRef();
 			/*changes made here */
 			//this.hrrRefreshData = this.hrrRefreshData.bind(this);
 			//this.handleChange=this.handleChange.bind(this);
@@ -430,7 +432,7 @@ class HeartRateCal extends Component{
     toggleEditForm(){
        this.setState({
 		 editable:!this.state.editable,
-		 include_hrr:!this.state.IncludeExcludeHRRToggler
+		 include_hrr:!this.state.include_hrr
        });
     }
     hrr_data_measured(newVal) {
@@ -444,7 +446,12 @@ class HeartRateCal extends Component{
 	IncludeExcludeHRRToggler(value){
 		this.setState({
 			include_hrr:!this.state.include_hrr
-		})	
+		},() => {
+			let data = {
+				include_hrr:this.state.include_hrr
+			}
+			updateHeartData(data, this.props.selectedDate, () => {},() => {});
+		})
 	}
 
 	updateText(updating_hrr){
@@ -457,6 +464,12 @@ class HeartRateCal extends Component{
 
     
   render(){
+	//const children = React.Children.map(this.props.children,(child, index) => React.cloneElement(child, {ref : child${index}}));
+	const children = React.Children.map(this.props.children,
+		(child, index) => React.cloneElement(child, {
+		ref : 'child${index}'
+		})
+		);
 	  const {fix} = this.props;
 	     
   	return(
@@ -554,7 +567,8 @@ class HeartRateCal extends Component{
 						updateText={this.updateText}
 						HRR_measured = {this.hrr_data_measured}
 						renderHrrData = {this.renderHrrData.bind(this)}
-						shouldIncludeHRR = {this.state.include_hrr}/>
+						shouldIncludeHRR = {this.state.include_hrr}
+						ExcludeHrr={this.state.exclude_hrr}/>
           		}
 
           	{this.state.Did_you_measure_HRR == "yes" &&
@@ -575,11 +589,14 @@ class HeartRateCal extends Component{
 					updateText={this.updateText}
 					HRR_measured = {this.hrr_data_measured}
 					renderHrrData = {this.renderHrrData1.bind(this)}
-					shouldIncludeHRR = {this.state.include_hrr}/>
+					shouldIncludeHRR = {this.state.include_hrr}
+			/>
           	}
 
           	{(this.state.Did_you_measure_HRR == "no" || this.state.Did_you_measure_HRR == "" || this.state.Did_you_measure_HRR == "Heart Rate Data Not Provided") &&
-          		<No_Hrr_Data hrr = {{
+				  <No_Hrr_Data  
+				  ref = "nohrrdata"
+				  hrr = {{
           			"editable":this.state.editable,
           			"Did_you_measure_HRR":this.state.Did_you_measure_HRR,
           			"end_time_activity":this.state.end_time_activity,
@@ -597,7 +614,9 @@ class HeartRateCal extends Component{
 					updateText={this.updateText}
           			HRR_measured = {this.hrr_data_measured}
           			renderHrrData = {this.renderHrrNoData.bind(this)}
-          			shouldIncludeHRR = {this.state.include_hrr}
+					  shouldIncludeHRR = {this.state.include_hrr}
+					  ExcludeHrr={this.state.exclude_hrr}
+				
           			/>   
           	}
           	
