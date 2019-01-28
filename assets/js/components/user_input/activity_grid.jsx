@@ -283,12 +283,12 @@ addingCommaToSteps(value){
     return x1 + x2;
 }
 successProfile(data){
-    let today_date = new Date();
-    let date_of_birth = moment(data.data.date_of_birth);
-    let today_date1 = moment(moment(today_date).format('YYYY-MM-DD'));
-    let age = Math.abs(today_date1.diff(date_of_birth, 'years'));
+    // let today_date = new Date();
+    // let date_of_birth = moment(data.data.date_of_birth);
+    // let today_date1 = moment(moment(today_date).format('YYYY-MM-DD'));
+    // let age = Math.abs(today_date1.diff(date_of_birth, 'years'));
     this.setState({
-        age:age
+        age:data.data.user_age
     })
 }
 

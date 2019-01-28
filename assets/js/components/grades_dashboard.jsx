@@ -42,7 +42,7 @@ class Grades_Dashboard extends Component{
 			"alcohol_drinks_yesterday":"",
 			last_synced:null,
 			"gender":"",
-			"date_of_birth":"",
+			"age":"",
 			selectedDate:new Date(),
 		}
 		this.renderHourNonExerciseStepsColor = this.renderHourNonExerciseStepsColor.bind(this);
@@ -65,7 +65,6 @@ class Grades_Dashboard extends Component{
 	 	this.getStylesUserinput = this.getStylesUserinput.bind(this);
 	 	this.renderPanalitiesColor = this.renderPanalitiesColor.bind(this);
 	 	this.renderControlledColor = this.renderControlledColor.bind(this);
-	 	this.renderAge = this.renderAge.bind(this);
 	 	this.renderEcsColors = this.renderEcsColors.bind(this);
 	 	this.gpascoreDecimal = this.gpascoreDecimal.bind(this);
 	 	this.renderSmokeColor = this.renderSmokeColor.bind(this);
@@ -92,7 +91,7 @@ class Grades_Dashboard extends Component{
   	successProfile(data){
   		this.setState({
   			gender:data.data.gender,
-  			date_of_birth:data.data.date_of_birth,
+  			age:data.data.user_age,
   		})
   	}
   	errorGradesData(error){
@@ -561,19 +560,13 @@ class Grades_Dashboard extends Component{
     	let s_time = hours + min;
     	return s_time;
 	}
-	renderAge(){
-		let today_date = new Date();
-		let date_of_birth = moment(this.state.date_of_birth);
-		let today_date1 = moment(moment(today_date).format('YYYY-MM-DD'));
-		let age = Math.abs(today_date1.diff(date_of_birth, 'years'));
-		return age;
-	}
+	
 	getStylesForUserinputSleep(value){
 		let background = "";
 		let color = "";
 		let hr_background = "";
 		let score;
-		let age = this.renderAge();
+		let age = this.state.age;
 		if(value){
 		 score = value;
 		}

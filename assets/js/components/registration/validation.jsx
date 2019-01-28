@@ -32,16 +32,20 @@ export function personal_validate(values){
 		errors.last_name = "Last name must be atleast 2 character";
 	}
 
-	if(!values.dob_month || values.dob_month === 'Month'){
-		errors.dob_month = "month  required";
-	}
+	// if(!values.dob_month || values.dob_month === 'Month'){
+	// 	errors.dob_month = "month  required";
+	// }
 
-	if(!values.dob_day || values.dob_day === 'Date'){
-		errors.dob_day = "date required";
-	}
+	// if(!values.dob_day || values.dob_day === 'Date'){
+	// 	errors.dob_day = "date required";
+	// }
 
-	if(!values.dob_year || values.dob_year === 'Year'){
-		errors.dob_year = "year  required";
+	// if(!values.dob_year || values.dob_year === 'Year'){
+	// 	errors.dob_year = "year  required";
+	// }
+
+	if(!values.user_age || values.user_age === 'select_age'){
+		errors.user_age = "Age is required";
 	}
 
 	if(!values.gender){
