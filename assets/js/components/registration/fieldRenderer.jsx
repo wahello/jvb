@@ -125,6 +125,7 @@ export function renderSelectMonth(field){
 				<option value="Month">Month</option> 
 				{createDropdown(1,12)}
 				{touched ? field.err_callback(error) : field.err_callback('')}
+				{field.onDOBChange()}
 			</Input>
 	);
 }
@@ -140,6 +141,7 @@ export function renderSelectDate(field){
 				<option value="Date">Date</option> 
 				{createDropdown(1,31)}
 				{touched ? field.err_callback(error) : field.err_callback('')}
+				{field.onDOBChange()}
 			</Input>
 	);
 }
@@ -156,6 +158,7 @@ export function renderSelectYear(field){
 				<option value="Year">Year</option> 
 				{createDropdown(1930,yearEnd)}
 				{touched ? field.err_callback(error) : field.err_callback('')}
+				{field.onDOBChange()}
 			</Input>
 	);
 }
@@ -173,6 +176,7 @@ export function renderSelectAge(field){
 					required 
 					{...field.input}
 				>
+					<option value="select_age">Select Age</option> 
 					{createDropdown(13,120)}
 				</Input>
 				<div style={{color:"red"}}className="form-control-feedback">
