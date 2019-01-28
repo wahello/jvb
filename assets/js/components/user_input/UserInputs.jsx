@@ -158,7 +158,9 @@ class UserInputs extends React.Component{
 
         no_exercise_reason:'',
         no_exercise_comment:'',
-        activities:{},
+        activities:{
+          /* change 1. */
+        },
         report_type:'quick',
 
         took_nap:'no',
@@ -285,6 +287,8 @@ class UserInputs extends React.Component{
     this.renderRemoveDate = this.renderRemoveDate.bind(this);
 
     this.dateTimeValidation = this.dateTimeValidation.bind(this);
+    this.AutoPopulateActivities = this.AutoPopulateActivities.bind(this);
+    this.AutoPopulateActTimings = this.AutoPopulateActTimings.bind(this);
  }   
     _extractDateTimeInfo(dateObj){
       let datetimeInfo = {
@@ -357,7 +361,7 @@ transformActivity(activity){
       "duplicate":false,
       "deleted":false
   }
-  for(let[key,value] of Object.entries(activity)){
+  for(let[key,value] of Object.entries(activity)){    
       defaultActivityObject[key] = value
   }
   return defaultActivityObject;
@@ -1403,7 +1407,7 @@ handleScroll() {
         }
 
         let sleep_awake_time_dt = null;
-        if (end_time_date && end_time_hours
+        if (end_time_date && end_time_hours                                         
            && end_time_mins && end_time_am_pm){
           sleep_awake_time_dt = this.getDTMomentObj(end_time_date,end_time_hours,
             end_time_mins,end_time_am_pm)
@@ -1415,7 +1419,8 @@ handleScroll() {
         }
         return true;
     }
-
+    
+  
     render(){
       const children = React.Children.map(this.props.children,
       (child, index) => React.cloneElement(child, {

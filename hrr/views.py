@@ -3188,10 +3188,11 @@ def store_hhr(user,from_date,to_date,type_data=None):
 			hrr_obj = Hrr.objects.get(user_hrr=user,created_at=current_date)
 		except:
 			hrr_obj = None
-		if type_data == 'dailies' or not hrr_obj or hrr_obj.Did_you_measure_HRR == 'no':	 
-			hrr_only_store(user,current_date)
-		elif not type_data:
-			hrr_only_store(user,current_date)
+		if not hrr_obj.use_updated_hrr:
+			if type_data == 'dailies' or not hrr_obj or hrr_obj.Did_you_measure_HRR == 'no':
+				hrr_only_store(user,current_date)
+			elif not type_data:
+				hrr_only_store(user,current_date)
 		current_date -= timedelta(days=1)
 	print("HRR calculations got finished")
 	return None
