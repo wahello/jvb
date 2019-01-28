@@ -173,6 +173,8 @@ class UserInputs extends React.Component{
         nap_duration_hour:"",
         nap_duration_min:"",
         nap_comment:"",
+        number_of_activities:null,
+        garmin_number_of_activities:null
       };
       return initialState;
     }
@@ -357,7 +359,14 @@ transformActivity(activity){
       "steps_type":"",
       "summaryId":"",
       "duplicate":false,
-      "deleted":false
+      "deleted":false,
+      "indoor_temperature":"",
+      "temperature" :"",
+      "dewPoint":"",
+      "humidity":"",
+      "wind":"",
+      "temperature_feels_like":"",
+      "weather_condition":"",
   }
   for(let[key,value] of Object.entries(activity)){
       defaultActivityObject[key] = value
@@ -437,6 +446,7 @@ transformActivity(activity){
           activities = JSON.parse(data.data.strong_input.activities);
           activities = _.mapValues(activities,this.transformActivity);
         }
+        let number_of_activities = Object.keys(activities).length;
         this.setState({
           fetched_user_input_created_at:data.data.created_at,
           update_form:canUpdateForm,
@@ -554,8 +564,8 @@ transformActivity(activity){
           nap_duration_hour:(have_optional_input&&canUpdateForm)?data.data.optional_input.nap_duration.split(':')[0]:'',
           nap_duration_min:(have_optional_input&&canUpdateForm)?data.data.optional_input.nap_duration.split(':')[1]:'',
           nap_comment:have_optional_input ? data.data.optional_input.nap_comment: '',
+          number_of_activities:number_of_activities,
         },()=>{
-          
             let humidity = Object.keys(this.state.activities)
               .map(prop => this.state.activities[prop].humidity);
             let temperature_feels_like = Object.keys(this.state.activities)
@@ -568,7 +578,6 @@ transformActivity(activity){
               .map(prop => this.state.activities[prop].dewPoint);
             let wind = Object.keys(this.state.activities)
               .map(prop => this.state.activities[prop].wind);
-
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
               (!this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet')||
               (!this.state.weight || this.state.weight == "i do not weigh myself today") || (!this.state.activities[0].humidity || !this.state.activities[0].temperature_feels_like || !this.state.activities[0].weather_condition || !this.state.activities[0].temperature || !this.state.activities[0].dewPoint || !this.state.activities[0].wind)){
@@ -581,13 +590,19 @@ transformActivity(activity){
             else if(!this.state.weight || this.state.weight == "i do not weigh myself today"){
              this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
             }
-            if(!humidity[0] || !temperature_feels_like[0] || !weather_condition[0] || !temperature[0] || ! dewpoint[0] || !wind[0]) {
+            let count = 0;
+            if(this.state.number_of_activities>0){
+              for(let i=0;i<this.state.number_of_activities;i++){
+                if(!humidity[i] || !temperature_feels_like[i] || !weather_condition[i] || !temperature[i] || ! dewpoint[i] || !wind[i]) {
+                  count+=1;
+
+                }
+              }
+            }
+            if(count>0){
               /******** CALLING WEATHER REPORT API *******/
               userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,true);
             }
-            /*else if(!this.state.activities["0"].humidity || !this.state.activities[0].temperature_feels_like || !this.state.activities[0].weather_condition || !this.state.activities[0].temperature || !this.state.activities[0].dewpoint || !this.state.activities[0].wind) {
-              userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,true);
-            }*/
           }
           fetchGarminHrrData(this.state.selected_date,this.onFetchGarminSuccessHrr, this.onFetchGarminFailure);
           this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
@@ -792,6 +807,7 @@ transformActivity(activity){
       }
       else if(_.isEmpty(user_activities)){
         merged_activities = garmin_activities;
+        merged_activities = _.mapValues(merged_activities,this.transformActivity);
       }
       else if(_.isEmpty(garmin_activities)){
         merged_activities = user_activities;
@@ -805,7 +821,7 @@ transformActivity(activity){
       let have_activities = data.data.have_activities;
       let activities = this.state.activities;
       activities = this.getMergedGarminAndUserActivities(data.data.activites,activities);
-     
+      let number_of_activities = Object.keys(activities).length;
       let weight = this.state.weight;
       if((!weight || weight == "i do not weigh myself today")&&
           data.data.weight.value){
@@ -847,7 +863,8 @@ transformActivity(activity){
           sleep_mins_last_night:mins,
           workout:have_activities?'yes':workout_status,
           weight: weight?weight:"i do not weigh myself today",
-          activities:activities
+          activities:activities,
+          number_of_activities:number_of_activities
       },() => {
           /*** WEATHER REPORT ****/
           let humidity = Object.keys(this.state.activities)
@@ -862,16 +879,25 @@ transformActivity(activity){
           .map(prop => this.state.activities[prop].dewPoint);
           let wind = Object.keys(this.state.activities)
           .map(prop => this.state.activities[prop].wind);
-          if(!humidity[0] || !temperature_feels_like[0] || !weather_condition[0] || !temperature[0] || ! dewpoint[0] || !wind[0]) {
-          /** CALLING WEATHER REPORT API */
-          userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,true);
-          }
+          let count = 0;
+          if(this.state.number_of_activities>0){
+              for(let i=0;i<this.state.number_of_activities;i++){
+                if(!humidity[i] || !temperature_feels_like[i] || !weather_condition[i] || !temperature[i] || ! dewpoint[i] || !wind[i]) {
+                  count+=1;
+                }
+              }
+            }
+            if(count>0){
+              /******** CALLING WEATHER REPORT API *******/
+              userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,true);
+            }
         });
      }else{
         this.setState({
           workout:have_activities?'yes':workout_status,
           weight: weight?weight:"i do not weigh myself today",
-          activities:activities
+          activities:activities,
+          number_of_activities:number_of_activities,
         },() => {
           /*** WEATHER REPORT ****/
           let humidity = Object.keys(this.state.activities)
@@ -886,9 +912,17 @@ transformActivity(activity){
           .map(prop => this.state.activities[prop].dewPoint);
           let wind = Object.keys(this.state.activities)
           .map(prop => this.state.activities[prop].wind);
-          if(!humidity[0] || !temperature_feels_like[0] || !weather_condition[0] || !temperature[0] || ! dewpoint[0] || !wind[0]) {
-          /** CALLING WEATHER REPORT API */
-          userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,true);
+          let count = 0;
+          if(this.state.number_of_activities>0){
+              for(let i=0;i<this.state.number_of_activities;i++){
+                if(!humidity[i] || !temperature_feels_like[i] || !weather_condition[i] || !temperature[i] || ! dewpoint[i] || !wind[i]) {
+                  count+1;
+                }
+              }
+          }
+          if(count>0){
+            /******** CALLING WEATHER REPORT API *******/
+            userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,true);
           }
         });
      }
@@ -901,28 +935,31 @@ transformActivity(activity){
         weight = Math.round((data.data.weight.value)*0.00220462);
 
     let activities = this.state.activities;
+    
     activities = this.getMergedGarminAndUserActivities(data.data.activites,activities);
-      
+    let number_of_activities = Object.keys(activities).length;
     let workout_status = this.state.workout;
     let have_activities = data.data.have_activities;
     this.setState({
       workout: have_activities?'yes':workout_status,
       weight: weight?weight:"i do not weigh myself today",
-      activities:activities
+      activities:activities,
     });
   }
 
   onFetchGarminSuccessWeight(data){
     let weight = this.state.weight;
     let activities = this.state.activities;
+    
     activities = this.getMergedGarminAndUserActivities(data.data.activites,activities);
+    let number_of_activities = Object.keys(activities).length;
     if(data.data.weight.value)
       // convert to pound
       weight = Math.round(data.data.weight.value*0.00220462);
 
     this.setState({
        weight: weight?weight:"i do not weigh myself today",
-       activities:activities
+       activities:activities,
     });
   }
   onFetchGarminSuccessHrr(data){
@@ -979,11 +1016,38 @@ transformActivity(activity){
   onFetchGarminSuccessActivities(data){
     let activities = this.state.activities;
     activities = this.getMergedGarminAndUserActivities(data.data.activites,activities);
+    let number_of_activities = Object.keys(activities).length;
     this.setState({
-      activities:activities
-    });
+      activities:activities,
+      garmin_number_of_activities:number_of_activities,
+    },() => {
+          /*** WEATHER REPORT ****/
+          let humidity = Object.keys(this.state.activities)
+          .map(prop => this.state.activities[prop].humidity);
+          let temperature_feels_like = Object.keys(this.state.activities)
+          .map(prop => this.state.activities[prop].temperature_feels_like);
+          let weather_condition = Object.keys(this.state.activities)
+          .map(prop => this.state.activities[prop].weather_condition);
+          let temperature = Object.keys(this.state.activities)
+          .map(prop => this.state.activities[prop].temperature);
+          let dewpoint = Object.keys(this.state.activities)
+          .map(prop => this.state.activities[prop].dewPoint);
+          let wind = Object.keys(this.state.activities)
+          .map(prop => this.state.activities[prop].wind);
+          let count = 0;
+          if(this.state.garmin_number_of_activities>0&&this.state.number_of_activities==0){
+            for(let i=0;i<this.state.garmin_number_of_activities;i++){
+              if(!humidity[i] || !temperature_feels_like[i] || !weather_condition[i] || !temperature[i] || ! dewpoint[i] || !wind[i]) {
+                count+=1;
+              }
+            }
+          }
+          if(count>0){
+            /** CALLING WEATHER REPORT API */
+              userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,true);
+            }
+        });
   }
-  
 
 getDTMomentObj(dt,hour,min,am_pm){
   hour = hour ? parseInt(hour) : 0;
@@ -1160,7 +1224,7 @@ getTotalSleep(){
         garminRequestCancelSource:[],
         selected_date:date,
         fetching_data:true,
-        calendarOpen:!this.state.calendarOpen
+        calendarOpen:!this.state.calendarOpen,
       },function(){
         const clone = true;
         userDailyInputFetch(date,this.onFetchSuccess,this.onFetchFailure,clone);
@@ -1235,6 +1299,7 @@ getTotalSleep(){
       });
       userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,
                           this.onFetchFailure,true);
+      //this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessNumberOfActivities, this.onFetchGarminFailure);
       getUserProfile(this.onProfileSuccessFetch);
       
       window.addEventListener('scroll', this.handleScroll);
@@ -1499,7 +1564,6 @@ handleScroll() {
         let sleep_bedtime_dt = null;
         if (start_time_date && start_time_hours
            && start_time_mins && start_time_am_pm){
-          console.log("Sleep bedtime date:",sleep_bedtime_dt);
           sleep_bedtime_dt = this.getDTMomentObj(start_time_date,start_time_hours,
             start_time_mins,start_time_am_pm)
         }
@@ -2747,7 +2811,7 @@ handleScroll() {
                                 !this.state.editable && this.state.fasted == 'yes' &&
                                 <div >
                                   <Label className="LAbel">1.9.1 What Food Did You Eat Before Your Workout?</Label>
-                                  <p className="input">{this.state.food_ate_before_workout}</p>
+                                  <p className="input">{this.state.food_ate_before_workout?this.state.food_ate_before_workout:'Nothing'}</p>
                                 </div>
                               }
                                <FormGroup id="padd">
