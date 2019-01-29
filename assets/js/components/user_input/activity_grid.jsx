@@ -114,7 +114,7 @@ this.handleChange_end_time=this.handleChange_end_time.bind(this);
 this.createSleepDropdown = this.createSleepDropdown.bind(this);
 this.createSleepDropdown_heartrate=this.createSleepDropdown_heartrate.bind(this);
 this.renderTable = this.renderTable.bind(this);
-this.renderEditActivityModal = this.renderEditActivityModal.bind(this);/*** ****************************************/
+this.renderEditActivityModal = this.renderEditActivityModal.bind(this);
 this.handleChangeModal = this.handleChangeModal.bind(this);
 this.CreateNewActivity = this.CreateNewActivity.bind(this);
 this.activitySelectOptions = this.activitySelectOptions.bind(this);
@@ -124,16 +124,16 @@ this.toggle_starttime=this.toggle_starttime.bind(this);
 this.saveStartTimeModel=this.saveStartTimeModel.bind(this);
 this.deleteActivity=this.deleteActivity.bind(this);
 this.toggle_delete=this.toggle_delete.bind(this);
-this.editToggleHandlerStartTime = this.editToggleHandlerStartTime.bind(this);/*** *****************************************/
+this.editToggleHandlerStartTime = this.editToggleHandlerStartTime.bind(this);
 this.handleChangeActivityStartEndTime = this.handleChangeActivityStartEndTime.bind(this);
 this.handleChangeActivityDate = this.handleChangeActivityDate.bind(this);
-this.DurationOnStartEndTimeChange = this.DurationOnStartEndTimeChange.bind(this);/*** *****************************************/
-this.getTotalActivityDuration = this.getTotalActivityDuration.bind(this);/*** */
-this.handleChangeModalActivityTime = this.handleChangeModalActivityTime.bind(this);/*** *****************************************************/
-this.handleChangeModelActivityStartTimeDate = this.handleChangeModelActivityStartTimeDate.bind(this);/*** ***********************************/
-this.handleChangeModelActivityEndTimeDate = this.handleChangeModelActivityEndTimeDate.bind(this);/*** *******************************************/
-this.createActivityTime = this.createActivityTime.bind(this);/*** *****************************************/
-this.createStartAndEndTime = this.createStartAndEndTime.bind(this);/*** *************************************************/
+this.DurationOnStartEndTimeChange = this.DurationOnStartEndTimeChange.bind(this);
+this.getTotalActivityDuration = this.getTotalActivityDuration.bind(this);
+this.handleChangeModalActivityTime = this.handleChangeModalActivityTime.bind(this);
+this.handleChangeModelActivityStartTimeDate = this.handleChangeModelActivityStartTimeDate.bind(this);
+this.handleChangeModelActivityEndTimeDate = this.handleChangeModelActivityEndTimeDate.bind(this);
+this.createActivityTime = this.createActivityTime.bind(this);
+this.createStartAndEndTime = this.createStartAndEndTime.bind(this);
 this.setActivitiesEditModeFalse = this.setActivitiesEditModeFalse.bind(this);
 this.addingCommaToSteps = this.addingCommaToSteps.bind(this);
 let activities = this.props.activities;
@@ -250,12 +250,12 @@ addingCommaToSteps(value){
     return x1 + x2;
 }
 successProfile(data){
-    let today_date = new Date();
-    let date_of_birth = moment(data.data.date_of_birth);
-    let today_date1 = moment(moment(today_date).format('YYYY-MM-DD'));
-    let age = Math.abs(today_date1.diff(date_of_birth, 'years'));
+    // let today_date = new Date();
+    // let date_of_birth = moment(data.data.date_of_birth);
+    // let today_date1 = moment(moment(today_date).format('YYYY-MM-DD'));
+    // let age = Math.abs(today_date1.diff(date_of_birth, 'years'));
     this.setState({
-        age:age
+        age:data.data.user_age
     })
 }
 
@@ -647,9 +647,6 @@ editToggleHandler_duplicate_info(event) {
     categoryMode['duplicate'] = !categoryMode['duplicate'] 
     if(selectedActivityId){
         this.setState({
-
-
-            
             ...this.state.activities_edit_mode,
             [selectedActivityId]:categoryMode
         },()=>{
@@ -1097,13 +1094,13 @@ handleChange(event){
     const target = event.target;
     const value = target.value;
     const name = target.name;//modal_duplicate_info_status
-   
+
  /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
     let actType = this.state.modal_activity_type;
     let actAvgHeartRate = this.state.modal_activity_heart_rate;
     let steps_type = this.getActivityCategory(actType,parseInt(actAvgHeartRate));
 /************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
-     
+
     if(value == "OTHER"){
         let actType = value;
         let actAvgHeartRate = this.state.modal_activity_heart_rate;
@@ -1340,7 +1337,6 @@ _extractDateTimeInfo(dateObj){
 handleChangeActivityStartEndTime(event){
   const value = event.target.value;
   const name = event.target.name;
-  
   this.setState({
     [name]: value
   });
