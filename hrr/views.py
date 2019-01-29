@@ -59,6 +59,7 @@ from hrr.calculation_helper import week_date,\
 from .serializers import AaSerializer,HeartzoneSerializer
 from .serializers import HrrSerializer
 
+
 class UserHrrView(generics.ListCreateAPIView):
 	'''
 		- Create the Hrr instance
@@ -169,11 +170,11 @@ class UpdateHrr(generics.RetrieveUpdateDestroyAPIView):
 				None
 		except Hrr.DoesNotExist:
 			return None
-
+	
 	def put(self, request,format="json"):
 		latest_hrr = self.get_object()
 		if latest_hrr:
-			serializer = HrrSerializer(latest_hrr,data = request.data)
+			serializer = HrrSerializer(latest_hrr,data = request.data, partial=True)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data)
