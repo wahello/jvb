@@ -86,7 +86,8 @@ class UserBackfillRequestView(APIView):
 		return Response(serializer.data)
 
 	def post(self,request,*args,**kwargs):
-		serializer = UserBackfillRequestSerializer(data=request.data)
+		serializer = UserBackfillRequestSerializer(data=request.data,
+			context={'user_id':request.user.id})
 		if serializer.is_valid():
 			serializer.save()
 			return Response(serializer.data,status=status.HTTP_201_CREATED)
