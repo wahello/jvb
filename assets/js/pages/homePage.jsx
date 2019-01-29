@@ -41,7 +41,7 @@ import WorkoutDashboard from '../components/weekly_workout_dashboard';
 import OverallRank from '../components/overall_hrr_rank';
 import ProgressDashboard from '../components/progressanalyzer_dashboard';
 import ActiveDashboard from '../components/Active_dashboard';
-import NewLink from '../components/new_link';
+import BackfillRequest from '../components/BackfillRequest';
 
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
@@ -82,7 +82,7 @@ function initializeLocalState(){
 					<Route path='/WeeklySummary' component={RequireAuth(Weeklysummary)} /> 
 					{/*<Route path='/sleep' component={RequireAuth(Sleepgraph)} />*/}
 
-					<Route path='/new_link' component={RequireAuth(NewLink)} />
+					<Route path='/backfill' component={RequireAuth(BackfillRequest)} />
 
 					<Route path='/rawdata' component={RequireAuth(Quicklook)} />
 					<Route path='/rawdata#movementconsistency' component={RequireAuth(Quicklook)} />
