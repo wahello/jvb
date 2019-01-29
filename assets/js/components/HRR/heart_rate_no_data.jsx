@@ -478,11 +478,13 @@ class No_Hrr_Data extends Component{
 				"lowest_hrr_no_fitfile": parseInt(this.state.lowest_hrr_no_fitfile),
 				"no_file_beats_recovered": parseInt(this.state.no_file_beats_recovered),
 				"use_updated_hrr":this.state.use_updated_hrr,
-				"include_hrr":this.props.shouldIncludeHRR
+				"include_hrr":this.props.shouldIncludeHRR,
+				
 			}
 		    console.log(data,"data")
 			updateHeartData(data, this.props.selectedDate, this.successHeart, this.errorHeart);
-		
+			
+		   
 		});
 			
 	}
