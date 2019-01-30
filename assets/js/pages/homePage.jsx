@@ -82,8 +82,6 @@ function initializeLocalState(){
 					<Route path='/WeeklySummary' component={RequireAuth(Weeklysummary)} /> 
 					{/*<Route path='/sleep' component={RequireAuth(Sleepgraph)} />*/}
 
-					<Route path='/backfill' component={RequireAuth(BackfillRequest)} />
-
 					<Route path='/rawdata' component={RequireAuth(Quicklook)} />
 					<Route path='/rawdata#movementconsistency' component={RequireAuth(Quicklook)} />
 					<Route path='/rawdata#grades' component={RequireAuth(Quicklook)} />
@@ -101,6 +99,7 @@ function initializeLocalState(){
 					<Route path='/overall_hrr_rank' component={OverallRank}/>
 					<Route path='/progressanalyzer_dashboard' component={ProgressDashboard}/>
 					<Route path='/active_dahsboard' component={ActiveDashboard}/>
+					<Route path='/backfill' component={RequireAuth(BackfillRequest)} />
 				</Switch>
 			  </BrowserRouter>
 			</Provider> 

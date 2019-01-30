@@ -39,7 +39,7 @@ class BackfillRequest extends Component{
 	}
 
 	successBackfill(data){
-      toast.info("Your request has been submitted successfully.",{className:"dark"});
+      toast.info("Your request has been submitted successfully",{className:"dark"});
 	    if(data.data.length){
 	      this.setState({
 	          fitbit_data:data.data,
@@ -91,8 +91,7 @@ class BackfillRequest extends Component{
           let requestData = {
             'device_type':this.state.device_type,
             'start_date':start_date,
-            'end_date':end_date,
-            'user':1
+            'end_date':end_date
           }
         requestBackfill(this.successBackfill, this.errorBackfill, this.state.start_date, this.state.end_date, requestData.device_type, requestData.user, requestData.status);
       });
@@ -131,63 +130,61 @@ class BackfillRequest extends Component{
 		    <NavbarMenu title = { <span> Request Historical Data Backfill&nbsp;
                                   <span id = "infobutton" onClick = {this.toggleInfo}>
                                       <a className="infoBtn"> 
-                                         <FontAwesome 
-                                            name = "info-circle"
-                                            size = "1x"/>
+                                          <FontAwesome name = "info-circle" size = "1x"/>
                                       </a>
                                   </span>
                               </span> }>
         </NavbarMenu>
-        <Modal id = "popover"
-               placement = "bottom" 
-               isOpen = {this.state.infoButton}
-               target = "infobutton" 
-               toggle = {this.toggleInfo}>
-                    <ModalHeader toggle={this.toggleInfo} style={{fontWeight:"bold"}}>
-                        <div >                      
-                          <a href="#" onClick={this.infoPrint} style={{fontSize:"15px",color:"black"}}><i className="fa fa-print">Print</i></a>
-                        </div>
-                    </ModalHeader>
-                    <ModalBody className="modalcontent" id="modal1" >
-                        <div> In some instances, we may able to backfill your historical data. Please enter the date range to backfill and we will try to backfill it. </div>
-                    </ModalBody>
+        <Modal  id = "popover"
+                placement = "bottom" 
+                isOpen = {this.state.infoButton}
+                target = "infobutton" 
+                toggle = {this.toggleInfo}>
+            <ModalHeader toggle={this.toggleInfo} style={{fontWeight:"bold"}}>
+                <div> <a href="#" onClick={this.infoPrint} style={{fontSize:"15px",color:"black"}}><i className="fa fa-print">Print</i></a> </div>
+            </ModalHeader>
+            <ModalBody className="modalcontent" id="modal1" >
+                <div> In some instances, we may able to backfill your historical data. Please enter the date range to backfill and we will try to backfill it. </div>
+            </ModalBody>
         </Modal> 
 
-        <div className = "input" style={{ marginTop:"30px", marginBottom:"30px"}}>
-            <Label style = {{marginBottom:"15px",display:"flex", justifyContent:"center"}}>Choose the Type of Device :</Label>   
+        <div className = "input" style={{ display:"flex", justifyContent:"center", marginTop:"30px", marginBottom:"30px"}}>
+            <Form>
+            <div><Label style = {{paddingBottom:"4px"}}>Choose Device Type</Label></div>  
             <div style={{display:"flex", justifyContent:"center"}}>
-            <Input type = "select" 
-                   className = "custom-select form-control" 
-                   id = "select"
-                   name = "type"
-                   style = {{height:"35px", width:"220px",borderRadius:"7px",borderWidth:"medium", fontWeight:"bold", backgroundColor:"#E5E7E6"}}
-                   checked = {this.state.device_type === ''}
-                   onChange = {this.handleChange}>
-                      <option value="select">Select</option>
-                      <option value="fitbit">Fitbit</option>
-                      <option value="garmin">Garmin</option>  
-            </Input>
+                <Input  type = "select" 
+                        className = "custom-select form-control" 
+                        id = "select"
+                        name = "type"
+                        style = {{height:"35px", width:"220px",borderRadius:"7px",borderWidth:"medium", fontWeight:"bold", backgroundColor:"#E5E7E6"}}
+                        checked = {this.state.device_type === ''}
+                        onChange = {this.handleChange}>
+                            <option value="select">Select</option>
+                            <option value="fitbit">Fitbit</option>
+                            <option value="garmin">Garmin</option>  
+                </Input>
             </div>
+            </Form>
         </div>
 
         <div style={{display:"flex", justifyContent:"center"}}>
             <Form>
             <div style = {{paddingBottom:"12px"}} className="justify-content-center">
-                <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
-                <Input type = "date"
-                       name = "start_date"
-                       value = {moment(this.state.start_date).format('YYYY-MM-DD')}
-                       onChange = {this.handleChangeDate} 
-                       style = {{height:"35px",width:"220px",borderRadius:"7px"}}>
+                <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}></b>&nbsp;
+                <Input  type = "date"
+                        name = "start_date"
+                        value = {moment(this.state.start_date).format('YYYY-MM-DD')}
+                        onChange = {this.handleChangeDate} 
+                        style = {{height:"35px",width:"220px",borderRadius:"7px"}}>
                 </Input>
             </div>
             <div id = "date" className = "justify-content-center">
-                <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
-                <Input type = "date"
-                       name = "end_date"
-                       value = {moment(this.state.end_date).format('YYYY-MM-DD')}
-                       onChange = {this.handleChangeDate} 
-                       style = {{height:"35px",width:"220px",borderRadius:"7px"}}>
+                <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}></b>&nbsp;
+                <Input  type = "date"
+                        name = "end_date"
+                        value = {moment(this.state.end_date).format('YYYY-MM-DD')}
+                        onChange = {this.handleChangeDate} 
+                        style = {{height:"35px",width:"220px",borderRadius:"7px"}}>
                 </Input>
             </div>
             <div id = "date" style = {{paddingLeft:"25px", marginTop:"22px"}} className = "justify-content-center">

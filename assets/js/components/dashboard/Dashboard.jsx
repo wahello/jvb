@@ -155,7 +155,7 @@ class Dashboard extends Component {
 							  <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>
 							  <Link to='/raw/fitbit'>Fitbit Pull Down</Link><br/>*/}
 
-							<h3 id="link_style">User Request</h3>
+							<h3 id="link_style">Data Backfill Request</h3>
 							<Link to='/backfill'>Historical Data Backfill Request</Link><br/>
 
 						  </div>
