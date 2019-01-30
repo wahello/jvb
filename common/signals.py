@@ -18,7 +18,7 @@ def user_data_backfill_request_notify(sender,instance=None, created=False,**kwar
 		start_date = instance.start_date
 		end_date = instance.end_date
 		status = instance.status
-		email_subject = "User backfill data request Notification"
+		email_subject = "User Backfill Data Request Notification"
 		email_body = '''
 Hi there,
 
