@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from .calculations.calculation_driver import create_quick_look
-from .models import Steps
+from .models import Steps,Detail
 
 class QuicklookCalculationView(APIView):
 
@@ -32,7 +32,7 @@ class movementConsistencySummary(generics.ListAPIView):
 		mc = ql.movement_consistency
 		obj = {
 			"created_at":ql.user_ql.created_at.strftime("%Y-%m-%d"),
-			"movement_consistency":ast.literal_eval(mc) if (mc != ''and mc != None) else {}, 
+			"movement_consistency":ast.literal_eval(mc) if (mc != '' and mc != None) else {}, 
 			"non_exercise_steps":ql.non_exercise_steps,
 			"exercise_steps":ql.exercise_steps,
 			"total_steps":ql.total_steps
@@ -40,11 +40,12 @@ class movementConsistencySummary(generics.ListAPIView):
 		return obj
 
 	def get_queryset(self):
-		from_dt = None
-		to_dt = None
-		y,m,d = map(int,self.request.query_params.get('from_date').split('-'))
+		user = self.request.user
+		start_dt = self.request.data.get('date_joined', None)
+		end_dt = self.request.data.get('last_login',None)
+		y,m,d = map(int,self.request.query_params.get('start_dt').split('-'))
 		from_dt = datetime(y,m,d,0,0,0)
-		if self.request.query_params.get('to_date',None):
+		if self.request.query_params.get('to_date'):
 			y,m,d = map(int,self.request.query_params.get('to_date').split('-'))
 			to_dt = datetime(y,m,d,0,0,0)
 		else:
@@ -57,6 +58,7 @@ class movementConsistencySummary(generics.ListAPIView):
 
 	def get(self, request, format="json"):
 		movement_consistency = []
+
 		qs = self.get_queryset()
 		for ql in qs:
 			movement_consistency.append(self._create_mc_object(ql))

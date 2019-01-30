@@ -8,7 +8,8 @@ from .models import ExerciseAndReporting,\
 					Food,\
 					Alcohol,\
 					Grades,\
-					UserQuickLook
+					UserQuickLook,\
+					Detail
 
 class ExerciseAndReportingSerializer(serializers.ModelSerializer):
 	user_ql= serializers.PrimaryKeyRelatedField(read_only = True)
@@ -154,3 +155,10 @@ class UserQuickLookSerializer(serializers.ModelSerializer):
 
 		alcohol_obj = instance.alcohol_ql
 		self._update_helper(alcohol_obj,alcohol_data)
+
+class DetailSerializer(serializers.ModelSerializer):
+	user_ql= serializers.PrimaryKeyRelatedField(read_only = True)
+
+	class Meta:
+		model=Detail
+		fields='__all__'
