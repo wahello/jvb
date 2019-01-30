@@ -14,6 +14,7 @@ from quicklook.calculations.calculation_driver import which_device
 from .models import UserDataBackfillRequest
 from .serializers import UserBackfillRequestSerializer
 
+
 class UserLastSyncedItemview(generics.RetrieveUpdateDestroyAPIView):
 	permission_classes = (IsAuthenticated,)
 	serializer_class = UserLastSyncedSerializer
@@ -77,15 +78,18 @@ class HaveTokens(APIView):
 
 		return Response(have_tokens,status=status.HTTP_200_OK)
 
-	
-class UserBackfillRequestView(APIView):
+
+class UserBackfillRequestView(generics.ListCreateAPIView):
+
+	permission_classes = (IsAuthenticated,)
+	serializer_class = UserBackfillRequestSerializer
 
 	def get(self,request,*args,**kwargs):
 		userrequestmodel=UserDataBackfillRequest.objects.all()
 		serializer=UserBackfillRequestSerializer(userrequestmodel,many=True)
 		return Response(serializer.data)
-
-	def post(self,request,*args,**kwargs):
+	
+	def post(self,request,format="json"):
 		serializer = UserBackfillRequestSerializer(data=request.data)
 		if serializer.is_valid():
 			serializer.save()
