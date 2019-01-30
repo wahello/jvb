@@ -8,6 +8,7 @@ from quicklook.calculations.garmin_calculation import get_filtered_activity_stat
 from user_input.utils.daily_activity import get_daily_activities_in_base_format
 from weather.utils.weather_helper import weather_report_dict
 from django.conf import settings
+
 class ActivityWeatherView(APIView):
 
     def get(self, request):
@@ -24,8 +25,11 @@ class ActivityWeatherView(APIView):
         filtered_activities_list = get_filtered_activity_stats(
                             activities_json=garmin_list,
                             user_age = user.profile.age(),
-                            manually_updated_json=manually_edited,
-                            userinput_activities=activities)
+                            manually_updated_json = manually_edited,
+                            userinput_activities = activities,
+                            include_duplicate = True,
+                            include_deleted = True,
+                            include_non_exercise = True)
         weather_data = {}
         for activity in filtered_activities_list:
             epoch_time = activity['startTimeInSeconds']+activity['startTimeOffsetInSeconds']
