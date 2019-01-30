@@ -88,9 +88,10 @@ class UserBackfillRequestView(generics.ListCreateAPIView):
 		userrequestmodel=UserDataBackfillRequest.objects.all()
 		serializer=UserBackfillRequestSerializer(userrequestmodel,many=True)
 		return Response(serializer.data)
-	
-	def post(self,request,format="json"):
-		serializer = UserBackfillRequestSerializer(data=request.data)
+
+	def post(self,request,*args,**kwargs):
+		serializer = UserBackfillRequestSerializer(data=request.data,
+			context={'user_id':request.user.id})
 		if serializer.is_valid():
 			serializer.save()
 			return Response(serializer.data,status=status.HTTP_201_CREATED)
