@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'djangojs',
     'webpack_loader',
     'corsheaders',
+    'rest_framework',
     'rest_framework.authtoken',
 
     'common',

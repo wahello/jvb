@@ -114,10 +114,8 @@ class Dashboard extends Component {
 							   <Link to='/heartrate'>Heartrate Aerobic/Anaerobic Ranges</Link><br/>
 							   
 							   <Link to='/heartrate_zone'>Time in Heart-Rate Zones Chart</Link><br/>
-							   
-
-							   {/*<Link to='/workout_stats'>Heartrate Workout</Link><br/>*/}
-							   
+								{/*<Link to='/workout_stats'>Heartrate Workout</Link><br/>*/}
+							  
 							  <h3 id="link_style">Raw Data</h3>		  
 							  <Link to='/rawdata'>Raw Data</Link><br/>
 							  <Link to='/rawdata#movementconsistency'>Movement Consistency</Link><br/>
@@ -156,6 +154,10 @@ class Dashboard extends Component {
 							  {/*<h3 id="link_style">Other</h3>
 							  <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>
 							  <Link to='/raw/fitbit'>Fitbit Pull Down</Link><br/>*/}
+
+							<h3 id="link_style">Data Backfill Request</h3>
+							<Link to='/backfill'>Historical Data Backfill Request</Link><br/>
+
 						  </div>
 						</div>
 					</div>
