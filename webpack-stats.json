@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"status":"done","publicPath":"http://localhost:3000/assets/bundles/","chunks":{"main":[{"name":"main.js","publicPath":"http://localhost:3000/assets/bundles/main.js","path":"/home/normsoftware/healthtracker/assets/bundles/main.js"}]},"error":"ModuleBuildError","message":"Module build failed: Error: ENOENT: no such file or directory, open '/home/normsoftware/healthtracker/assets/js/components/movement-leaderboard/movement_leaderboard.jsx'\n    at Error (native)"}
+=======
+{"status":"error","publicPath":"http://localhost:3000/assets/bundles/","chunks":{"main":[{"name":"main.js","publicPath":"http://localhost:3000/assets/bundles/main.js","path":"/home/normsoftware/healthtracker/assets/bundles/main.js"}]},"error":"ModuleBuildError","message":"Module build failed: Error: ENOENT: no such file or directory, open '/home/normsoftware/healthtracker/assets/js/components/movement-leaderboard/movement_leaderboard.jsx'\n    at Error (native)"}
+>>>>>>> staging
