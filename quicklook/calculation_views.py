@@ -40,11 +40,13 @@ class movementConsistencySummary(generics.ListAPIView):
 
 		return obj
 
-	def get_queryset(self):
+	def get_queryset(self,id=None):
 		user = self.request.user
-		# username = self.request.query_params.get('username',None)		
 		from_dt = None
 		to_dt = None
+		uid = self.request.user.id
+		if self.request.query_params.get('uid'):
+			uid = int(self.request.query_params.get('uid'))
 		y,m,d = map(int,self.request.query_params.get('from_date').split('-'))
 		from_dt = datetime(y,m,d,0,0,0)
 		if self.request.query_params.get('to_date'):
@@ -55,12 +57,11 @@ class movementConsistencySummary(generics.ListAPIView):
 
 		qs = Steps.objects.filter(Q(user_ql__created_at__gte = from_dt.date())&
 								  Q(user_ql__created_at__lte = to_dt.date()),
-								  user_ql__user = self.request.user)
+								  user_ql__user__id = uid)
 		return qs
 
-	def get(self, request, format="json"):
+	def get(self, request, format = "json"):
 		movement_consistency = []
-
 		qs = self.get_queryset()
 		for ql in qs:
 			movement_consistency.append(self._create_mc_object(ql))
