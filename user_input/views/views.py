@@ -1,4 +1,4 @@
-from datetime import datetime,timezone,timedelta
+from datetime import datetime,timezone,timedelta,time
 import ast
 
 from django.db.models import Q
@@ -173,6 +173,10 @@ class GetManualActivityInfo(APIView):
         else:
             return sec - diff
 
+    def __convert_timestamp_to_dt(self, dateObj, timestamp):
+        h,m,s = map(int, timestamp.strip(' ').split(":"))
+        return datetime.combine(dateObj.date(),time(h,m,s))
+
     def __cal_garmin_heartrate(self,act_date,act_start_epoch,act_end_epoch,utc_offset=0):
         avg_heartrate = None
         act_dt = datetime.strptime(act_date,"%Y-%m-%d")
@@ -202,10 +206,16 @@ class GetManualActivityInfo(APIView):
                     avg_heartrate = None
         return avg_heartrate
 
-    def __get_fitbit_hr_between_timeframe(act_start,act_end,heartrate_data):
+    def __get_fitbit_hr_between_timeframe(self,act_date,act_start,act_end,heartrate_data):
         hr_in_timeframe = []
-        cutoff_diff_in_seconds = 60
-        
+        act_start_time_in_sec_from_midnight = (act_start - act_date).seconds
+        act_end_time_in_sec_from_midnight = (act_end - act_date).seconds
+        for hr_sample in heartrate_data:
+            sample_time_in_sec_from_midnight = (self.__convert_timestamp_to_dt(
+                act_date,hr_sample['time']) - act_date).seconds
+            if(sample_time_in_sec_from_midnight >= act_start_time_in_sec_from_midnight
+                and sample_time_in_sec_from_midnight <= act_end_time_in_sec_from_midnight):
+                hr_in_timeframe.append(hr_sample)
         return hr_in_timeframe
 
     def __cal_fitbit_heartrate(self,act_date,act_start_epoch,act_end_epoch,utc_offset=0):
@@ -223,7 +233,7 @@ class GetManualActivityInfo(APIView):
                 hr = []
                 intraday_heartrate_data = intraday_heartrate_data.get('dataset',[])
                 hr_in_timeframe = self.__get_fitbit_hr_between_timeframe(
-                    act_start_dt,act_end_dt,intraday_heartrate_data)
+                    act_dt,act_start_dt,act_end_dt,intraday_heartrate_data)
                 for hr_sample in hr_in_timeframe:
                     hr.append(hr_sample.get('value'))
                 hr = list(filter(lambda x:x is not None, hr))
@@ -237,9 +247,10 @@ class GetManualActivityInfo(APIView):
     def get_heartrate(self,act_date,act_start_epoch,act_end_epoch,utc_offset=0):
         if which_device(self.request.user) == 'garmin':
             return self.__cal_garmin_heartrate(
-                act_date,act_start_epoch,act_end_epoch,utc_offset=0)
-        elif which_device == 'fitbit':
-            pass
+                act_date,act_start_epoch,act_end_epoch,utc_offset)
+        elif which_device(self.request.user) == 'fitbit':
+            return self.__cal_fitbit_heartrate(
+                act_date,act_start_epoch,act_end_epoch,utc_offset)
 
         return None
 
