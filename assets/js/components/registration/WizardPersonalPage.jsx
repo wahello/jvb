@@ -2,12 +2,21 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
-import {Field, reduxForm } from 'redux-form';
+import {Field,change,formValueSelector,reduxForm } from 'redux-form';
 import { Form, Label, Button, Input, FormText, FormGroup,
 		 Row, Col, Modal, ModalHeader, ModalBody,ModalFooter, Container,InputGroup} from 'reactstrap';
 
-import {renderFieldFormGroup,renderSelectFeet, renderSelectInches,renderSelectPounds,renderSelectMonth,renderSelectDate,renderSelectYear} from './fieldRenderer';
+import {renderFieldFormGroup,
+	renderSelectFeet,
+	renderSelectInches,
+	renderSelectPounds,
+	renderSelectMonth,
+	renderSelectDate,
+	renderSelectYear,
+	renderSelectAge} from './fieldRenderer';
 import { personal_validate } from './validation';
+
+const selector = formValueSelector('register')
 
 class WizardPersonalPage extends Component{
 
@@ -54,11 +63,40 @@ class WizardPersonalPage extends Component{
 			dateError:err_msg !== undefined ? err_msg : ' '
 		});
 	}
+
 	yearError(err_msg){
 		this.setState({
 			yearError:err_msg !== undefined ? err_msg : ' '
 		});
 	}
+
+	onDOBChange = () => {
+		// Calculate the age of the user and auto populate the 
+		// age in question "How old are you today?"
+
+		let day = this.props.day_dob;
+		if(day === 'Date')
+			day = null;
+		let month = this.props.month_dob;
+		if(month === 'Month')
+			month = null;
+		let year = this.props.year_dob;
+		if(year === 'Year')
+			year = null;
+		
+		if(day && month && year){
+			let today = new Date();
+		    let birthDate = new Date(year,month-1,day);
+		    let age = today.getFullYear() - birthDate.getFullYear();
+		    let m = today.getMonth() - birthDate.getMonth();
+		    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+		        age--;
+		    }
+			this.props.updateAge(age);
+		}
+	}
+
+
 
 	render(){
 		const { handleSubmit, previousPage, onSubmit } = this.props;
@@ -93,7 +131,8 @@ class WizardPersonalPage extends Component{
 									name = "dob_year"
 									type = "select"
 									component = {renderSelectYear}	
-									err_callback = {this.yearError}		
+									err_callback = {this.yearError}
+									onDOBChange = {this.onDOBChange}
 								/>
 								&nbsp;
 								
@@ -101,7 +140,8 @@ class WizardPersonalPage extends Component{
 									name = "dob_month"
 									type = "select"
 									component = {renderSelectMonth}
-									err_callback = {this.monthError}	
+									err_callback = {this.monthError}
+									onDOBChange = {this.onDOBChange}
 								/>
 								&nbsp;
 								
@@ -110,7 +150,7 @@ class WizardPersonalPage extends Component{
 									type = "select"
 									component = {renderSelectDate}	
 									err_callback = {this.dateError}
-	
+									onDOBChange = {this.onDOBChange}
 								/>
 							</InputGroup>
 							<div style={{color:"red"}}>
@@ -118,7 +158,15 @@ class WizardPersonalPage extends Component{
 							</div>
 
 						</FormGroup>
-						 <FormGroup>
+
+						<Field
+							name = "user_age"
+							type = "select"
+							label = "How old are you today?"
+							component = {renderSelectAge}
+						/>
+
+						<FormGroup>
 					          <Label className="custom-control custom-radio">
 					            	<Field 
 					            		className="custom-control-input custom-radio custom-control-indicator"
@@ -453,11 +501,25 @@ located in the United States. By providing us with your data, you consent to the
 	}
 }
 
+const mapStateToProps = state => {
+	return {
+		day_dob:selector(state,'dob_day'),
+		month_dob:selector(state,'dob_month'),
+		year_dob:selector(state,'dob_year')
+	}
+} 
+
+const mapDispatchToProps = (dispatch) => {
+	return {
+		updateAge: (age) => dispatch(change('register','user_age',age))
+	}
+}
+
 export default reduxForm({
 	form: 'register',
 	destroyOnUnmount: false,
 	forceUnregisterOnUnmount: true,
 	validate: personal_validate
 })(
-	connect(null,{})(withRouter(WizardPersonalPage))
+	connect(mapStateToProps,mapDispatchToProps)(withRouter(WizardPersonalPage))
 );

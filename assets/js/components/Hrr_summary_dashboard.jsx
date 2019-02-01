@@ -16,7 +16,6 @@ import { Collapse, Navbar, NavbarToggler,
 import NavbarMenu from './navbar';
 import {fetchLastSync} from '../network/quick';
 import fetchHrrSummaryData from '../network/Hrr_dashboard';
-import {getUserProfile} from '../network/auth';
 import fetchLeaderBoard from '../network/leaderBoard';
 import {renderHrrSummaryDashboardDataFetchOverlay} from './dashboard_healpers';
 import HrrLeaderboard from './Hrr_leaderboard';
@@ -46,7 +45,6 @@ class Hrr_Dashboard extends Component{
 				time99:"",
 				points:"",
 			},
-			date_of_birth:"",
 			last_synced:null,
 			all_hrr_rank_data:"",
 			Hrr_username:"",
@@ -69,7 +67,6 @@ class Hrr_Dashboard extends Component{
 		this.renderAddDate = this.renderAddDate.bind(this);
 		this.renderRemoveDate = this.renderRemoveDate.bind(this);
 		this.renderPureTimeTo99Colors = this.renderPureTimeTo99Colors.bind(this);
-		this.successProfile = this.successProfile.bind(this);
 		this.renderSecToMin = this.renderSecToMin.bind(this);
 		this.successLeaderboard = this.successLeaderboard.bind(this);
 		this.handleBackButton = this.handleBackButton.bind(this);
@@ -106,11 +103,6 @@ class Hrr_Dashboard extends Component{
   			fetching_hrr_dashboard:false,
   		});
 		console.log(error.message);
-    }
-    successProfile(data){
-    	this.setState({
-    		date_of_birth:data.data.date_of_birth
-    	});
     }
     successLeaderboard(data){
     	this.setState({
@@ -156,7 +148,6 @@ class Hrr_Dashboard extends Component{
 			fetching_hrr_dashboard:true,
 
 		},()=>{
-			getUserProfile(this.successProfile);
 			fetchHrrSummaryData(this.successHrrSummaryData,this.errorHrrSummaryData,this.state.selectedDate);
 			fetchLeaderBoard(this.successLeaderboard,this.errorHrrSummaryData,this.state.selectedDate);
 		});
@@ -170,7 +161,6 @@ class Hrr_Dashboard extends Component{
 			rank_data:"Getting Rank...",
 			fetching_hrr_dashboard:true,
 		},()=>{
-			getUserProfile(this.successProfile);
 			fetchHrrSummaryData(this.successHrrSummaryData,this.errorHrrSummaryData,this.state.selectedDate);
 			fetchLeaderBoard(this.successLeaderboard,this.errorHrrSummaryData,this.state.selectedDate);
 		});
@@ -182,7 +172,6 @@ class Hrr_Dashboard extends Component{
 			rank_data:"Getting Rank...",
 			fetching_hrr_dashboard:true,
 		},()=>{
-			getUserProfile(this.successProfile);
 			fetchHrrSummaryData(this.successHrrSummaryData,this.errorHrrSummaryData,this.state.selectedDate);
 			fetchLeaderBoard(this.successLeaderboard,this.errorHrrSummaryData,this.state.selectedDate);
 		});
@@ -509,7 +498,6 @@ class Hrr_Dashboard extends Component{
     		fetching_hrr_dashboard:true,
     	})
 		 fetchLastSync(this.successLastSync,this.errorquick);
-		 getUserProfile(this.successProfile);
 		 fetchHrrSummaryData(this.successHrrSummaryData,this.errorHrrSummaryData,this.state.selectedDate);
 		 fetchLeaderBoard(this.successLeaderboard,this.errorHrrSummaryData,this.state.selectedDate);
 	}

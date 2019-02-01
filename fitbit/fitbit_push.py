@@ -35,6 +35,7 @@ from .models import FitbitConnectToken,\
 
 from quicklook.tasks import generate_quicklook
 from garmin.garmin_push import _get_data_start_end_time
+from hrr.tasks import create_hrrdata
 from progress_analyzer.tasks import (
 	generate_cumulative_instances_custom_range,
 	set_pa_report_update_date
@@ -201,7 +202,11 @@ def call_push_api(data):
 			else:
 				activities_data = None
 			if activities_data:
-				activity_fitbit = activities_data.get('activity_summary')
+				try:
+					activity_fitbit = activities_data.get('activity_summary')
+					create_hrrdata.delay(user.id,date,date)
+				except:
+					logging.exception("message")
 			else:
 				activity_fitbit = None
 			if (user and data_type == 'activities'
