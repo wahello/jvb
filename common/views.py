@@ -6,11 +6,14 @@ from rest_framework.permissions import IsAuthenticated
 
 from garmin.serializers import UserLastSyncedSerializer
 from fitbit.serializers import UserFitbitLastSyncedSerializer
-
+import json
 from garmin.models import UserLastSynced,GarminConnectToken
 from fitbit.models import UserFitbitLastSynced,FitbitConnectToken
 from users.models import GarminToken
 from quicklook.calculations.calculation_driver import which_device
+from .models import UserDataBackfillRequest
+from .serializers import UserBackfillRequestSerializer
+
 
 class UserLastSyncedItemview(generics.RetrieveUpdateDestroyAPIView):
 	permission_classes = (IsAuthenticated,)
@@ -74,3 +77,22 @@ class HaveTokens(APIView):
 			have_tokens['linked_devices'] = True
 
 		return Response(have_tokens,status=status.HTTP_200_OK)
+
+
+class UserBackfillRequestView(generics.ListCreateAPIView):
+
+	permission_classes = (IsAuthenticated,)
+	serializer_class = UserBackfillRequestSerializer
+
+	def get(self,request,*args,**kwargs):
+		userrequestmodel=UserDataBackfillRequest.objects.all()
+		serializer=UserBackfillRequestSerializer(userrequestmodel,many=True)
+		return Response(serializer.data)
+
+	def post(self,request,*args,**kwargs):
+		serializer = UserBackfillRequestSerializer(data=request.data,
+			context={'user_id':request.user.id})
+		if serializer.is_valid():
+			serializer.save()
+			return Response(serializer.data,status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

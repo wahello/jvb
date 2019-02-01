@@ -41,7 +41,11 @@ import WorkoutDashboard from '../components/weekly_workout_dashboard';
 import OverallRank from '../components/overall_hrr_rank';
 import ProgressDashboard from '../components/progressanalyzer_dashboard';
 import ActiveDashboard from '../components/Active_dashboard';
+<<<<<<< HEAD
 import MovementLeaderboard from '../components/movement-leaderboard/movement_leaderboard';
+=======
+import BackfillRequest from '../components/BackfillRequest';
+>>>>>>> staging
 
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
@@ -81,6 +85,7 @@ function initializeLocalState(){
 					{/*<Route path='/BreakDown' component={RequireAuth(Breakdown)} /> */}
 					<Route path='/WeeklySummary' component={RequireAuth(Weeklysummary)} /> 
 					{/*<Route path='/sleep' component={RequireAuth(Sleepgraph)} />*/}
+
 					<Route path='/rawdata' component={RequireAuth(Quicklook)} />
 					<Route path='/rawdata#movementconsistency' component={RequireAuth(Quicklook)} />
 					<Route path='/rawdata#grades' component={RequireAuth(Quicklook)} />
@@ -98,7 +103,11 @@ function initializeLocalState(){
 					<Route path='/overall_hrr_rank' component={OverallRank}/>
 					<Route path='/progressanalyzer_dashboard' component={ProgressDashboard}/>
 					<Route path='/active_dahsboard' component={ActiveDashboard}/>
+<<<<<<< HEAD
 					<Route path='/movement_leaderboard' component={RequireAuth(MovementLeaderboard)}/>
+=======
+					<Route path='/backfill' component={RequireAuth(BackfillRequest)} />
+>>>>>>> staging
 				</Switch>
 			  </BrowserRouter>
 			</Provider> 

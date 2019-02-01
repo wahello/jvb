@@ -183,9 +183,16 @@ def _get_activities(user,target_date):
 
 def _get_fitbit_activities_data(user,target_date):
 	activity_data= {}
-	current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
-	activity_data = quicklook.calculations.fitbit_calculation.get_fitbit_model_data(
-		UserFitbitDataActivities,user,current_date.date(),current_date.date())
+	try:
+		current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
+	except AttributeError:
+		current_date = target_date
+	try:
+		activity_data = quicklook.calculations.fitbit_calculation.get_fitbit_model_data(
+			UserFitbitDataActivities,user,current_date.date(),current_date.date())
+	except AttributeError:
+		activity_data = quicklook.calculations.fitbit_calculation.get_fitbit_model_data(
+			UserFitbitDataActivities,user,current_date,current_date)
 	if activity_data:
 		activity_data = ast.literal_eval(activity_data[0].replace(
 			"'activity_fitbit': {...}","'activity_fitbit': {}"))
