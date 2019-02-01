@@ -8,8 +8,7 @@ from .models import ExerciseAndReporting,\
 					Food,\
 					Alcohol,\
 					Grades,\
-					UserQuickLook,\
-					Detail
+					UserQuickLook
 
 class GradesInline(admin.StackedInline):
 	model = Grades
@@ -36,10 +35,6 @@ class AlcoholInline(admin.StackedInline):
 	model = Alcohol
 
 
-class DetailsInline(admin.ModelAdmin):
-	model=Detail
-
-
 class UserQuickLookAdmin(admin.ModelAdmin):
 	list_display=('user','created_at', 'updated_at')
 	ordering = ('-created_at',)
@@ -59,4 +54,3 @@ class UserQuickLookAdmin(admin.ModelAdmin):
 	]
 
 admin.site.register(UserQuickLook,UserQuickLookAdmin)
-admin.site.register(Detail,DetailsInline)

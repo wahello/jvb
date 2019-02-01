@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from .calculations.calculation_driver import create_quick_look
-from .models import Steps,Detail
+from .models import Steps
 
 class QuicklookCalculationView(APIView):
 
@@ -37,13 +37,15 @@ class movementConsistencySummary(generics.ListAPIView):
 			"exercise_steps":ql.exercise_steps,
 			"total_steps":ql.total_steps
 		}
+
 		return obj
 
 	def get_queryset(self):
 		user = self.request.user
-		start_dt = self.request.data.get('date_joined', None)
-		end_dt = self.request.data.get('last_login',None)
-		y,m,d = map(int,self.request.query_params.get('start_dt').split('-'))
+		# username = self.request.query_params.get('username',None)		
+		from_dt = None
+		to_dt = None
+		y,m,d = map(int,self.request.query_params.get('from_date').split('-'))
 		from_dt = datetime(y,m,d,0,0,0)
 		if self.request.query_params.get('to_date'):
 			y,m,d = map(int,self.request.query_params.get('to_date').split('-'))

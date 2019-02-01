@@ -261,11 +261,18 @@ class Alcohol(models.Model):
 
 
 
-class Detail(models.Model):
-	user_ql=models.OneToOneField(UserQuickLook,related_name='details_ql')
-	start_time = models.DateTimeField()
-	end_time = models.DateTimeField(auto_now=True)
+# class Detail(models.Model):
+# 	# user_ql = models.OneToOneField(UserQuickLook, related_name = "detail_ql")
+# 	user = models.ForeignKey(User)
+# 	start_time = models.DateTimeField()
+# 	end_time = models.DateTimeField()
 
-	def __str__(self):
-		return "{} {} {}".format(self.user_ql,self.start_time,self.end_time)
+#     # def save(self, *args,**kwargs):
+#     # 	start = datetime.datetime.strptime(str(self.start_time), '%H:%M:%S')
+#     #     end = datetime.datetime.strptime(str(self.end_time), '%H:%M:%S')
+
+#     # super(Detail, self).save(*args, **kwargs)
+
+# 	def __str__(self):
+# 		return "{} {} {}".format(self.user_ql , self.start_time , self.end_time)
 
