@@ -86,7 +86,7 @@ class UserHrrView(generics.ListCreateAPIView):
 						update_hrr_instance(user_hrr, final_query)
 					except Hrr.DoesNotExist:
 						create_hrr_instance(user_get, final_query, start_date)
-					return final_query
+				return final_query
 			elif device_type == 'fitbit':
 				start_date = datetime.strptime(start_dt, "%Y-%m-%d").date()
 				fitbit_hrr = fitbit_aa.generate_hrr_charts(user_get,start_date)
@@ -3131,7 +3131,7 @@ def hrr_calculations(request):
 	start_date = datetime.strptime(start_date_get, "%Y-%m-%d").date()
 	data = hrr_data(request.user,start_date)
 	if data.get('Did_you_measure_HRR'):
-		try:
+		try:	
 			user_hrr = Hrr.objects.get(user_hrr=request.user, created_at=start_date)
 			update_hrr_instance(user_hrr, data)
 		except Hrr.DoesNotExist:
@@ -3177,14 +3177,9 @@ def hrr_only_store(user,current_date):
 	else:
 		print("NO HRR")
 
-def store_hhr(user,from_date,to_date,type_data=None):
+def store_garmin_hrr(user,from_date,to_date,type_data):
 	'''
-	This function takes user start date and end date, calculate the HRR calculations 
-	then stores in Data base
-	Args:user(user object)
-		:from_date(start date)
-		:to_date(end date)
-	Return:None
+		This function will store only Garmin HRR data
 	'''
 	print("HRR calculations got started",user.username)
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
@@ -3201,6 +3196,58 @@ def store_hhr(user,from_date,to_date,type_data=None):
 			hrr_only_store(user,current_date)
 		current_date -= timedelta(days=1)
 	print("HRR calculations got finished")
+	return None
+
+def store_fitbit_hrr(user,from_date,to_date):
+	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
+	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
+	current_date = to_date_obj
+	while (current_date >= from_date_obj):
+		fitbit_hrr = fitbit_aa.generate_hrr_charts(user,current_date)
+		if fitbit_hrr.get('Did_you_measure_HRR'):
+			print("Storing Fitbit HRR")
+			try:
+				user_hrr = Hrr.objects.get(
+					user_hrr=user, created_at=current_date)
+				update_hrr_instance(user_hrr, fitbit_hrr)
+			except Hrr.DoesNotExist:
+				create_hrr_instance(user, fitbit_hrr, current_date)
+		current_date -= timedelta(days=1)
+	return None
+
+def store_hhr(user,from_date,to_date,type_data=None):
+	'''
+	This function takes user start date and end date, calculate the HRR calculations 
+	then stores in Data base
+
+	Args:user(user object)
+		:from_date(start date)
+		:to_date(end date)
+
+	Return:None
+	'''
+	# print("HRR calculations got started",user.username)
+	# from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
+	# to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
+	# current_date = to_date_obj
+	# while (current_date >= from_date_obj):
+	# 	try:
+	# 		hrr_obj = Hrr.objects.get(user_hrr=user,created_at=current_date)
+	# 	except:
+	# 		hrr_obj = None
+	# 	if type_data == 'dailies' or not hrr_obj or hrr_obj.Did_you_measure_HRR == 'no':	 
+	# 		hrr_only_store(user,current_date)
+	# 	elif not type_data:
+	# 		hrr_only_store(user,current_date)
+	# 	current_date -= timedelta(days=1)
+	# print("HRR calculations got finished")
+	device_type = quicklook.calculations.calculation_driver.which_device(user)
+	if device_type == "garmin":
+		store_garmin_hrr(user,from_date,to_date,type_data)
+	elif device_type == 'fitbit':
+		print("Fitbit HRR data calculation got started")
+		store_fitbit_hrr(user,from_date,to_date)
+		print("Fitbit HRR data calculation finished")
 	return None
 
 class UserheartzoneView(APIView):

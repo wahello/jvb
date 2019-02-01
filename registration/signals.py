@@ -19,7 +19,7 @@ def init_new_user(sender, instance=None, created=False, **kwargs):
 
 @receiver(post_registration_notify,sender=UserCreate)
 def notify_users_registration_success(sender, **kwargs):
-	recipient_email = kwargs.get('email_address')
+	recipient_email = [kwargs.get('email_address')]
 	username = kwargs.get('username')
 	first_name = kwargs.get('first_name')
 
@@ -49,7 +49,7 @@ JVB Health & Wellness'''
 @receiver(post_save, sender=Invitation)
 def notify_user_invitation(sender, instance=None, created=False,**kwargs):
 	if created and instance:
-		recipient_email = instance.email
+		recipient_email = [instance.email]
 		email_subject = "You have been invited to join the JVB Health & Wellness app"
 		email_body = '''
 Hi,

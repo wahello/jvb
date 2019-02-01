@@ -2599,7 +2599,7 @@ handleScroll() {
                              consequences on your health). We carry a 20 ounce water bottle for
                              all of our runs/workouts (there are many bottles that have handles
                              on them that are great and barely noticeable once you get used to them).
-                             Staying hydrated to critical to health. When we become dehydrated, our
+                             Staying hydrated is critical to health. When we become dehydrated, our
                              blood gets thicker, and when our blood get thicker, our heart and
                              cardiovascular system has to work harder to pump the blood through
                              our body. When this happens, our heart rate goes up! As heart rate
@@ -3913,11 +3913,11 @@ handleScroll() {
                                </div>
 
                                <div style={{paddingTop:"15px"}}>
-                                   1.We ask for yesterday so we have 24 hours of reporting 
+                                   1. We ask for yesterday so we have 24 hours of reporting 
                                </div>
 
                                 <div style={{paddingTop:"15px"}}>
-                                    2.You determine what % of unprocessed food based on the quantity of
+                                    2. You determine what % of unprocessed food based on the quantity of
                                     food you consumed yesterday. There are many ways to determine the
                                     unprocessed %. (1) If you had 3 meals yesterday and one was highly
                                     processed and the other 2 meals had little to no unprocessed food,
@@ -3934,7 +3934,7 @@ handleScroll() {
                                </div>
 
                                <div style={{paddingTop:"15px"}}>
-                                1. 1. Dairy (cheese, milk, yogurt, other refined milk products).
+                                1. Dairy (cheese, milk, yogurt, other refined milk products).
                                       If you consumed any of these dairy products that you
                                      (1) directly obtained from an animal at a local farm or
                                      (2) obtained directly from a local farm that you know has
@@ -4078,7 +4078,7 @@ handleScroll() {
                                </div>
 
                                <div style={{paddingTop:"15px"}}>
-                                  In the Unites States, a standard drink is equal to 14.0 grams (0.6 ounces) of pure alcohol.
+                                  In the United States, a standard drink is equal to 14.0 grams (0.6 ounces) of pure alcohol.
                                   Generally, this amount of pure alcohol is found in:  
                                </div>
 

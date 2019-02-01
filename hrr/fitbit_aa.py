@@ -35,10 +35,12 @@ from hrr.models import (AaCalculations,
 					AA, TwentyfourHourAA, 
 					TwentyfourHourTimeHeartZones)
 
+from hrr.calculation_helper import get_usernput_activities
 import quicklook.calculations.converter
 from quicklook.calculations.converter.fitbit_to_garmin_converter import fitbit_to_garmin_activities
 from quicklook.calculations.fitbit_calculation import get_fitbit_model_data
 import user_input
+
 
 def get_time_from_timestamp(time_stamp):
 	'''
@@ -1283,6 +1285,12 @@ def lowest_hrr_1min_no_hrr(time_diff_sum,hr):
 			one_min_hr.append(hr)
 	return one_min_hr
 
+def get_latest_activities(ui_activities,detected_activities):
+	ui_activities_copy = ui_activities.copy()
+	for key,activity in detected_activities.items():
+		if not ui_activities.get(key) and not activity.get('duplicate'):
+			ui_activities_copy[key] = activity
+	return ui_activities_copy
 
 def generate_hrr_charts(user,start_date):
 	'''
@@ -1291,10 +1299,18 @@ def generate_hrr_charts(user,start_date):
 	# get activities from the user input form
 	fitbit_act = user_input.views.garmin_views._get_fitbit_activities_data(
 		user,start_date)
+	user_input_activities = get_usernput_activities(user,start_date)
+	if user_input_activities and fitbit_act:
+		ui_activities = get_latest_activities(user_input_activities[1],fitbit_act)
+		hrr_act = determine_hhr_activity(user,start_date,ui_activities)
+	elif fitbit_act:
+		hrr_act = determine_hhr_activity(user,start_date,fitbit_act)
 	# determine the if activtyt is HRR or not
-	hrr_act = determine_hhr_activity(user,start_date,fitbit_act)
 	# get HRR activty id
-	hrr_act_id = get_hrr_activity(hrr_act)
+	if hrr_act:
+		hrr_act_id = get_hrr_activity(hrr_act)
+	else:
+		hrr_act_id = None
 	# get all activities start time and end time
 	activities_start_end_time_list = fitbit_aa_chart_one(user,start_date)
 	# get activity that is related to HRR activity
@@ -1382,6 +1398,16 @@ def generate_hrr_charts(user,start_date):
 			pure_time_99 = time_99 + diff_actity_hrr
 		else:
 			pure_time_99 = -1
+		if Did_heartrate_reach_99 == 'no' and hrr_act:
+			hr_time_diff,hr,time_to_99_time = get_time_to_99_no_hrr(hrr_act[0].get(
+															'act_start'),hr_data_set)
+			if hr_time_diff:
+				time_99 = sum(hr_time_diff)
+				pure_time_99 = time_99 + diff_actity_hrr
+			else:
+				time_99 = None
+				pure_time_99 = None
+
 		data = {"Did_you_measure_HRR":Did_you_measure_HRR,
 				"Did_heartrate_reach_99":Did_heartrate_reach_99,
 				"time_99":time_99,
