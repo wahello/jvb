@@ -41,12 +41,8 @@ import WorkoutDashboard from '../components/weekly_workout_dashboard';
 import OverallRank from '../components/overall_hrr_rank';
 import ProgressDashboard from '../components/progressanalyzer_dashboard';
 import ActiveDashboard from '../components/Active_dashboard';
-<<<<<<< HEAD
-import MovementLeaderboard from '../components/movement-leaderboard/movement_leaderboard';
-=======
 import BackfillRequest from '../components/BackfillRequest';
->>>>>>> staging
-
+import MovementLeaderboard from '../components/movement-leaderboard/movement_leaderboard';
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
 import {isLoggedIn} from '../network/auth';
@@ -103,11 +99,8 @@ function initializeLocalState(){
 					<Route path='/overall_hrr_rank' component={OverallRank}/>
 					<Route path='/progressanalyzer_dashboard' component={ProgressDashboard}/>
 					<Route path='/active_dahsboard' component={ActiveDashboard}/>
-<<<<<<< HEAD
-					<Route path='/movement_leaderboard' component={RequireAuth(MovementLeaderboard)}/>
-=======
 					<Route path='/backfill' component={RequireAuth(BackfillRequest)} />
->>>>>>> staging
+					<Route path='/movement_leaderboard' component={RequireAuth(MovementLeaderboard)}/>
 				</Switch>
 			  </BrowserRouter>
 			</Provider> 
