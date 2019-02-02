@@ -580,7 +580,7 @@ transformActivity(activity){
               .map(prop => this.state.activities[prop].wind);
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
               (!this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet')||
-              (!this.state.weight || this.state.weight == "i do not weigh myself today") || (!this.state.activities[0].humidity || !this.state.activities[0].temperature_feels_like || !this.state.activities[0].weather_condition || !this.state.activities[0].temperature || !this.state.activities[0].dewPoint || !this.state.activities[0].wind)){
+              (!this.state.weight || this.state.weight == "i do not weigh myself today")){
             if(!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date){
               this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessSleep, this.onFetchGarminFailure);
             }
@@ -590,19 +590,23 @@ transformActivity(activity){
             else if(!this.state.weight || this.state.weight == "i do not weigh myself today"){
              this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
             }
-            let count = 0;
-            if(this.state.number_of_activities>0){
-              for(let i=0;i<this.state.number_of_activities;i++){
-                if(!humidity[i] || !temperature_feels_like[i] || !weather_condition[i] || !temperature[i] || ! dewpoint[i] || !wind[i]) {
+          }
+          
+          let count = 0;
+          if(this.state.number_of_activities>0){
+            for(let i=0;i<this.state.number_of_activities;i++){
+              if(!humidity[i] || !temperature_feels_like[i] || 
+                 !weather_condition[i] || !temperature[i] || 
+                 ! dewpoint[i] || !wind[i]) {
                   count+=1;
-
-                }
               }
             }
-            if(count>0){
-              /******** CALLING WEATHER REPORT API *******/
-              userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,true);
-            }
+          }
+          if(count>0){
+            /******** CALLING WEATHER REPORT API *******/
+            userDailyInputWeatherReportFetch(this.state.selected_date,
+              this.onWeatherReportFetchSuccess,
+              this.onWeatherReportFetchFailure,true);
           }
           fetchGarminHrrData(this.state.selected_date,this.onFetchGarminSuccessHrr, this.onFetchGarminFailure);
           this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
