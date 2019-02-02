@@ -70,7 +70,7 @@ renderLastSync(value){
     }
     return <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
 }
-renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
+renderTableColumns(mcDatewise, start_date, end_date){
     let columns = [];
     let obj ={ 
             "dmc" :[],
@@ -116,121 +116,111 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
         let end_dt = moment(this.props.end_date);
         let duration = end_dt.diff(start_dt,'days') + 1;
 
-    for(let [date,data] of Object.entries(dateWiseData)){
-       for(let [key,value] of Object.entries(data[category])){
-            if(key !== 'id' && key !== 'user_ql'){  
-                if (key == 'movement_consistency'){
-                            let mc = value;
-                            if( mc != undefined && mc != "" && mc != "-"){
-                                mc = JSON.parse(mc);                       
-                                for(let time of Object.keys(obj)){
-                                  if(time !== 'dmc'){
-                                      let mCdata = mc[time];
-                                      if(time == "inactive_hours"){
-                                        obj[time].push({value:mc.inactive_hours?mc.inactive_hours:0,
-                                                        extra:"",
-                                                        style:{}});
-                                        obj["dmc"].push({value:mc.inactive_hours,
-                                                          extra:"",
-                                                          style:this.dailyMC(mc.inactive_hours)});
-                                      }
-                                      else if (time == "active_hours")
-                                        obj[time].push({value:mc.active_hours?mc.active_hours:0,
-                                                        extra:"",
-                                                        style:{}});
-                                      else if (time == "strength_hours")
-                                        obj[time].push({value:mc.strength_hours?mc.strength_hours:0,
-                                                        extra:"",
-                                                        style:{}});
-                                      else if (time == "exercise_hours")
-                                        obj[time].push({value:mc.exercise_hours?mc.exercise_hours:0,
-                                                        extra:"",
-                                                        style:{}});
-                                      else if (time == "sleeping_hours")
-                                        obj[time].push({value:mc.sleeping_hours?mc.sleeping_hours:0,
-                                                        extra:"",
-                                                        style:{}});
-                                      else if (time == "no_data_hours")
-                                        obj[time].push({value:mc.no_data_hours?mc.no_data_hours:0,
-                                                        extra:"",
-                                                        style:{}});
-                                      else if (time == "timezone_change_hours")
-                                        obj[time].push({value:mc.timezone_change_hours?mc.timezone_change_hours:0,
-                                                        extra:"",
-                                                        style:{}});
-                                      else if (time == "nap_hours")
-                                        obj[time].push({value:mc.nap_hours?mc.nap_hours:0,
-                                                        extra:"",
-                                                        style:{}});
-                                      else if (time == "total_active_minutes")
-                                        obj[time].push({
-                                          value:mc.total_active_minutes?mc.total_active_minutes:0,
-                                          extra:"",
-                                          style:{}
-                                        });
-                                      else if (time == "total_active_prcnt")
-                                        obj[time].push({
-                                          value:mc.total_active_prcnt?mc.total_active_prcnt:0,
-                                          extra:"",
-                                          style:{}
-                                        }); 
-                                      else if (time == "total_steps"){
-                                        let totalSteps = mc.total_steps;
-                                         if(totalSteps != undefined){
-                                          totalSteps += '';
-                                                  var x = totalSteps.split('.');
-                                                  var x1 = x[0];
-                                                  var x2 = x.length > 1 ? '.' + x[1] : '';
-                                                  var rgx = /(\d+)(\d{3})/;
-                                                  while (rgx.test(x1)) {
-                                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                                              }
-                                              obj[time].push({value:x1 + x2,
-                                                        extra:"",
-                                                        style:{}});
-                                         }
-                                      }
-                                      else if(mCdata.status == "no data yet"){
-                                         obj[time].push(
-                                            {value:"No Data Yet",
-                                             extra:(mCdata.active_prcnt != null || mCdata.active_prcnt != undefined
-                                                    ?" ( " + mCdata.active_prcnt + "% )":""),
-                                             style:this.mcHistoricalData(mCdata.steps,mCdata.status)});
-                                      }
-                                      // else if(mCdata.status == "time zone change"){
-                                      //    obj[time].push(
-                                      //       {value:mCdata.steps,
-                                      //        extra:mCdata.active_prcnt?"( " + mCdata.active_prcnt + " )":"",
-                                      //        style:this.mcHistoricalData(mCdata.steps,mCdata.status)});
-                                      // }
-                                      // else if(mCdata.status == "nap"){
-                                      //    obj[time].push(
-                                      //       {value:mCdata.steps,
-                                      //        extra:mCdata.active_prcnt?"( " + mCdata.active_prcnt + " )":"",
-                                      //        style:this.mcHistoricalData(mCdata.steps,mCdata.status)});
-                                      // }                         
-                                      else{
-                                          obj[time].push(
-                                            {value:mCdata.steps,
-                                             extra:(mCdata.active_prcnt != null || mCdata.active_prcnt != undefined 
-                                                    ?" ( " + mCdata.active_prcnt + "% )":""),
-                                             style:this.mcHistoricalData(mCdata.steps,mCdata.status)}
-                                          );
-                                      }
-                                                                    
-                                }
-                              }
-                            }else{
-                              for(let [time,mCdata] of Object.entries(obj)){
-                                obj[time].push({value:'-',
-                                                extra:"",
-                                                style:""});
-                              }
+    for(let [date,mc] of Object.entries(mcDatewise)){
+        if( mc != undefined && mc != "" && mc != "-"){                      
+            for(let time of Object.keys(obj)){
+                if(time !== 'dmc'){
+                    let mCdata = mc[time];
+                    if(time == "inactive_hours"){
+                        obj[time].push({value:mc.inactive_hours?mc.inactive_hours:0,
+                            extra:"",
+                            style:{}});
+                            obj["dmc"].push({value:mc.inactive_hours,
+                            extra:"",
+                            style:this.dailyMC(mc.inactive_hours)
+                        });
+                    }
+                    else if (time == "active_hours")
+                        obj[time].push({value:mc.active_hours?mc.active_hours:0,
+                            extra:"",
+                            style:{}
+                        });
+                    else if (time == "strength_hours")
+                        obj[time].push({value:mc.strength_hours?mc.strength_hours:0,
+                            extra:"",
+                            style:{}
+                        });
+                    else if (time == "exercise_hours")
+                        obj[time].push({value:mc.exercise_hours?mc.exercise_hours:0,
+                        extra:"",
+                        style:{}
+                    });
+                    else if (time == "sleeping_hours")
+                        obj[time].push({value:mc.sleeping_hours?mc.sleeping_hours:0,
+                        extra:"",
+                        style:{}
+                    });
+                    else if (time == "no_data_hours")
+                        obj[time].push({value:mc.no_data_hours?mc.no_data_hours:0,
+                        extra:"",
+                        style:{}
+                    });
+                    else if (time == "timezone_change_hours")
+                        obj[time].push({value:mc.timezone_change_hours?mc.timezone_change_hours:0,
+                        extra:"",
+                        style:{}
+                    });
+                    else if (time == "nap_hours")
+                        obj[time].push({value:mc.nap_hours?mc.nap_hours:0,
+                        extra:"",
+                        style:{}
+                    });
+                    else if (time == "total_active_minutes")
+                        obj[time].push({
+                            value:mc.total_active_minutes?mc.total_active_minutes:0,
+                            extra:"",
+                            style:{}
+                        });
+                    else if (time == "total_active_prcnt")
+                        obj[time].push({
+                            value:mc.total_active_prcnt?mc.total_active_prcnt:0,
+                            extra:"",
+                            style:{}
+                        }); 
+                    else if (time == "total_steps"){
+                        let totalSteps = mc.total_steps;
+                        if(totalSteps != undefined){
+                            totalSteps += '';
+                            var x = totalSteps.split('.');
+                            var x1 = x[0];
+                            var x2 = x.length > 1 ? '.' + x[1] : '';
+                            var rgx = /(\d+)(\d{3})/;
+                            while (rgx.test(x1)) {
+                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
                             }
-                }        
+                            obj[time].push({value:x1 + x2,
+                                extra:"",
+                                style:{}
+                            });
+                        }
+                    }
+                    else if(mCdata.status == "no data yet"){
+                        obj[time].push({
+                            value:"No Data Yet",
+                            extra:(mCdata.active_prcnt != null || mCdata.active_prcnt != undefined
+                            ?" ( " + mCdata.active_prcnt + "% )":""),
+                            style:this.mcHistoricalData(mCdata.steps,mCdata.status)
+                        });
+                    }
+                    else{
+                        obj[time].push({
+                            value:mCdata.steps,
+                            extra:(mCdata.active_prcnt != null || mCdata.active_prcnt != undefined 
+                            ?" ( " + mCdata.active_prcnt + "% )":""),
+                            style:this.mcHistoricalData(mCdata.steps,mCdata.status)
+                        });
+                    }
+                }
             }
-       }
-    }
+        }else{
+            for(let [time,mCdata] of Object.entries(obj)){
+                obj[time].push({value:'-',
+                    extra:"",
+                    style:""}
+                );
+            }
+        }
+    }      
 
     let verbose_name = {
         "12:00 AM to 12:59 AM" : "12:00 AM to 12:59 AM",
@@ -318,12 +308,29 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
       )
     }
   return columns;
+}
 
+extractDatewiseMCS = (dateWiseData,category) => {
+    let mcData = {};
+    for(let [date,data] of Object.entries(dateWiseData)){
+        for(let [key,value] of Object.entries(data[category])){
+            if(key !== 'id' && key !== 'user_ql' && key == 'movement_consistency'){  
+                let mc = value;
+                mcData[date] = mc;
+                if( mc != undefined && mc != "" && mc != "-"){
+                    mc = JSON.parse(mc);
+                    mcData[date] = mc               
+                }
+            }
+        }
+    }
+    return mcData;
 }
 
  render(){
     const {height, width, containerHeight, containerWidth, ...props} = this.props;
     let rowsCount = this.state.myTableData.length;
+    let mcData = (this.extractDatewiseMCS(this.props.data,"steps_ql"));
     return(
       <div>
        <div>
@@ -347,7 +354,7 @@ renderTableColumns(dateWiseData,category,classes="",start_date,end_date){
               width={115}
               fixed={true}
             />
-            {this.renderTableColumns(this.props.data,"steps_ql")}
+            {this.renderTableColumns(mcData,"steps_ql")}
          
           </Table>
          
