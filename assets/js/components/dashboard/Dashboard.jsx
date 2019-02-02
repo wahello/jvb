@@ -117,7 +117,7 @@ class Dashboard extends Component {
 							  
 							  <h3 id="link_style">Raw Data</h3>		  
 							  <Link to='/rawdata'>Raw Data</Link><br/>
-							  <Link to='/rawdata#movementconsistency'>Movement Consistency</Link><br/>
+							  <Link to='/rawdata?rtype=mc'>Movement Consistency</Link><br/>
 							  <Link to='/rawdata#grades'>Grades</Link><br/>
 							  <a target="_blank" href = "/static/quicklook/grades_key.pdf">Grades Key</a><br/>
 							  {/*<Link to='/movement_consistency'>movement Consistency</Link><br/>*/}
