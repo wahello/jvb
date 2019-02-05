@@ -2,11 +2,15 @@ import React, { Component } from 'react';
 import moment from 'moment';
 import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
+import { withRouter} from 'react-router-dom'
 import {Button} from "reactstrap";
 import {Table, Column, Cell} from 'fixed-data-table-2';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
 import Dimensions from 'react-dimensions';
 import { StyleSheet, css } from 'aphrodite';
+import _ from 'lodash';
+
+import {fetchMovementConsistency} from '../../network/quick';
 
 class MovementHistorical extends Component{
 	constructor(props){
@@ -18,21 +22,80 @@ class MovementHistorical extends Component{
     this.renderLastSync = this.renderLastSync.bind(this);
 
     this.state = {
-      myTableData: [{name:"% of Days User Get 300 Steps in the Hour"}]
+      tableRowHeader: [{name:"% of Days User Get 300 Steps in the Hour"}],
+      uidMCData:null
     }
 
     var p = this.props.data;
 
     for(var key in p) {
-      this.state.myTableData.push({name: key})
+      this.state.tableRowHeader.push({name: key})
     }
   }
+
+  uidMCDataSuccess = (data) => {
+    let uidMCData = {}
+    let queryParams = new URLSearchParams(this.props.location.search)
+    let startDate = moment(queryParams.get('start_date'))
+    let endDate = moment(queryParams.get('end_date'))
+
+    uidMCData[endDate.format('M-D-YY')] = "-";
+    let diff = endDate.diff(startDate, 'days');
+    let tmp_end_date = moment(endDate);
+    for(let i=0; i<diff; i++){
+      let dt = tmp_end_date.subtract(1,'days');
+      let current_dt = dt.format('M-D-YY');
+      uidMCData[current_dt]="-";
+    }
+    for(let mc of data.data){
+      let created_at = moment(mc.created_at).format('M-D-YY');
+      if(!_.isEmpty(mc.movement_consistency))
+        uidMCData[created_at] = mc.movement_consistency
+      else
+        uidMCData[created_at] = "-"
+    }
+
+    let tableRowHeader = [{name:"% of Days User Get 300 Steps in the Hour"}]
+    for(var key in uidMCData) {
+      tableRowHeader.push({name: key})
+    }
+
+    this.setState({
+      tableRowHeader,
+      uidMCData
+    })
+  }
+
+  uidMCDataFailed = (error) => {
+    console.log(error);
+  }
+
+  getUIDMCData = (uid,start_date,end_date) => {
+    fetchMovementConsistency(start_date,
+      this.uidMCDataSuccess,
+      this.uidMCDataFailed,
+      end_date,uid)
+  }
+
   getDayWithDate(date){
    let d = moment(date,'M-D-YY');
    let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
    let dayName = days[d.day()] ;
    return date +"\n"+ dayName;
   }
+
+  componentDidMount(){
+    console.log("Conponent Did mount");
+    let queryParams = new URLSearchParams(this.props.location.search)
+    let startDate = queryParams.get('start_date')
+    let endDate = queryParams.get('end_date')
+    let uid = queryParams.get('uid')
+    if(startDate && endDate && uid){
+      console.log(startDate,endDate,uid);
+      this.getUIDMCData(uid,startDate,endDate);
+    }
+  }
+
 mcHistoricalData(score,status){
       if(status == "sleeping")
         return {background:'rgb(0,176,240)',color:'white'}
@@ -55,6 +118,7 @@ mcHistoricalData(score,status){
       else if (score >= 300 )
         return {background:'green', color:'white'};
 }
+
 dailyMC(score,status){
       if (score <= 5 )
         return {background:'green', color:'white'};
@@ -63,6 +127,7 @@ dailyMC(score,status){
       else if (score > 10 )
         return {background:'red', color:'white'};
 }
+
 renderLastSync(value){
     let time;
     if(value != null){
@@ -70,6 +135,7 @@ renderLastSync(value){
     }
     return <div style = {{fontSize:"13px"}}>Synced at {time}</div>;
 }
+
 renderTableColumns(mcDatewise, start_date, end_date){
     let columns = [];
     let obj ={ 
@@ -326,11 +392,14 @@ extractDatewiseMCS = (dateWiseData,category) => {
     }
     return mcData;
 }
-
  render(){
     const {height, width, containerHeight, containerWidth, ...props} = this.props;
-    let rowsCount = this.state.myTableData.length;
+    let rowsCount = this.state.tableRowHeader.length;
     let mcData = (this.extractDatewiseMCS(this.props.data,"steps_ql"));
+
+    if(this.state.uidMCData)
+      mcData = this.state.uidMCData
+
     return(
       <div>
        <div>
@@ -346,8 +415,8 @@ extractDatewiseMCS = (dateWiseData,category) => {
               header={<Cell className={css(styles.newTableHeader)}>Movement Consistency Historical Data</Cell>}
 
               cell={props => (
-                <Cell {...{'title':this.state.myTableData[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
-                  {this.getDayWithDate(this.state.myTableData[props.rowIndex].name)}
+                <Cell {...{'title':this.state.tableRowHeader[props.rowIndex].name}} {...props} className={css(styles.newTableBody)}>
+                  {this.getDayWithDate(this.state.tableRowHeader[props.rowIndex].name)}
                 </Cell>
                 )}
 
@@ -409,4 +478,4 @@ export default Dimensions({
     var widthOffset = window.innerWidth < 1024 ? 0 : 3;
     return window.innerWidth - widthOffset;
   }
-})(MovementHistorical);
+})(withRouter(MovementHistorical));
