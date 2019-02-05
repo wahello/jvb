@@ -39,7 +39,8 @@ class Register extends Component {
 			progress:20,
 			isOpen: false,
 			checkingInvitation:false,
-			isUserInvited:false
+			isUserInvited:false,
+			isRegistrationInProgress:false
 		};
 	}
 
@@ -51,7 +52,8 @@ class Register extends Component {
 
 	onRegisterSuccess(response){
 		this.setState({
-			progress: this.state.progress + 50
+			progress: this.state.progress + 50,
+			isRegistrationInProgress:false
 		});
 
 		//show success message and redirect to user newly created profile
@@ -63,12 +65,19 @@ class Register extends Component {
 	}
 
 	onRegisterFailure(error){
+		this.setState({
+			isRegistrationInProgress:false
+		})
 		console.log('Error: ',error);
 	}
 
 	onSubmit(values){
-		var reg = new RegisterNetwork();
-		reg.register(values,this.onRegisterSuccess,this.onRegisterFailure);
+		this.setState({
+			isRegistrationInProgress:true
+		},() => {
+			var reg = new RegisterNetwork();
+			reg.register(values,this.onRegisterSuccess,this.onRegisterFailure);
+		})
 	}
 
 	nextPage() {
@@ -154,6 +163,7 @@ class Register extends Component {
 									 <WizardPersonalPage 
 											onSubmit = {this.onSubmit}
 											previousPage = {this.previousPage}
+											isRegistrationInProgress = {this.state.isRegistrationInProgress}
 									 />}
 								</CardBody>
 							</Card>
