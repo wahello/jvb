@@ -11,7 +11,7 @@ import moment from 'moment';
 import NavbarMenu from '../navbar';
 import {renderOverallHrr1FetchOverlay,renderOverallHrr2FetchOverlay,renderOverallHrr3FetchOverlay,renderOverallHrrSelectedDateFetchOverlay} from '../leaderboard_healpers';
 import { getGarminToken,logoutUser} from '../../network/auth';
-import fetchLeaderBoard from '../../network/leaderBoard';
+import fetchLeaderBoard, {fetchMcsSnapshot} from '../../network/leaderBoard';
 import MovementLeaderboard2 from "./movement_leaderboard2";
 
 var CalendarWidget = require('react-calendar-widget');  
@@ -54,12 +54,17 @@ class MovementLeaderboard extends Component{
 			calendarOpen:false,
 			isOpen1:false,
 			dateRange1:false,
+
+
 	        dateRange2:false,
 	        dateRange3:false,
 	        Movement_view:false,
 	        active_view:true,
 			btnView:false,
 	        all_movement_rank_data:'',
+	        mcs_data:'',
+	        current_user_id:null,
+	        // mcs_date:new Date(),
 	        Movement_username:"",
 	        duration_date:{
 				"week":"",
@@ -69,14 +74,20 @@ class MovementLeaderboard extends Component{
 				"month":"",
 			
 			},
-			date:"",
+			date:new Date(),
 			capt:"",
 			dropdownOpen: false,
+			selectedRange:{
+		  		dateRange:null,
+		  		rangeType:'today'
+		  	}
 		}
 		this.toggleCalendar = this.toggleCalendar.bind(this);
 		this.renderOverallMovementTable = this.renderOverallMovementTable.bind(this);
 		this.successOverallMovementRank = this.successOverallMovementRank.bind(this);
 		this.errorOverallMovementRank = this.errorOverallMovementRank.bind(this);
+		this.successMcsSnapshot = this.successMcsSnapshot.bind(this);
+		this.errorMcsSnapshot = this.errorMcsSnapshot.bind(this);
 		this.processDate = this.processDate.bind(this);
 		this.toggle1 = this.toggle1.bind(this);
 		this.toggleDate1 = this.toggleDate1.bind(this);
@@ -103,14 +114,13 @@ class MovementLeaderboard extends Component{
 			Movement_data:data.data.movement,
 			duration_date:data.data.duration_date,
 			all_movement_rank_data:data.data.movement.today.all_rank,
+			current_user_id:data.data.movement.today.user_rank.total_steps.user_id,
 			date:moment(date).format("MMM D, YYYY"),
 			capt:"Today",
 			fetching_hrr1:false,
 	        fetching_hrr2:false,
 	        fetching_hrr3:false,
 	        fetching_hrr4:false,
-		},()=>{
-			// console.log("*********************** state data",this.state.Movement_data);
 		})
 	}
 	// doOnOrientationChange() {
@@ -128,12 +138,28 @@ class MovementLeaderboard extends Component{
 	        fetching_hrr4:false,
 		})
 	}
+	successMcsSnapshot(data){
+		this.setState({
+			// mcs_data:data.data[moment(this.state.selectedDate).format('YYYY-MM-DD')]
+			mcs_data:data.data,
+			selectedRangeMCSData:data.data[moment(this.state.selectedDate).format('YYYY-MM-DD')]
+		},()=>{
+			
+		})
+	}
+	errorMcsSnapshot(error){
+		console.log(error.message);
+	}
 	processDate(selectedDate){
 		this.setState({
 			selectedDate:selectedDate,
+			// mcs_date:selectedDate,
 			fetching_hrr4:true,
 			calendarOpen:!this.state.calendarOpen,
-		},()=>{fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate);
+		},()=>{
+			fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate);
+			fetchMcsSnapshot(this.successMcsSnapshot,this.errorMcsSnapshot,this.state.selectedDate);
+
 		});
 	}
 	componentDidMount(){
@@ -141,6 +167,7 @@ class MovementLeaderboard extends Component{
 			fetching_hrr4:true,
 		});
 		fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,true);
+		fetchMcsSnapshot(this.successMcsSnapshot,this.errorMcsSnapshot,this.state.selectedDate);
 	}
 	toggle(){
 		this.setState({
@@ -269,7 +296,7 @@ class MovementLeaderboard extends Component{
   		}
   		return date;
   	}
-   	renderOverallMovementTable(value,value5){
+   	renderOverallMovementTable(value,mcs_data,value5){
 		let category = "";
 	  	let durations = [];
 	  	let scores = [];
@@ -296,9 +323,7 @@ class MovementLeaderboard extends Component{
 			  		durations.push(duration);
 			  		for (let [key,rankData] of Object.entries(val)){
 			  		 	if(key == "all_rank"){
-			  		 		/*console.log("******************",rankData);*/
 			  		 		 userName = rankData.username;
-			  		 		 /*console.log("**************** single",userName);*/
 			  		 		ranks.push(rankData);
 			  		 	}	
 			  		}
@@ -309,39 +334,59 @@ class MovementLeaderboard extends Component{
 		let date;
 	  	let tableHeaders = [];
 	  	for(let dur of durations){
+	  		let selectedRange = {
+		  		dateRange:null,
+		  		rangeType:null
+		  	};
+	  		let rangeMCSData = null;
 	  		let rank;
 	  		let capt = dur[0].toUpperCase() + dur.slice(1)
 	  		if(dur == "today"){
 	  			date = moment(value5[dur]).format('MMM DD, YYYY');
-	  			rank = value[dur].all_rank;	
+	  			rank = value[dur].all_rank;
+	  			rangeMCSData = mcs_data[value5[dur]];
+	  			selectedRange['dateRange'] = value5[dur];
+	  			selectedRange['rangeType'] = dur;
 	  		}
 	  		else if(dur == "yesterday"){
 	  			date = moment(value5[dur]).format('MMM DD, YYYY');
 	  			rank = value[dur].all_rank;	
+	  			rangeMCSData = mcs_data[value5[dur]];
+	  			selectedRange['dateRange'] = value5[dur];
+	  			selectedRange['rangeType'] = dur;
 	  		}
 	  		else if(dur == "week"){
 		  		date = this.headerDates(value5[dur]);
 		  		rank = value[dur].all_rank;
+		  		selectedRange['dateRange'] = value5[dur];
+	  			selectedRange['rangeType'] = dur;
 	  		}
 	  		else if(dur == "month"){
 		  		date = this.headerDates(value5[dur]);
 		  		rank = value[dur].all_rank;
+		  		selectedRange['dateRange'] = value5[dur];
+	  			selectedRange['rangeType'] = dur;
 	  		}
 	  		else if(dur == "year"){
 		  		date = this.headerDates(value5[dur]);
 		  		rank = value[dur].all_rank;
+		  		selectedRange['dateRange'] = value5[dur];
+	  			selectedRange['rangeType'] = dur;
 	  		}
 	  		else{
 	  			date = this.headerDates(dur);
 	  			capt = "";
 	  			rank = value['custom_range'][dur].all_rank;
-
+	  			selectedRange['dateRange'] = dur;
+	  			selectedRange['rangeType'] = 'custom_range';
 	  		}
 
   			tableHeaders.push(
           	<DropdownItem>
   			 <a className="dropdown-item" 
-	  			onClick = {this.reanderAllHrr.bind(this,rank,userName,capt,date)}
+	  			onClick = {this.reanderAllHrr.bind(
+	  				this,rank,rangeMCSData,userName,
+	  				capt,date,selectedRange)}
 	  			style = {{fontSize:"13px"}}>
 	  			{capt}<br/>{date}
   			</a></DropdownItem>);
@@ -349,17 +394,20 @@ class MovementLeaderboard extends Component{
 	  return tableHeaders;	
 	  	
 	}
-	reanderAllHrr(all_data,value1,capt,date){
+	reanderAllHrr(all_data,rangeMCSData,value1,capt,date,selectedRange){
 		this.setState({
 			all_movement_rank_data:all_data,
 			Movement_username:value1,
 			date:date,
+			// mcs_date:date,
 			capt:capt,
 			Movement_view:!this.state.Movement_view,
 			active_view:!this.state.active_view,
 			btnView:!this.state.btnView2,
+			selectedRangeMCSData:rangeMCSData,
+			selectedRange:selectedRange
 		},()=>{
-			/*console.log("*************************** all rank data",this.state.all_movement_rank_data);*/
+
 		});
 	}
 
@@ -551,14 +599,18 @@ class MovementLeaderboard extends Component{
 					          Select Range
 					        </DropdownToggle>
 					        <DropdownMenu>
-					          {this.renderOverallMovementTable(this.state.Movement_data,this.state.duration_date)}
+					          {this.renderOverallMovementTable(this.state.Movement_data,this.state.mcs_data,this.state.duration_date)}
 					        </DropdownMenu>
 					      </Dropdown>
 					      
 				      	<span className = "weekdate"><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span>
 			        </div>
-		  		<MovementLeaderboard2 Movement_data = {this.state.all_movement_rank_data}
-	  							Movement_username = {this.state.Movement_username}/>
+		  		<MovementLeaderboard2 
+		  			Movement_data = {this.state.all_movement_rank_data}
+	  				Movement_username = {this.state.Movement_username}
+	  				mcs_data = {this.state.selectedRangeMCSData}
+	  				selectedRange = {this.state.selectedRange}
+	  			/>
 				
                 </div>
                 {this.renderOverallHrrSelectedDateFetchOverlay()}

@@ -17,6 +17,8 @@ class MovementLeaderboard2 extends Component{
 	constructor(props) {
     super(props);
 	    this.state = {
+	    	//mcs_data:this.props.mcs_data,
+	    	//date_of_data:this.props.selected_date
 	    }
 		this.renderTable = this.renderTable.bind(this);
 		//this.heartBeatsColors = this.heartBeatsColors.bind(this);
@@ -28,6 +30,7 @@ class MovementLeaderboard2 extends Component{
 		this.strToSecond = this.strToSecond.bind(this);
 		this.getStylesForExerciseduration   = this.getStylesForExerciseduration.bind(this);
 		this.secondsToHms = this.secondsToHms.bind(this);
+		this.mcsData = this.mcsData.bind(this);
 
 		//this.time99Colors = this.time99Colors.bind(this);
 		
@@ -149,75 +152,6 @@ class MovementLeaderboard2 extends Component{
 	    }
 	    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{this.renderCommaSteps(steps)}</span><span style = {{paddingLeft:"8px"}}>({rank})</span></td>
   }
-	// heartBeatsColors(score, rank){
- //  		/* Applying the colors for the table cells depends upon their heart beat ranges*/
- //  		let background = "";
- //  		let color = "";
- //  		if(score && score != "N/A"){
-	//   		if(score >= 30){
-	//   			background = "green";
-	//   			color = "white";
-	//   		}
-	//   		else if(score >= 20 && score <= 29){
-	//   			background = "#32CD32";
-	//   			color = "white";
-	//   		}
-	//   		else if(score >= 14 && score <= 19){
-	//   			background = "yellow";
-	//   			color = "black";
-	//   		}
-	//   		else if(score >= 12 && score <= 13){
-	//   			background = "#FF8C00";
-	//   			color = "black";
-	//   		}
-	//   		else if(score > 0 && score < 12){
-	//   			background = "red";
-	//   			color = "black";
-	//   		}
- //  		}
- //  		return <td style ={{background:background,color:color}} className ="overall_rank_value">{score + " (" + rank + ")"}</td>
- //  	}
-  // 	time99Colors(score,value, rank){
-  // 		/* Applying the colors for the table cells depends upon their heart beat ranges*/
-  // 		let background = "";
-		// let color = "";
-		// let hr_background = "";
-  // 		if(!(isNaN(value))){
-	 //            if(value >= 3.4){
-	 //           		background = 'green';
-	 //               	color = 'white';
-	 //               	hr_background = 'white';
-	 //            }
-	 //            else if(value >= 3 && value <= 3.39){
-	 //                background = '#32CD32';
-	 //                color = 'white';
-	 //                hr_background = 'white';
-	 //            }
-	 //            else if(value >= 2 && value < 3){
-	 //                background = '#FFFF01';
-	 //                color = 'black';
-	 //                hr_background = 'black';
-	 //            }
-	 //            else if(value >= 1 && value < 2){
-	 //                background = '#E26B0A';
-	 //                color = 'black';
-	 //                hr_background = 'black';
-	 //            }
-	 //            else if(value < 1 && value != -1) {
-	 //            	background = 'red';
-	 //            	color = 'black';
-	 //            	hr_background = 'black';
-	 //            }
-	 //            else{
-	 //            background = 'white';
-	 //            color = '#5e5e5e';
-	 //            hr_background = '#E5E5E5';
-  //       }
-	 //        }
-  // 		return <td style ={{background:background,color:color}} className ="overall_rank_value">{score + " (" + rank + ")"}</td>
-  // 	}
-
-
   	scrollCallback(operationCount) {
       if (objectLength === operationCount) {
           setTimeout(function () {
@@ -227,12 +161,6 @@ class MovementLeaderboard2 extends Component{
                 var index = -1;
                 var rows = document.getElementById("my-table").offsetHeight;
                 var rows1 = document.getElementById("my-row").offsetTop;
-                // for (var i=0;i<rows.length; i++){
-                //     if ( rows[i] == document.getElementById("my-row")){
-                //         index = i;
-                //         break;
-                //     }
-                // }
                 var rows2 = rows1 + 180;
                 var rows3 = rows2 - 712;
                 if(rows1 >= 520){
@@ -247,12 +175,6 @@ class MovementLeaderboard2 extends Component{
                 var index = -1;
                 var rows = document.getElementById("my-table").offsetHeight;
                 var rows1 = document.getElementById("my-row").offsetTop;
-                // for (var i=0;i<rows.length; i++){
-                //     if ( rows[i] == document.getElementById("my-row")){
-                //         index = i;
-                //         break;
-                //     }
-                // }
                 var rows2 = rows1 + 180;
                 var rows3 = rows2 - 662;
                 if(rows1 >= 520){
@@ -321,15 +243,59 @@ class MovementLeaderboard2 extends Component{
 		 }
 
 	};
-
-	renderTable(Movement_data,Movement_username){
+	mcsData(status){
+  		/* adding background color to card depends upon their steps ranges*/
+	  	  let background = "";
+		  let color = "";
+	      if(status == "sleeping"){
+	        background= 'rgb(0,176,240)';
+	        // color = 'black';
+	      }
+	      else if(status == "inactive"){
+	        background = 'red';
+	    	// color = 'white';
+	      }
+	      else if(status == "strength"){
+	      	background = "rgb(255,0,255)";
+	      	// color = 'white';
+	      }
+	      else if(status == "exercise"){
+	        background = "#FD9A44";
+	        // color = 'black';
+	      }
+	      else if(status == "no data yet"){
+	      	// score = "NDY";
+	        background = "#A5A7A5";
+	        // color = 'black';
+	      }
+	      else if(status == "time zone change"){
+	      	background = "#fdeab7";
+	      	// color = 'black';
+	      }
+	       else if(status == "nap"){
+	      	background = " #107dac";
+	      	// color = 'white';
+	      }
+	      else if (status == "active"){
+	        background = 'green';
+	        // color = 'white';
+	      }
+	    return (
+	    	<td style = {{background:background}}>
+	    	</td> 
+	    )
+	}
+	renderTable(Movement_data,Movement_username,MCS_data,selectedRange){
+		console.log("Selected range:",selectedRange);
+		
 		let operationCount = 0;
 		let td_rows = [];
-		let keys = ["rank","username","nes","exercise_steps","total_steps","mc","exercise_duration","active_min_total","active_min_sleep","active_min_exclude_sleep","active_min_exercise","active_min_exclude_sleep_exercise","total_movement_rank_point"];
+		let keys = ["user_id","rank","username","nes","exercise_steps","total_steps","mc","exercise_duration","active_min_total","active_min_sleep","active_min_exclude_sleep","active_min_exercise","active_min_exclude_sleep_exercise","total_movement_rank_point"];
 		objectLength = Object.keys(Movement_data).length;
 		for(let[key,value] of Object.entries(Movement_data)){
 			let td_values = [];
 			 let currentUser = '';
+			 let currentUserId = value['nes'].user_id;
 			for(let key1 of keys){
 				if(key1 == "rank"){
 					td_values.push(<td className ="overall_rank_value">{value[key1]}</td>);
@@ -362,18 +328,11 @@ class MovementLeaderboard2 extends Component{
 				}
 				else if(key1 == "active_min_total"){
 					td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value[key1].score.value)}</span></td>);
-					// if(value[key1].other_scores != null) {
-					// 	td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.active_min_exercise.value}</span></td>);
-					// 	td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.active_min_sleep.value}</span></td>);
-					// }
-					//td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.active_min_sleep.value}</span></td>);
 				}
 				  else if(key1 == "active_min_sleep"){
 				  	if(value["active_min_total"].other_scores != null) {
 						td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value["active_min_total"].other_scores.active_min_sleep.value)}</span></td>);
 					}
-					//td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.active_min_sleep.value}</span></td>);
-				 	//td_values.push(<td className ="overall_rank_value"><span>{value[key1].score.value}</span></td>);	
 				}
 				else if(key1 == "active_min_exclude_sleep"){
 					td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value[key1].score.value)}</span></td>);	
@@ -381,13 +340,8 @@ class MovementLeaderboard2 extends Component{
 			     else if(key1 == "active_min_exercise"){
 			     	if(value["active_min_total"].other_scores != null) {
 						td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value["active_min_total"].other_scores.active_min_exercise.value)}</span></td>);
-					}
-				// td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.active_min_exercise.value}</span></td>);
-				// td_values.push(<td className ="overall_rank_value"><span>{value[key1].score.value}</span></td>);	
+					}	
 			     }
-			 //    else if(key1 == "active_min_total"){
-				// 		td_values.push(<td className ="overall_rank_value"><span>{value[key1].other_scores.active_min_exercise.value}</span></td>);
-				// }
                 else if(key1 == "active_min_exclude_sleep_exercise"){
 					td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value[key1].score.value)}</span></td>);	
 				}
@@ -397,13 +351,67 @@ class MovementLeaderboard2 extends Component{
 
 			}
 
+			if( MCS_data && !_.isEmpty( MCS_data[currentUserId.toString()] ) ){
+				let object = MCS_data[currentUserId.toString()]
+				td_values.push(<td className ="overall_rank_value">
+				<table cellpadding="3" cellspacing="3" style={{width:"45px"}}>
+					<tr>
+						{this.mcsData(object["12:00 AM to 12:59 AM"])}
+						{this.mcsData(object["01:00 AM to 01:59 AM"])}
+						{this.mcsData(object["02:00 AM to 02:59 AM"])}
+						{this.mcsData(object["03:00 AM to 03:59 AM"])}
+						{this.mcsData(object["04:00 AM to 04:59 AM"])}
+						{this.mcsData(object["05:00 AM to 05:59 AM"])}
+						{this.mcsData(object["06:00 AM to 06:59 AM"])}
+						{this.mcsData(object["07:00 AM to 07:59 AM"])}
+						{this.mcsData(object["08:00 AM to 08:59 AM"])}
+						{this.mcsData(object["09:00 AM to 09:59 AM"])}
+						{this.mcsData(object["10:00 AM to 10:59 AM"])}
+						{this.mcsData(object["11:00 AM to 11:59 AM"])}	
+					</tr>
+
+					<tr>
+						{this.mcsData(object["12:00 PM to 12:59 PM"])}
+						{this.mcsData(object["01:00 PM to 01:59 PM"])}
+						{this.mcsData(object["02:00 PM to 02:59 PM"])}
+						{this.mcsData(object["03:00 PM to 03:59 PM"])}
+						{this.mcsData(object["04:00 PM to 04:59 PM"])}
+						{this.mcsData(object["05:00 PM to 05:59 PM"])}
+						{this.mcsData(object["06:00 PM to 06:59 PM"])}
+						{this.mcsData(object["07:00 PM to 07:59 PM"])}
+						{this.mcsData(object["08:00 PM to 08:59 PM"])}
+						{this.mcsData(object["09:00 PM to 09:59 PM"])}
+						{this.mcsData(object["10:00 PM to 10:59 PM"])}
+						{this.mcsData(object["11:00 PM to 11:59 PM"])}
+					</tr>
+				</table>
+					
+			</td>);
+		}
+		else if(selectedRange.rangeType !== 'today' && selectedRange.rangeType !== 'yesterday'){
+			let startDate = selectedRange.dateRange.split("to")[0].trim();
+			let endDate = selectedRange.dateRange.split("to")[1].trim();
+			let redirectMCHURL = `/rawdata?&rtype=mch&uid=${currentUserId}&start_date=${startDate}&end_date=${endDate}`
+			td_values.push(
+				<td className ="overall_rank_value">
+					<Link to={redirectMCHURL}>
+					Link
+					</Link>	
+				</td>
+			)
+
+		}
+		else{
+			td_values.push(<td className ="overall_rank_value"></td>);
+		}
 			++operationCount;
                 this.scrollCallback(operationCount);
 			td_rows.push(<tr id={(currentUser) ? 'my-row' : ''}>{td_values}</tr>);	
 		}
 		let table = <div className = "table table-responsive table-bordered">
-			          	    <table id="my-table" className = "table table-striped">
+			          	    <table id="my-table" className = "table table-striped" cellpadding="10" cellspacing="10">
 								<tr ref="table_header_hrr">
+									{/*<th>UID</th>*/}
 									<th>Rank</th>
 									<th>User</th>
 									<th>Non Exercise Steps <br/> (Rank)</th>
@@ -426,11 +434,19 @@ class MovementLeaderboard2 extends Component{
 						</div>
 		return table;
 	}
+
 	render(){
 		return(
 				<div className = "container-fluid">		   
 					<div className = "mov_dashboard_table" ref="mov_dashboard_table">
-						{this.renderTable(this.props.Movement_data,this.props.Movement_username)}	
+						{
+							this.renderTable(
+								this.props.Movement_data,
+								this.props.Movement_username,
+								this.props.mcs_data,
+								this.props.selectedRange
+							)
+						}	
 					</div>	
 				</div>
 			);
