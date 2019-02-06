@@ -5,6 +5,8 @@ import { Form, Label, Button, Input, FormText, FormGroup,
 		 Row, Col, Container} from 'reactstrap';
 import FontAwesome from "react-fontawesome";
 
+import {AsyncValidateUsernameEmail} from '../../network/register';
+
 import {renderFieldFormGroup} from './fieldRenderer';
 import { account_validate } from './validation';
 
@@ -108,7 +110,9 @@ export default reduxForm({
 	form: 'register',
 	destroyOnUnmount: false,
 	forceUnregisterOnUnmount: true,
-	validate: account_validate
+	validate: account_validate,
+	asyncValidate:AsyncValidateUsernameEmail,
+	asyncBlurFields: ['username','email']
 })(
 	connect(null,{})(WizardAccountPage)
 );
