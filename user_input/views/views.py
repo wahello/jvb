@@ -22,6 +22,7 @@ from quicklook.calculations.garmin_calculation import get_garmin_model_data,\
     activity_step_from_epoch,\
     get_activity_exercise_non_exercise_category
 from quicklook.calculations.fitbit_calculation import get_fitbit_model_data
+from quicklook.calculations.converter.fitbit_to_garmin_converter import steps_minutly_to_quartly,fitbit_to_garmin_epoch
 
 # https://stackoverflow.com/questions/30871033/django-rest-framework-remove-csrf
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -263,6 +264,7 @@ class GetManualActivityInfo(APIView):
             act_date_epoch,act_date_epoch+86400,
             order_by ='-id',filter_dup = True
         )
+        
         if epoch_data:
             act_start_dt = datetime.utcfromtimestamp(act_start_epoch+utc_offset)
             act_end_dt = datetime.utcfromtimestamp(act_end_epoch+utc_offset)
@@ -270,12 +272,38 @@ class GetManualActivityInfo(APIView):
             steps = activity_step_from_epoch(act_start_dt,act_end_dt,epoch_data)
         return steps
 
+    def __cal_fitbit_steps(self,act_date,act_start_epoch,act_end_epoch,utc_offset=0):
+        steps = None
+        act_dt = datetime.strptime(act_date,"%Y-%m-%d")
+        act_start_dt = datetime.utcfromtimestamp(act_start_epoch+utc_offset)
+        act_end_dt = datetime.utcfromtimestamp(act_end_epoch+utc_offset)
+        steps_data = get_fitbit_model_data(
+            UserFitbitDataSteps,self.request.user,act_dt.date(),act_dt.date()
+        )
+        
+        if steps_data:
+            todays_epoch_data = []
+            steps_data = ast.literal_eval(steps_data[0].replace(
+                    "'steps_fitbit': {...}","'steps_fitbit': {}"))
+            intraday_activity_steps = steps_data.get('activities-steps-intraday',None)
+            if (intraday_activity_steps):
+                interval_duration = 15*60
+                quarterly_dataset = steps_minutly_to_quartly(
+                    act_dt.date(),
+                    intraday_activity_steps.get('dataset',[]))
+                for step in quarterly_dataset:
+                    todays_epoch_data.append(fitbit_to_garmin_epoch(
+                        step,act_dt.date(),interval_duration))
+                steps = activity_step_from_epoch(act_start_dt,act_end_dt,todays_epoch_data)  
+        return steps
+
     def get_steps(self,act_date,act_start_epoch,act_end_epoch,utc_offset=0):
         if which_device(self.request.user) == 'garmin':
             return self.__cal_garmin_steps(
                 act_date,act_start_epoch,act_end_epoch,utc_offset)
-        elif which_device == 'fitbit':
-            pass
+        elif which_device(self.request.user) == 'fitbit':
+            return self.__cal_fitbit_steps(
+                act_date,act_start_epoch,act_end_epoch,utc_offset)
 
         return None
 
@@ -292,6 +320,7 @@ class GetManualActivityInfo(APIView):
         if(utc_offset):
             utc_offset = int(utc_offset)
         return (act_date,act_start_epoch,act_end_epoch,act_type,utc_offset)
+        
 
     def get(self, request, format="json"):
         user = request.user
@@ -312,3 +341,5 @@ class GetManualActivityInfo(APIView):
         else:
             response = {}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
+

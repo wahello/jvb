@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-{"status":"error","publicPath":"http://localhost:3000/assets/bundles/","chunks":{"main":[{"name":"main.js","publicPath":"http://localhost:3000/assets/bundles/main.js","path":"/home/normsoftware/healthtracker/assets/bundles/main.js"}]},"error":"ModuleBuildError","message":"Module build failed: Error: ENOENT: no such file or directory, open '/home/normsoftware/healthtracker/assets/js/components/movement-leaderboard/movement_leaderboard.jsx'\n    at Error (native)"}
-=======
-{"status":"done","publicPath":"http://localhost:3000/assets/bundles/","chunks":{"main":[{"name":"main.js","publicPath":"http://localhost:3000/assets/bundles/main.js","path":"/home/normsoftware/WORK/JVB/healthtracker/assets/bundles/main.js"},{"name":"0.3a659a56b00e4e901058.hot-update.js","publicPath":"http://localhost:3000/assets/bundles/0.3a659a56b00e4e901058.hot-update.js","path":"/home/normsoftware/WORK/JVB/healthtracker/assets/bundles/0.3a659a56b00e4e901058.hot-update.js"}]}}
->>>>>>> 32cbe7dad79d649cab4504e50a844de41551ab53
+{"status":"done","publicPath":"http://localhost:3000/assets/bundles/","chunks":{"main":[{"name":"main.js","publicPath":"http://localhost:3000/assets/bundles/main.js","path":"/home/normsoftware/healthtracker/assets/bundles/main.js"}]}}
