@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 
@@ -39,10 +41,19 @@ class UserProfileSerializer(serializers.ModelSerializer):
 	   		raise serializers.ValidationError("Email already exist")
 	   return email
 
+	def get_user_age(self,obj):
+		today = date.today()
+		dob = obj.date_of_birth
+		if dob:
+			return (today.year - dob.year
+				- ((today.month, today.day) < (dob.month, dob.day)))
+		else:
+			return obj.user_age
+
 	class Meta:
 		model = Profile
 		fields = ('id','username','email','password','first_name','last_name',
-				  'gender','height','weight','date_of_birth',
+				  'gender','height','weight','date_of_birth','user_age',
 				  'created_at','updated_at','terms_conditions')
 		
 	def create(self,validated_data):
@@ -65,6 +76,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		instance.height = validated_data.get('height', instance.height)
 		instance.weight = validated_data.get('weight', instance.weight)
 		instance.date_of_birth = validated_data.get('date_of_birth',instance.date_of_birth)
+		instance.user_age = validated_data.get('user_age', instance.user_age)
 		instance.save()
 		return instance
 		
@@ -73,3 +85,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		user = User.objects.create_user(**user_data)
 		termsconditions = TermsConditions.objects.create(user=user,**validated_data)
 		return termsconditions
+
+	def to_representation(self,instance):
+		serialized_data = super().to_representation(instance)
+		serialized_data['user_age'] = self.get_user_age(instance)
+		return serialized_data

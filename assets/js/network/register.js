@@ -9,8 +9,15 @@ class RegisterNetwork {
 
 	register(post_data, callback=undefined, err_callback=undefined){
 		post_data['terms_conditions'] = true;
-		let new_date_of_birth = post_data['dob_year']+"-"+post_data['dob_month']+"-"+post_data['dob_day'];
-		post_data['date_of_birth']=new_date_of_birth;
+		if( (post_data['dob_day'] && post_data['dob_day'] !== "Day")
+			&& (post_data['dob_month'] && post_data['dob_month'] !== "Month")
+			&& (post_data['dob_year'] && post_data['dob_year'] !== "Year") ){
+			let new_date_of_birth = post_data['dob_year']+"-"+post_data['dob_month']+"-"+post_data['dob_day'];
+			post_data['date_of_birth']=new_date_of_birth;
+		}else{
+			post_data['date_of_birth']=null;
+		}
+		post_data['user_age'] = parseInt(post_data['user_age']);
 		delete post_data['dob_day'];
 		delete post_data['dob_month'];
 		delete post_data['dob_year'];
