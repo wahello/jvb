@@ -124,3 +124,47 @@ class AA(models.Model):
 			models.Index(fields=['created_at']),
 		]
 
+class TwentyfourHourAA(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	created_at = models.DateField()
+	updated_at = models.DateTimeField(auto_now=True)
+	
+	total_time = models.FloatField(blank=True,null=True)
+	aerobic_zone = models.FloatField(blank=True,null=True)
+	anaerobic_zone = models.FloatField(blank=True,null=True)
+	below_aerobic_zone = models.FloatField(blank=True,null=True)
+	aerobic_range = models.CharField(max_length=20,blank=True,null=True)
+	anaerobic_range = models.CharField(max_length=20,blank=True,null=True)
+	below_aerobic_range = models.CharField(max_length=20,blank=True,null=True)
+	hrr_not_recorded = models.FloatField(blank=True,null=True)
+	percent_hrr_not_recorded = models.FloatField(blank=True,null=True)
+	percent_aerobic = models.FloatField(blank=True,null=True)
+	percent_below_aerobic = models.FloatField(blank=True,null=True)
+	percent_anaerobic = models.FloatField(blank=True,null=True)
+	total_percent = models.FloatField(blank=True,null=True)
+
+	def __str__(self):
+		return str((self.user))
+
+	class Meta:
+		unique_together = ("user", "created_at")
+		indexes = [
+			models.Index(fields=['user', '-created_at']),
+			models.Index(fields=['created_at']),
+		]
+
+class TwentyfourHourTimeHeartZones(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	created_at = models.DateField()
+	updated_at = models.DateTimeField(auto_now=True)
+	data = models.TextField(blank=True,null=True)
+
+	def __str__(self):
+		return str((self.user))
+
+	class Meta:
+		unique_together = ("user", "created_at")
+		indexes = [
+			models.Index(fields=['user', '-created_at']),
+			models.Index(fields=['created_at']),
+		]

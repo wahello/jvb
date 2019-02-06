@@ -2,7 +2,8 @@
 *.pyc
 */*.pyc
 node_modules
-webpack_stats.json
+webpack-stats.json
 jquery-webpack-stats.json
 db.sqlite3
 package-lock.json
+assets/sass/vendor/spritesmith.scss

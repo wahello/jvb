@@ -1,4 +1,6 @@
 from django.conf.urls import url
+from django.views.decorators.csrf import csrf_exempt
+
 from . import views
 
 urlpatterns = [
@@ -33,4 +35,8 @@ urlpatterns = [
 								  name="daily_aa"),
 	url(r'^aa_low_high_calculations$',views.UserAA_low_high_values.as_view(),
 									name="aa_classification chart"),
+	url(r'^aa_twentyfour_hour_calculations$',views.UserAA_twentyfour_hour.as_view(),
+								  name="aa_whole_day_database"),
+	url(r'^aa_twentyfour_hour_low_high_calculations$',views.UserAA_twentyfour_hour_low_high_values.as_view(),
+								  name="aa_whole_day_database"),
 ]

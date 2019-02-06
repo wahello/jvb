@@ -43,7 +43,7 @@ class Logout(APIView):
 		logout(request)
 		return Response(status=status.HTTP_200_OK)
 
-@method_decorator(invitation_required, name="dispatch")
+# @method_decorator(invitation_required, name="dispatch")
 class UserCreate(APIView):
 	def post(self, request, format="json"):
 		serializer = UserProfileSerializer(data=request.data)
@@ -105,10 +105,13 @@ class IsUserInvited(APIView):
 		email = request.query_params.get('email')
 		case_insensitive_email_field = "{}__iexact".format('email')
 		res = {"email":email}
-		try:
-			Invitation.objects.get(**{case_insensitive_email_field:email})
-			res['is_invited'] = True
-		except Invitation.DoesNotExist as e:
-			res['is_invited'] = False
+
+		# disabling invite check for time being
+		# try:
+		# 	Invitation.objects.get(**{case_insensitive_email_field:email})
+		# 	res['is_invited'] = True
+		# except Invitation.DoesNotExist as e:
+		# 	res['is_invited'] = False
+		res['is_invited'] = True
 
 		return Response(res,status=status.HTTP_200_OK)
