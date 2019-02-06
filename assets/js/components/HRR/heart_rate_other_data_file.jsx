@@ -299,7 +299,7 @@ class Other_Hrr_Data extends Component{
 				"heart_rate_down_up":this.state.heart_rate_down_up,
 				"pure_1min_heart_beats":this.state.pure_1min_heart_beats,
 				"pure_time_99":pure_time_99,
-                "use_updated_hrr":!this.state.use_updated_hrr
+                "use_updated_hrr":true
 
 			},() => {
 

@@ -240,7 +240,7 @@ class Heartrate_Data extends Component{
   			let time = mins + sec;
   			this.setState({
 				  fetching_hrr:true,
-			      "use_updated_hrr":!this.state.use_updated_hrr
+			      "use_updated_hrr":true
 				  
   			}, () => {
 		         this.props.updateText(this.state.use_updated_hrr);

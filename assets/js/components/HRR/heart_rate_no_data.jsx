@@ -465,7 +465,7 @@ class No_Hrr_Data extends Component{
 			"end_heartrate_activity":this.state.end_heartrate_activity,
 			"lowest_hrr_no_fitfile":this.state.lowest_hrr_no_fitfile,
 			"no_file_beats_recovered":this.state.no_file_beats_recovered,			
-			"use_updated_hrr":!this.state.use_updated_hrr
+			"use_updated_hrr":true
 		},() => {
   			this.props.updateText(this.state.use_updated_hrr);
 			let data = {

@@ -450,15 +450,18 @@ class HeartRateCal extends Component{
 			let data = {
 				include_hrr:this.state.include_hrr
 			}
-			updateHeartData(data, this.props.selectedDate, () => {},() => {});
+			updateHeartData(data, this.state.selectedDate, () => {} ,() => {} );
+			console.log(data,"data");
 		})
 	}
 
 	updateText(updating_hrr){
 		this.setState({
-			use_updated_hrr:updating_hrr
-		})
-
+			use_updated_hrr:updating_hrr,
+		});
+		if(this.state.use_updated_hrr == 'Yes'){
+			
+		}
 	}
 
 
