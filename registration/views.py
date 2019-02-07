@@ -115,3 +115,46 @@ class IsUserInvited(APIView):
 		res['is_invited'] = True
 
 		return Response(res,status=status.HTTP_200_OK)
+
+class ValidateEmailUsernameAvailability(APIView):
+
+	def get(self, request, format="json"):
+		username = request.query_params.get('username',None)
+		email = request.query_params.get('email',None)
+		response = {
+			"status":"success",
+			"data":{}
+		}
+
+		if username:
+			user = User.objects.filter(username__iexact = username)
+			if user:
+				username_status = {
+					"message": "username already taken",
+					"availability": False
+				}
+			else:
+				username_status = {
+					"message": "username is available",
+					"availability": True
+				}
+
+			response["data"]["username"] = username_status
+
+		if email:
+			user = User.objects.filter(email__iexact = email)
+			if user:
+				email_status = {
+					"message": "email already exist",
+					"availability": False
+				}
+			else:
+				email_status = {
+					"message": "email is available",
+					"availability": True
+				}
+
+			response["data"]["email"] = email_status
+
+
+		return Response(response,status = status.HTTP_200_OK)

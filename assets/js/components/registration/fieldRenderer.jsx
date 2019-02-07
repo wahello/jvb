@@ -3,22 +3,25 @@ import { Form, Label, Button, Input, FormText, FormGroup,
 		 Row, Col, Container} from 'reactstrap';
 
 export function renderFieldFormGroup(field){
-	const { meta: {touched, error} } = field;
+	const { meta: {touched, error,asyncValidating} } = field;
 	const className = `${ touched && error ? 'has-danger' : '' }`;
 	const label = field.label != "" ? <Label>{field.label}</Label> : ""
 	return(
 		<FormGroup className={className}>
 			{label}
-			<Input 
-				type={field.type} 
-				name={field.input.name} 
-				placeholder={field.placeholder} 
-				value={field.value}
-				required
-				{...field.input}
-			/>
-			<div style={{color:"red"}}className="form-control-feedback">
-				{touched ? error : ''}
+			<div className={asyncValidating ? 'async-validating' : ''}>
+				<Input 
+					type={field.type} 
+					name={field.input.name} 
+					placeholder={field.placeholder} 
+					value={field.value}
+					required
+					{...field.input}
+				/>
+				{console.log(error)}
+				<div style={{color:"red"}}className="form-control-feedback">
+				{touched && error ? error : ''}
+				</div>
 			</div>
 		</FormGroup>
 	);
