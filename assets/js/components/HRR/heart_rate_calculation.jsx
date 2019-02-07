@@ -464,7 +464,7 @@ class HeartRateCal extends Component{
 									name="hrr" 
 									checked={this.state.include_hrr}
 									onChange={this.IncludeExcludeHRRToggler}>
-								</input>
+								</input>&nbsp;
 								Include HRR
 							</label>
 							<label className="ex_button"  style = {{marginLeft:"175px"}}>
@@ -472,7 +472,7 @@ class HeartRateCal extends Component{
 									name="hrr"
 									checked={!this.state.include_hrr}
 									onChange={this.IncludeExcludeHRRToggler}>
-								</input>
+								</input>&nbsp;
 								Exclude HRR
 							</label>
 						</span>
