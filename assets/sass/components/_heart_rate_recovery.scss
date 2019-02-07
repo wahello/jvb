@@ -24,3 +24,24 @@
 	right: 40px;
 	padding-top: 3px;
 }
+@media screen and (max-width: 580px ) and (min-width:320px) and (orientation : portrait){
+ .updated_hrr{
+	 font-size: 12px;
+	 margin-left: 25px !important; 
+	margin-top: 12px;
+ }	
+ .yes_no{
+	 font-size: 12px;
+ }
+ .in_button{
+	 font-size: 12px;
+	 margin-left: -129px !important;
+	 margin-top: 12px;	
+ }
+ .ex_button{
+	font-size: 12px;
+	margin-left: 6px !important;	
+   margin-top: 12px;
+}
+
+ }
