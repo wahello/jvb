@@ -15,8 +15,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import {renderHrrSelectedDateFetchOverlay} from '../dashboard_healpers';
 import HeartRateCal from './heart_rate_calculation';
-
-
 class Heartrate_Data extends Component{
 	constructor(props){
 		    super(props);
@@ -62,7 +60,6 @@ class Heartrate_Data extends Component{
 		    this.successHeart = this.successHeart.bind(this);
 			this.errorHeart = this.errorHeart.bind(this);
 			this.renderHrrSelectedDateFetchOverlay = renderHrrSelectedDateFetchOverlay.bind(this);
-
 		}
 		componentWillReceiveProps(nextProps) {
 			this.setState({ editable: nextProps.hrr.editable });  
@@ -212,7 +209,6 @@ class Heartrate_Data extends Component{
 					heart_rate_down_up:data.data.heart_rate_down_up,
 					pure_1min_heart_beats:data.data.pure_1min_heart_beats,
 					pure_time_99:data.data.pure_time_99,
-					
 					in_hrr:data.data.in_hrr,
 				    update_hrr:data.data.update_hrr,
 
@@ -240,11 +236,9 @@ class Heartrate_Data extends Component{
   			let time = mins + sec;
   			this.setState({
 				  fetching_hrr:true,
-			      "use_updated_hrr":true
-				  
+			      "use_updated_hrr":true  
   			}, () => {
 		         this.props.updateText(this.state.use_updated_hrr);
-				
   				let data = {
 	  				Did_you_measure_HRR:this.state.Did_you_measure_HRR,
 			    	Did_heartrate_reach_99:this.state.Did_heartrate_reach_99,
@@ -255,12 +249,8 @@ class Heartrate_Data extends Component{
 					use_updated_hrr:this.state.use_updated_hrr,
 					"include_hrr":this.props.shouldIncludeHRR		
 			    };
-		        console.log(data,"data");
-	  			updateHeartData(data, this.props.selectedDate, this.successHeart, this.errorHeart);
-	  			
+	  			updateHeartData(data, this.props.selectedDate, this.successHeart, this.errorHeart);	
   			})
-	  			
-  			//this.props.renderHrrData(data);
   		}
 	render(){
 		return(<div>

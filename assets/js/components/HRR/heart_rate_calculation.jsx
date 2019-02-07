@@ -15,20 +15,16 @@ import NavbarMenu from '../navbar';
 import { getGarminToken,logoutUser} from '../../network/auth';
 import fetchHeartData from '../../network/heart_cal';
 import {updateHeartData} from '../../network/heart_cal';
-//import {fetchHeartRefreshData} from '../../network/heart_cal';
 import {renderHrrSelectedDateFetchOverlay} from '../dashboard_healpers';
 import Heartrate_Data from './heartrate_data_file';
 import Other_Hrr_Data from './heart_rate_other_data_file';
 import No_Hrr_Data from './heart_rate_no_data.jsx'; 
 
-
 axiosRetry(axios, { retries: 3});
 var CalendarWidget = require('react-calendar-widget');
 var ReactDOM = require('react-dom');
 
-
 class HeartRateCal extends Component{
-	
 	constructor(props) {
 		    super(props);
 		    this.state = {
@@ -37,8 +33,6 @@ class HeartRateCal extends Component{
 			    fetching_hrr:false,
 				editable : false,
 				selectedDate:new Date(),
-	
-    		
 
 	   			"Did_you_measure_HRR":"",
 				"Did_heartrate_reach_99":"",
@@ -83,28 +77,18 @@ class HeartRateCal extends Component{
 			this.renderNoworkout = this.renderNoworkout.bind(this);
 			this.captilizeYes = this.captilizeYes.bind(this);
 			this.hrr_data_measured = this.hrr_data_measured.bind(this);
-
             this.IncludeExcludeHRRToggler = this.IncludeExcludeHRRToggler.bind(this);
 			this.updateText = this.updateText.bind(this);
-			//this.nohrrdata = React.createRef();
-			/*changes made here */
-			//this.hrrRefreshData = this.hrrRefreshData.bind(this);
-			//this.handleChange=this.handleChange.bind(this);
-			//this.renderText = this.renderText.bind(this);
   	}
   	
 	successHeart(data){
 		{this.renderHrrSelectedDateFetchOverlay()}
-		console.log("Before updatding state:",this.state)
-
 		let shouldIncludeHRR = this.state.include_hrr;
 		if(data.data.include_hrr !== undefined && data.data.include_hrr !== null)
 			shouldIncludeHRR = data.data.include_hrr
-
 		let isHRRUpdated = this.state.use_updated_hrr;
 		if(data.data.use_updated_hrr !== undefined && data.data.use_updated_hrr !== null)
 			isHRRUpdated = data.data.use_updated_hrr
-
 	  	this.setState({
 	  	    		fetching_hrr:false,
 	  	    		editable:false,
@@ -135,7 +119,6 @@ class HeartRateCal extends Component{
 					offset:data.data.offset,
 					created_at:data.data.created_at
 	  	},()=>{
-	  		console.log("After gtting data:", this.state)
 	  	});
 	}
 
@@ -152,8 +135,6 @@ class HeartRateCal extends Component{
 		this.setState({
 			selectedDate:tomorrow.toDate(),
 			fetching_hrr:true,
-			
-		
 			"Did_you_measure_HRR":"",
 			"Did_heartrate_reach_99":"",
 			"time_99":"",
@@ -168,8 +149,7 @@ class HeartRateCal extends Component{
 			"heart_rate_down_up":"",
 			"pure_1min_heart_beats":"",
 			"pure_time_99":"",
-			
-
+		
 			"no_fitfile_hrr_reach_99":"",
 			"no_fitfile_hrr_time_reach_99":"",
 			"time_heart_rate_reached_99":"",
@@ -177,7 +157,6 @@ class HeartRateCal extends Component{
 			"no_file_beats_recovered":"",
 
 			"offset":"",
-			
 			"include_hrr":true,
 			"use_updated_hrr":false	
 
@@ -192,8 +171,6 @@ class HeartRateCal extends Component{
 		this.setState({
 			selectedDate:yesterday.toDate(),
 			fetching_hrr:true,
-		    
-		
 			"Did_you_measure_HRR":"",
 			"Did_heartrate_reach_99":"",
 			"time_99":"",
@@ -208,7 +185,6 @@ class HeartRateCal extends Component{
 			"heart_rate_down_up":"",
 			"pure_1min_heart_beats":"",
 			"pure_time_99":"",
-			
 
 			"no_fitfile_hrr_reach_99":"",
 			"no_fitfile_hrr_time_reach_99":"",
@@ -217,10 +193,8 @@ class HeartRateCal extends Component{
 			"no_file_beats_recovered":"",
 
 			"offset":"",
-			
 			"include_hrr":true,
 			"use_updated_hrr":false
-
 		},()=>{
 			fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
 		});
@@ -230,8 +204,6 @@ class HeartRateCal extends Component{
 			selectedDate:selectedDate,
 			calendarOpen:!this.state.calendarOpen,
 			fetching_hrr:true,
-		
-			
 			"Did_you_measure_HRR":"",
 			"Did_heartrate_reach_99":"",
 			"time_99":"",
@@ -246,7 +218,6 @@ class HeartRateCal extends Component{
 			"heart_rate_down_up":"",
 			"pure_1min_heart_beats":"",
 			"pure_time_99":"",
-			
 
 			"no_fitfile_hrr_reach_99":"",
 			"no_fitfile_hrr_time_reach_99":"",
@@ -255,11 +226,8 @@ class HeartRateCal extends Component{
 			"no_file_beats_recovered":"",
 
 			"offset":"",
-			
-			
 			"include_hrr":true,
 			"use_updated_hrr":false
-
 		},()=>{
 			fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
 		});
@@ -269,7 +237,6 @@ class HeartRateCal extends Component{
 			let shouldIncludeHRR = this.state.include_hrr
 			if(data.data.include_hrr !== undefined && data.data.include_hrr !== null)
 				shouldIncludeHRR = data.data.include_hrr
-
 			let isHRRUpdated = this.state.use_updated_hrr
 			if(data.data.use_updated_hrr !== undefined && data.data.use_updated_hrr !== null)
 				isHRRUpdated = data.data.use_updated_hrr
@@ -280,10 +247,8 @@ class HeartRateCal extends Component{
 				"HRR_start_beat":data.HRR_start_beat,
 				"lowest_hrr_1min":data.lowest_hrr_1min,
 				"No_beats_recovered":data.No_beats_recovered,
-	
 				include_hrr:shouldIncludeHRR,
 		        use_updated_hrr:isHRRUpdated
-	
 			});
 		}
 		else{
@@ -303,7 +268,6 @@ class HeartRateCal extends Component{
 				"pure_time_99":"",
 				"include_hrr":true,
 				"use_updated_hrr":false
-
 			});
 		}
 	}
@@ -311,11 +275,9 @@ class HeartRateCal extends Component{
 		let shouldIncludeHRR = this.state.include_hrr
 		if(data.data.include_hrr !== undefined && data.data.include_hrr !== null)
 			shouldIncludeHRR = data.data.include_hrr
-
 		let isHRRUpdated = this.state.use_updated_hrr
 		if(data.data.use_updated_hrr !== undefined && data.data.use_updated_hrr !== null)
 			isHRRUpdated = data.data.use_updated_hrr
-
 		this.setState({
 				"end_time_activity":data.end_time_activity,
 				"diff_actity_hrr":data.diff_actity_hrr,
@@ -332,11 +294,9 @@ class HeartRateCal extends Component{
 		let shouldIncludeHRR = this.state.include_hrr
 		if(data.data.include_hrr !== undefined && data.data.include_hrr !== null)
 			shouldIncludeHRR = data.data.include_hrr
-
 		let isHRRUpdated = this.state.use_updated_hrr
 		if(data.data.use_updated_hrr !== undefined && data.data.use_updated_hrr !== null)
 			isHRRUpdated = data.data.use_updated_hrr
-
 		this.setState({
 			"end_time_activity":data.end_time_activity,
 			"Did_you_measure_HRR":data.Did_you_measure_HRR,
@@ -351,17 +311,10 @@ class HeartRateCal extends Component{
 		});
 	}
 
-	/*hrrRefreshData(){
-		this.setState({
-			fetching_hrr:true,
-		});
-		fetchHeartRefreshData(this.successHeart,this.errorHeart,this.state.selectedDate);
-	}*/
 	componentDidMount(){
 		this.setState({
 			fetching_hrr:true,
 		});
-
 		fetchHeartData(this.successHeart,this.errorHeart,this.state.selectedDate);
 	}
 
@@ -424,17 +377,14 @@ class HeartRateCal extends Component{
 	  	}
   		return time;
   	}
-  	// toggleCalendar(){
-	    // this.setState({
-	    	// calendarOpen:!this.state.calendarOpen
-	    // });
-    // }
+  	
     toggleEditForm(){
        this.setState({
 		 editable:!this.state.editable,
 		 include_hrr:!this.state.include_hrr
        });
-    }
+	}
+	
     hrr_data_measured(newVal) {
     	this.setState({
     		Did_you_measure_HRR:newVal
@@ -451,7 +401,6 @@ class HeartRateCal extends Component{
 				include_hrr:this.state.include_hrr
 			}
 			updateHeartData(data, this.state.selectedDate, () => {} ,() => {} );
-			console.log(data,"data");
 		})
 	}
 
@@ -459,15 +408,9 @@ class HeartRateCal extends Component{
 		this.setState({
 			use_updated_hrr:updating_hrr,
 		});
-		if(this.state.use_updated_hrr == 'Yes'){
-			
-		}
 	}
-
-
     
   render(){
-	//const children = React.Children.map(this.props.children,(child, index) => React.cloneElement(child, {ref : child${index}}));
 	const children = React.Children.map(this.props.children,
 		(child, index) => React.cloneElement(child, {
 		ref : 'child${index}'
@@ -508,19 +451,15 @@ class HeartRateCal extends Component{
                               size="sm"
                               onClick={this.toggleEditForm}
                               className="btn hidden-sm-up">
-
-							  {this.state.editable ? 'View HRR Data' : 'Edit HRR Data'}
-							  
-							
-                        </Button>`
+							  {this.state.editable ? 'View HRR Data' : 'Edit HRR Data'}		  
+                        </Button>
 						</span>
                         <span>
-						<label style={{marginLeft:"150px"}}><strong>Use Updated HRR? &nbsp;</strong></label>
-			                      <span>{this.state.use_updated_hrr? 'Yes': 'No'}</span>
+						<label><strong className="updated_hrr" style = {{marginLeft:"75px"}}>Use Updated HRR?&nbsp;</strong></label>
+			                      <span className="yes_no">{this.state.use_updated_hrr? 'Yes': 'No'}</span>
 				        </span>
-			
-                    	<span>
-							<label style={{marginLeft:"150px"}}>
+                    	<span className="in_button">
+							<label  style = {{marginLeft:"145px"}}>
 								<input type="radio" 
 									name="hrr" 
 									checked={this.state.include_hrr}
@@ -528,7 +467,7 @@ class HeartRateCal extends Component{
 								</input>
 								Include HRR
 							</label>
-							<label style={{marginLeft:"150px"}}>
+							<label className="ex_button"  style = {{marginLeft:"175px"}}>
 								<input type="radio" 
 									name="hrr"
 									checked={!this.state.include_hrr}
@@ -537,12 +476,6 @@ class HeartRateCal extends Component{
 								Exclude HRR
 							</label>
 						</span>
-				
-                
-	
-                	{/*<span className = "button_padding">
-                    	<Button id="nav-btn" className="btn" onClick = {this.hrrRefreshData}>Refresh Hrr Data</Button>			      
-                	</span>*/}
 	            	<Popover
 			            placement="bottom"
 			            isOpen={this.state.calendarOpen}
@@ -564,7 +497,6 @@ class HeartRateCal extends Component{
 						"lowest_hrr_1min":this.state.lowest_hrr_1min,
 						"No_beats_recovered":this.state.No_beats_recovered,
 						"use_updated_hrr":this.state.use_updated_hrr
-
 						}}
 						selectedDate = {this.state.selectedDate}
 						updateText={this.updateText}
@@ -587,8 +519,7 @@ class HeartRateCal extends Component{
 					"pure_time_99":this.state.pure_time_99,
 					"use_updated_hrr":this.state.use_updated_hrr
 				}}
-					selectedDate = {this.state.selectedDate}
-                
+					selectedDate = {this.state.selectedDate} 
 					updateText={this.updateText}
 					HRR_measured = {this.hrr_data_measured}
 					renderHrrData = {this.renderHrrData1.bind(this)}
@@ -611,18 +542,15 @@ class HeartRateCal extends Component{
 					"created_at":this.state.created_at,
 					"no_file_beats_recovered":this.state.no_file_beats_recovered,
 					"use_updated_hrr":this.state.use_updated_hrr
-
 				    }}
 					selectedDate = {this.state.selectedDate}
 					updateText={this.updateText}
           			HRR_measured = {this.hrr_data_measured}
           			renderHrrData = {this.renderHrrNoData.bind(this)}
-					  shouldIncludeHRR = {this.state.include_hrr}
-					  ExcludeHrr={this.state.exclude_hrr}
-				
+					shouldIncludeHRR = {this.state.include_hrr}
+					ExcludeHrr={this.state.exclude_hrr}
           			/>   
           	}
-          	
           	{this.renderHrrSelectedDateFetchOverlay()}
   		</div>
   		);

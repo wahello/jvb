@@ -16,7 +16,6 @@ import {updateHeartData} from '../../network/heart_cal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import {renderHrrSelectedDateFetchOverlay} from '../dashboard_healpers';
-
 class Other_Hrr_Data extends Component{
 	constructor(props){
 		 super(props);
@@ -64,8 +63,7 @@ class Other_Hrr_Data extends Component{
 			diff_actity_hrr:"",
 			pure_time_99:"",
 			end_time_activity:"",
-			HRR_activity_start_time:"",
-            
+			HRR_activity_start_time:"",   
 		}
 		this.renderTime = this.renderTime.bind(this);
 		this.renderSecToMin = this.renderSecToMin.bind(this);
@@ -86,8 +84,7 @@ class Other_Hrr_Data extends Component{
 		this.getDTMomentObj = this.getDTMomentObj.bind(this);
 		this.successHeart = this.successHeart.bind(this);
 		this.errorHeart = this.errorHeart.bind(this);
-		this.renderHrrSelectedDateFetchOverlay = renderHrrSelectedDateFetchOverlay.bind(this);
-		
+		this.renderHrrSelectedDateFetchOverlay = renderHrrSelectedDateFetchOverlay.bind(this);	
 	}
 	componentWillReceiveProps(nextProps) {
 		this.setState({ editable: nextProps.hrr.editable });  
@@ -300,11 +297,8 @@ class Other_Hrr_Data extends Component{
 				"pure_1min_heart_beats":this.state.pure_1min_heart_beats,
 				"pure_time_99":pure_time_99,
                 "use_updated_hrr":true
-
 			},() => {
-
                 this.props.updateText(this.state.use_updated_hrr);
-				
 				let data = {
 	  				"end_time_activity":endTimeActivity.utc().valueOf(),
 					"diff_actity_hrr":diff_time,
@@ -316,13 +310,8 @@ class Other_Hrr_Data extends Component{
 			        "use_updated_hrr":this.state.use_updated_hrr,
 			        "include_hrr":this.props.shouldIncludeHRR
 				}
-                 console.log(data,"data");
-	  			updateHeartData(data, this.props.selectedDate, this.successHeart, this.errorHeart);
-	  				  				  			
-	  			
-			});
-
-	  			
+	  			updateHeartData(data, this.props.selectedDate, this.successHeart, this.errorHeart);		
+			});		
   		}
 	render(){
 		return(
