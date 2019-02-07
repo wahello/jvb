@@ -79,7 +79,7 @@
   width: 16%;
 }
 
-.table td {
+.mch_table td {
   padding: 0px !important;
 }
 
@@ -156,12 +156,6 @@
  overflow-x: auto;
 }
 
-.table td {
-  padding: 0rem;
-  width: fixed ;
-  padding: 0px !important;
-}
-
 .table_one {
 
   border-collapse: separate;
@@ -180,6 +174,10 @@
   min-width: 44px !important;
 } 
 
+.mch_table td {
+  padding: 0px !important;
+  width: fixed ;
+}
 
 }
 
