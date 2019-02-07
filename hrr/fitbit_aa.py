@@ -478,7 +478,7 @@ def fitbit_aa_twentyfour_hour_chart_one(user_get,start_date,hr_time_diff, user_i
 	else:
 		return {}
 
-def calculate_AA2_workout(user,start_date):
+def calculate_AA2_workout(user,start_date,user_input_activities=None):
 	fibit_activities_qs = UserFitbitDataActivities.objects.filter(
 		user=user,created_at=start_date)
 	trans_activity_data = []
