@@ -1612,17 +1612,7 @@ def aa_workout_calculations(request):
 			create_workout_instance(request.user, data, start_date)
 	return JsonResponse(data)
 
-def store_aa_workout_calculations(user,from_date,to_date):
-	'''
-	This function takes user start date and end date, calculate the Daily A/A
-	workout calculations then stores in Data base
-
-	Args:user(user object)
-		:from_date(start date)
-		:to_date(end date)
-
-	Return:None
-	'''
+def store_garmin_aa_workout(user,from_date,to_date):
 	print("A/A Workout started")
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
@@ -1643,6 +1633,38 @@ def store_aa_workout_calculations(user,from_date,to_date):
 				create_workout_instance(user, data, current_date)
 		current_date -= timedelta(days=1)
 	print("A/A workout finished")
+	return None
+
+
+def store_fitbit_aa_workout(user,from_date,to_date):
+	actvities_list,activities_dict,userinput_form = get_usernput_activities(user,from_date)
+	data = fitbit_aa.calculate_AA2_workout(user,from_date,user_input_activities=activities_dict)
+	if data:
+			try:
+				user_aa_workout = AaWorkoutCalculations.objects.get(
+					user_aa_workout=user, created_at=from_date)
+				update_workout_instance(user,from_date,data)
+			except  AaWorkoutCalculations.DoesNotExist:
+				create_workout_instance(user, data, from_date)
+
+def store_aa_workout_calculations(user,from_date,to_date):
+	'''
+	This function takes user start date and end date, calculate the Daily A/A
+	workout calculations then stores in Data base
+
+	Args:user(user object)
+		:from_date(start date)
+		:to_date(end date)
+
+	Return:None
+	'''
+	device_type = quicklook.calculations.calculation_driver.which_device(user)
+	if device_type == "garmin":
+		store_garmin_aa_workout(user,from_date,to_date)
+	elif device_type == "fitbit":
+		print("Fitbit AA chat workout data calculation got started")
+		store_fitbit_aa_workout(user,from_date,to_date)
+		print("Fitbit AA chat workout data calculation finished")
 	return None
 
 def total_percent(modified_data_total):
