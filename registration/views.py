@@ -27,7 +27,7 @@ from .decorators import invitation_required
 
 class Login(APIView):
 	def post(self, request, format="json"):
-		username = request.data.get('username')
+		username = request.data.get('username').strip()
 		password = request.data.get('password')
 		user = authenticate(request,username=username, password=password)
 		if user:
@@ -46,7 +46,12 @@ class Logout(APIView):
 # @method_decorator(invitation_required, name="dispatch")
 class UserCreate(APIView):
 	def post(self, request, format="json"):
-		serializer = UserProfileSerializer(data=request.data)
+		data = request.data
+		strip_space_from = ['username','email','first_name','last_name']
+		for key,value in data.items():
+			if key in strip_space_from:
+				data[key] = value.strip()
+		serializer = UserProfileSerializer(data=data)
 		if serializer.is_valid():
 			user = serializer.save()
 			if user:
@@ -103,7 +108,7 @@ class IsUserInvited(APIView):
 	'''
 	def get(self, request, format="json"):
 		email = request.query_params.get('email')
-		case_insensitive_email_field = "{}__iexact".format('email')
+		# case_insensitive_email_field = "{}__iexact".format('email')
 		res = {"email":email}
 
 		# disabling invite check for time being
@@ -127,6 +132,7 @@ class ValidateEmailUsernameAvailability(APIView):
 		}
 
 		if username:
+			username = username.strip()
 			user = User.objects.filter(username__iexact = username)
 			if user:
 				username_status = {
@@ -142,6 +148,7 @@ class ValidateEmailUsernameAvailability(APIView):
 			response["data"]["username"] = username_status
 
 		if email:
+			email = email.strip()
 			user = User.objects.filter(email__iexact = email)
 			if user:
 				email_status = {
