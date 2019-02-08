@@ -18,7 +18,6 @@ export function renderFieldFormGroup(field){
 					required
 					{...field.input}
 				/>
-				{console.log(error)}
 				<div style={{color:"red"}}className="form-control-feedback">
 				{touched && error ? error : ''}
 				</div>
