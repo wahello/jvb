@@ -1,7 +1,8 @@
+import re
+
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.shortcuts import get_object_or_404
-from django.utils.decorators import method_decorator
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -9,13 +10,13 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import generics
 
-from .serializers import UserSerializer, UserProfileSerializer
+from .serializers import UserProfileSerializer
 from .models import Profile,\
 	TermsConditions,\
 	TermsConditionsText,\
 	Invitation
 from .custom_signals import post_registration_notify
-from .decorators import invitation_required
+# from .decorators import invitation_required
 
 # class UserList(generics.ListAPIView):
 #     queryset = User.objects.all()
@@ -123,6 +124,16 @@ class IsUserInvited(APIView):
 
 class ValidateEmailUsernameAvailability(APIView):
 
+	def is_valid_login_creds(self,string,allowed_extra_chars=None):
+		# encode unicode chars (like emojis) to utf-8 encoding
+		string = string.encode('utf-8')
+		valid_chars = 'a-zA-Z0-9'
+		if(allowed_extra_chars):
+			valid_chars += ''.join(allowed_extra_chars)
+		pattern = '^[{}]+$'.format(valid_chars)
+		byte_pattern = pattern.encode()
+		return re.search(byte_pattern,string) is not None
+
 	def get(self, request, format="json"):
 		username = request.query_params.get('username',None)
 		email = request.query_params.get('email',None)
@@ -132,36 +143,43 @@ class ValidateEmailUsernameAvailability(APIView):
 		}
 
 		if username:
+			username_status = {
+				"message": "",
+				"availability": False
+			}
 			username = username.strip()
-			user = User.objects.filter(username__iexact = username)
-			if user:
-				username_status = {
-					"message": "username already taken",
-					"availability": False
-				}
+			if self.is_valid_login_creds(username):
+				user = User.objects.filter(username__iexact = username)
+				if user:
+					username_status["message"] = "Username already taken"
+					username_status["availability"] = False
+				else:
+					username_status["message"] = "Username is available"
+					username_status["availability"] = True
+
 			else:
-				username_status = {
-					"message": "username is available",
-					"availability": True
-				}
+				username_status["message"] = "Only alphanumeric characters allowed"
+				username_status["availability"] = False
 
 			response["data"]["username"] = username_status
 
 		if email:
+			email_status = {
+				"message": "",
+				"availability": False
+			}
 			email = email.strip()
-			user = User.objects.filter(email__iexact = email)
-			if user:
-				email_status = {
-					"message": "email already exist",
-					"availability": False
-				}
+			if self.is_valid_login_creds(email,['.','@']):
+				user = User.objects.filter(email__iexact = email)
+				if user:
+					email_status["message"] = "Email already exist"
+					email_status["availability"] = False
+				else:
+					email_status["message"] = "Email is available"
+					email_status["availability"] = True
 			else:
-				email_status = {
-					"message": "email is available",
-					"availability": True
-				}
-
+				email_status["message"] = "Only alphanumeric characters allowed"
+				email_status["availability"] = False
 			response["data"]["email"] = email_status
-
 
 		return Response(response,status = status.HTTP_200_OK)
