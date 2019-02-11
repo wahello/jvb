@@ -453,7 +453,7 @@ class MCS_Dashboard extends Component{
 			       <div className = "row justify-content-center mcs_dashboard">
 			          <div className="table_process col-sm-10 col-xs-10">
 			          	   <div style={{textAlign:'center'}}className="steps_count">{this.renderSteps(this.state.exercise_steps,this.state.non_exercise_steps,this.state.total_steps)}</div>          	
-						   <table className = "table tableContent table_one table-condensed  justify-content-center" >
+						   <table className = "mch_table table tableContent table_one table-condensed  justify-content-center" >
 							<div className="table-condensed">
 							<tbody className="tbody tbody_content">
 					        

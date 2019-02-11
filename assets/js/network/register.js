@@ -58,4 +58,36 @@ export const CheckInvitation = (email,onSuccess) => {
 	.catch((error) => {
 		console.log(error);
 	})
-} 
+}
+
+export const AsyncValidateUsernameEmail = (values) => {
+	const URL = "/api/users/validate_email_username/";
+	let config = {
+		method:"get",
+		url:URL,
+		params:{
+			email:values.email,
+			username:values.username
+		}
+	}
+	return axios(config).then((response)=>{
+		let data = response.data.data;
+		let isUsernameAvailable = data.username.availability;
+		let isEmailAvailable = data.email.availability;
+		let thowErrorMessages = null
+		if(!isUsernameAvailable){
+			if(thowErrorMessages === null)
+				thowErrorMessages = {'username':data.username.message}
+			else
+				thowErrorMessages['username'] = data.username.message
+		}
+		if(!isEmailAvailable){
+			if(thowErrorMessages === null)
+				thowErrorMessages = {'email':data.email.message}
+			else
+				thowErrorMessages['email'] = data.email.message
+		}
+		if(thowErrorMessages)
+			throw thowErrorMessages;
+	})
+}
