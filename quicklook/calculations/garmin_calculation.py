@@ -873,6 +873,7 @@ def get_zones_cutoff(age):
 	start heartbeat
 	'''
 	if age:
+
 		return {
 			"aerobic_zone":180-age-29,
 			"anaerobic_zone":180-age+5
@@ -887,7 +888,6 @@ def get_activity_exercise_non_exercise_category(activity,user_age):
 	EXERCISE = 'exercise'
 	NON_EXERCISE = 'non_exercise'
 	HEART_RATE_RECOVERY = 'heart_rate_recovery'
-
 	zones = get_zones_cutoff(user_age)
 	if activity.get("steps_type"):
 		return activity.get("steps_type")
@@ -899,7 +899,7 @@ def get_activity_exercise_non_exercise_category(activity,user_age):
 		# If average heart rate in beats per minute is not submitted by user
 		# then it would be by default empty string. In that case default it to 0 
 		if not avg_hr:
-			avg_hr = 0
+			avg_hr = 0	
 		if(not avg_hr or avg_hr < zones['aerobic_zone']):
 			return NON_EXERCISE
 		else:
@@ -2713,7 +2713,6 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 	current_date = from_dt
 	SERIALIZED_DATA = []
 	user_age = user.profile.age()
-
 	while current_date <= to_dt:
 		last_seven_days_date = current_date - timedelta(days=6)
 		start_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
