@@ -39,7 +39,10 @@ class MovementLeaderboard2 extends Component{
     
 	var time;
 	if(value){
-		if(value>0){
+		if(value == "N/A"){
+			time = "00:00:00";
+		}
+		else if(value>0){
 			var sec_num = parseInt(value); 
 			var hours   = Math.floor(sec_num / 3600);
 			var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
@@ -88,7 +91,7 @@ class MovementLeaderboard2 extends Component{
 			background = "green";
 	        color = "white";
 	    }
-	    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{value1}</span><span style = {{paddingLeft:"8px"}}>({rank})</span></td>
+	    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{value1} {'('+rank+')'}</span></td>
 	}
 
 	renderCommaSteps(value){
@@ -125,7 +128,7 @@ class MovementLeaderboard2 extends Component{
 	        background = "red";
 	        color = "white";
 	    }
-	    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{hours_inactive}</span><span style = {{paddingLeft:"8px"}}>({rank})</span></td>
+	    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{hours_inactive} {'('+rank+')'}</span></td>
   }
 	renderStepsColor(steps,rank){
 		let background = "";
@@ -150,7 +153,7 @@ class MovementLeaderboard2 extends Component{
 	        background = "red";
 	       color = "black";
 	    }
-	    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{this.renderCommaSteps(steps)}</span><span style = {{paddingLeft:"8px"}}>({rank})</span></td>
+	    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{this.renderCommaSteps(steps)} {'('+rank+')'}</span></td>
   }
   	scrollCallback(operationCount) {
       if (objectLength === operationCount) {
@@ -213,10 +216,10 @@ class MovementLeaderboard2 extends Component{
 		let getTable = this.refs.mov_dashboard_table;
 
 		if(screen.width < 1023){
-			getTable.classList.add('table_padd')
+			getTable.classList.add('table_padding')
 		}
 		else{
-			getTable.classList.remove('table_padd')
+			getTable.classList.remove('table_padding')
 		}
 		
 		/***********************/
@@ -249,36 +252,27 @@ class MovementLeaderboard2 extends Component{
 		  let color = "";
 	      if(status == "sleeping"){
 	        background= 'rgb(0,176,240)';
-	        // color = 'black';
 	      }
 	      else if(status == "inactive"){
 	        background = 'red';
-	    	// color = 'white';
 	      }
 	      else if(status == "strength"){
 	      	background = "rgb(255,0,255)";
-	      	// color = 'white';
 	      }
 	      else if(status == "exercise"){
 	        background = "#FD9A44";
-	        // color = 'black';
 	      }
 	      else if(status == "no data yet"){
-	      	// score = "NDY";
 	        background = "#A5A7A5";
-	        // color = 'black';
 	      }
 	      else if(status == "time zone change"){
 	      	background = "#fdeab7";
-	      	// color = 'black';
 	      }
 	       else if(status == "nap"){
 	      	background = " #107dac";
-	      	// color = 'white';
 	      }
 	      else if (status == "active"){
 	        background = 'green';
-	        // color = 'white';
 	      }
 	    return (
 	    	<td style = {{background:background}}>
@@ -286,11 +280,9 @@ class MovementLeaderboard2 extends Component{
 	    )
 	}
 	renderTable(Movement_data,Movement_username,MCS_data,selectedRange){
-		console.log("Selected range:",selectedRange);
-		
 		let operationCount = 0;
 		let td_rows = [];
-		let keys = ["user_id","rank","username","nes","exercise_steps","total_steps","mc","exercise_duration","active_min_total","active_min_sleep","active_min_exclude_sleep","active_min_exercise","active_min_exclude_sleep_exercise","total_movement_rank_point"];
+		let keys = ["rank","username","nes","exercise_steps","total_steps","mc","exercise_duration","active_min_total","active_min_sleep","active_min_exclude_sleep","active_min_exercise","active_min_exclude_sleep_exercise","total_movement_rank_point"];
 		objectLength = Object.keys(Movement_data).length;
 		for(let[key,value] of Object.entries(Movement_data)){
 			let td_values = [];
@@ -327,7 +319,7 @@ class MovementLeaderboard2 extends Component{
 					td_values.push(this.getStylesForExerciseduration(value[key1].score.value,value[key1].rank));	
 				}
 				else if(key1 == "active_min_total"){
-					td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value[key1].score.value)}</span></td>);
+					td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value[key1].score.value)} ({value[key1].rank})</span></td>);
 				}
 				  else if(key1 == "active_min_sleep"){
 				  	if(value["active_min_total"].other_scores != null) {
@@ -335,7 +327,7 @@ class MovementLeaderboard2 extends Component{
 					}
 				}
 				else if(key1 == "active_min_exclude_sleep"){
-					td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value[key1].score.value)}</span></td>);	
+					td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value[key1].score.value)} ({value[key1].rank})</span></td>);	
 				}
 			     else if(key1 == "active_min_exercise"){
 			     	if(value["active_min_total"].other_scores != null) {
@@ -343,7 +335,7 @@ class MovementLeaderboard2 extends Component{
 					}	
 			     }
                 else if(key1 == "active_min_exclude_sleep_exercise"){
-					td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value[key1].score.value)}</span></td>);	
+					td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value[key1].score.value)} ({value[key1].rank})</span></td>);	
 				}
 				else if (key1 == "total_movement_rank_point"){
 					td_values.push(<td className ="overall_rank_value"><span>{value[key1]}</span></td>);
@@ -395,7 +387,13 @@ class MovementLeaderboard2 extends Component{
 			td_values.push(
 				<td className ="overall_rank_value">
 					<Link to={redirectMCHURL}>
-					Link
+						<span id="lbfontawesome">
+		                    <FontAwesome
+		                    	className = "fantawesome_style"
+		                        name = "external-link"
+		                        size = "1x"
+		                    />
+					    </span>
 					</Link>	
 				</td>
 			)
@@ -411,21 +409,25 @@ class MovementLeaderboard2 extends Component{
 		let table = <div className = "table table-responsive table-bordered">
 			          	    <table id="my-table" className = "table table-striped" cellpadding="10" cellspacing="10">
 								<tr ref="table_header_hrr">
-									{/*<th>UID</th>*/}
 									<th>Rank</th>
 									<th>User</th>
 									<th>Non Exercise Steps <br/> (Rank)</th>
 									<th>Exercise (Activity) <br/>Steps</th>
-									<th>Total Steps<br />(not included in overall Rank Points)*</th>
+									<th>Total <br />Steps *</th>
 									<th>MCS Score<br />(Rank)</th>
 									<th>Exercise Duration</th>
-									<th>Entire 24 Hour Day</th>
+									<th>Entire 24 Hour Day <br/> (Rank)</th>
 									<th>During Sleep Hours</th>
-									<th>Entire 24 Hour Day Excluding Sleep</th>
+									<th>Entire 24 Hour Day Excluding Sleep <br/> (Rank)</th>
 									<th>During Exercise Hours</th>
-									<th>Entire 24 Hour Day Excluding Sleep and Exercise</th>
-									<th>Overall Movement Rank Points (Rank)</th>
-									<th> </th>
+									<th>Entire 24 Hour Day Excluding Sleep and Exercise <br/> (Rank)</th>
+									<th>Overall Movement Rank Points</th>
+									<th>
+										<table>
+										<tr><td>12 AM</td><td>11:59 AM</td></tr>
+										<tr><td>12 PM</td><td>11:59 PM</td></tr>
+										</table>
+									</th>
 								</tr>
 								<tbody>
 								{td_rows}
@@ -447,7 +449,14 @@ class MovementLeaderboard2 extends Component{
 								this.props.selectedRange
 							)
 						}	
-					</div>	
+					</div>
+					<div className = "row">
+						<div className = "col-sm-9">
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			*  Not included in overall Rank Points
+			          			</p>
+			          	</div>
+		          	</div>	
 				</div>
 			);
 	}
