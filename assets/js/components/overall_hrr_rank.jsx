@@ -56,7 +56,7 @@ class OverallRank extends Component{
 			dateRange1:false,
 	        dateRange2:false,
 	        dateRange3:false,
-	        Movement_view:false,
+	        Hrr_view:false,
 	        active_view:true,
 			btnView:false,
 	        all_hrr_rank_data:'',
@@ -350,7 +350,7 @@ class OverallRank extends Component{
 			Hrr_username:value1,
 			date:date,
 			capt:capt,
-			Movement_view:!this.state.Movement_view,
+			Hrr_view:!this.state.Hrr_view,
 			active_view:!this.state.active_view,
 			btnView:!this.state.btnView2,
 		});

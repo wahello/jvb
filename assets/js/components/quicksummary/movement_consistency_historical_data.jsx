@@ -85,13 +85,11 @@ class MovementHistorical extends Component{
   }
 
   componentDidMount(){
-    console.log("Conponent Did mount");
     let queryParams = new URLSearchParams(this.props.location.search)
     let startDate = queryParams.get('start_date')
     let endDate = queryParams.get('end_date')
     let uid = queryParams.get('uid')
     if(startDate && endDate && uid){
-      console.log(startDate,endDate,uid);
       this.getUIDMCData(uid,startDate,endDate);
     }
   }

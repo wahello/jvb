@@ -104,7 +104,6 @@ class AllRank_Data1 extends Component{
       return names;
   }
 renderScoreHeader1(otherScoreObject){
-  console.log(otherScoreObject)
   let name = [];
   if(otherScoreObject != null && otherScoreObject != undefined && otherScoreObject != ""){
     for (let [otherScoreCatg,otherScoreData] of Object.entries(otherScoreObject)){
