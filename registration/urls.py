@@ -21,6 +21,8 @@ urlpatterns = [
     url(r'api/users/status/$',views.IsUserLoggedIn.as_view(), name="user_logged_status"),
     url(r'api/users/termsconditions/$',views.AccepteTermsCondition.as_view(), name="terms_and conditions"),
     url(r'api/users/isinvited/$',views.IsUserInvited.as_view(), name="is_user_invited"),
+    url(r'api/users/validate_email_username/$', views.ValidateEmailUsernameAvailability.as_view(),
+        name = "validate_email_username"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
