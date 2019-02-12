@@ -81,7 +81,7 @@ class MovementLeaderboard2 extends Component{
 	    }
 		else if(this.strToSecond("15:00")<=value && value<this.strToSecond("30:00")){
 			background = "yellow";
-	        color = "white";
+	        color = "black";
 	    }
 		else if((this.strToSecond("30:00")<=value && value<this.strToSecond("60:00"))){
 			background = "lightgreen";
@@ -118,7 +118,7 @@ class MovementLeaderboard2 extends Component{
 	    }
 	    else if (hours_inactive > 6 && hours_inactive <= 7){
 	       background = "yellow";
-	        color = "white";
+	        color = "black";
 	    }
 	    else if (hours_inactive > 7 && hours_inactive <= 10){
 	       background = "#FF8C00";
@@ -143,7 +143,7 @@ class MovementLeaderboard2 extends Component{
 	    }
 	    else if (steps <= 7499 && steps >= 5000){
 	      background = "yellow";
-	       color = "white";
+	       color = "black";
 	    }
 	    else if (steps <= 4999 && steps >= 3500){
 	       background = "#FF8C00";
