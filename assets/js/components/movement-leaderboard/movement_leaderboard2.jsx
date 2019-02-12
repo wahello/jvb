@@ -415,7 +415,7 @@ class MovementLeaderboard2 extends Component{
 									<th>Exercise (Activity) <br/>Steps</th>
 									<th>Total <br />Steps *</th>
 									<th>MCS Score<br />(Rank)</th>
-									<th>Exercise Duration</th>
+									<th>Exercise Duration<br />(Rank)</th>
 									<th>Entire 24 Hour Day <br/> (Rank)</th>
 									<th>During Sleep Hours</th>
 									<th>Entire 24 Hour Day Excluding Sleep <br/> (Rank)</th>
