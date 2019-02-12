@@ -176,9 +176,9 @@ renderTableColumns(mcDatewise, start_date, end_date){
             "total_steps" : []
           };
         
-        let start_dt = moment(this.props.start_date);
-        let end_dt = moment(this.props.end_date);
-        let duration = end_dt.diff(start_dt,'days') + 1;
+        // let start_dt = moment(this.props.start_date);
+        // let end_dt = moment(this.props.end_date);
+        let duration = end_date.diff(start_date,'days') + 1;
 
     for(let [date,mc] of Object.entries(mcDatewise)){
         if( mc != undefined && mc != "" && mc != "-"){                      
@@ -391,12 +391,20 @@ extractDatewiseMCS = (dateWiseData,category) => {
     return mcData;
 }
  render(){
+    let queryParams = new URLSearchParams(this.props.location.search)
+    let rangeStartDate = queryParams.get('start_date')
+    let rangeEndDate = queryParams.get('end_date')
     const {height, width, containerHeight, containerWidth, ...props} = this.props;
     let rowsCount = this.state.tableRowHeader.length;
     let mcData = (this.extractDatewiseMCS(this.props.data,"steps_ql"));
+    let start_date = moment(this.props.start_date)
+    let end_date = moment(this.props.end_date)
+    if(this.state.uidMCData){
+      mcData = this.state.uidMCData;
+      start_date = moment(rangeStartDate);
+      end_date = moment(rangeEndDate);
+    }
 
-    if(this.state.uidMCData)
-      mcData = this.state.uidMCData
 
     return(
       <div>
@@ -421,7 +429,7 @@ extractDatewiseMCS = (dateWiseData,category) => {
               width={115}
               fixed={true}
             />
-            {this.renderTableColumns(mcData,"steps_ql")}
+            {this.renderTableColumns(mcData,start_date,end_date)}
          
           </Table>
          
