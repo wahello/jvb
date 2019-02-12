@@ -422,7 +422,7 @@ class MovementLeaderboard2 extends Component{
 									<th>During Exercise Hours</th>
 									<th>Entire 24 Hour Day Excluding Sleep and Exercise <br/> (Rank)</th>
 									<th>Overall Movement Rank Points</th>
-									<th>
+									<th>MCS<br/>
 										<table>
 										<tr><td>12 AM</td><td>11:59 AM</td></tr>
 										<tr><td>12 PM</td><td>11:59 PM</td></tr>

@@ -155,6 +155,7 @@
 .mov_dashboard_table .mov_sticky th table td{
 	padding: 0px !important;
 	min-width: 37px !important;
+	font-size: 13px !important;
 }
 .mov_dashboard_table th{
 	min-width:50px;	
@@ -169,6 +170,7 @@
 	padding: 0px !important;
 	min-width: 58px !important;
 	vertical-align: middle !important;
+	font-size: 10px !important;
 }
 .mov_dashboard_table .mov_sticky {
 	position: fixed;
@@ -226,7 +228,7 @@
 	    word-wrap: break-word;
 	    padding-left: 0px !important;
 	    padding-right: 1px !important;
-	    font-size: 9px;
+	    font-size: 9px !important;
 	}
 	.mov_dashboard_table th{
 		min-width: 21px !important;
@@ -236,11 +238,13 @@
 	.mov_dashboard_table th table {
 	    width: 0px !important;
 	    align-items: center;
+	    margin: 2px !important;
 	}
 	.mov_dashboard_table th table td {
 	    padding: 0px !important;
 	    min-width: 41px !important;
 	    vertical-align: middle !important;
+	    font-size: 8.3px !important;
 	}
 	.mov_dashboard_table .mov_sticky th {
 		min-width:43px !important;
@@ -249,10 +253,12 @@
 	}
 	.mov_dashboard_table .mov_sticky th table {
 	    align-items: center;
+	    margin: 1px !important;
 	}
 	.mov_dashboard_table .mov_sticky th table td {
 	    padding: 0px !important;
 	    min-width: 1px !important;
+	    font-size: 9px !important;
 	}
 	.mov_dashboard_table .mov_sticky{
 		padding-right:55px;
@@ -305,18 +311,24 @@
 	}
 	.mov_dashboard_table th table {
     	width: 0px !important;
+    	margin: 2px !important;
 	}	
 	.mov_dashboard_table th table td{
 		min-width: 20px !important;
 		vertical-align: middle !important;
+		font-size: 8.3px !important;
 	}
 	.mov_dashboard_table .mov_sticky th {
 		min-width:48px !important;
      	font-size: 9px !important;
     	padding: 0.1rem !important;
 	}
+	.mov_dashboard_table .mov_sticky th table{
+		margin: 0px !important;
+	}
 	.mov_dashboard_table .mov_sticky th table td{
 		min-width: 20px !important;
+		font-size: 9px !important;
 	}
 	.mov_dashboard_table .mov_sticky{
 		padding-right:55px;	

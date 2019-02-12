@@ -593,7 +593,7 @@ class MovementLeaderboard extends Component{
                 </Popover>
 
                 <div className = "col-md-12 col-sm-12 col-lg-12" >
-			        <div className = "row dropStyles">
+			        <div className = "row dropStyles" style={{marginBottom:'10px'}}>
 				        <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle}>
 					        <DropdownToggle caret className = "drop_text">
 					          Select Range
