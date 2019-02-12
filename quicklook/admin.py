@@ -34,6 +34,7 @@ class FoodInline(admin.StackedInline):
 class AlcoholInline(admin.StackedInline):
 	model = Alcohol
 
+
 class UserQuickLookAdmin(admin.ModelAdmin):
 	list_display=('user','created_at', 'updated_at')
 	ordering = ('-created_at',)

@@ -1,10 +1,16 @@
+from datetime import datetime,timedelta
+import json
+
 from rest_framework.views import APIView
+from rest_framework import status,generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
 from leaderboard.models import Score
 from leaderboard.helpers.leaderboard_helper_classes import LeaderboardOverview
+
+from quicklook.models import Steps
 
 # Pagination not working on RawQuerySet
 # from leaderboard.pagination import LeaderboardPageNumberPagination,CustomPaginationMixin
@@ -97,4 +103,55 @@ class LeaderBoardAPIView(APIView):
 		# }
 		r = LeaderboardOverview(request.user,request.query_params).get_leaderboard()
 		return Response(r, status=status.HTTP_200_OK)
-		#print(r)
+
+
+class MovementLeaderboardMCSAPIView(generics.ListAPIView):
+	'''
+	Provide the hourly mcs status of all users for the requested date
+	and day before requested date
+	'''
+	permissions_classes = (IsAuthenticated, )
+
+	def get_queryset(self):
+		y,m,d = map(int,self.request.query_params.get('start_date').split('-'))
+		start_date = datetime(y,m,d,0,0,0)
+		day_before_start_date = start_date - timedelta(days=1)
+		qs = Steps.objects.filter(
+			user_ql__created_at__range = (
+				day_before_start_date.date(),start_date.date()))
+		return qs
+
+	def get(self, request, format="json"):
+		y,m,d = map(int,self.request.query_params.get('start_date').split('-'))
+		start_date = datetime(y,m,d,0,0,0)
+		day_before_start_date = start_date - timedelta(days=1)
+		qs = self.get_queryset()
+		mcs_date_wise = {
+			start_date.strftime("%Y-%m-%d"):{},
+			day_before_start_date.strftime("%Y-%m-%d"):{}
+		}
+
+		for steps_data in qs:
+			mcs = steps_data.movement_consistency
+			if mcs:
+				mcs = json.loads(mcs) 
+				user_id = steps_data.user_ql.user.id
+				dt = steps_data.user_ql.created_at.strftime("%Y-%m-%d")
+				mcs = self.get_mcs_hourly_status(mcs)
+				mcs_date_wise[dt][user_id] = mcs # Key is user id			
+
+		return Response(mcs_date_wise,status=status.HTTP_200_OK)
+
+	def get_mcs_hourly_status(self,mcs):
+		'''
+		Return mcs data with hourly status only
+		'''
+		processed_mcs = {}
+		NON_INTERVAL_KEYS = ['total_active_minutes','total_active_prcnt',
+			'active_hours','inactive_hours','sleeping_hours','strength_hours',
+			'exercise_hours','nap_hours','no_data_hours','timezone_change_hours',
+			'total_steps']
+		for key,value in mcs.items():
+			if key not in NON_INTERVAL_KEYS:
+				processed_mcs[key] = value['status']
+		return processed_mcs

@@ -13,6 +13,11 @@
   padding-right: 45px;
   padding-top: 10px;
 }
+.table_padding{
+  padding-left: 47px;
+  padding-right: 45px;
+  padding-top: 10px;
+}
 @media (min-width: 319px) and (max-width: 1023px) and (orientation:landscape) {
   .table_padd table th{
     min-width: 55px;
@@ -47,6 +52,25 @@
     font-size: 11px;
   }
 }
+@media (min-width: 319px) and (max-width: 1023px) and (orientation:landscape) {
+  .table_padding table th{
+    min-width: 55px;
+    font-size: 9px;
+    padding: 0.2rem;
+  }
+  .table_padding table td{
+    min-width: 55px;
+    font-size: 9px;
+    padding: 0.2rem;
+  }
+  .table_padding table-responsive{
+    max-width: 520px !important;
+  }
+  .table_padding{
+    padding: 10px 10px 10px 10px !important;
+
+  }
+}
 @media (max-width: 1023px){
   .dropStyles{
   padding-top: 10px;
@@ -60,6 +84,10 @@
   font-size: 13px;
 }
 .table_padd{
+  padding-right: 10px;
+  padding-left: 10px;
+}
+.table_padding{
   padding-right: 10px;
   padding-left: 10px;
 }

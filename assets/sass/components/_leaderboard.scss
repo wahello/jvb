@@ -139,5 +139,205 @@
 	}
 }
 
+/* Movement leaderboard */
+
+.mov_dashboard_table #my-table{
+	padding-top:10px;
+	margin-bottom: 0rem !important;
+}
+.mov_dashboard_table .mov_sticky th {
+	padding: 0.45rem !important;
+    vertical-align: top !important;
+    text-align: center;
+    max-width: 91px;
+    width:91px !important;
+}
+.mov_dashboard_table .mov_sticky th table td{
+	padding: 0px !important;
+	min-width: 37px !important;
+	font-size: 13px !important;
+}
+.mov_dashboard_table th{
+	min-width:50px;	
+	word-wrap:break-word;
+	white-space:unset !important;
+	font-size: 13px;
+}
+.mov_dashboard_table  th table{
+	width: 10px !important;
+}
+.mov_dashboard_table  th table td{
+	padding: 0px !important;
+	min-width: 58px !important;
+	vertical-align: middle !important;
+	font-size: 10px !important;
+}
+.mov_dashboard_table .mov_sticky {
+	position: fixed;
+	top: 0;
+	width: inherit;
+	padding-right:35px;
+	background:#fff;
+	z-index:100;
+	border:none;
+}
+.mov_dashboard_table tbody td{
+	min-width: 7px;
+    font-size: 13px;
+    padding: 3px;
+    width: 91px;
+    height: 44px !important;
+}
+.mov_dashboard_table tbody td table tr td{
+	height: 20px !important;
+	min-width: 10px !important;
+}
+.mov_dashboard_table .mov_sticky + tbody td{
+    min-width: 7px;
+    font-size: 13px;
+    padding: 3px;
+    width: 91px;
+    padding:0px;
+}
+.mov_dashboard_table .mov_sticky + tbody td table tr td{
+	min-width: 7px !important;
+}
+.footer_content{
+	font-size: 14px !important;
+}
+
+@media screen and (max-width:649px){
+	.mov_sticky{
+		position:relative !important;
+		font-size: 10px;
+	}
+}
+@media (max-width: 667px) and (min-width: 667px) and (orientation: landscape){
+	.mov_dashboard_table{
+		padding:10px;
+	}
+	.mov_dashboard_table tbody td{
+		min-width:7px !important;
+		font-size:9px;
+		white-space:unset !important;
+		padding: 0rem !important;
+	}
+	.mov_dashboard_table .mov_sticky + tbody td{
+		min-width: 1px !important;
+	    max-width: 0px !important;
+	    word-wrap: break-word;
+	    padding-left: 0px !important;
+	    padding-right: 1px !important;
+	    font-size: 9px !important;
+	}
+	.mov_dashboard_table th{
+		min-width: 21px !important;
+     	font-size: 9px;
+    	padding: 0rem !important;
+	}
+	.mov_dashboard_table th table {
+	    width: 0px !important;
+	    align-items: center;
+	    margin: 2px !important;
+	}
+	.mov_dashboard_table th table td {
+	    padding: 0px !important;
+	    min-width: 41px !important;
+	    vertical-align: middle !important;
+	    font-size: 8.3px !important;
+	}
+	.mov_dashboard_table .mov_sticky th {
+		min-width:43px !important;
+     	font-size: 9px;
+    	padding: 0rem !important;
+	}
+	.mov_dashboard_table .mov_sticky th table {
+	    align-items: center;
+	    margin: 1px !important;
+	}
+	.mov_dashboard_table .mov_sticky th table td {
+	    padding: 0px !important;
+	    min-width: 1px !important;
+	    font-size: 9px !important;
+	}
+	.mov_dashboard_table .mov_sticky{
+		padding-right:55px;
+	}
+	.mov_dashboard_table tbody td table tr td{
+		height: 20px !important;
+	    min-width: 7px !important;    
+	}
+	.mov_dashboard_table .mov_sticky + tbody td table tr td{
+	    min-width: 0px !important;
+	    margin-left: 0px !important;
+	}
+	.footer_content{
+		font-size: 12px !important;
+	}
+}
+@media (max-width: 1300px) and (min-width: 668px) and (orientation: landscape){
+	.mov_dashboard_table{
+		padding:10px;
+	}
+	.mov_dashboard_table tbody td{
+		min-width:4px !important;
+		font-size:9px;
+		white-space:unset !important;
+		padding: 0.2rem !important;	
+	}
+	.mov_dashboard_table tbody td table tr td{
+		padding: 0.1rem !important;
+		height: 20px !important;
+	    min-width: 7px !important;
+	    margin-left: 6px !important;
+	}
+	.mov_dashboard_table .mov_sticky + tbody td {
+	    min-width: 0px !important;
+	    max-width: 0px !important;
+	    word-wrap: break-word;
+	    padding: 2px !important;
+	    padding-right: 1.1px !important;
+	    padding-left: 1px !important;
+	    font-size: 9px;
+	}
+	.mov_dashboard_table .mov_sticky + tbody td table tr td{
+	    min-width: 0px !important;
+	    margin-left: 0px !important;
+	}
+	.mov_dashboard_table th{
+		min-width: 35px !important;
+     	font-size: 9px !important;
+    	padding: 0rem !important;
+	}
+	.mov_dashboard_table th table {
+    	width: 0px !important;
+    	margin: 2px !important;
+	}	
+	.mov_dashboard_table th table td{
+		min-width: 20px !important;
+		vertical-align: middle !important;
+		font-size: 8.3px !important;
+	}
+	.mov_dashboard_table .mov_sticky th {
+		min-width:48px !important;
+     	font-size: 9px !important;
+    	padding: 0.1rem !important;
+	}
+	.mov_dashboard_table .mov_sticky th table{
+		margin: 0px !important;
+	}
+	.mov_dashboard_table .mov_sticky th table td{
+		min-width: 20px !important;
+		font-size: 9px !important;
+	}
+	.mov_dashboard_table .mov_sticky{
+		padding-right:55px;	
+	}
+	.footer_content{
+		font-size: 12px !important;
+	}
+}
+
+
 
 

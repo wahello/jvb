@@ -107,21 +107,23 @@ class Dashboard extends Component {
 							  <h3 id="link_style">Heart Rate Recovery (HRR)</h3>
 							  <Link to='/hrr_summary_dashboard'>HRR Dashboard</Link><br/>
 							  <Link to='/hrr_recovery'>HRR Daily Summary Details</Link><br/>
-							  <Link to='/overall_hrr_rank'>HRR Leaderboard</Link><br/>
+
 							  <h3 id="link_style">Reporting</h3>
 							  <Link to='/progressanalyzer'>Progress Analyzer</Link><br/>
 							  <Link to='/leaderboard'>My Rankings</Link><br/>
 							   <Link to='/heartrate'>Heartrate Aerobic/Anaerobic Ranges</Link><br/>
-							   
 							   <Link to='/heartrate_zone'>Time in Heart-Rate Zones Chart</Link><br/>
 								{/*<Link to='/workout_stats'>Heartrate Workout</Link><br/>*/}
 							  
 							  <h3 id="link_style">Raw Data</h3>		  
 							  <Link to='/rawdata'>Raw Data</Link><br/>
-							  <Link to='/rawdata#movementconsistency'>Movement Consistency</Link><br/>
+							  <Link to='/rawdata?rtype=mc'>Movement Consistency</Link><br/>
 							  <Link to='/rawdata#grades'>Grades</Link><br/>
 							  <a target="_blank" href = "/static/quicklook/grades_key.pdf">Grades Key</a><br/>
 							  {/*<Link to='/movement_consistency'>movement Consistency</Link><br/>*/}
+							  <h3 id="link_style">Leaderboards</h3>
+							  <Link to='/overall_hrr_rank'>HRR Leaderboard</Link><br/>		  
+							  <Link to='/movement_leaderboard'>Movement Leaderboard</Link><br/>
 							{(!this.state.have_garmin_connect_token 
 								&& !this.state.have_garmin_health_token)
 								&& <div>
