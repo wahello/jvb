@@ -75,19 +75,19 @@ class MovementLeaderboard2 extends Component{
 			background = "red";
 		    color = "black";
 		}
-		else if(this.strToSecond("0:01") <= value && value < this.strToSecond("15:00")){
+		else if(this.strToSecond("0:01") <= value && value < this.strToSecond("00:15")){
 			background = "orange";
 	        color = "white";
 	    }
-		else if(this.strToSecond("15:00")<=value && value<this.strToSecond("30:00")){
+		else if(this.strToSecond("00:15")<=value && value<this.strToSecond("00:30")){
 			background = "yellow";
 	        color = "black";
 	    }
-		else if((this.strToSecond("30:00")<=value && value<this.strToSecond("60:00"))){
+		else if((this.strToSecond("00:30")<=value && value<this.strToSecond("01:00"))){
 			background = "lightgreen";
 	        color = "white";
 	    }
-		else if(this.strToSecond("60:00")<=value){
+		else if(this.strToSecond("01:00")<=value){
 			background = "green";
 	        color = "white";
 	    }

@@ -90,6 +90,9 @@ class Dashboard extends Component {
 						    <div className="social-login-buttons">
 
 							 <Link to='/userinputs'>User Inputs Daily Form</Link><br/>
+							 <h3 id="link_style">Leaderboards</h3>
+							  <Link to='/movement_leaderboard'>Movement Leaderboard</Link><br/>
+							  <Link to='/overall_hrr_rank'>HRR Leaderboard</Link><br/>		  
 							 <h3 id="link_style">Dashboards</h3>
 				  		 	  <Link to='/movement_dashboard'>Movement Dashboard</Link><br/>
 				  		 	  <Link to='/grades_dashboard'>Grades Dashboard</Link><br/>
@@ -121,9 +124,6 @@ class Dashboard extends Component {
 							  <Link to='/rawdata#grades'>Grades</Link><br/>
 							  <a target="_blank" href = "/static/quicklook/grades_key.pdf">Grades Key</a><br/>
 							  {/*<Link to='/movement_consistency'>movement Consistency</Link><br/>*/}
-							  <h3 id="link_style">Leaderboards</h3>
-							  <Link to='/overall_hrr_rank'>HRR Leaderboard</Link><br/>		  
-							  <Link to='/movement_leaderboard'>Movement Leaderboard</Link><br/>
 							{(!this.state.have_garmin_connect_token 
 								&& !this.state.have_garmin_health_token)
 								&& <div>
