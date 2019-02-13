@@ -1,3 +1,4 @@
+
 import React, {Component} from 'react'
 import {Button,FormGroup, Label, Input, FormText, className, Modal,
 ModalHeader, ModalBody, ModalFooter, Collapse,Popover,PopoverBody} from 'reactstrap';
@@ -106,7 +107,9 @@ this.handleChange_time = this.handleChange_time.bind(this);
 this.handleChange_comments = this.handleChange_comments.bind(this);
 this.handleChange_steps = this.handleChange_steps.bind(this);
 this.handleChange_steps_type = this.handleChange_steps_type.bind(this);
+/************** CHANGES DONE BY MOUNIKA NH:STARTS *****************/
 this.handleChange_duplicate_info = this.handleChange_duplicate_info.bind(this);
+/************** CHANGES DONE BY MOUNIKA NH:ENDS *****************/
 this.handleChange_start_time=this.handleChange_start_time.bind(this);
 this.handleChange_end_time=this.handleChange_end_time.bind(this);          
 this.createSleepDropdown = this.createSleepDropdown.bind(this);
@@ -213,7 +216,7 @@ initializeActivity(activities,selected_date,isEditable,callback){
       activites_hour_min:this.createActivityTime(activities),
       activity_start_end_time:this.createStartAndEndTime(activities),
       activites:activities
-    },()=>{     
+    },()=>{
         if(!isEditable)
             callback();
     });
@@ -234,6 +237,8 @@ componentWillReceiveProps(nextProps) {
     }
 }
 
+
+
 addingCommaToSteps(value){
     value += '';
     var x = value.split('.');
@@ -246,12 +251,12 @@ addingCommaToSteps(value){
     return x1 + x2;
 }
 successProfile(data){
-    let today_date = new Date();
-    let date_of_birth = moment(data.data.date_of_birth);
-    let today_date1 = moment(moment(today_date).format('YYYY-MM-DD'));
-    let age = Math.abs(today_date1.diff(date_of_birth, 'years'));
+    // let today_date = new Date();
+    // let date_of_birth = moment(data.data.date_of_birth);
+    // let today_date1 = moment(moment(today_date).format('YYYY-MM-DD'));
+    // let age = Math.abs(today_date1.diff(date_of_birth, 'years'));
     this.setState({
-        age:age
+        age:data.data.user_age
     })
 }
 
@@ -268,6 +273,29 @@ setActivitiesEditModeFalse(){
         activities_edit_mode:falseEditMode
     });
 }
+
+/*deleteActivity(event) {
+    const target = event.target;
+    const selectedActivityId = target.getAttribute('data-name');
+    let updated_activites_state = this.state.activites;
+    let updated_activities_edit_mode = this.state.activities_edit_mode;
+    let updated_activites_hour_min = this.state.activites_hour_min;
+    let updated_activity_start_end_time = this.state.activity_start_end_time;
+    delete updated_activites_state[selectedActivityId];
+    delete updated_activities_edit_mode[selectedActivityId];
+    delete updated_activites_hour_min[selectedActivityId];
+    delete updated_activity_start_end_time[selectedActivityId];
+    this.setState({
+        activites:updated_activites_state,
+        activities_edit_mode:updated_activities_edit_mode,
+        activites_hour_min:updated_activites_hour_min,
+        activity_start_end_time:updated_activity_start_end_time,
+    },()=>{
+        this.props.updateParentActivities(this.state.activites);
+    });
+
+    this.toggle_delete(event);
+}*/
 
 deleteActivity(event){
     const target = event.target;
@@ -302,7 +330,11 @@ toggle_delete(event){
     this.setState({
       modal: !this.state.modal,
       getselectedid: selectedActivityId
-    }); 
+
+    });
+    
+
+     
   }
   toggle_starttime(event){
     const target = event.target;
@@ -472,6 +504,9 @@ editToggleHandlerActivityType(event){
     }
 }
 
+
+
+
 editToggleHandler_heartrate(event){
     const target = event.target;
     const selectedActivityId = target.getAttribute('data-name');
@@ -605,6 +640,7 @@ editToggleHandler_steps_type(event){
     }
 }
 
+/************** CHANGES DONE BY MOUNIKA NH:STARTS *****************/
 editToggleHandler_duplicate_info(event) {
     const target = event.target;
     const selectedActivityId = target.getAttribute('data-name');
@@ -619,6 +655,7 @@ editToggleHandler_duplicate_info(event) {
         });
     }
 }
+/************** CHANGES DONE BY MOUNIKA NH:ENDS *****************/
 
 editToggleHandlerDuration(event){
     const target = event.target;
@@ -718,9 +755,12 @@ handleChange_activity(event){
     const selectedActivityId = target.getAttribute('data-name');
     let activity_data = this.state.activites[selectedActivityId];
     activity_data['activityType'] = value;
+
+    /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
     let avg_hr = activity_data['averageHeartRateInBeatsPerMinute'];
     let steps_type = this.getActivityCategory(value,avg_hr);
     activity_data['steps_type'] = steps_type;
+    /************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
     this.setState({
     activites:{
         ...this.state.activites,
@@ -781,15 +821,18 @@ handleChange_heartrate(event){
     const selectedActivityId = target.getAttribute('data-name');
     let activity_data = this.state.activites[selectedActivityId];
     activity_data['averageHeartRateInBeatsPerMinute'] = parseInt(value);
+    /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
     let act_type = activity_data['activityType'];
     let steps_type = this.getActivityCategory(act_type,parseInt(value));
     activity_data['steps_type'] = steps_type;
+    /************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
     this.setState({
         activites:{
             ...this.state.activites,
             [selectedActivityId]:activity_data
         }
-    });  
+    });
+    
 }
 
 valueChange(event){
@@ -799,7 +842,10 @@ const target = event.target;
   let activity_data = this.state.activites[selectedActivityId];
   activity_data['comments'] = value;
   this.setState({
+ 
   changevalue: activity_data
+
+ 
      });
 }
  handleChange_comments(event){
@@ -890,6 +936,7 @@ handleChange_steps_type(event){
     this.props.updateParentActivities(this.state.activites);
 }
 
+/************** CHANGES DONE BY MOUNIKA NH:STARTS *****************/
 handleChange_duplicate_info(event) {
     const target = event.target;
     const selectedActivityId = target.getAttribute('data-name');
@@ -908,6 +955,7 @@ handleChange_duplicate_info(event) {
     }
     this.props.updateParentActivities(this.state.activites);
 }
+/************** CHANGES DONE BY MOUNIKA NH:ENDS *****************/
 getDTMomentObj(dt,hour,min,sec,am_pm){
   hour = hour ? parseInt(hour) : 0;
   min = min ? parseInt(min) : 0;
@@ -949,6 +997,8 @@ DurationOnStartEndTimeChange(startTime, endTime, selectedActivityId){
     timeHourMin['duration_min'] = strMin;
     timeHourMin['duration_sec'] = strSec;
 
+    // First is updated "activites" state object for current summary id
+    // Second is updated "activites_hour_min" state object for current summary id
     return [timeOriginData, timeHourMin]
 }
 
@@ -1031,27 +1081,34 @@ EndTimeInSecondsSaveCalender(event){
       const name = target.name;
       const selectedActivityId = target.getAttribute('data-name');
   let new_value = {
-      "calender_date":this.state.activity_calender,   
+      "calender_date":this.state.activity_calender,
+      
   }
   this.setState({
     end_time_hours:value,
   })
 }
 
+
+
 handleChange(event){
     const target = event.target;
     const value = target.value;
-    const name = target.name;
-    if(value.includes('STRENGTH')){
-        this.setState({
-            workout_type:'strength',
-        },()=>{
-            this.props.AutoPopulateActivities(this.state.workout_type);
-        })
-    }
+    const name = target.name;//modal_duplicate_info_status
+
+ /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
     let actType = this.state.modal_activity_type;
     let actAvgHeartRate = this.state.modal_activity_heart_rate;
     let steps_type = this.getActivityCategory(actType,parseInt(actAvgHeartRate));
+/************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
+    if(value.includes('STRENGTH')){
+    this.setState({
+        workout_type:'strength',
+     },()=>{
+        this.props.AutoPopulateActivities(this.state.workout_type);
+     })
+    }
+
     if(value == "OTHER"){
         let actType = value;
         let actAvgHeartRate = this.state.modal_activity_heart_rate;
@@ -1169,6 +1226,7 @@ CreateNewActivity(data){
         "can_update_steps_type":true,
         "deleted":false
     }; 
+
     let durationInHourMin = this.secondsToHourMinStr(new_value["durationInSeconds"]);
     let edit_mode_state = {}
     for(let [key,val] of Object.entries(new_value)){
@@ -1180,6 +1238,7 @@ CreateNewActivity(data){
         "duration_min":durationInHourMin.split(":")[1],
         "duration_sec":durationInHourMin.split(":")[2]
     };
+
     let activity_start_end_time_state = this.createStartAndEndTime({[newActivityID]:new_value});
     this.setState({
         activites:{
@@ -1230,7 +1289,6 @@ CreateNewActivity(data){
 activitySelectOptions(){
     let option = [];
     for(let [value,label] of Object.entries(activites)){
-    
         option.push(<option key={value} value={value}>{label}</option>)
     }
     return option;
@@ -1314,6 +1372,7 @@ getTotalActivityDuration(){
             activityStartTimeAmPm
         )
     }
+
     let activityEndTimeDate = this.state.activityendtime_calender;
     let activityEndTimeHour = this.state.modalendtime_activity_hour;
     let activityEndTimeMin = this.state.modalendtime_activity_min;
@@ -1336,10 +1395,12 @@ getTotalActivityDuration(){
         let secs = diff - (hours * 3600) - (mins * 60);
         if (secs < 10)
         secs = `0${secs}`;
+
         if(mins < 10)
         mins = `0${mins}`;
-        return hours+":"+mins+":"+secs;    
-    }else return '';   
+        return hours+":"+mins+":"+secs;
+    }else
+        return '';
 }
 
 ActivityTimeInvalidErrorPopup(){
@@ -1414,7 +1475,7 @@ handleChangeModalActivityTime(event){
     let oldValue = this.state[name];
     this.setState({
         [name]: value
-    },()=>{   
+    },()=>{
             let duration = this.getTotalActivityDuration();
             let isActivityTimeValid = this.props.dateTimeValidation(
                 this.state.activitystarttime_calender,
@@ -1479,8 +1540,10 @@ infoPrint(infoPrintText){
     mywindow.document.write('<h1>' + document.title  + '</h1>');
     mywindow.document.write(document.getElementById(infoPrintText).innerHTML);
     mywindow.document.write('</body></html>');
-    mywindow.document.close(); 
-    mywindow.focus(); 
+
+    mywindow.document.close(); // necessary for IE >= 10
+    mywindow.focus(); // necessary for IE >= 10*/
+
     mywindow.print();
     mywindow.close();
    }
@@ -1767,7 +1830,7 @@ renderTable(){
                                     </Input>
                                 </div> 
                             </div>
-                         </div>
+                        </div>
                     </ModalBody>
                     <ModalFooter>
                         <Button 
@@ -1830,6 +1893,12 @@ renderTable(){
                                     this.state.activites_hour_min[summaryId]["duration_hour"]+":"+
                                     this.state.activites_hour_min[summaryId]["duration_min"]+":"+
                                     this.state.activites_hour_min[summaryId]["duration_sec"]:time}
+                            {/*this.props.editable &&  
+                                <span data-name = {summaryId} onClick={this.editToggleHandlerDuration.bind(this)}
+                                className="fa fa-pencil fa-1x progressActivity1 "
+                                id = "add_button">
+                                </span>
+                             */}
                             </td>); 
             }
             else if(key === "steps"){
@@ -1890,7 +1959,9 @@ renderTable(){
                      </span>
                 }
                 </td>);
-            } 
+            }
+            //duplicate_info
+            /************** CHANGES DONE BY MOUNIKA NH:STARTS *****************/
             else if(key === "duplicate"){
                 let duplicate_info = keyValue;
                 let duplicateInfoLabel = "Not Duplicate";
@@ -1935,6 +2006,7 @@ renderTable(){
                     }
                 </td>);
             }
+            /************** CHANGES DONE BY MOUNIKA NH:ENDS *****************/
             else if(key === "comments"){
                 let  comments=keyValue;
                 activityData.push(<td name={summaryId} className="comment_td" id = "add_button">
@@ -1958,8 +2030,11 @@ renderTable(){
                         }
                         </td>);
             }
+
+
             else
                 activityData.push(<td id = "add_button">{keyValue}</td>);
+
         }
     activityRows.push(
         <tr name = {summaryId} 
@@ -1993,9 +2068,11 @@ renderTable(){
                 </Modal>
         </tr>
     ); 
-    }      
+    }
+          
     return activityRows.reverse();
 }
+
 
 renderEditActivityModal(){
       if (this.state.activityEditModal){
@@ -2300,14 +2377,22 @@ renderEditActivityModal(){
                       <Button size = "sm" className="btn btn-info" onClick={this.CreateNewActivity}>Save</Button>&nbsp;&nbsp;&nbsp;&nbsp;
                       <Button size = "sm" className="btn btn-info" onClick={this.toggleModal}>Cancel</Button>
                       </div>
+                      
+                    
                           </ModalBody>
                           </Modal>  
+            
                   return modal;
+          
           }
-    } 
+    }
+
+
+    
 componentDidMount(){
     getUserProfile(this.successProfile);
 }
+
 
 render(){
 
@@ -2379,6 +2464,8 @@ return(
 {this.renderTable()}
 </tbody>
 </table>
+{/*/************MODAL WINDOW FOR INFO BUTTON*************/}
+
     <Modal 
         className="pop"
         id="infoModalWindow" 
@@ -2398,7 +2485,8 @@ return(
             We identify potential duplicate activities by labeling them "Duplicate File". This often happens when a user has two devices capturing data for the same workout, most commonly seen when triathletes/cyclists start a watch file and a bike computer file for the same cycling workout. In order not report duplicate activities to you, WE EXCLUDE ALL DUPLICATE FILE INFORMATION FROM EXERCISE STATS ON THE SITE (WEEKLY WORKOUT SUMMARIES, RAW DATA STATS, GRADES, AEROBIC/ANAEROBIC STATS, ETC.) If we have mis-identified a file as "duplicate", you can change it back to "non-duplicate".
             </div>
         </ModalBody>
-    </Modal>   
+    </Modal>
+{/******* INFO MODAL WINDOW FOR DELETE FUNCTIONALITY ************/}    
     <Modal 
         className="pop"
         id="deleteInfoModalWindow" 
@@ -2419,6 +2507,7 @@ return(
             </div>
         </ModalBody>
     </Modal>
+{/****Modal window for activitity steps change, if validation fails****/}
     <Modal 
         className="pop"
         id="activityStepsTypeModalWindow" 
@@ -2439,6 +2528,7 @@ return(
         </ModalBody>
         
     </Modal>
+{/************ MODAL WINDOW FOR ACTIVITY STEPS ***********/}
     <Modal 
         className="pop"
         id="activityStepsInfoModalWindow" 
@@ -2470,6 +2560,10 @@ return(
             </div>
         </ModalBody>
     </Modal>
+    
+{/********** MODAL WINDOW CODE:ENDS HERE***********/}
+
+{/************ MODAL WINDOW FOR STEPS TYPE ***********/}
     <Modal 
         className="pop"
         id="stepsTypeInfoModalWindow" 
@@ -2616,11 +2710,19 @@ return(
 
                             <p> NOTE 2: USERS CAN NOT CHANGE EXERCISE STEPS TO NON EXERCISE STEPS IF THE ACTIVITY FILE HAS AN AVERAGE HEART RATE IN THE ANAEROBIC ZONE, AS IN ALL CASES WE CONSIDER THIS EXERCISE (AND NOT MOVEMENT) </p>
 
-                            <p>If you’d like to recharacterize AN EXERCISE ACTIVITY AS EXERCISE OR NOT EXERCISE (MOVEMENT) and are unable to do so on the site, email us at info@jvbwellness.com to request what you would like to do and explain why </p>     
+                            <p>If you’d like to recharacterize AN EXERCISE ACTIVITY AS EXERCISE OR NOT EXERCISE (MOVEMENT) and are unable to do so on the site, email us at info@jvbwellness.com to request what you would like to do and explain why </p>
+                            
+                        
+                        
+
+                       
                    
             </div>
         </ModalBody>
     </Modal>
+    
+{/********** MODAL WINDOW CODE:ENDS HERE***********/}
+
 </div>
 {this.props.editable && 
  <div className="activity_add_btn btn4 mar_20 row"> 
@@ -2638,12 +2740,16 @@ return(
             Create Manual Activity
   </Button>
 </div>
+
 </div>
 }
+
 {this.renderEditActivityModal()}
+
 </div>
 </div>
 </div>
+
 )
 }
 }

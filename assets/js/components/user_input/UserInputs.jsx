@@ -18,16 +18,21 @@ import { Container, Select, option, Option, Row, Col, Button,
 import moment from 'moment';
 // https://github.com/Hacker0x01/react-datepicker
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';   
+import 'react-datepicker/dist/react-datepicker.css'; 
+  
 import * as handlers from './handlers';
 import * as renderers from './renderers';
+
 import { getGarminToken,logoutUser} from '../../network/auth';
+
+
 import {userDailyInputSend,userDailyInputFetch,
         userDailyInputUpdate,userDailyInputRecentFetch,
         fetchGarminData,fetchGarminHrrData} from '../../network/userInput';
 import {getUserProfile} from '../../network/auth';
 
 class UserInputs extends React.Component{
+
     getInitialState(){
       const initialState = {
         garminRequestCancelSource:[],
@@ -279,6 +284,7 @@ class UserInputs extends React.Component{
     this.extraTab = this.extraTab.bind(this);
     this.renderAddDate = this.renderAddDate.bind(this);
     this.renderRemoveDate = this.renderRemoveDate.bind(this);
+
     this.dateTimeValidation = this.dateTimeValidation.bind(this);
     this.AutoPopulateActivities = this.AutoPopulateActivities.bind(this);
  }   
@@ -353,7 +359,7 @@ transformActivity(activity){
       "duplicate":false,
       "deleted":false
   }
-  for(let[key,value] of Object.entries(activity)){    
+  for(let[key,value] of Object.entries(activity)){
       defaultActivityObject[key] = value
   }
   return defaultActivityObject;
@@ -780,17 +786,15 @@ transformActivity(activity){
           workout:have_activities?'yes':workout_status,
           weight: weight?weight:"i do not weigh myself today",
           activities:activities
-      },()=>{
-         this.Autopopulate();
-      });
+      }, ()=>{
+        this.Autopopulate()});
      }else{
         this.setState({
           workout:have_activities?'yes':workout_status,
           weight: weight?weight:"i do not weigh myself today",
           activities:activities
-        },()=>{
-           this.Autopopulate();
-        });
+        }, ()=>{
+          this.Autopopulate()});
      }
     }
     
@@ -964,6 +968,7 @@ getTotalSleep(){
    }
    
    getTotalNapSleep(){
+     //let nap_start_time_date = this.state.nap_start_time_date;
      let nap_start_time_hour=this.state.nap_start_time_hour;
      let nap_start_time_min=this.state.nap_start_time_min;
      let nap_start_time_am_pm = this.state.nap_start_time_am_pm;
@@ -973,6 +978,8 @@ getTotalSleep(){
         nap_start_time_dt = this.getDTMomentObj1(nap_start_time_hour,
           nap_start_time_min,nap_start_time_am_pm)
      }
+     
+     //let nap_end_time_date = this.state.nap_end_time_date;
      let nap_end_time_hour=this.state.nap_end_time_hour;
      let nap_end_time_min=this.state.nap_end_time_min;
      let nap_end_time_am_pm = this.state.nap_end_time_am_pm;
@@ -994,6 +1001,7 @@ getTotalSleep(){
        return '';
    }
    
+
     onFetchGarminFailure(error){
       console.log(error);
     }
@@ -1047,6 +1055,7 @@ getTotalSleep(){
 
     processDate(date){
       /*Handle selection of new date from calendar*/
+
       // Cancle pending ajax call for fetching Garmin data
       // when date is changed
       this.cancelPendingGarminRequests();
@@ -1085,6 +1094,7 @@ getTotalSleep(){
                     })
                   });
     }
+
 
     onUpdateSuccess(response){
       this.setState({
@@ -1128,8 +1138,10 @@ getTotalSleep(){
       });
       userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,
                           this.onFetchFailure,true);
-      getUserProfile(this.onProfileSuccessFetch);    
+      getUserProfile(this.onProfileSuccessFetch);
+      
       window.addEventListener('scroll', this.handleScroll);
+
     }
 
 createDropdown(start_num , end_num, step=1){
@@ -1167,7 +1179,7 @@ createDropdown(start_num , end_num, step=1){
     }
     return elements;
   }
-  
+
   createSleepDropdown(start_num , end_num, mins=false, step=1){
     let elements = [];
     let i = start_num;
@@ -1195,6 +1207,8 @@ createDropdown(start_num , end_num, step=1){
   onLogoutSuccess(response){
     this.props.history.push("/#logout");
   }
+
+ 
 
 componentWillUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
@@ -1265,8 +1279,10 @@ handleScroll() {
     mywindow.document.write('<h1>' + document.title  + '</h1>');
     mywindow.document.write(document.getElementById('modal1').innerHTML);
     mywindow.document.write('</body></html>');
+
     mywindow.document.close(); // necessary for IE >= 10
     mywindow.focus(); // necessary for IE >= 10*/
+
     mywindow.print();
     mywindow.close();
    }
@@ -1391,7 +1407,7 @@ handleScroll() {
         }
 
         let sleep_awake_time_dt = null;
-        if (end_time_date && end_time_hours                                   
+        if (end_time_date && end_time_hours
            && end_time_mins && end_time_am_pm){
           sleep_awake_time_dt = this.getDTMomentObj(end_time_date,end_time_hours,
             end_time_mins,end_time_am_pm)
@@ -1403,7 +1419,6 @@ handleScroll() {
         }
         return true;
     }
-  
     AutoPopulateActivities(workoutType){
       this.setState({
         workout_type:workoutType,
@@ -1990,7 +2005,7 @@ handleScroll() {
                               !this.state.editable &&
                               this.state.report_type == 'full' &&
                               <div className="input">
-                              
+                          
                               {(this.state.strength_workout_start_hour &&
                                this.state.strength_workout_start_min &&
                                this.state.strength_workout_start_am_pm) &&
@@ -2433,7 +2448,7 @@ handleScroll() {
                              consequences on your health). We carry a 20 ounce water bottle for
                              all of our runs/workouts (there are many bottles that have handles
                              on them that are great and barely noticeable once you get used to them).
-                             Staying hydrated to critical to health. When we become dehydrated, our
+                             Staying hydrated is critical to health. When we become dehydrated, our
                              blood gets thicker, and when our blood get thicker, our heart and
                              cardiovascular system has to work harder to pump the blood through
                              our body. When this happens, our heart rate goes up! As heart rate
@@ -3747,11 +3762,11 @@ handleScroll() {
                                </div>
 
                                <div style={{paddingTop:"15px"}}>
-                                   1.We ask for yesterday so we have 24 hours of reporting 
+                                   1. We ask for yesterday so we have 24 hours of reporting 
                                </div>
 
                                 <div style={{paddingTop:"15px"}}>
-                                    2.You determine what % of unprocessed food based on the quantity of
+                                    2. You determine what % of unprocessed food based on the quantity of
                                     food you consumed yesterday. There are many ways to determine the
                                     unprocessed %. (1) If you had 3 meals yesterday and one was highly
                                     processed and the other 2 meals had little to no unprocessed food,
@@ -3768,7 +3783,7 @@ handleScroll() {
                                </div>
 
                                <div style={{paddingTop:"15px"}}>
-                                1. 1. Dairy (cheese, milk, yogurt, other refined milk products).
+                                1. Dairy (cheese, milk, yogurt, other refined milk products).
                                       If you consumed any of these dairy products that you
                                      (1) directly obtained from an animal at a local farm or
                                      (2) obtained directly from a local farm that you know has
@@ -3912,7 +3927,7 @@ handleScroll() {
                                </div>
 
                                <div style={{paddingTop:"15px"}}>
-                                  In the Unites States, a standard drink is equal to 14.0 grams (0.6 ounces) of pure alcohol.
+                                  In the United States, a standard drink is equal to 14.0 grams (0.6 ounces) of pure alcohol.
                                   Generally, this amount of pure alcohol is found in:  
                                </div>
 

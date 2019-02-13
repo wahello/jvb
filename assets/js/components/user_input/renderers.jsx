@@ -309,7 +309,6 @@ export function renderSubmitOverlay(){
 		);
 	}
 }
-
 export function Autopopulate(){
 	let maxduration = 0;
   let duration;
@@ -364,7 +363,7 @@ export function renderActivityGrid(){
 				}
 			}
 			workout = have_exercise_activity?'yes':'no';
-		} 
+		}
 		for(let [key,act] of Object.entries(activities)){
 			let activity_name = act.activityType;
 			if(activity_name.includes('strength') || activity_name.includes('STRENGTH')){
