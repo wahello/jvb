@@ -309,48 +309,83 @@ export function renderSubmitOverlay(){
 		);
 	}
 }
+
+function _extractDateTimeInfo(dateObj){
+	let datetimeInfo = {
+		calendarDate:null,
+		hour:'',
+		min:'',
+		meridiem:''
+	}
+
+	if(dateObj){
+		dateObj = moment(dateObj);
+		datetimeInfo['calendarDate'] = moment({ 
+			year :dateObj.year(),
+			month :dateObj.month(),
+			day :dateObj.date()
+		});
+
+		let hour = dateObj.hour();
+		if(hour < 12){
+			if(hour == 0)
+			hour = 12;
+			datetimeInfo['hour'] = hour;
+			datetimeInfo['meridiem'] = 'am';
+		}
+		else if(hour >= 12){
+			if(hour > 12)
+			hour -= 12;
+			datetimeInfo['hour'] = hour;
+			datetimeInfo['meridiem'] = 'pm';
+		}
+		let mins = dateObj.minute();
+		mins = (mins < 10) ? '0'+mins : mins;
+		datetimeInfo['min'] = mins;
+	}
+	return datetimeInfo;
+}
+
+function shouldPopulateStrength(){
+	// return whether update strength fields or not
+	
+}
+
 export function Autopopulate(){
 	let maxduration = 0;
-  let duration;
-  let starttime ,endtime ;
+ 	let duration;
+ 	let starttime ,endtime ;
 	for(let[key,act] of  Object.entries(this.state.activities)){		
-				let activity_name = act.activityType;
-		    if((activity_name.includes('strength'))|| (activity_name.includes('STRENGTH'))){
-		              duration = act.durationInSeconds;
-						    	starttime = act.startTimeInSeconds;
-							    endtime = starttime + duration ;
-               	if(maxduration < duration){
-									     maxduration = duration;
-					                	if(starttime){
-																         let shours = moment.unix(starttime).hour();
-																         let smin = moment.unix(starttime).minute();
-															        	 if(smin<10){
-																                    smin =	"0"+smin;
-																                   }
-																         let sam_pm = ((shours) >= 12 ? 'pm' : 'am');	
-																this.setState({
-																	             strength_workout_start_hour : shours,
-																	             strength_workout_start_min : smin,
-																							 strength_workout_start_am_pm : sam_pm,	
-																							 
-														                });
-														            }
-														if (endtime){	
-															            let ehours =  moment.unix(endtime).hour();
-														            	let emin =  moment.unix(endtime).minutes();
-															            if( emin < 10){
-                                                         emin = "0"+emin;
-															                          }
-															            let eam_pm = ((ehours) >= 12 ? 'pm' : 'am');
-																 this.setState({
-															                	 strength_workout_end_hour : ehours,
-																                 strength_workout_end_min : emin,
-																                 strength_workout_end_am_pm : eam_pm});
-														        	}
-													      	 }
-													  }
-												 }
-											}
+		let activity_name = act.activityType;
+	    if(activity_name && activity_name.toLowerCase().includes('strength')){
+			duration = act.durationInSeconds;
+			starttime = act.startTimeInSeconds;
+			endtime = starttime + duration ;
+			if(maxduration < duration){
+				maxduration = duration;
+				if(starttime){
+			        let startTime12Hours = _extractDateTimeInfo(moment.unix(starttime));
+					this.setState({
+						workout_type:'strength',
+			            strength_workout_start_hour : startTime12Hours.hour,
+			            strength_workout_start_min : startTime12Hours.min,
+						strength_workout_start_am_pm : startTime12Hours.meridiem			 
+	                });
+	            }
+				if (endtime){	
+					let endTime12Hours = _extractDateTimeInfo(moment.unix(endtime));
+					this.setState({
+						workout_type:'strength',
+						strength_workout_end_hour : endTime12Hours.hour,
+						strength_workout_end_min : endTime12Hours.min,
+						strength_workout_end_am_pm : endTime12Hours.meridiem
+					});
+				}
+	    	}
+  		}
+ 	}
+}
+
 export function renderActivityGrid(){
 	const updateParentActivities = function(activities){
 		let workout = this.state.workout;
@@ -366,18 +401,23 @@ export function renderActivityGrid(){
 		}
 		for(let [key,act] of Object.entries(activities)){
 			let activity_name = act.activityType;
-			if(activity_name.includes('strength') || activity_name.includes('STRENGTH')){
-			this.setState({
-				workout : workout,
-				activities : activities,
-				 },() => {this.Autopopulate()});
+			if(activity_name && activity_name.toLowerCase().includes('strength')){
+				this.setState({
+					workout : workout,
+					activities : activities,
+				},() => {
+					this.Autopopulate()
+				});
 			}
-		else{
-		this.setState({
-			workout:workout,
-			activities:activities,	
-		});}}
+			else{
+				this.setState({
+					workout:workout,
+					activities:activities,	
+				});
+			}
+		}
 	}.bind(this);
+
 	return(
 		<ActivityGrid
 			updateParentActivities = {updateParentActivities}
