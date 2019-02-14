@@ -151,7 +151,7 @@ class ValidateEmailUsernameAvailability(APIView):
 			if self.is_valid_login_creds(username):
 				user = User.objects.filter(username__iexact = username)
 				if user:
-					username_status["message"] = "Username already taken"
+					username_status["message"] = "Username already exist"
 					username_status["availability"] = False
 				else:
 					username_status["message"] = "Username is available"
