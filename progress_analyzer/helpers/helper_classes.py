@@ -1329,6 +1329,13 @@ class ProgressReport():
 						return self._hours_to_hours_min(avg_hours)
 					return None
 
+				elif key == 'total_workout_duration_over_range':
+					if todays_meta_data and current_meta_data:
+						total_duration_over_period = todays_data.cum_workout_duration_in_hours\
+							- current_data.cum_workout_duration_in_hours
+						return self._hours_to_hours_min(total_duration_over_period)
+					return None
+
 				elif key == 'workout_effort_level':
 					if todays_meta_data and current_meta_data:
 						effort_lvl_days = (todays_meta_data.cum_effort_level_days_count - 
@@ -1368,7 +1375,8 @@ class ProgressReport():
 			'workout_duration_hours_min':{d:None for d in self.duration_type},
 			'workout_effort_level':{d:None for d in self.duration_type},
 			'avg_exercise_heart_rate':{d:None for d in self.duration_type},
-			'vo2_max':{d:None for d in self.duration_type}
+			'vo2_max':{d:None for d in self.duration_type},
+			'total_workout_duration_over_range':{d:None for d in self.duration_type}
 		}
 		summary_type = "exercise_stats_cum"
 
