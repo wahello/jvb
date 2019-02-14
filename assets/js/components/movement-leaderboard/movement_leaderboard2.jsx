@@ -29,33 +29,31 @@ class MovementLeaderboard2 extends Component{
 		this.renderGetColors = this.renderGetColors.bind(this);
 		this.strToSecond = this.strToSecond.bind(this);
 		this.getStylesForExerciseduration   = this.getStylesForExerciseduration.bind(this);
-		this.secondsToHms = this.secondsToHms.bind(this);
+		this.minuteToHM = this.minuteToHM.bind(this);
 		this.mcsData = this.mcsData.bind(this);
 
 		//this.time99Colors = this.time99Colors.bind(this);
 		
 	}
-	secondsToHms(value) {
-    
+
+	minuteToHM(value) {
 	var time;
 	if(value){
 		if(value == "N/A"){
-			time = "00:00:00";
+			time = "00:00";
 		}
 		else if(value>0){
-			var sec_num = parseInt(value); 
-			var hours   = Math.floor(sec_num / 3600);
-			var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-			var seconds = sec_num - (hours * 3600) - (minutes * 60);
+			var min_num = parseInt(value); 
+			var hours   = Math.floor(min_num / 60);
+			var minutes = Math.floor(min_num % 60);
 
 			if (hours   < 10) {hours   = "0"+hours;}
 			if (minutes < 10) {minutes = "0"+minutes;}
-			if (seconds < 10) {seconds = "0"+seconds;}
-			time = hours+':'+minutes+':'+seconds;
+			time = hours+':'+minutes;
 		}
 	}
 	else if(value == 0 || value == null){
-		time = "00:00:00";
+		time = "00:00";
 	}
 	return time;
 	}
@@ -319,23 +317,23 @@ class MovementLeaderboard2 extends Component{
 					td_values.push(this.getStylesForExerciseduration(value[key1].score.value,value[key1].rank));	
 				}
 				else if(key1 == "active_min_total"){
-					td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value[key1].score.value)} ({value[key1].rank})</span></td>);
+					td_values.push(<td className ="overall_rank_value"><span>{this.minuteToHM(value[key1].score.value)} ({value[key1].rank})</span></td>);
 				}
 				  else if(key1 == "active_min_sleep"){
 				  	if(value["active_min_total"].other_scores != null) {
-						td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value["active_min_total"].other_scores.active_min_sleep.value)}</span></td>);
+						td_values.push(<td className ="overall_rank_value"><span>{this.minuteToHM(value["active_min_total"].other_scores.active_min_sleep.value)}</span></td>);
 					}
 				}
 				else if(key1 == "active_min_exclude_sleep"){
-					td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value[key1].score.value)} ({value[key1].rank})</span></td>);	
+					td_values.push(<td className ="overall_rank_value"><span>{this.minuteToHM(value[key1].score.value)} ({value[key1].rank})</span></td>);	
 				}
 			     else if(key1 == "active_min_exercise"){
 			     	if(value["active_min_total"].other_scores != null) {
-						td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value["active_min_total"].other_scores.active_min_exercise.value)}</span></td>);
+						td_values.push(<td className ="overall_rank_value"><span>{this.minuteToHM(value["active_min_total"].other_scores.active_min_exercise.value)}</span></td>);
 					}	
 			     }
                 else if(key1 == "active_min_exclude_sleep_exercise"){
-					td_values.push(<td className ="overall_rank_value"><span>{this.secondsToHms(value[key1].score.value)} ({value[key1].rank})</span></td>);	
+					td_values.push(<td className ="overall_rank_value"><span>{this.minuteToHM(value[key1].score.value)} ({value[key1].rank})</span></td>);	
 				}
 				else if (key1 == "total_movement_rank_point"){
 					td_values.push(<td className ="overall_rank_value"><span>{value[key1]}</span></td>);
@@ -454,6 +452,13 @@ class MovementLeaderboard2 extends Component{
 						<div className = "col-sm-9">
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			*  Not included in overall Rank Points
+			          			</p>
+			          	</div>
+		          	</div>
+		          	<div className = "row">
+						<div className = "col-sm-9">
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Note: All time periods/durations are in hours:minutes (hh:mm)
 			          			</p>
 			          	</div>
 		          	</div>	
