@@ -82,7 +82,7 @@ class MovementLeaderboard2 extends Component{
 	        color = "black";
 	    }
 		else if((this.strToSecond("00:30")<=value && value<this.strToSecond("01:00"))){
-			background = "lightgreen";
+			background = "#32CD32";
 	        color = "white";
 	    }
 		else if(this.strToSecond("01:00")<=value){
