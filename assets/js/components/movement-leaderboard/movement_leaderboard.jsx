@@ -9,7 +9,7 @@ import { Collapse, Navbar, NavbarToggler,
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import NavbarMenu from '../navbar';
-import {renderOverallHrr1FetchOverlay,renderOverallHrr2FetchOverlay,renderOverallHrr3FetchOverlay,renderOverallHrrSelectedDateFetchOverlay} from '../leaderboard_healpers';
+import {renderOverallMovement1FetchOverlay,renderOverallMovement2FetchOverlay,renderOverallMovement3FetchOverlay,renderOverallMovementSelectedDateFetchOverlay} from '../leaderboard_healpers';
 import { getGarminToken,logoutUser} from '../../network/auth';
 import fetchLeaderBoard, {fetchMcsSnapshot} from '../../network/leaderBoard';
 import MovementLeaderboard2 from "./movement_leaderboard2";
@@ -99,16 +99,17 @@ class MovementLeaderboard extends Component{
 		this.handleChange = this.handleChange.bind(this);
 		this.headerDates = this.headerDates.bind(this);
 		this.handleBackButton = this.handleBackButton.bind(this);
-		this.renderOverallHrr1FetchOverlay = renderOverallHrr1FetchOverlay.bind(this);
-		this.renderOverallHrr2FetchOverlay = renderOverallHrr2FetchOverlay.bind(this);
-		this.renderOverallHrr3FetchOverlay = renderOverallHrr3FetchOverlay.bind(this);
-		this.renderOverallHrrSelectedDateFetchOverlay = renderOverallHrrSelectedDateFetchOverlay.bind(this);
+		this.renderOverallMovement1FetchOverlay = renderOverallMovement1FetchOverlay.bind(this);
+		this.renderOverallMovement2FetchOverlay = renderOverallMovement2FetchOverlay.bind(this);
+		this.renderOverallMovement3FetchOverlay = renderOverallMovement3FetchOverlay.bind(this);
+		this.renderOverallMovementSelectedDateFetchOverlay = renderOverallMovementSelectedDateFetchOverlay.bind(this);
 		this.renderDate = this.renderDate.bind(this);
 		this.toggle = this.toggle.bind(this);
+		this.reanderAllHrr = this.reanderAllHrr.bind(this);
 		// this.doResizeCode = this.doResizeCode.bind(this);
 		// this.doOnOrientationChange = this.doOnOrientationChange.bind(this);
 	}
-	successOverallMovementRank(data){
+	successOverallMovementRank(data,custom_range=undefined){
 		let date = this.renderDate(data.data.movement,data.data.duration_date);
 		this.setState({
 			Movement_data:data.data.movement,
@@ -121,6 +122,33 @@ class MovementLeaderboard extends Component{
 	        fetching_hrr2:false,
 	        fetching_hrr3:false,
 	        fetching_hrr4:false,
+		},()=>{
+			if(custom_range&&this.state.Movement_data['custom_range']){
+				let rank = this.state.Movement_data['custom_range'][custom_range].all_rank;
+				let date = this.headerDates(custom_range);
+				let capt = "";
+				let rangeMCSData = null;
+				let selectedRange = {
+					dateRange:null,
+					rangeType:null,
+				}
+				selectedRange['dateRange'] = custom_range;
+				selectedRange['rangeType'] = 'custom_range';
+				let val = this.state.Movement_data['custom_range'];
+				let userName;
+		  		if(val){
+		  			for(let [range,value1] of Object.entries(val)){
+		  				for(let [c_key,c_rankData] of Object.entries(value1)){
+			  				if(c_key == "all_rank"){
+			  					userName = c_rankData.username;
+			  		 		}
+		  				}
+		  			}
+		  		}
+		  		this.reanderAllHrr(
+	  				rank,rangeMCSData,userName,
+	  				capt,date,selectedRange)
+			}
 		})
 	}
 	// doOnOrientationChange() {
@@ -166,7 +194,7 @@ class MovementLeaderboard extends Component{
 		this.setState({
 			fetching_hrr4:true,
 		});
-		fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,true);
+		fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate);
 		fetchMcsSnapshot(this.successMcsSnapshot,this.errorMcsSnapshot,this.state.selectedDate);
 	}
 	toggle(){
@@ -192,7 +220,8 @@ class MovementLeaderboard extends Component{
         }
         custom_ranges.push(this.state.lb1_start_date);
         custom_ranges.push(this.state.lb1_end_date);
-      fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,custom_ranges);
+        let crange1 = this.state.lb1_start_date + " " + "to" + " " + this.state.lb1_end_date ;
+      fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,custom_ranges,crange1);
     });
   }
    onSubmitDate2(event){
@@ -214,7 +243,8 @@ class MovementLeaderboard extends Component{
 
         custom_ranges.push(this.state.lb2_start_date);
         custom_ranges.push(this.state.lb2_end_date);
-      fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,custom_ranges);
+        let crange2 = this.state.lb2_start_date + " " + "to" + " " + this.state.lb2_end_date ;
+      fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,custom_ranges,crange2);
     });
   }
  onSubmitDate3(event){
@@ -235,7 +265,8 @@ class MovementLeaderboard extends Component{
         }
         custom_ranges.push(this.state.lb3_start_date);
         custom_ranges.push(this.state.lb3_end_date);
-      fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,custom_ranges);
+        let crange3 = this.state.lb3_start_date + " " + "to" + " " + this.state.lb3_end_date ;
+      fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,custom_ranges,crange3);
     });
   }
   handleChange(event){
@@ -380,7 +411,6 @@ class MovementLeaderboard extends Component{
 	  			selectedRange['dateRange'] = dur;
 	  			selectedRange['rangeType'] = 'custom_range';
 	  		}
-
   			tableHeaders.push(
           	<DropdownItem>
   			 <a className="dropdown-item" 
@@ -399,7 +429,6 @@ class MovementLeaderboard extends Component{
 			all_movement_rank_data:all_data,
 			Movement_username:value1,
 			date:date,
-			// mcs_date:date,
 			capt:capt,
 			Movement_view:!this.state.Movement_view,
 			active_view:!this.state.active_view,
@@ -613,10 +642,10 @@ class MovementLeaderboard extends Component{
 	  			/>
 				
                 </div>
-                {this.renderOverallHrrSelectedDateFetchOverlay()}
-                {this.renderOverallHrr1FetchOverlay()}
-                {this.renderOverallHrr2FetchOverlay()}
-                {this.renderOverallHrr3FetchOverlay()}
+                {this.renderOverallMovementSelectedDateFetchOverlay()}
+                {this.renderOverallMovement1FetchOverlay()}
+                {this.renderOverallMovement2FetchOverlay()}
+                {this.renderOverallMovement3FetchOverlay()}
                 {/*{this.doResizeCode()}*/}
 			</div>
 			);

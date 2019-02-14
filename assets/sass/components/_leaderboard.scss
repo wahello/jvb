@@ -198,6 +198,8 @@
     padding: 3px;
     width: 91px;
     padding:0px;
+    max-width: 1px !important;
+    word-wrap: break-word !important;
 }
 .mov_dashboard_table .mov_sticky + tbody td table tr td{
 	min-width: 7px !important;

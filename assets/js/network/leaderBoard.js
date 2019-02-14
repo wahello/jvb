@@ -4,7 +4,7 @@ import moment from 'moment';
 
 axiosRetry(axios, { retries: 4}); 
 
-export default function fetchLeaderBoard(successLeaderBoard,errorLeaderBoard,selectedDate,custom_ranges=undefined){   
+export default function fetchLeaderBoard(successLeaderBoard,errorLeaderBoard,selectedDate,custom_ranges=undefined,custom_range=undefined){   
   selectedDate = moment(selectedDate);
   const URL=`/leaderboard/`;
   const config={
@@ -17,7 +17,10 @@ export default function fetchLeaderBoard(successLeaderBoard,errorLeaderBoard,sel
    withCredentials: true
   };
   axios(config).then((response)=>{
-   successLeaderBoard(response);
+    if(custom_range!=undefined)
+      successLeaderBoard(response,custom_range);
+    else
+      successLeaderBoard(response);
   }).catch(function(error){
     errorLeaderBoard(error);
   });
