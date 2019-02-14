@@ -381,10 +381,12 @@ class MovementLeaderboard2 extends Component{
 		else if(selectedRange.rangeType !== 'today' && selectedRange.rangeType !== 'yesterday'){
 			let startDate = selectedRange.dateRange.split("to")[0].trim();
 			let endDate = selectedRange.dateRange.split("to")[1].trim();
-			let redirectMCHURL = `/rawdata?&rtype=mch&uid=${currentUserId}&start_date=${startDate}&end_date=${endDate}`
+			startDate = moment(startDate,"YYYY-MM-DD").format("MM-DD-YYYY");
+			endDate = moment(endDate,"YYYY-MM-DD").format("MM-DD-YYYY");
+			let exportExcelMCHURL = `/quicklook/print/excel?type=only_mcs&user_id=${currentUserId}&from_date=${startDate}&to_date=${endDate}`
 			td_values.push(
 				<td className ="overall_rank_value">
-					<Link to={redirectMCHURL}>
+					<a href={exportExcelMCHURL}>
 						<span id="lbfontawesome">
 		                    <FontAwesome
 		                    	className = "fantawesome_style"
@@ -392,7 +394,7 @@ class MovementLeaderboard2 extends Component{
 		                        size = "1x"
 		                    />
 					    </span>
-					</Link>	
+					</a>	
 				</td>
 			)
 
