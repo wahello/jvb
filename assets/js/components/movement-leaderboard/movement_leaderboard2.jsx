@@ -344,7 +344,7 @@ class MovementLeaderboard2 extends Component{
 			if( MCS_data && !_.isEmpty( MCS_data[currentUserId.toString()] ) ){
 				let object = MCS_data[currentUserId.toString()]
 				td_values.push(<td className ="overall_rank_value">
-				<table cellpadding="3" cellspacing="3" style={{width:"45px"}}>
+				<table cellpadding="3" cellspacing="3" style={{width:"45px",marginLeft:"auto",marginRight:"auto"}}>
 					<tr>
 						{this.mcsData(object["12:00 AM to 12:59 AM"])}
 						{this.mcsData(object["01:00 AM to 01:59 AM"])}
@@ -420,12 +420,12 @@ class MovementLeaderboard2 extends Component{
 									<th>During Sleep Hours</th>
 									<th>Entire 24 Hour Day Excluding Sleep <br/> (Rank)</th>
 									<th>During Exercise Hours</th>
-									<th>Entire 24 Hour Day Excluding Sleep and Exercise <br/> (Rank)</th>
+									<th>24 Hour Day Excluding Sleep and Exercise <br/> (Rank)</th>
 									<th>Overall Movement Rank Points</th>
 									<th>MCS<br/>
 										<table>
-										<tr><td>12 AM</td><td>11:59 AM</td></tr>
-										<tr><td>12 PM</td><td>11:59 PM</td></tr>
+										<tr><td>12:00 AM</td><td>11:59 AM</td></tr>
+										<tr><td>12:00 PM</td><td>11:59 PM</td></tr>
 										</table>
 									</th>
 								</tr>
