@@ -1095,20 +1095,11 @@ handleChange(event){
     const target = event.target;
     const value = target.value;
     const name = target.name;//modal_duplicate_info_status
-
  /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
     let actType = this.state.modal_activity_type;
     let actAvgHeartRate = this.state.modal_activity_heart_rate;
     let steps_type = this.getActivityCategory(actType,parseInt(actAvgHeartRate));
 /************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
-    if(value.includes('STRENGTH')){
-    this.setState({
-        workout_type:'strength',
-     },()=>{
-        this.props.AutoPopulateActivities(this.state.workout_type);
-     })
-    }
-
     if(value == "OTHER"){
         let actType = value;
         let actAvgHeartRate = this.state.modal_activity_heart_rate;

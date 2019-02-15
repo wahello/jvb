@@ -225,7 +225,7 @@ class UserInputs extends React.Component{
       this.renderUpdateOverlay = renderers.renderUpdateOverlay.bind(this);
       this.renderSubmitOverlay = renderers.renderSubmitOverlay.bind(this);
       this.renderHrr = renderers.renderHrr.bind(this);
-      this.Autopopulate = renderers.Autopopulate.bind(this);
+      this.AutopopulateStrengthActivities = renderers.AutopopulateStrengthActivities.bind(this);
       this.renderActivityGrid = renderers.renderActivityGrid.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
@@ -286,7 +286,6 @@ class UserInputs extends React.Component{
     this.renderRemoveDate = this.renderRemoveDate.bind(this);
 
     this.dateTimeValidation = this.dateTimeValidation.bind(this);
-    this.AutoPopulateActivities = this.AutoPopulateActivities.bind(this);
  }   
     _extractDateTimeInfo(dateObj){
       let datetimeInfo = {
@@ -786,15 +785,13 @@ transformActivity(activity){
           workout:have_activities?'yes':workout_status,
           weight: weight?weight:"i do not weigh myself today",
           activities:activities
-      }, ()=>{
-        this.Autopopulate()});
+      });
      }else{
         this.setState({
           workout:have_activities?'yes':workout_status,
           weight: weight?weight:"i do not weigh myself today",
           activities:activities
-        }, ()=>{
-          this.Autopopulate()});
+        });
      }
     }
     
@@ -885,7 +882,9 @@ transformActivity(activity){
     activities = this.getMergedGarminAndUserActivities(data.data.activites,activities);
     this.setState({
       activities:activities
-    });
+      }, 
+        () => {this.AutopopulateStrengthActivities()}
+    );
   }
   
 
@@ -1419,12 +1418,7 @@ handleScroll() {
         }
         return true;
     }
-    AutoPopulateActivities(workoutType){
-      this.setState({
-        workout_type:workoutType,
-      })
-    }
-
+    
     render(){
       const children = React.Children.map(this.props.children,
       (child, index) => React.cloneElement(child, {
