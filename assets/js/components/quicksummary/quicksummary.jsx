@@ -50,7 +50,7 @@ var ReactDOM = require('react-dom');
 
 
 let hashComponentMapping = {
-	"movementconsistency":"movement",
+	"mc":"movement",
 	"allstats":"allstats1",
 	"grades":"grade",
 	"swimstats":"swim",
@@ -61,9 +61,7 @@ let hashComponentMapping = {
 	"alcohol":"alcohol",
 	"exercisereporting":"exercise",
 	"userinputs":"user",
-	"mchistorical":""
-
-
+	"mch":"movementhistorical"
 } 
 
 class Quicklook extends Component{
@@ -429,6 +427,7 @@ class Quicklook extends Component{
              	};
              return properties;
     }
+
     successLastSync(data){
     	let last_synced;
     	if(_.isEmpty(data.data))
@@ -439,10 +438,12 @@ class Quicklook extends Component{
     		last_synced:last_synced,
     	})
     }
+
 	successquick(data,start_dt,end_dt){
 		let targetTab = 'grade'
-		if (location.hash)
-			targetTab = hashComponentMapping[location.hash.split('#')[1]];
+		let queryParams = new URLSearchParams(this.props.location.search)
+		if (queryParams.get('rtype'))
+			targetTab = hashComponentMapping[queryParams.get('rtype')];
 		
 		if (!targetTab)
 			targetTab = 'grade';

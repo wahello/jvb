@@ -743,13 +743,25 @@ class ProgressReport():
 							current_data.cum_non_exercise_steps,alias
 						)
 					)[0]
+
+				elif key == 'exercise_steps':
+					total_steps = self._get_average_for_duration(
+						todays_data.cum_total_steps,
+						current_data.cum_total_steps,alias)
+					non_exec_steps = self._get_average_for_duration(
+						todays_data.cum_non_exercise_steps,
+						current_data.cum_non_exercise_steps,alias)
+					exercise_steps = total_steps - non_exec_steps
+					return int(Decimal(exercise_steps).quantize(0,ROUND_HALF_UP))
+
 			return None
 
 		calculated_data = {
 			'non_exercise_steps':{d:None for d in self.duration_type},
 			'movement_non_exercise_step_grade':{d:None for d in self.duration_type},
 			'non_exericse_steps_gpa':{d:None for d in self.duration_type},
-			'total_steps':{d:None for d in self.duration_type}
+			'total_steps':{d:None for d in self.duration_type},
+			'exercise_steps':{d:None for d in self.duration_type}
 		}
 		summary_type = "non_exercise_steps_cum"
 
@@ -984,6 +996,37 @@ class ProgressReport():
 							return value
 						else:
 							return "Not Reported"
+							
+				elif key == "sleep_active_minutes":
+					if todays_meta_data and current_meta_data:
+						mc_days = (
+							todays_meta_data.cum_mc_recorded_days_count - 
+							current_meta_data.cum_mc_recorded_days_count
+						)
+						value = round(_cal_custom_average(
+									todays_data.cum_sleep_active_min,
+									current_data.cum_sleep_active_min,
+									mc_days))
+						if mc_days:
+							return value
+						else:
+							return "Not Reported"
+
+				elif key == "exercise_active_minutes":
+					if todays_meta_data and current_meta_data:
+						mc_days = (
+							todays_meta_data.cum_mc_recorded_days_count - 
+							current_meta_data.cum_mc_recorded_days_count
+						)
+						value = round(_cal_custom_average(
+									todays_data.cum_exercise_active_min,
+									current_data.cum_exercise_active_min,
+									mc_days))
+						if mc_days:
+							return value
+						else:
+							return "Not Reported"
+				
 				elif key == "active_minutes_without_sleep":
 					if todays_meta_data and current_meta_data:
 						mc_days = (
@@ -1139,11 +1182,13 @@ class ProgressReport():
 			'movement_consistency_grade':{d:None for d in self.duration_type},
 			'movement_consistency_gpa':{d:None for d in self.duration_type},
 			'total_active_minutes':{d:None for d in self.duration_type},
+			'sleep_active_minutes':{d:None for d in self.duration_type},
+			'exercise_active_minutes':{d:None for d in self.duration_type},
 			'total_active_minutes_prcnt':{d:None for d in self.duration_type},
 			'active_minutes_without_sleep':{d:None for d in self.duration_type},
 			'active_minutes_without_sleep_prcnt':{d:None for d in self.duration_type},
 			'active_minutes_without_sleep_exercise':{d:None for d in self.duration_type},
-			'active_minutes_without_sleep_exercise_prcnt':{d:None for d in self.duration_type}
+			'active_minutes_without_sleep_exercise_prcnt':{d:None for d in self.duration_type},
 		}
 		summary_type = "movement_consistency_cum"
 
@@ -1284,6 +1329,13 @@ class ProgressReport():
 						return self._hours_to_hours_min(avg_hours)
 					return None
 
+				elif key == 'total_workout_duration_over_range':
+					if todays_meta_data and current_meta_data:
+						total_duration_over_period = todays_data.cum_workout_duration_in_hours\
+							- current_data.cum_workout_duration_in_hours
+						return self._hours_to_hours_min(total_duration_over_period)
+					return None
+
 				elif key == 'workout_effort_level':
 					if todays_meta_data and current_meta_data:
 						effort_lvl_days = (todays_meta_data.cum_effort_level_days_count - 
@@ -1323,7 +1375,8 @@ class ProgressReport():
 			'workout_duration_hours_min':{d:None for d in self.duration_type},
 			'workout_effort_level':{d:None for d in self.duration_type},
 			'avg_exercise_heart_rate':{d:None for d in self.duration_type},
-			'vo2_max':{d:None for d in self.duration_type}
+			'vo2_max':{d:None for d in self.duration_type},
+			'total_workout_duration_over_range':{d:None for d in self.duration_type}
 		}
 		summary_type = "exercise_stats_cum"
 
