@@ -13,7 +13,8 @@ def get_activity_base_format(activity):
     del (activity['activity_data'], activity['user_id'], \
         activity['id'], (activity['created_at']),  \
             activity["activity_weather"], activity['activity_id'])
-    weather_keys = ('temperature_feels_like', 'humidity', 'dewPoint', 'wind', 'temperature')
+    weather_keys = ('temperature_feels_like', 'humidity', 'dewPoint', 'wind',
+                    'temperature','indoor_temperature')
     activity_weathers = {}
     for k in weather_keys:
         if activity_weather_dict and activity_weather_dict[k]:

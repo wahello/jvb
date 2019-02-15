@@ -252,7 +252,7 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 					'comments', 'steps_type', 'can_update_steps_type',
 					'duplicate', 'deleted', 'temperature_feels_like',
 					'weather_condition', 'humidity', 'dewPoint', 'wind',
-					'temperature')
+					'temperature','indoor_temperature')
 				for k in keys_to_remove:
 					activity_stats.pop(k, None)
 
@@ -262,7 +262,8 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 					'dewPoint': activity.get('dewPoint'),
 					'wind': activity.get('wind'),
 					'temperature': activity.get('temperature'),
-					'weather_condition': activity.get('weather_condition')
+					'weather_condition': activity.get('weather_condition'),
+					'indoor_temperature':activity.get('indoor_temperature')
 				}
 				weather_attrs_with_units = weather_report_dict(weather_attrs)
 				act_obj = DailyActivity(

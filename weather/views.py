@@ -84,7 +84,8 @@ def get_weather_response_as_required(latitude, longitude, epoch_time):
                 'temperature': temperature_value,
                 'wind': wind_value,
                 'temperature_feels_like': temperature_feels_like_value,
-                'weather_condition': weather_info['currently']['icon']}
+                'weather_condition': weather_info['currently']['icon'],
+                'indoor_temperature':None}
     activity_weather = weather_report_dict(weather_info)
     return activity_weather
 

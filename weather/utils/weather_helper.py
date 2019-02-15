@@ -12,6 +12,10 @@ def weather_report_dict(weather_data = None):
      		'value': None if weather_data == None  else weather_data['temperature'],
      		'units': 'fahrenheit'
      	},
+        'indoor_temperature':{
+            'value': None if weather_data ==None else weather_data['indoor_temperature'],
+            'units': 'fahrenheit'
+        },
      	'wind':{
      		'value': None if weather_data == None  else weather_data['wind'],
      		'units': 'miles/hour'
