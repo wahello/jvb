@@ -1057,7 +1057,7 @@ class LeaderboardOverview(object):
 							RankedScore(self.user,user,catg,score,other_scores=other_scores)
 						)
 					elif catg == 'exercise_duration':
-						score = data['exercise']['workout_duration_hours_min'][dtype]
+						score = data['exercise']['total_workout_duration_over_range'][dtype]
 						score = _str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
 					elif catg == 'exercise_steps':
@@ -1205,7 +1205,7 @@ class LeaderboardOverview(object):
 								RankedScore(self.user,user,catg,score,other_scores=other_scores)
 							)
 						elif catg == 'exercise_duration':
-							score = data['exercise']['workout_duration_hours_min']['custom_range'][str_range]['data']
+							score = data['exercise']['total_workout_duration_over_range']['custom_range'][str_range]['data']
 							score = _str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
 							category_wise_data[catg]['custom_range'][str_range].append(
 								RankedScore(self.user,user,catg,score))
