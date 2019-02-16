@@ -48,7 +48,7 @@ export function handleChangeWorkoutType(event){
     this.setState({
       [name]:value
     }, 
-    //() => {this.AutopopulateStrengthActivities()}
+    () => {this.AutopopulateStrengthActivities()}
     )
   }
 }

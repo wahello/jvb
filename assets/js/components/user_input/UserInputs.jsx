@@ -785,12 +785,16 @@ transformActivity(activity){
           workout:have_activities?'yes':workout_status,
           weight: weight?weight:"i do not weigh myself today",
           activities:activities
+      },() => {
+        this.AutopopulateStrengthActivities()
       });
      }else{
         this.setState({
           workout:have_activities?'yes':workout_status,
           weight: weight?weight:"i do not weigh myself today",
           activities:activities
+        },() => {
+          this.AutopopulateStrengthActivities()
         });
      }
     }

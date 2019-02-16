@@ -1,5 +1,6 @@
 
 import React, {Component} from 'react'
+import _ from 'lodash';
 import {Button,FormGroup, Label, Input, FormText, className, Modal,
 ModalHeader, ModalBody, ModalFooter, Collapse,Popover,PopoverBody} from 'reactstrap';
 import Textarea from 'react-textarea-autosize';
@@ -300,7 +301,8 @@ setActivitiesEditModeFalse(){
 deleteActivity(event){
     const target = event.target;
     const selectedActivityId = target.getAttribute('data-name');
-    let updated_activites_state = this.state.activites;
+    let oldActivities = this.state.activites;
+    let updated_activites_state = _.cloneDeep(this.state.activites);
     let updated_activities_edit_mode = this.state.activities_edit_mode;
     updated_activites_state[selectedActivityId]['deleted'] = true;
     for(let[key,val] of Object.entries(updated_activities_edit_mode[selectedActivityId])){
@@ -310,7 +312,7 @@ deleteActivity(event){
         activites:updated_activites_state,
         activities_edit_mode:updated_activities_edit_mode
     },()=>{
-        this.props.updateParentActivities(this.state.activites);
+        this.props.updateParentActivities(updated_activites_state,oldActivities);
     });
     this.toggle_delete(event);
 }
@@ -940,6 +942,7 @@ handleChange_steps_type(event){
 handleChange_duplicate_info(event) {
     const target = event.target;
     const selectedActivityId = target.getAttribute('data-name');
+    let oldActivities = _.cloneDeep(this.state.activites)
     let activity_data = this.state.activites[selectedActivityId];
     let duplicate = activity_data['duplicate'];
     if(duplicate == false)
@@ -953,7 +956,7 @@ handleChange_duplicate_info(event) {
         [selectedActivityId]: activity_data
       });
     }
-    this.props.updateParentActivities(this.state.activites);
+    this.props.updateParentActivities(this.state.activites,oldActivities);
 }
 /************** CHANGES DONE BY MOUNIKA NH:ENDS *****************/
 getDTMomentObj(dt,hour,min,sec,am_pm){
