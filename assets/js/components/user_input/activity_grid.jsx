@@ -394,14 +394,13 @@ createStartAndEndTime(activityData){
     for(let [id,data] of Object.entries(activityData)){
         let start_time_seconds = data["startTimeInSeconds"]; 
         let end_time_seconds= data["startTimeInSeconds"] + data["durationInSeconds"];
-        let tzOffset = data["startTimeOffsetInSeconds"];
 
-        if (start_time_seconds && tzOffset){
+        if (start_time_seconds){
             start_time_seconds = start_time_seconds;
             start_time_seconds = moment.unix(start_time_seconds);
         }
 
-        if (end_time_seconds && tzOffset){
+        if (end_time_seconds){
             end_time_seconds = end_time_seconds;
             end_time_seconds = moment.unix(end_time_seconds);
         }
