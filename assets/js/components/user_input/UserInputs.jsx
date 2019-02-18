@@ -373,6 +373,35 @@ transformActivity(activity){
   }
   return defaultActivityObject;
 }
+
+shouldFetchWeatherData(activities){
+    let humidity = Object.keys(activities)
+    .map(prop => activities[prop].humidity);
+    let temperature_feels_like = Object.keys(activities)
+    .map(prop => activities[prop].temperature_feels_like);
+    let weather_condition = Object.keys(activities)
+    .map(prop => activities[prop].weather_condition);
+    let temperature = Object.keys(activities)
+    .map(prop => activities[prop].temperature);
+    let dewpoint = Object.keys(activities)
+    .map(prop => activities[prop].dewPoint);
+    let wind = Object.keys(activities)
+    .map(prop => activities[prop].wind);
+    let fetchWeatherData = false;
+    let number_of_activities = Object.keys(activities).length;
+
+    if(!_.isEmpty(activities)){
+      for (let i=0;i<this.state.number_of_activities;i++){
+        if (!humidity[i] || !temperature_feels_like[i] ||
+           !weather_condition[i] || !temperature[i] ||
+           ! dewpoint[i] || !wind[i]) {
+            fetchWeatherData = true;
+            break;
+        }
+      }
+    }
+    return fetchWeatherData;
+}
     
     onFetchSuccess(data,canUpdateForm=undefined){
       if (_.isEmpty(data.data)){
@@ -566,18 +595,6 @@ transformActivity(activity){
           nap_comment:have_optional_input ? data.data.optional_input.nap_comment: '',
           number_of_activities:number_of_activities,
         },()=>{
-            let humidity = Object.keys(this.state.activities)
-              .map(prop => this.state.activities[prop].humidity);
-            let temperature_feels_like = Object.keys(this.state.activities)
-              .map(prop => this.state.activities[prop].temperature_feels_like);
-            let weather_condition = Object.keys(this.state.activities)
-              .map(prop => this.state.activities[prop].weather_condition);
-            let temperature = Object.keys(this.state.activities)
-              .map(prop => this.state.activities[prop].temperature);
-            let dewpoint = Object.keys(this.state.activities)
-              .map(prop => this.state.activities[prop].dewPoint);
-            let wind = Object.keys(this.state.activities)
-              .map(prop => this.state.activities[prop].wind);
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
               (!this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet')||
               (!this.state.weight || this.state.weight == "i do not weigh myself today")){
@@ -591,22 +608,14 @@ transformActivity(activity){
              this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
             }
           }
-          
-          let count = 0;
-          if(this.state.number_of_activities>0){
-            for(let i=0;i<this.state.number_of_activities;i++){
-              if(!humidity[i] || !temperature_feels_like[i] || 
-                 !weather_condition[i] || !temperature[i] || 
-                 ! dewpoint[i] || !wind[i]) {
-                  count+=1;
-              }
-            }
-          }
-          if(count>0){
+          if(this.shouldFetchWeatherData(this.state.activities)){
             /******** CALLING WEATHER REPORT API *******/
-            userDailyInputWeatherReportFetch(this.state.selected_date,
+            userDailyInputWeatherReportFetch(
+              this.state.selected_date,
               this.onWeatherReportFetchSuccess,
-              this.onWeatherReportFetchFailure,true);
+              this.onWeatherReportFetchFailure,
+              true
+            );
           }
           fetchGarminHrrData(this.state.selected_date,this.onFetchGarminSuccessHrr, this.onFetchGarminFailure);
           this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
@@ -632,8 +641,6 @@ transformActivity(activity){
         }
         this.setState({
           activities:activities
-        }, () => {
-          this.props.updateParentActivities(this.state.activities);
         });
       }
     }
@@ -871,29 +878,14 @@ transformActivity(activity){
           number_of_activities:number_of_activities
       },() => {
           /*** WEATHER REPORT ****/
-          let humidity = Object.keys(this.state.activities)
-          .map(prop => this.state.activities[prop].humidity);
-          let temperature_feels_like = Object.keys(this.state.activities)
-          .map(prop => this.state.activities[prop].temperature_feels_like);
-          let weather_condition = Object.keys(this.state.activities)
-          .map(prop => this.state.activities[prop].weather_condition);
-          let temperature = Object.keys(this.state.activities)
-          .map(prop => this.state.activities[prop].temperature);
-          let dewpoint = Object.keys(this.state.activities)
-          .map(prop => this.state.activities[prop].dewPoint);
-          let wind = Object.keys(this.state.activities)
-          .map(prop => this.state.activities[prop].wind);
-          let count = 0;
-          if(this.state.number_of_activities>0){
-              for(let i=0;i<this.state.number_of_activities;i++){
-                if(!humidity[i] || !temperature_feels_like[i] || !weather_condition[i] || !temperature[i] || ! dewpoint[i] || !wind[i]) {
-                  count+=1;
-                }
-              }
-            }
-            if(count>0){
+            if(this.shouldFetchWeatherData(this.state.activities)){
               /******** CALLING WEATHER REPORT API *******/
-              userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,true);
+                userDailyInputWeatherReportFetch(
+                    this.state.selected_date,
+                    this.onWeatherReportFetchSuccess,
+                    this.onWeatherReportFetchFailure,
+                    true
+                );
             }
         });
      }else{
@@ -904,29 +896,14 @@ transformActivity(activity){
           number_of_activities:number_of_activities,
         },() => {
           /*** WEATHER REPORT ****/
-          let humidity = Object.keys(this.state.activities)
-          .map(prop => this.state.activities[prop].humidity);
-          let temperature_feels_like = Object.keys(this.state.activities)
-          .map(prop => this.state.activities[prop].temperature_feels_like);
-          let weather_condition = Object.keys(this.state.activities)
-          .map(prop => this.state.activities[prop].weather_condition);
-          let temperature = Object.keys(this.state.activities)
-          .map(prop => this.state.activities[prop].temperature);
-          let dewpoint = Object.keys(this.state.activities)
-          .map(prop => this.state.activities[prop].dewPoint);
-          let wind = Object.keys(this.state.activities)
-          .map(prop => this.state.activities[prop].wind);
-          let count = 0;
-          if(this.state.number_of_activities>0){
-              for(let i=0;i<this.state.number_of_activities;i++){
-                if(!humidity[i] || !temperature_feels_like[i] || !weather_condition[i] || !temperature[i] || ! dewpoint[i] || !wind[i]) {
-                  count+1;
-                }
-              }
-          }
-          if(count>0){
+          if(this.shouldFetchWeatherData(this.state.activities)){
             /******** CALLING WEATHER REPORT API *******/
-            userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,true);
+            userDailyInputWeatherReportFetch(
+                this.state.selected_date,
+                this.onWeatherReportFetchSuccess,
+                this.onWeatherReportFetchFailure,
+                true
+            );
           }
         });
      }
@@ -1048,7 +1025,12 @@ transformActivity(activity){
           }
           if(count>0){
             /** CALLING WEATHER REPORT API */
-              userDailyInputWeatherReportFetch(this.state.selected_date,this.onWeatherReportFetchSuccess,this.onWeatherReportFetchFailure,true);
+              userDailyInputWeatherReportFetch(
+                this.state.selected_date,
+                this.onWeatherReportFetchSuccess,
+                this.onWeatherReportFetchFailure,
+                true
+              );
             }
         });
   }
