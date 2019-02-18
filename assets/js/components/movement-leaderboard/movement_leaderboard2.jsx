@@ -17,8 +17,7 @@ class MovementLeaderboard2 extends Component{
 	constructor(props) {
     super(props);
 	    this.state = {
-	    	//mcs_data:this.props.mcs_data,
-	    	//date_of_data:this.props.selected_date
+	    	
 	    }
 		this.renderTable = this.renderTable.bind(this);
 		//this.heartBeatsColors = this.heartBeatsColors.bind(this);
@@ -31,6 +30,7 @@ class MovementLeaderboard2 extends Component{
 		this.getStylesForExerciseduration   = this.getStylesForExerciseduration.bind(this);
 		this.minuteToHM = this.minuteToHM.bind(this);
 		this.mcsData = this.mcsData.bind(this);
+		this.exerciseDurColrsSingleDayOr2to6Days = this.exerciseDurColrsSingleDayOr2to6Days.bind(this);
 
 		//this.time99Colors = this.time99Colors.bind(this);
 		
@@ -65,31 +65,70 @@ class MovementLeaderboard2 extends Component{
 	    let s_time = hours + min;
 	    return s_time;
  	}
-	getStylesForExerciseduration(value1,rank){
+ 	exerciseDurColrsSingleDayOr2to6Days(value,background,color,value1,rank){
+ 			if(value == this.strToSecond("0:00")){
+				background = "red";
+			    color = "black";
+			}
+			else if(this.strToSecond("0:01") <= value && value < this.strToSecond("00:15")){
+				background = "orange";
+		        color = "white";
+		    }
+			else if(this.strToSecond("00:15")<=value && value<this.strToSecond("00:30")){
+				background = "yellow";
+		        color = "black";
+		    }
+			else if((this.strToSecond("00:30")<=value && value<this.strToSecond("01:00"))){
+				background = "#32CD32";
+		        color = "white";
+		    }
+			else if(this.strToSecond("01:00")<=value){
+				background = "green";
+		        color = "white";
+		    }
+		    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{value1} {'('+rank+')'}</span></td>
+	}
+	getStylesForExerciseduration(value1,rank,selectedRange){
 		let value = this.strToSecond(value1);
 		let background = "";
 		let color = "";
-		if(value == this.strToSecond("0:00")){
-			background = "red";
-		    color = "black";
+		if(selectedRange.rangeType == 'today' || selectedRange.rangeType == 'yesterday'){
+			let td = this.exerciseDurColrsSingleDayOr2to6Days(value,background,color,value1,rank);
+			return td;
+			
 		}
-		else if(this.strToSecond("0:01") <= value && value < this.strToSecond("00:15")){
-			background = "orange";
-	        color = "white";
-	    }
-		else if(this.strToSecond("00:15")<=value && value<this.strToSecond("00:30")){
-			background = "yellow";
-	        color = "black";
-	    }
-		else if((this.strToSecond("00:30")<=value && value<this.strToSecond("01:00"))){
-			background = "#32CD32";
-	        color = "white";
-	    }
-		else if(this.strToSecond("01:00")<=value){
-			background = "green";
-	        color = "white";
-	    }
-	    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{value1} {'('+rank+')'}</span></td>
+		else{
+			let startDate = selectedRange.dateRange.split("to")[0].trim();
+			let endDate = selectedRange.dateRange.split("to")[1].trim();
+			let numberOfDays = Math.abs(moment(endDate).diff(moment(startDate), 'days'))+1;
+			if(numberOfDays >= 7){
+				if(value == this.strToSecond("0:00")){
+					background = "red";
+				    color = "black";
+				}
+				else if(value > this.strToSecond("0:00")  && value <= this.strToSecond("01:39")){
+					background = "orange";
+			        color = "white";
+			    }
+				else if(value > this.strToSecond("01:39")  && value <= this.strToSecond("02:29")){
+					background = "yellow";
+			        color = "black";
+			    }
+				else if((value > this.strToSecond("02:29")  && value <= this.strToSecond("04:59"))){
+					background = "#32CD32";
+			        color = "white";
+			    }
+				else if(value >= this.strToSecond("05:00")){
+					background = "green";
+			        color = "white";
+			    }
+			    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{value1} {'('+rank+')'}</span></td>
+			}
+			else if(numberOfDays >= 2 && numberOfDays <= 6){
+				let td = this.exerciseDurColrsSingleDayOr2to6Days(value,background,color,value1,rank);
+				return td;
+			}	
+		}   
 	}
 
 	renderCommaSteps(value){
@@ -278,6 +317,7 @@ class MovementLeaderboard2 extends Component{
 	    )
 	}
 	renderTable(Movement_data,Movement_username,MCS_data,selectedRange){
+		console.log("renderTable")
 		let operationCount = 0;
 		let td_rows = [];
 		let keys = ["rank","username","nes","exercise_steps","total_steps","mc","exercise_duration","active_min_total","active_min_sleep","active_min_exclude_sleep","active_min_exercise","active_min_exclude_sleep_exercise","total_movement_rank_point"];
@@ -314,7 +354,7 @@ class MovementLeaderboard2 extends Component{
 					td_values.push(this.renderGetColors(value[key1].score.value,value[key1].rank));
 				}
 				else if(key1 == "exercise_duration"){
-					td_values.push(this.getStylesForExerciseduration(value[key1].score.value,value[key1].rank));	
+					td_values.push(this.getStylesForExerciseduration(value[key1].score.value,value[key1].rank,selectedRange));	
 				}
 				else if(key1 == "active_min_total"){
 					td_values.push(<td className ="overall_rank_value"><span>{this.minuteToHM(value[key1].score.value)} ({value[key1].rank})</span></td>);
@@ -418,7 +458,7 @@ class MovementLeaderboard2 extends Component{
 									<th>Exercise Duration<br />(Rank)</th>
 									<th>Entire 24 Hour Day <br/> (Rank)</th>
 									<th>During Sleep Hours</th>
-									<th>Entire 24 Hour Day Excluding Sleep <br/> (Rank)</th>
+									<th>24 Hour Day Excluding Sleep <br/> (Rank)</th>
 									<th>During Exercise Hours</th>
 									<th>24 Hour Day Excluding Sleep and Exercise <br/> (Rank)</th>
 									<th>Overall Movement Rank Points</th>
