@@ -3181,8 +3181,6 @@ def update_data_as_per_userinput_form(user,data,current_date):
 def hrr_only_store(user,current_date):
 	data = hrr_data(user,current_date)
 	data = update_data_as_per_userinput_form(user,data,current_date)
-	print(data,"dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-	print("HRR calculations creating")
 	try:
 		user_hrr = Hrr.objects.get(user_hrr=user, created_at=current_date)
 		update_hrr_instance(user_hrr, data)
