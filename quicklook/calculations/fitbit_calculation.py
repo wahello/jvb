@@ -37,6 +37,8 @@ from .converter.fitbit_to_garmin_converter import fitbit_to_garmin_sleep,\
 	fitbit_to_garmin_epoch,\
 	steps_minutly_to_quartly
 
+from user_input.utils.daily_activity import get_daily_activities_in_base_format
+
 def get_fitbit_model_data(model,user,start_date, end_date,
 		order_by = None, group_by_date=False):
 
@@ -331,6 +333,10 @@ def get_exercise_consistency_grade(user,current_date,user_age):
 			user_input__user = user).order_by('user_input__created_at'))
 	weekly_daily_strong = quicklook.calculations.garmin_calculation.get_weekly_user_input_data(
 		daily_strong,current_date,last_seven_days_date)
+	weekly_user_input_activities = get_daily_activities_in_base_format(
+			user,last_seven_days_date.date(),
+			to_date = current_date.date(),
+			include_all = True)
 	if week_activity_data:
 		for i in range(0,len(week_activity_data)):
 			todays_activity_data = ast.literal_eval(week_activity_data[i].activities_data.replace(
@@ -341,7 +347,7 @@ def get_exercise_consistency_grade(user,current_date,user_age):
 	formated_data = makeformat(trans_activity_data,current_date,last_seven_days_date)
 	weekly_combined_activities = quicklook.calculations.\
 		garmin_calculation.get_weekly_combined_activities(
-			formated_data,{},weekly_daily_strong,
+			formated_data,{},weekly_user_input_activities,
 			last_seven_days_date,current_date,user_age)
 	exe_consistency_grade,exe_consistency_point = quicklook.calculations.\
 		garmin_calculation.get_exercise_consistency_grade(
