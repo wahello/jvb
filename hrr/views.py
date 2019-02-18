@@ -2823,7 +2823,7 @@ def hrr_data(user,start_date):
 		workout_final_timestamp = ''
 		workout_timestamp = ''
 	Did_you_measure_HRR = ""
-	if hrr and workout:
+	if hrr and workout and all_activities_heartrate:
 		hrr_data = fitfile_parse(hrr,offset,start_date_str)
 		hrr_final_heartrate,hrr_final_timestamp,hrr_timestamp = hrr_data
 		Did_you_measure_HRR = 'yes'
@@ -3174,21 +3174,18 @@ def update_data_as_per_userinput_form(user,data,current_date):
 			data['lowest_hrr_1min'] =  float(lowest_hr_first_minute)
 			data['No_beats_recovered'] = data.get(
 				'HRR_start_beat',0)-float(lowest_hr_first_minute)
+		data['Did_you_measure_HRR'] = single_obj.measured_hr
 
 	return data
 
 def hrr_only_store(user,current_date):
 	data = hrr_data(user,current_date)
-	if data.get('Did_you_measure_HRR'):
-		data = update_data_as_per_userinput_form(user,data,current_date)
-		print("HRR calculations creating")
-		try:
-			user_hrr = Hrr.objects.get(user_hrr=user, created_at=current_date)
-			update_hrr_instance(user_hrr, data)
-		except Hrr.DoesNotExist:
-			create_hrr_instance(user, data, current_date)
-	else:
-		print("NO HRR")
+	data = update_data_as_per_userinput_form(user,data,current_date)
+	try:
+		user_hrr = Hrr.objects.get(user_hrr=user, created_at=current_date)
+		update_hrr_instance(user_hrr, data)
+	except Hrr.DoesNotExist:
+		create_hrr_instance(user, data, current_date)
 
 def store_garmin_hrr(user,from_date,to_date,type_data):
 	'''
