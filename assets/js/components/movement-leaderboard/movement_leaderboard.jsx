@@ -135,9 +135,6 @@ class MovementLeaderboard extends Component{
 				}
 				selectedRange['dateRange'] = custom_range;
 				selectedRange['rangeType'] = 'custom_range';
-				let startDate = selectedRange.dateRange.split("to")[0].trim();
-				let endDate = selectedRange.dateRange.split("to")[1].trim();
-				let numberOfDays = moment(endDate).diff(moment(startDate), 'days')+1;
 				let val = this.state.Movement_data['custom_range'];
 				let userName;
 		  		if(val){
@@ -151,7 +148,7 @@ class MovementLeaderboard extends Component{
 		  		}
 		  		this.reanderAllHrr(
 	  				rank,rangeMCSData,userName,
-	  				capt,date,selectedRange,numberOfDays)
+	  				capt,date,selectedRange)
 			}
 		})
 	}
@@ -172,7 +169,6 @@ class MovementLeaderboard extends Component{
 	}
 	successMcsSnapshot(data){
 		this.setState({
-			// mcs_data:data.data[moment(this.state.selectedDate).format('YYYY-MM-DD')]
 			mcs_data:data.data,
 			selectedRangeMCSData:data.data[moment(this.state.selectedDate).format('YYYY-MM-DD')]
 		},()=>{
@@ -185,7 +181,6 @@ class MovementLeaderboard extends Component{
 	processDate(selectedDate){
 		this.setState({
 			selectedDate:selectedDate,
-			// mcs_date:selectedDate,
 			fetching_hrr4:true,
 			calendarOpen:!this.state.calendarOpen,
 			numberOfDays:1,
@@ -442,7 +437,6 @@ class MovementLeaderboard extends Component{
 	  	
 	}
 	reanderAllHrr(all_data,rangeMCSData,value1,capt,date,selectedRange){
-		console.log("reander")
 		let numberOfDays = 1;
 		if(selectedRange.rangeType !== 'today' && selectedRange.rangeType !== 'yesterday'){
 			let startDate = selectedRange.dateRange.split("to")[0].trim();
