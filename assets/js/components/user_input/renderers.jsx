@@ -346,12 +346,12 @@ function _extractDateTimeInfo(dateObj){
 	return datetimeInfo;
 }
 
- function shouldPopulateStrength(state,isStrengthDeleted){
+ function shouldPopulateStrength(state,isStrengthChanged){   
 	if(state.workout_type === 'cardio')
 		return false;
 
-	if(isStrengthDeleted){
-		return true
+	if(isStrengthChanged){
+		return true;
 	}
 
 	if(state.strength_workout_start_hour &&
@@ -367,27 +367,28 @@ function _extractDateTimeInfo(dateObj){
 	
 }
 
-function isStrengthActivityDeleted(oldActivities, newActivities){
-	let isStrengthActivityDeleted = false;
+function isStrengthActivityChanged(oldActivities, newActivities){
+	let isActivityChanged = false;
 	if(oldActivities){
 		for(let[actID,actData] of Object.entries(oldActivities)){
 			if(actData.deleted != newActivities[actID].deleted ||
-				actData.duplicate != newActivities[actID].duplicate){
-				isStrengthActivityDeleted = true;
+				actData.duplicate != newActivities[actID].duplicate ||
+				actData.activityType !== newActivities[actID].activityType) {
+				 isActivityChanged = true;
 			}
 		}
 	}
-	return isStrengthActivityDeleted;
+	return isActivityChanged;
 }
 
-export function AutopopulateStrengthActivities(isStrengthDeleted=false){
+export function AutopopulateStrengthActivities(isStrengthChanged=false){ 
 	let maxduration = 0;
 	let duration;
 	let starttime ,endtime ;
 	let workout_type = this.state.workout_type;
 	workout_type = workout_type?workout_type:'strength'; 
 
-	if(!shouldPopulateStrength(this.state,isStrengthDeleted)){
+	if(!shouldPopulateStrength(this.state,isStrengthChanged)){
 		return
 	}
 
@@ -395,7 +396,7 @@ export function AutopopulateStrengthActivities(isStrengthDeleted=false){
 		let activity_name = act.activityType;
 		let isActivityDeletedOrDuplicate = act.deleted || act.duplicate;
 		if(activity_name && !isActivityDeletedOrDuplicate 
-			&& activity_name.toLowerCase().includes('strength') ){
+			&& activity_name.toLowerCase().includes('strength')){
 			duration = act.durationInSeconds;
 			starttime = act.startTimeInSeconds;
 			endtime = starttime + duration ;
@@ -440,16 +441,16 @@ export function renderActivityGrid(){
 		for(let [key,act] of Object.entries(activities)){
 			let activity_name = act.activityType;
 			if(activity_name && activity_name.toLowerCase().includes('strength')){
-				let isStrengthDeleted = isStrengthActivityDeleted(
+				let isStrengthChanged = isStrengthActivityChanged(
 					oldActivities,
 					activities
-				)
+				);
 				this.setState({
 					workout : workout,
 					activities : activities,
 				},() => {
-					this.AutopopulateStrengthActivities(isStrengthDeleted)
-				});
+					this.AutopopulateStrengthActivities(isStrengthChanged)
+				});  
 			}
 			else{
 				this.setState({

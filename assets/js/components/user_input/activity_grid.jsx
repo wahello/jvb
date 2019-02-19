@@ -755,6 +755,7 @@ handleChange_activity(event){
     const target = event.target;
     const value = target.value;
     const selectedActivityId = target.getAttribute('data-name');
+    let oldActivities = _.cloneDeep(this.state.activites);
     let activity_data = this.state.activites[selectedActivityId];
     activity_data['activityType'] = value;
 
@@ -768,25 +769,35 @@ handleChange_activity(event){
         ...this.state.activites,
         [selectedActivityId]:activity_data
     }
-    });
+     }
+     ,() =>  this.props.updateParentActivities(this.state.activites,oldActivities)
+     );
     $('#comments_id').css('display','none');
     if(value == "OTHER"){
+        console.log(value,"value");
         this.setState({
         [selectedActivityId]: value,
         "modal_activity_type":""
-        });
+        }
+        ,() =>  this.props.updateParentActivities(this.state.activites,oldActivities)
+        );
     }
     else if(name == "activity_display_name"){
+        console.log(name,"name");
         this.setState({
         [selectedActivityId]: value,
         "modal_activity_type":value
-        });
+        }
+        ,() =>  this.props.updateParentActivities(this.state.activites,oldActivities)
+        );
     }
     else{
         this.setState({
         [selectedActivityId]: value
-        });
-    } 
+        }
+        ,() =>  this.props.updateParentActivities(this.state.activites,oldActivities)
+        );
+    }
 }
 
 handleChange_time(event){
@@ -844,10 +855,7 @@ const target = event.target;
   let activity_data = this.state.activites[selectedActivityId];
   activity_data['comments'] = value;
   this.setState({
- 
-  changevalue: activity_data
-
- 
+         changevalue: activity_data
      });
 }
  handleChange_comments(event){
@@ -1115,13 +1123,15 @@ handleChange(event){
     }
     else if(name == "activity_display_name"){
         let actType = value;
+        console.log(actType+"actType");
         let actAvgHeartRate = this.state.modal_activity_heart_rate;
         let steps_type = this.getActivityCategory(actType,parseInt(actAvgHeartRate));
         this.setState({
             [name]: value,
             modal_activity_type:value,
             modal_exercise_steps_status:steps_type
-        });
+        },  () => {this.AutopopulateStrengthActivities(), this.isStrengthActivityDeleted()}
+        );
     }
     else if(name == "modal_activity_heart_rate"){
         let actType = this.state.modal_activity_type;
