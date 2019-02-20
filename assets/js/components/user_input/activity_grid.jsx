@@ -1123,7 +1123,6 @@ handleChange(event){
     }
     else if(name == "activity_display_name"){
         let actType = value;
-        console.log(actType+"actType");
         let actAvgHeartRate = this.state.modal_activity_heart_rate;
         let steps_type = this.getActivityCategory(actType,parseInt(actAvgHeartRate));
         this.setState({
