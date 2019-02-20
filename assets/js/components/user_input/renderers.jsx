@@ -369,11 +369,15 @@ function _extractDateTimeInfo(dateObj){
 
 function isStrengthActivityChanged(oldActivities, newActivities){
 	let isActivityChanged = false;
-	if(oldActivities){
-		for(let[actID,actData] of Object.entries(oldActivities)){
-			if(actData.deleted != newActivities[actID].deleted ||
-				actData.duplicate != newActivities[actID].duplicate ||
-				actData.activityType !== newActivities[actID].activityType) {
+	if(!_.isEmpty(newActivities)){
+		for(let[actID,actData] of Object.entries(newActivities)){
+			if(oldActivities[actID] == undefined || oldActivities[actID] == null){
+				// new activity is added, so trigger the autopopulation
+				isActivityChanged = true;
+			}
+			else if(actData.deleted != oldActivities[actID].deleted ||
+				actData.duplicate != oldActivities[actID].duplicate ||
+				actData.activityType !== oldActivities[actID].activityType) {
 				 isActivityChanged = true;
 			}
 		}
@@ -387,6 +391,7 @@ export function AutopopulateStrengthActivities(isStrengthChanged=false){
 	let starttime ,endtime ;
 	let workout_type = this.state.workout_type;
 	workout_type = workout_type?workout_type:'strength'; 
+    console.log("Activities:",this.state.activities)
 
 	if(!shouldPopulateStrength(this.state,isStrengthChanged)){
 		return
@@ -395,8 +400,9 @@ export function AutopopulateStrengthActivities(isStrengthChanged=false){
 	for(let[key,act] of  Object.entries(this.state.activities)){	
 		let activity_name = act.activityType;
 		let isActivityDeletedOrDuplicate = act.deleted || act.duplicate;
-		if(activity_name && !isActivityDeletedOrDuplicate 
-			&& activity_name.toLowerCase().includes('strength')){
+		if(activity_name  
+			&& activity_name.toLowerCase().includes('strength') 
+			&& !isActivityDeletedOrDuplicate){
 			duration = act.durationInSeconds;
 			starttime = act.startTimeInSeconds;
 			endtime = starttime + duration ;
@@ -445,6 +451,7 @@ export function renderActivityGrid(){
 					oldActivities,
 					activities
 				);
+
 				this.setState({
 					workout : workout,
 					activities : activities,

@@ -1130,8 +1130,7 @@ handleChange(event){
             [name]: value,
             modal_activity_type:value,
             modal_exercise_steps_status:steps_type
-        },  () => {this.AutopopulateStrengthActivities(), this.isStrengthActivityDeleted()}
-        );
+        });
     }
     else if(name == "modal_activity_heart_rate"){
         let actType = this.state.modal_activity_type;
@@ -1181,6 +1180,7 @@ handleChange(event){
  
 
 CreateNewActivity(data){
+    let oldActivities = _.cloneDeep(this.state.activites);
     let newActivityID = Math.floor(1000000000 + Math.random() * 900000000);
     let durationsecs = this.state.modal_activity_sec;
     let durationmins = this.state.modal_activity_min;
@@ -1286,7 +1286,7 @@ CreateNewActivity(data){
             [newActivityID]:activity_start_end_time_state[newActivityID]
         }
     },()=>{
-        this.props.updateParentActivities(this.state.activites);
+        this.props.updateParentActivities(this.state.activites,oldActivities);
     });
 }
 
