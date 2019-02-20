@@ -492,6 +492,7 @@ handleChangeModal(event){
 editToggleHandlerActivityType(event){
     const target = event.target;
     const selectedActivityId = target.getAttribute('data-name');
+    let oldActivities = _.cloneDeep(this.state.activites);
     let activity_time=this.state.activites_hour_min[selectedActivityId];
     let categoryMode = this.state.activities_edit_mode[selectedActivityId];
 
@@ -501,7 +502,7 @@ editToggleHandlerActivityType(event){
             ...this.state.activities_edit_mode,
             [selectedActivityId]:categoryMode
         },()=>{
-            this.props.updateParentActivities(this.state.activites);
+            this.props.updateParentActivities(this.state.activites,oldActivities);
         });
     }
 }

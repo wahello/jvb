@@ -390,8 +390,7 @@ export function AutopopulateStrengthActivities(isStrengthChanged=false){
 	let duration;
 	let starttime ,endtime ;
 	let workout_type = this.state.workout_type;
-	workout_type = workout_type?workout_type:'strength'; 
-    console.log("Activities:",this.state.activities)
+	workout_type = workout_type?workout_type:'strength';
 
 	if(!shouldPopulateStrength(this.state,isStrengthChanged)){
 		return
@@ -428,7 +427,7 @@ export function AutopopulateStrengthActivities(isStrengthChanged=false){
 				}
 			}
 		}
-	}  
+	} 
 } 
 
 export function renderActivityGrid(){
@@ -462,7 +461,14 @@ export function renderActivityGrid(){
 			else{
 				this.setState({
 					workout:workout,
-					activities:activities,	
+					activities:activities,
+					workout_type:'',
+					strength_workout_start_hour: '',
+					strength_workout_start_min : '',
+					strength_workout_start_am_pm: '',
+					strength_workout_end_hour: '',
+					strength_workout_end_min: '',
+					strength_workout_end_am_pm:'',		 
 				});
 			}
 		}
