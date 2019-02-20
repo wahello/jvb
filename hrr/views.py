@@ -3174,7 +3174,8 @@ def update_data_as_per_userinput_form(user,data,current_date):
 			data['lowest_hrr_1min'] =  float(lowest_hr_first_minute)
 			data['No_beats_recovered'] = data.get(
 				'HRR_start_beat',0)-float(lowest_hr_first_minute)
-		data['Did_you_measure_HRR'] = single_obj.measured_hr
+		if single_obj.measured_hr:
+			data['Did_you_measure_HRR'] = single_obj.measured_hr
 
 	return data
 
