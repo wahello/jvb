@@ -320,7 +320,7 @@ def makeformat(trans_activity_data,current_date,last_seven_days_date):
 					formated_data[actvity_date] = single_activity	
 	return formated_data
 
-def get_exercise_consistency_grade(user,current_date,user_age):
+def get_exercise_consistency_grade(user,current_date,user_age,weekly_user_input_activities):
 	trans_activity_data = []
 	last_seven_days_date = current_date - timedelta(days=6)
 	week_activity_data = UserFitbitDataActivities.objects.filter(
@@ -333,10 +333,6 @@ def get_exercise_consistency_grade(user,current_date,user_age):
 			user_input__user = user).order_by('user_input__created_at'))
 	weekly_daily_strong = quicklook.calculations.garmin_calculation.get_weekly_user_input_data(
 		daily_strong,current_date,last_seven_days_date)
-	weekly_user_input_activities = get_daily_activities_in_base_format(
-			user,last_seven_days_date.date(),
-			to_date = current_date.date(),
-			include_all = True)
 	if week_activity_data:
 		for i in range(0,len(week_activity_data)):
 			todays_activity_data = ast.literal_eval(week_activity_data[i].activities_data.replace(
@@ -486,10 +482,11 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 				todays_daily_strong.append(daily_strong[i])
 				break
 
-		userinput_activities = quicklook.calculations.garmin_calculation.safe_get(
-			todays_daily_strong,'activities',None)
-		if userinput_activities:
-			userinput_activities = json.loads(userinput_activities)
+		weekly_user_input_activities = get_daily_activities_in_base_format(
+			user,last_seven_days_date.date(),
+			to_date = current_date.date(),
+			include_all = True)
+		userinput_activities = weekly_user_input_activities[current_date.strftime('%Y-%m-%d')]
 
 		todays_activity_data = get_fitbit_model_data(
 			UserFitbitDataActivities,user,current_date.date(),current_date.date())
@@ -727,7 +724,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			
 		# Exercise Grade and point calculation
 		exe_consistency_grade = get_exercise_consistency_grade(
-			user,current_date,user_age)
+			user,current_date,user_age,weekly_user_input_activities)
 		grades_calculated_data['exercise_consistency_grade'] = \
 			exe_consistency_grade[0]
 		grades_calculated_data['exercise_consistency_score'] = \

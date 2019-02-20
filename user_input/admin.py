@@ -1,3 +1,5 @@
+import ast
+
 from django.contrib import admin
 from user_input.models import DailyUserInputEncouraged,\
 							  DailyUserInputStrong,\
@@ -37,12 +39,14 @@ class UserInputAdmin(admin.ModelAdmin):
 	]
 
 class DailyActivityAdmin(admin.ModelAdmin):
-	list_display = ('user', 'created_at',)
+	list_display = ('user','activity_name','created_at','duplicate','deleted')
 	list_filter = ('created_at',)
 	save_on_top = True
-	search_fields = ('user__username', 'created_at', )
-
-# Register your models here.
+	search_fields = ('user__username', 'created_at',)
+	def activity_name(self,obj):
+		activity_data = ast.literal_eval(obj.activity_data)
+		activity_name = activity_data.get('activityType','-')
+		return activity_name.lower()
 
 admin.site.register(UserDailyInput,UserInputAdmin)
 admin.site.register(DailyActivity, DailyActivityAdmin)

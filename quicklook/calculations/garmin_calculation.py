@@ -2793,9 +2793,6 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 				todays_daily_strong.append(daily_strong[i])
 				break
 		
-		# userinput_activities = safe_get(todays_daily_strong,'activities',None)
-		# if userinput_activities:
-		# 	userinput_activities = json.loads(userinput_activities)
 		userinput_activities = weekly_user_input_activities[current_date.strftime('%Y-%m-%d')]
 
 		bodycmp = get_garmin_model_data(
