@@ -1,4 +1,6 @@
+
 import React, {Component} from 'react'
+import _ from 'lodash';
 import {Button,FormGroup, Label, Input, FormText, className, Modal,
 ModalHeader, ModalBody, ModalFooter, Collapse,Popover,PopoverBody} from 'reactstrap';
 import Textarea from 'react-textarea-autosize';
@@ -332,7 +334,8 @@ setActivitiesEditModeFalse(){
 deleteActivity(event){
     const target = event.target;
     const selectedActivityId = target.getAttribute('data-name');
-    let updated_activites_state = this.state.activites;
+    let oldActivities = this.state.activites;
+    let updated_activites_state = _.cloneDeep(this.state.activites);
     let updated_activities_edit_mode = this.state.activities_edit_mode;
     updated_activites_state[selectedActivityId]['deleted'] = true;
     for(let[key,val] of Object.entries(updated_activities_edit_mode[selectedActivityId])){
@@ -342,7 +345,7 @@ deleteActivity(event){
         activites:updated_activites_state,
         activities_edit_mode:updated_activities_edit_mode
     },()=>{
-        this.props.updateParentActivities(this.state.activites);
+        this.props.updateParentActivities(updated_activites_state,oldActivities);
     });
     this.toggle_delete(event);
 }
@@ -604,6 +607,7 @@ handleChangeModal(event){
 editToggleHandlerActivityType(event){
     const target = event.target;
     const selectedActivityId = target.getAttribute('data-name');
+    let oldActivities = _.cloneDeep(this.state.activites);
     let activity_time=this.state.activites_hour_min[selectedActivityId];
     let categoryMode = this.state.activities_edit_mode[selectedActivityId];
 
@@ -613,7 +617,7 @@ editToggleHandlerActivityType(event){
             ...this.state.activities_edit_mode,
             [selectedActivityId]:categoryMode
         },()=>{
-            this.props.updateParentActivities(this.state.activites);
+            this.props.updateParentActivities(this.state.activites,oldActivities);
         });
     }
 }
@@ -881,6 +885,7 @@ handleChange_activity(event){
     const target = event.target;
     const value = target.value;
     const selectedActivityId = target.getAttribute('data-name');
+    let oldActivities = _.cloneDeep(this.state.activites);
     let activity_data = this.state.activites[selectedActivityId];
     activity_data['activityType'] = value;
 
@@ -894,25 +899,33 @@ handleChange_activity(event){
         ...this.state.activites,
         [selectedActivityId]:activity_data
     }
-    });
+     }
+     ,() =>  this.props.updateParentActivities(this.state.activites,oldActivities)
+     );
     $('#comments_id').css('display','none');
     if(value == "OTHER"){
         this.setState({
         [selectedActivityId]: value,
         "modal_activity_type":""
-        });
+        }
+        ,() =>  this.props.updateParentActivities(this.state.activites,oldActivities)
+        );
     }
     else if(name == "activity_display_name"){
         this.setState({
         [selectedActivityId]: value,
         "modal_activity_type":value
-        });
+        }
+        ,() =>  this.props.updateParentActivities(this.state.activites,oldActivities)
+        );
     }
     else{
         this.setState({
         [selectedActivityId]: value
-        });
-    } 
+        }
+        ,() =>  this.props.updateParentActivities(this.state.activites,oldActivities)
+        );
+    }
 }
 
 handleChange_time(event){
@@ -1097,6 +1110,7 @@ handleChange_steps_type(event){
 handleChange_duplicate_info(event) {
     const target = event.target;
     const selectedActivityId = target.getAttribute('data-name');
+    let oldActivities = _.cloneDeep(this.state.activites)
     let activity_data = this.state.activites[selectedActivityId];
     let duplicate = activity_data['duplicate'];
     if(duplicate == false)
@@ -1110,7 +1124,7 @@ handleChange_duplicate_info(event) {
         [selectedActivityId]: activity_data
       });
     }
-    this.props.updateParentActivities(this.state.activites);
+    this.props.updateParentActivities(this.state.activites,oldActivities);
 }
 /************** CHANGES DONE BY MOUNIKA NH:ENDS *****************/
 getDTMomentObj(dt,hour,min,sec,am_pm){
@@ -1252,13 +1266,11 @@ handleChange(event){
     const target = event.target;
     const value = target.value;
     const name = target.name;//modal_duplicate_info_status
-
  /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
     let actType = this.state.modal_activity_type;
     let actAvgHeartRate = this.state.modal_activity_heart_rate;
     let steps_type = this.getActivityCategory(actType,parseInt(actAvgHeartRate));
 /************** CHANGES DONE BY BHANUCHANDAR B:ENDS *****************/
-
     if(value == "OTHER"){
         let actType = value;
         let actAvgHeartRate = this.state.modal_activity_heart_rate;
@@ -1345,7 +1357,7 @@ CreateNewActivity(data){
         let newActivityID = Math.floor(1000000000 + Math.random() * 900000000);
         activity_Id = newActivityID;
     }
-    
+    let oldActivities = _.cloneDeep(this.state.activites);
     let durationsecs = this.state.modal_activity_sec;
     let durationmins = this.state.modal_activity_min;
     let durationhours = this.state.modal_activity_hour;
@@ -1467,7 +1479,7 @@ CreateNewActivity(data){
             [activity_Id]:activity_start_end_time_state[activity_Id]
         }
     },()=>{
-        this.props.updateParentActivities(this.state.activites);
+        this.props.updateParentActivities(this.state.activites,oldActivities);
     });
 }
 activitySelectOptions(){

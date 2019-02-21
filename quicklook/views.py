@@ -413,7 +413,7 @@ def mcs_excel(to_date,from_date,book,user,response,excel_type,
 	sheet11 = book.add_worksheet('Movement Consistency')
 	sheet11.set_landscape()
 	sheet11.fit_to_pages(1, 1)
-	sheet11.set_zoom(73)
+	sheet11.set_zoom(58)
 	sheet11.write(0,0,"Movement Consistency Historical Data",bold)
 	sheet11.write(0,10,"Sleeping",format_orange)
 	sheet11.write(0,11,"Active",format_green)

@@ -227,6 +227,7 @@ class UserInputs extends React.Component{
       this.renderUpdateOverlay = renderers.renderUpdateOverlay.bind(this);
       this.renderSubmitOverlay = renderers.renderSubmitOverlay.bind(this);
       this.renderHrr = renderers.renderHrr.bind(this);
+      this.AutopopulateStrengthActivities = renderers.AutopopulateStrengthActivities.bind(this);
       this.renderActivityGrid = renderers.renderActivityGrid.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
@@ -887,6 +888,7 @@ shouldFetchWeatherData(activities){
                     true
                 );
             }
+            this.AutopopulateStrengthActivities()
         });
      }else{
         this.setState({
@@ -905,6 +907,7 @@ shouldFetchWeatherData(activities){
                 true
             );
           }
+          this.AutopopulateStrengthActivities()
         });
      }
     }
@@ -1032,6 +1035,7 @@ shouldFetchWeatherData(activities){
                 true
               );
             }
+          this.AutopopulateStrengthActivities()
         });
   }
 
@@ -1568,7 +1572,7 @@ handleScroll() {
         }
         return true;
     }
-
+    
     render(){
       
        const {fix} = this.props;
@@ -2142,6 +2146,7 @@ handleScroll() {
                             <FormGroup>
                            {
                               !this.state.editable &&
+                              this.state.report_type == 'full' &&
                               <div className="input">
                           
                               {(this.state.strength_workout_start_hour &&
@@ -2203,6 +2208,7 @@ handleScroll() {
                             <FormGroup>
                            {
                               !this.state.editable &&
+                              this.state.report_type == 'full' &&
                               <div className="input">
                 
                               {(this.state.strength_workout_end_hour &&
