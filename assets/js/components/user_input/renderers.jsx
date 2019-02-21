@@ -310,8 +310,128 @@ export function renderSubmitOverlay(){
 	}
 }
 
+function _extractDateTimeInfo(dateObj){
+	let datetimeInfo = {
+		calendarDate:null,
+		hour:'',
+		min:'',
+		meridiem:''
+	}
+
+	if(dateObj){
+		dateObj = moment(dateObj);
+		datetimeInfo['calendarDate'] = moment({ 
+			year :dateObj.year(),
+			month :dateObj.month(),
+			day :dateObj.date()
+		});
+
+		let hour = dateObj.hour();
+		if(hour < 12){
+			if(hour == 0)
+			hour = 12;
+			datetimeInfo['hour'] = hour;
+			datetimeInfo['meridiem'] = 'am';
+		}
+		else if(hour >= 12){
+			if(hour > 12)
+			hour -= 12;
+			datetimeInfo['hour'] = hour;
+			datetimeInfo['meridiem'] = 'pm';
+		}
+		let mins = dateObj.minute();
+		mins = (mins < 10) ? '0'+mins : mins;
+		datetimeInfo['min'] = mins;
+	}
+	return datetimeInfo;
+}
+
+ function shouldPopulateStrength(state,isStrengthChanged){   
+	if(state.workout_type === 'cardio')
+		return false;
+
+	if(isStrengthChanged){
+		return true;
+	}
+
+	if(state.strength_workout_start_hour &&
+		state.strength_workout_start_min &&
+		state.strength_workout_start_am_pm &&
+		state.strength_workout_end_hour &&
+		state.strength_workout_end_min &&
+		state.strength_workout_end_am_pm){
+		return false;
+	}
+
+	return true;
+	
+}
+
+function isStrengthActivityChanged(oldActivities, newActivities){
+	let isActivityChanged = false;
+	if(!_.isEmpty(newActivities)){
+		for(let[actID,actData] of Object.entries(newActivities)){
+			if(oldActivities[actID] == undefined || oldActivities[actID] == null){
+				// new activity is added, so trigger the autopopulation
+				isActivityChanged = true;
+			}
+			else if(actData.deleted != oldActivities[actID].deleted ||
+				actData.duplicate != oldActivities[actID].duplicate ||
+				actData.activityType !== oldActivities[actID].activityType) {
+				 isActivityChanged = true;
+			}
+		}
+	}
+	return isActivityChanged;
+}
+
+export function AutopopulateStrengthActivities(isStrengthChanged=false){ 
+	let maxduration = 0;
+	let duration;
+	let starttime ,endtime ;
+	let workout_type = this.state.workout_type;
+	workout_type = workout_type?workout_type:'strength';
+
+	if(!shouldPopulateStrength(this.state,isStrengthChanged)){
+		return
+	}
+
+	for(let[key,act] of  Object.entries(this.state.activities)){	
+		let activity_name = act.activityType;
+		let isActivityDeletedOrDuplicate = act.deleted || act.duplicate;
+		if(activity_name  
+			&& activity_name.toLowerCase().includes('strength') 
+			&& !isActivityDeletedOrDuplicate){
+			duration = act.durationInSeconds;
+			starttime = act.startTimeInSeconds;
+			endtime = starttime + duration ;
+			if(maxduration < duration){
+				maxduration = duration;
+				if(starttime){
+					let startTime12Hours = _extractDateTimeInfo(moment.unix(starttime));
+					this.setState({
+						workout_type:workout_type,
+						strength_workout_start_hour : startTime12Hours.hour,
+						strength_workout_start_min : startTime12Hours.min,
+						strength_workout_start_am_pm : startTime12Hours.meridiem			 
+					});				 
+				}
+				if (endtime){	
+					let endTime12Hours = _extractDateTimeInfo(moment.unix(endtime));
+					this.setState({
+						workout_type:workout_type,
+						strength_workout_end_hour : endTime12Hours.hour,
+						strength_workout_end_min : endTime12Hours.min,
+						strength_workout_end_am_pm : endTime12Hours.meridiem
+					});
+				}
+			}
+		}
+	} 
+} 
+
 export function renderActivityGrid(){
-	const updateParentActivities = function(activities){
+	const updateParentActivities = function(activities,oldActivities=null){
 		let workout = this.state.workout;
 		if(!_.isEmpty(activities)){
 			let have_exercise_activity = false;
@@ -323,12 +443,37 @@ export function renderActivityGrid(){
 			}
 			workout = have_exercise_activity?'yes':'no';
 		}
+		for(let [key,act] of Object.entries(activities)){
+			let activity_name = act.activityType;
+			if(activity_name && activity_name.toLowerCase().includes('strength')){
+				let isStrengthChanged = isStrengthActivityChanged(
+					oldActivities,
+					activities
+				);
 
-		this.setState({
-			workout:workout,
-			activities:activities
-		});
+				this.setState({
+					workout : workout,
+					activities : activities,
+				},() => {
+					this.AutopopulateStrengthActivities(isStrengthChanged)
+				});  
+			}
+			else{
+				this.setState({
+					workout:workout,
+					activities:activities,
+					workout_type:'',
+					strength_workout_start_hour: '',
+					strength_workout_start_min : '',
+					strength_workout_start_am_pm: '',
+					strength_workout_end_hour: '',
+					strength_workout_end_min: '',
+					strength_workout_end_am_pm:'',		 
+				});
+			}
+		}
 	}.bind(this);
+
 	return(
 		<ActivityGrid
 			updateParentActivities = {updateParentActivities}

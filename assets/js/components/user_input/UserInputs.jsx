@@ -225,6 +225,7 @@ class UserInputs extends React.Component{
       this.renderUpdateOverlay = renderers.renderUpdateOverlay.bind(this);
       this.renderSubmitOverlay = renderers.renderSubmitOverlay.bind(this);
       this.renderHrr = renderers.renderHrr.bind(this);
+      this.AutopopulateStrengthActivities = renderers.AutopopulateStrengthActivities.bind(this);
       this.renderActivityGrid = renderers.renderActivityGrid.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
@@ -784,12 +785,16 @@ transformActivity(activity){
           workout:have_activities?'yes':workout_status,
           weight: weight?weight:"i do not weigh myself today",
           activities:activities
+      },() => {
+        this.AutopopulateStrengthActivities()
       });
      }else{
         this.setState({
           workout:have_activities?'yes':workout_status,
           weight: weight?weight:"i do not weigh myself today",
           activities:activities
+        },() => {
+          this.AutopopulateStrengthActivities()
         });
      }
     }
@@ -881,7 +886,9 @@ transformActivity(activity){
     activities = this.getMergedGarminAndUserActivities(data.data.activites,activities);
     this.setState({
       activities:activities
-    });
+      }, 
+        () => {this.AutopopulateStrengthActivities()}
+    );
   }
   
 
@@ -1415,7 +1422,7 @@ handleScroll() {
         }
         return true;
     }
-
+    
     render(){
       const children = React.Children.map(this.props.children,
       (child, index) => React.cloneElement(child, {
@@ -1994,6 +2001,7 @@ handleScroll() {
                             <FormGroup>
                            {
                               !this.state.editable &&
+                              this.state.report_type == 'full' &&
                               <div className="input">
                           
                               {(this.state.strength_workout_start_hour &&
@@ -2055,6 +2063,7 @@ handleScroll() {
                             <FormGroup>
                            {
                               !this.state.editable &&
+                              this.state.report_type == 'full' &&
                               <div className="input">
                 
                               {(this.state.strength_workout_end_hour &&
