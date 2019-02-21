@@ -138,7 +138,11 @@ class MovementLeaderboard2 extends Component{
 				let td = this.exerciseDurColrsSingleDayOr2to6Days(
 							avgValueInSecPerDay,background,color,value1,rank);
 				return td;
-			}	
+			}
+			else {
+				let td = this.exerciseDurColrsSingleDayOr2to6Days(value,background,color,value1,rank);
+				return td;
+			} 	
 		}   
 	}
 
