@@ -80,7 +80,8 @@ class MovementLeaderboard extends Component{
 			selectedRange:{
 		  		dateRange:null,
 		  		rangeType:'today'
-		  	}
+		  	},
+		  	numberOfDays:1,
 		}
 		this.toggleCalendar = this.toggleCalendar.bind(this);
 		this.renderOverallMovementTable = this.renderOverallMovementTable.bind(this);
@@ -168,7 +169,6 @@ class MovementLeaderboard extends Component{
 	}
 	successMcsSnapshot(data){
 		this.setState({
-			// mcs_data:data.data[moment(this.state.selectedDate).format('YYYY-MM-DD')]
 			mcs_data:data.data,
 			selectedRangeMCSData:data.data[moment(this.state.selectedDate).format('YYYY-MM-DD')]
 		},()=>{
@@ -181,9 +181,13 @@ class MovementLeaderboard extends Component{
 	processDate(selectedDate){
 		this.setState({
 			selectedDate:selectedDate,
-			// mcs_date:selectedDate,
 			fetching_hrr4:true,
 			calendarOpen:!this.state.calendarOpen,
+			numberOfDays:1,
+			selectedRange:{
+		  		dateRange:null,
+		  		rangeType:'today'
+		  	},
 		},()=>{
 			fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate);
 			fetchMcsSnapshot(this.successMcsSnapshot,this.errorMcsSnapshot,this.state.selectedDate);
@@ -309,8 +313,14 @@ class MovementLeaderboard extends Component{
        let date1 =moment(d1).format('MMM DD, YYYY');
        let d2 = d[2];
        let date2 =moment(d2).format('MMM DD, YYYY');
-       let date = date1 + ' to ' + date2;
-       return date;
+       if(moment(d2).isAfter(d1)){
+       	let date = date1 + ' to ' + date2;
+       	return date;
+       }
+       else{
+       	let date = date2 + ' to ' + date1;
+       	return date;
+       }
 	}
 	handleBackButton(){
   		this.setState({
@@ -369,6 +379,7 @@ class MovementLeaderboard extends Component{
 		  		dateRange:null,
 		  		rangeType:null
 		  	};
+		  	let numberOfDays = 1;
 	  		let rangeMCSData = null;
 	  		let rank;
 	  		let capt = dur[0].toUpperCase() + dur.slice(1)
@@ -385,6 +396,7 @@ class MovementLeaderboard extends Component{
 	  			rangeMCSData = mcs_data[value5[dur]];
 	  			selectedRange['dateRange'] = value5[dur];
 	  			selectedRange['rangeType'] = dur;
+	  			// let numberOfDays = 1;
 	  		}
 	  		else if(dur == "week"){
 		  		date = this.headerDates(value5[dur]);
@@ -425,6 +437,20 @@ class MovementLeaderboard extends Component{
 	  	
 	}
 	reanderAllHrr(all_data,rangeMCSData,value1,capt,date,selectedRange){
+		let numberOfDays = 1;
+		if(selectedRange.rangeType !== 'today' && selectedRange.rangeType !== 'yesterday'){
+			let startDate = selectedRange.dateRange.split("to")[0].trim();
+			let endDate = selectedRange.dateRange.split("to")[1].trim();
+			let numberOfDays = Math.abs(moment(endDate).diff(moment(startDate), 'days'))+1;
+			this.setState({
+				numberOfDays:numberOfDays,
+			})
+		}
+		else{
+			this.setState({
+				numberOfDays:1,
+			})
+		}
 		this.setState({
 			all_movement_rank_data:all_data,
 			Movement_username:value1,
@@ -434,9 +460,8 @@ class MovementLeaderboard extends Component{
 			active_view:!this.state.active_view,
 			btnView:!this.state.btnView2,
 			selectedRangeMCSData:rangeMCSData,
-			selectedRange:selectedRange
+			selectedRange:selectedRange,
 		},()=>{
-
 		});
 	}
 
@@ -632,7 +657,7 @@ class MovementLeaderboard extends Component{
 					        </DropdownMenu>
 					      </Dropdown>
 					      
-				      	<span className = "weekdate"><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span>
+				      	<span className = "weekdate" style={{marginLeft:"auto",marginRight:"auto"}}><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"+" - "+" Number of Days: "+this.state.numberOfDays}</span></span>
 			        </div>
 		  		<MovementLeaderboard2 
 		  			Movement_data = {this.state.all_movement_rank_data}
