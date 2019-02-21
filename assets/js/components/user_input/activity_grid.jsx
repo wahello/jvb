@@ -775,7 +775,6 @@ handleChange_activity(event){
      );
     $('#comments_id').css('display','none');
     if(value == "OTHER"){
-        console.log(value,"value");
         this.setState({
         [selectedActivityId]: value,
         "modal_activity_type":""
@@ -784,7 +783,6 @@ handleChange_activity(event){
         );
     }
     else if(name == "activity_display_name"){
-        console.log(name,"name");
         this.setState({
         [selectedActivityId]: value,
         "modal_activity_type":value
