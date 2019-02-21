@@ -102,30 +102,41 @@ class MovementLeaderboard2 extends Component{
 			let endDate = selectedRange.dateRange.split("to")[1].trim();
 			let numberOfDays = Math.abs(moment(endDate).diff(moment(startDate), 'days'))+1;
 			if(numberOfDays >= 7){
-				if(value == this.strToSecond("0:00")){
+				let avgValueInSecPer7Days = Math.round(value / numberOfDays) * 7
+				if(avgValueInSecPer7Days == this.strToSecond("0:00")){
 					background = "red";
 				    color = "black";
 				}
-				else if(value > this.strToSecond("0:00")  && value <= this.strToSecond("01:39")){
+				else if(avgValueInSecPer7Days > this.strToSecond("0:00") 
+						&& avgValueInSecPer7Days <= this.strToSecond("01:39")){
 					background = "orange";
 			        color = "white";
 			    }
-				else if(value > this.strToSecond("01:39")  && value <= this.strToSecond("02:29")){
+				else if(avgValueInSecPer7Days > this.strToSecond("01:39") 
+						&& avgValueInSecPer7Days <= this.strToSecond("02:29")){
 					background = "yellow";
 			        color = "black";
 			    }
-				else if((value > this.strToSecond("02:29")  && value <= this.strToSecond("04:59"))){
+				else if((avgValueInSecPer7Days > this.strToSecond("02:29") 
+						&& avgValueInSecPer7Days <= this.strToSecond("04:59"))){
 					background = "#32CD32";
 			        color = "white";
 			    }
-				else if(value >= this.strToSecond("05:00")){
+				else if(avgValueInSecPer7Days >= this.strToSecond("05:00")){
 					background = "green";
 			        color = "white";
 			    }
-			    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{value1} {'('+rank+')'}</span></td>
+			    return (
+			    	<td className ="overall_rank_value" 
+			    		style = {{backgroundColor:background,color:color}}>
+			    		<span>{value1} {'('+rank+')'}</span>
+			    	</td>
+			    );
 			}
 			else if(numberOfDays >= 2 && numberOfDays <= 6){
-				let td = this.exerciseDurColrsSingleDayOr2to6Days(value,background,color,value1,rank);
+				let avgValueInSecPerDay = Math.round(value / numberOfDays)
+				let td = this.exerciseDurColrsSingleDayOr2to6Days(
+							avgValueInSecPerDay,background,color,value1,rank);
 				return td;
 			}	
 		}   
