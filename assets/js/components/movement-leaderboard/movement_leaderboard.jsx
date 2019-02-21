@@ -81,7 +81,7 @@ class MovementLeaderboard extends Component{
 		  		dateRange:null,
 		  		rangeType:'today'
 		  	},
-		  	numberOfDays:1,
+		  	numberOfDays:null,
 		}
 		this.toggleCalendar = this.toggleCalendar.bind(this);
 		this.renderOverallMovementTable = this.renderOverallMovementTable.bind(this);
@@ -183,7 +183,7 @@ class MovementLeaderboard extends Component{
 			selectedDate:selectedDate,
 			fetching_hrr4:true,
 			calendarOpen:!this.state.calendarOpen,
-			numberOfDays:1,
+			numberOfDays:null,
 			selectedRange:{
 		  		dateRange:null,
 		  		rangeType:'today'
@@ -379,7 +379,6 @@ class MovementLeaderboard extends Component{
 		  		dateRange:null,
 		  		rangeType:null
 		  	};
-		  	let numberOfDays = 1;
 	  		let rangeMCSData = null;
 	  		let rank;
 	  		let capt = dur[0].toUpperCase() + dur.slice(1)
@@ -396,7 +395,6 @@ class MovementLeaderboard extends Component{
 	  			rangeMCSData = mcs_data[value5[dur]];
 	  			selectedRange['dateRange'] = value5[dur];
 	  			selectedRange['rangeType'] = dur;
-	  			// let numberOfDays = 1;
 	  		}
 	  		else if(dur == "week"){
 		  		date = this.headerDates(value5[dur]);
@@ -437,18 +435,21 @@ class MovementLeaderboard extends Component{
 	  	
 	}
 	reanderAllHrr(all_data,rangeMCSData,value1,capt,date,selectedRange){
-		let numberOfDays = 1;
+		let numberOfDays;
 		if(selectedRange.rangeType !== 'today' && selectedRange.rangeType !== 'yesterday'){
+			console.log("not today or yesterday")
 			let startDate = selectedRange.dateRange.split("to")[0].trim();
 			let endDate = selectedRange.dateRange.split("to")[1].trim();
 			let numberOfDays = Math.abs(moment(endDate).diff(moment(startDate), 'days'))+1;
 			this.setState({
 				numberOfDays:numberOfDays,
+			},()=>{
+				console.log("numberOfDays:",this.state.numberOfDays)
 			})
 		}
 		else{
 			this.setState({
-				numberOfDays:1,
+				numberOfDays:null,
 			})
 		}
 		this.setState({
@@ -657,7 +658,7 @@ class MovementLeaderboard extends Component{
 					        </DropdownMenu>
 					      </Dropdown>
 					      
-				      	<span className = "weekdate" style={{marginLeft:"auto",marginRight:"auto"}}><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"+" - "+" Number of Days: "+this.state.numberOfDays}</span></span>
+				      	<span className = "weekdate" style={{marginLeft:"auto",marginRight:"auto"}}><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}{this.state.numberOfDays&&<span>{" - "+"Total Days: "+this.state.numberOfDays}</span>}</span></span>
 			        </div>
 		  		<MovementLeaderboard2 
 		  			Movement_data = {this.state.all_movement_rank_data}
