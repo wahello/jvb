@@ -1314,7 +1314,7 @@ def store_garmin_aa1(user,from_date,to_date):
 	print("HRR calculations got finished")
 
 def store_fitbit_aa1(user,from_date,to_date):
-	actvities_list,activities_dict,userinput_form = get_usernput_activities(user,from_date)
+	activities_dict = get_usernput_activities(user,from_date)
 	data = fitbit_aa.fitbit_aa_chart_one_new(user,from_date,user_input_activities=activities_dict)
 	if data.get('total_time'):
 		print("Fitbit AA1 calculations creating")
@@ -1658,7 +1658,7 @@ def store_garmin_aa_workout(user,from_date,to_date):
 
 
 def store_fitbit_aa_workout(user,from_date,to_date):
-	actvities_list,activities_dict,userinput_form = get_usernput_activities(user,from_date)
+	activities_dict = get_usernput_activities(user,from_date)
 	data = fitbit_aa.calculate_AA2_workout(user,from_date,user_input_activities=activities_dict)
 	if data:
 			try:
@@ -2226,7 +2226,7 @@ def store_garmin_aa_daily(user,from_date,to_date):
 	print("A/A dailes finished")
 
 def store_fitbit_aa_daily(user,from_date,to_date):
-	actvities_list,activities_dict,userinput_form = get_usernput_activities(user,from_date)
+	activities_dict = get_usernput_activities(user,from_date)
 	data = fitbit_aa.calculate_AA2_daily(user,from_date,user_input_activities=activities_dict)
 	if data:
 			try:
@@ -2675,7 +2675,7 @@ def store_garmin_aa3(user,from_date,to_date):
 	return None
 
 def store_fitbit_aa3(user,from_date,to_date):
-	actvities_list,activities_dict,userinput_form = get_usernput_activities(user,from_date)
+	activities_dict = get_usernput_activities(user,from_date)
 	data = fitbit_aa.calculate_AA3(user,from_date,user_input_activities=activities_dict)
 	if data:
 		try:
