@@ -266,6 +266,17 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 					'indoor_temperature':activity.get('indoor_temperature')
 				}
 				weather_attrs_with_units = weather_report_dict(weather_attrs)
+
+				is_duplicate = False
+				if activity.get("duplicate"):
+					is_duplicate = activity.get("duplicate")
+				is_deleted = False
+				if activity.get("deleted"):
+					is_deleted = activity.get("deleted")
+				can_update_steps_type = False
+				if activity.get("can_update_steps_type"):
+					can_update_steps_type = activity.get("can_update_steps_type")
+
 				act_obj = DailyActivity(
 					user = user,
 					activity_id = activity['summaryId'],
@@ -273,12 +284,11 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 					activity_data = activity_stats,
 					start_time_in_seconds  = start_time,
 					activity_weather = weather_attrs_with_units,
-					can_update_steps_type = activity.get(
-						'can_update_steps_type',True),
+					can_update_steps_type = can_update_steps_type,
 					steps_type = activity.get('steps_type'),
 					comments = activity.get('comments'),
-					duplicate = activity.get('duplicate',False),
-					deleted = activity.get('deleted',False)
+					duplicate = is_duplicate,
+					deleted = is_deleted
 				)
 				todays_activity = todays_activities.get(activity['summaryId'],None)
 				if todays_activity:
@@ -286,12 +296,11 @@ class UserDailyInputSerializer(serializers.ModelSerializer):
 						activity_data = activity_stats,
 						activity_weather = weather_attrs_with_units,
 						start_time_in_seconds  = start_time,
-						can_update_steps_type = activity.get(
-							'can_update_steps_type',True),
+						can_update_steps_type = can_update_steps_type,
 						steps_type = activity.get('steps_type'),
 						comments = activity.get('comments'),
-						duplicate = activity.get('duplicate',False),
-						deleted = activity.get('deleted',False))
+						duplicate = is_duplicate,
+						deleted = is_deleted)
 					todays_activity.save()
 				else:
 					activities_model_objects.append(act_obj)
