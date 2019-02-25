@@ -10,7 +10,8 @@ import 'moment-timezone';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; 
 import { ToastContainer, toast } from 'react-toastify';
-import {getUserProfile} from '../../network/auth';
+import { getUserProfile,getActivityInfo } from '../../network/auth';
+
 
 const activites = { "":"Select",
 "OTHER":"OTHER",
@@ -150,6 +151,7 @@ this.successProfile=this.successProfile.bind(this);
 this.calculateZone = this.calculateZone.bind(this);
 this.editToggleHandler_weather = this.editToggleHandler_weather.bind(this);
 this.handleChange_weather = this.handleChange_weather.bind(this);
+//this.getInfoOfActivity = this.getInfoOfActivity.bind(this);
 
 this.state ={
     selected_date:selected_date,
@@ -271,7 +273,62 @@ componentWillReceiveProps(nextProps) {
     }
 }
 
+successCallback(data){
+  console.log(data,"data");
+    this.setState({
+            "avg_heartrate": data.data.avg_heartrate,
+            "activity_category": data.data.activity_category,
+            "steps": data.data.steps
+           });
+  }
 
+errorCallback(error){
+        console.log(error.message); 
+    }
+
+getInfoOfActivity(activity_display_name,activity_start_date, activity_start_hour,
+                  activity_start_min,activity_start_sec, activity_start_am_pm,
+                  activity_end_date,activity_end_hour, activity_end_min, 
+                  activity_end_sec,activity_end_am_pm){
+
+    let activityStartTimeMObject = this.getDTMomentObj( activity_start_date,
+                                                        activity_start_hour,
+                                                        activity_start_min,
+                                                        activity_start_sec,
+                                                        activity_start_am_pm );
+    let activityEndTimeMObject = this.getDTMomentObj( activity_end_date,
+                                                      activity_end_hour,
+                                                      activity_end_min,
+                                                      activity_end_sec,
+                                                      activity_end_am_pm );
+    let timezone = moment.tz.guess();
+   
+    let date = this.state.selected_date;
+    let act_type = this.state.activities;
+    let act_start_epoch = activityStartTimeMObject.unix();
+    let act_end_epoch = activityEndTimeMObject.unix();
+    let utc_offset = (moment.tz(moment.utc(),timezone).utcOffset())*60;
+    console.log(date);
+    console.log(act_start_epoch);
+    console.log(act_end_epoch);
+    console.log(act_type);
+    console.log(utc_offset);
+   
+    if(this.state.date != null && this.state.act_type != null && this.state.act_start_epoch != null 
+         && this.state.act_end_epoch != null && this.state.utc_offset != null){
+    this.setState({
+
+        "date":"",
+        "act_start_epoch":"",
+        "act_end_epoch":"",
+        "act_type":"",
+        "utc_offset":"",
+
+    },() => {this.getActivityInfo(this.successCallback,this.errorCallback,this.state.date,
+                                  this.state.act_start_epoch,this.state.act_end_epoch,this.state.act_type,
+                                  this.state.utc_offset)});
+  }
+}
 
 addingCommaToSteps(value){
     value += '';
@@ -1279,7 +1336,9 @@ handleChange(event){
             [name]: value,
             modal_activity_type:"",
             modal_exercise_steps_status:steps_type
-        });
+        },
+          () => this.getInfoOfActivity(actType) 
+        );
     }
     else if(name == "activity_display_name"){
         let actType = value;
@@ -1289,7 +1348,9 @@ handleChange(event){
             [name]: value,
             modal_activity_type:value,
             modal_exercise_steps_status:steps_type
-        });
+        },
+          () => this.getInfoOfActivity(actType)
+          );
     }
     else if(name == "modal_activity_heart_rate"){
         let actType = this.state.modal_activity_type;
@@ -1612,6 +1673,8 @@ handleChangeModelActivityStartTimeDate(date){
     this.setState({
         activity_start_date:date
     },()=>{
+            //let ActivityInfo = this.getInfoOfActivity(this.state.activity_start_date);        
+            
             let duration = this.getTotalActivityDuration();
             let isActivityTimeValid = this.props.dateTimeValidation(
                 this.state.activitystarttime_calender,
@@ -1642,6 +1705,14 @@ handleChangeModelActivityEndTimeDate(date){
     this.setState({
         activity_end_date:date
     },()=>{
+           // let ActivityInfo = this.getInfoOfActivity(this.state.activity_end_date);
+          //  if(this.state.activity_display_name)
+              //  let ActivityInfo = this.getInfoOfActivity(this.state.activity_display_name,this.state.activity_start_date,
+                 //                                      this.state.activity_start_hour,this.state.activity_start_min,
+               //                                        this.state.activity_start_sec,this.state.activity_start_am_pm,
+                  //                                     this.state.activity_end_date,this.state.activity_end_hour,
+                  //                                     this.state.activity_end_min,this.state.activity_end_sec,
+                    //                                   this.state.activity_end_am_pm);
             let duration = this.getTotalActivityDuration();
             let isActivityTimeValid = this.props.dateTimeValidation(
                 this.state.activitystarttime_calender,
@@ -1674,6 +1745,15 @@ handleChangeModalActivityTime(event){
     this.setState({
         [name]: value
     },()=>{
+            //let ActivityInfo = this.getInfoOfActivity(this.state.activity_start_hour,this.state.activity_start_min,
+            //                                          this.state.activity_start_sec,this.state.activity_start_am_pm,
+             //                                         this.state.activity_end_hour,this.state.activity_end_min,
+              //                                        this.state.activity_end_sec,this.state.activity_end_am_pm);
+           // else if(this.state.activity_display_name)
+             //   let ActivityInfo = this.getActivityInfo(this.state.activity_start_hour,this.state.activity_start_min,
+               //                                         this.state.activity_start_sec,this.state.activity_start_am_pm,
+                 //                                       this.state.activity_end_hour,this.state.activity_end_min,
+                   //                                     this.state.activity_end_sec,this.state.activity_end_am_pm);
             let duration = this.getTotalActivityDuration();
             let isActivityTimeValid = this.props.dateTimeValidation(
                 this.state.activitystarttime_calender,
@@ -2064,24 +2144,9 @@ renderEditActivityModal(){
                         </Input>
                             </div> 
                             </FormGroup>
-                        }
-                        <FormGroup>
-                      <Label className="padding1">2. Activity Heart Rate</Label>
-                       <div className="input1 ">
-                        <Input 
-                          type="select" 
-                          className="form-control"
-                          style={{height:"37px"}}
-                          name = "modal_activity_heart_rate" 
-                          value={this.state.modal_activity_heart_rate}                               
-                          onChange={this.handleChange}>
-                          <option key="hours" value="">Select</option>
-                        {this.createSleepDropdown_heartrate(60,220)}     
-                        </Input>
-                            </div> 
-                            </FormGroup>                               
+                        }                            
                          <FormGroup>
-                            <Label className="padding1">3. Enter the Time Your Workout Started</Label>
+                            <Label className="padding1">2. Enter the Time Your Workout Started</Label>
                      <div className=" display_flex margin_lft0" >
                       <div className="align_width align_width1">
                         <div className="input " style = {{marginLeft:"15px"}}> 
@@ -2152,7 +2217,7 @@ renderEditActivityModal(){
                       </div>
                          </FormGroup>
                               <FormGroup>
-                            <Label className="padding1">4. Enter the Time Your Workout Ended</Label>
+                            <Label className="padding1">3. Enter the Time Your Workout Ended</Label>
                      <div className=" display_flex margin_lft0" >
                      <div className="align_width align_width1">
                         <div className="input " style = {{marginLeft:"15px"}}> 
@@ -2220,6 +2285,21 @@ renderEditActivityModal(){
                       </div>
                       </div>
                          </FormGroup>
+                         <FormGroup>
+                      <Label className="padding1">4. Activity Heart Rate</Label>
+                       <div className="input1 ">
+                        <Input 
+                          type="select" 
+                          className="form-control"
+                          style={{height:"37px"}}
+                          name = "modal_activity_heart_rate" 
+                          value={this.state.modal_activity_heart_rate}                               
+                          onChange={this.handleChange}>
+                          <option key="hours" value="">Select</option>
+                        {this.createSleepDropdown_heartrate(60,220)}     
+                        </Input>
+                            </div> 
+                            </FormGroup>   
                        <FormGroup>
                      <Label className="padding1">5. Exercise Duration (hh:mm:ss)</Label>
                      <div className=" display_flex margin_lft0" >
@@ -2462,6 +2542,12 @@ renderEditActivityModal(){
     
 componentDidMount(){
     getUserProfile(this.successProfile);
+     getActivityInfo(this.state.date,this.state.act_start_epoch,this.state.act_end_epoch,
+                     this.state.act_type,this.state.utc_offset,this.successCallback,this.errorCallback);
+    // fetch('http://127.0.0.1:8000/users/daily_input/get_activity_info')
+    // .then(response =>{
+    //   console.log(response,"response");
+    // });
 }
 
 
