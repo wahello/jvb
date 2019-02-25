@@ -276,7 +276,7 @@ class MovementLeaderboard2 extends Component{
 		
 		/***********************/
 		let header = this.refs.table_header_hrr;		
-		if(screen.width < 650){
+		if(window.scrollY < 150){
 			  header.classList.remove("mov_sticky");
 		}
 
@@ -286,17 +286,11 @@ class MovementLeaderboard2 extends Component{
 	/******* sticky table header on scroll ********/
 	handleScroll = () => {
 		 let header = this.refs.table_header_hrr;	
-		 var rect = header.getBoundingClientRect()
-		 let sticky = rect.top+80;
-
-		 if(screen.width > 650){
-		 	if (window.pageYOffset > sticky) {
+		 	if (window.scrollY >= 150) {
 		    header.classList.add("mov_sticky");
 		  } else {
 		    header.classList.remove("mov_sticky");
 		  }
-		 }
-
 	};
 	mcsData(status){
   		/* adding background color to card depends upon their steps ranges*/
@@ -332,7 +326,6 @@ class MovementLeaderboard2 extends Component{
 	    )
 	}
 	renderTable(Movement_data,Movement_username,MCS_data,selectedRange){
-		console.log("renderTable")
 		let operationCount = 0;
 		let td_rows = [];
 		let keys = ["rank","username","nes","exercise_steps","total_steps","mc","exercise_duration","active_min_total","active_min_sleep","active_min_exclude_sleep","active_min_exercise","active_min_exclude_sleep_exercise","total_movement_rank_point"];
