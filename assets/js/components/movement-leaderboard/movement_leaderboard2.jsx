@@ -326,7 +326,6 @@ class MovementLeaderboard2 extends Component{
 	    )
 	}
 	renderTable(Movement_data,Movement_username,MCS_data,selectedRange){
-		console.log("renderTable")
 		let operationCount = 0;
 		let td_rows = [];
 		let keys = ["rank","username","nes","exercise_steps","total_steps","mc","exercise_duration","active_min_total","active_min_sleep","active_min_exclude_sleep","active_min_exercise","active_min_exclude_sleep_exercise","total_movement_rank_point"];

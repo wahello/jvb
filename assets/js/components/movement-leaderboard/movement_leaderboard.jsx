@@ -462,14 +462,11 @@ class MovementLeaderboard extends Component{
 	reanderAllHrr(all_data,rangeMCSData,value1,capt,date,selectedRange){
 		let numberOfDays;
 		if(selectedRange.rangeType !== 'today' && selectedRange.rangeType !== 'yesterday'){
-			console.log("not today or yesterday")
 			let startDate = selectedRange.dateRange.split("to")[0].trim();
 			let endDate = selectedRange.dateRange.split("to")[1].trim();
 			let numberOfDays = Math.abs(moment(endDate).diff(moment(startDate), 'days'))+1;
 			this.setState({
 				numberOfDays:numberOfDays,
-			},()=>{
-				console.log("numberOfDays:",this.state.numberOfDays)
 			})
 		}
 		else{
