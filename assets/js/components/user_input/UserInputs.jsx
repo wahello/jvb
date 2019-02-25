@@ -464,11 +464,11 @@ shouldFetchWeatherData(activities){
           nap_end_time_info = this._extractDurationInfo(data.data.optional_input.nap_end_time);
 
         let strength_start_info = this._extractDurationInfo(null);
-        if(have_strong_input && data.data.strong_input.strength_workout_start) 
+        if(have_strong_input && canUpdateForm && data.data.strong_input.strength_workout_start) 
           strength_start_info = this._extractDurationInfo(data.data.strong_input.strength_workout_start);
 
         let strength_end_info = this._extractDurationInfo(null);
-        if(have_strong_input && data.data.strong_input.strength_workout_end)
+        if(have_strong_input && canUpdateForm && data.data.strong_input.strength_workout_end)
           strength_end_info = this._extractDurationInfo(data.data.strong_input.strength_workout_end); 
 
         let activities = {};
