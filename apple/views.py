@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.http import Http404
 
+
 from .serializers import UserAppleDataStepsSerializer
 
 from .models import UserAppleDataSteps
@@ -18,6 +19,6 @@ class UserAppleDataStepsView(generics.CreateAPIView):
 		serializer= UserAppleDataStepsSerializer(data= request.data, partial=True)
 		if serializer.is_valid():
 			serializer.save()
-			return Response(serializer.data,status=status.HTTP_201_CREATED)
-		return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+			return Response("Data Stored in Database Successfully",status=status.HTTP_201_CREATED)
+		return Response("Data Not Stored in Database",status=status.HTTP_400_BAD_REQUEST)
  

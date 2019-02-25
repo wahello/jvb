@@ -149,28 +149,33 @@
 	padding: 0.45rem !important;
     vertical-align: top !important;
     text-align: center;
-    max-width: 91px;
-    width:91px !important;
+    min-width: 90px !important;
+    width:1918px !important;
+    font-size: 12px !important;
 }
 .mov_dashboard_table .mov_sticky th table td{
 	padding: 0px !important;
 	min-width: 37px !important;
-	font-size: 13px !important;
+	font-size: 9px !important;
+	height: 24px !important;
 }
 .mov_dashboard_table th{
 	min-width:50px;	
 	word-wrap:break-word;
 	white-space:unset !important;
-	font-size: 13px;
+	font-size: 12px;
 }
 .mov_dashboard_table  th table{
 	width: 10px !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
 }
 .mov_dashboard_table  th table td{
 	padding: 0px !important;
 	min-width: 58px !important;
 	vertical-align: middle !important;
 	font-size: 10px !important;
+	height: 28px !important;
 }
 .mov_dashboard_table .mov_sticky {
 	position: fixed;
@@ -193,10 +198,9 @@
 	min-width: 10px !important;
 }
 .mov_dashboard_table .mov_sticky + tbody td{
-    min-width: 7px;
+    min-width: 90px !important;
     font-size: 13px;
     padding: 3px;
-    width: 91px;
     padding:0px;
     max-width: 1px !important;
     word-wrap: break-word !important;
@@ -206,6 +210,7 @@
 }
 .footer_content{
 	font-size: 14px !important;
+	text-align: justify;
 }
 
 @media screen and (max-width:649px){
@@ -214,7 +219,7 @@
 		font-size: 10px;
 	}
 }
-@media (max-width: 667px) and (min-width: 667px) and (orientation: landscape){
+@media (max-width: 666px) and (min-width: 450px) and (orientation: landscape){
 	.mov_dashboard_table{
 		padding:10px;
 	}
@@ -223,6 +228,78 @@
 		font-size:9px;
 		white-space:unset !important;
 		padding: 0rem !important;
+	}
+	.mov_dashboard_table .mov_sticky + tbody {
+		width:10px !important;
+	}
+	.mov_dashboard_table .mov_sticky + tbody td{
+		min-width: 1px !important;
+	    max-width: 0px !important;
+	    word-wrap: break-word;
+	    padding-left: 0px !important;
+	    padding-right: 1px !important;
+	    font-size: 9px !important;
+	}
+	.mov_dashboard_table th{
+		min-width: 21px !important;
+     	font-size: 9px;
+    	padding: 0rem !important;
+	}
+	.mov_dashboard_table th table {
+	    width: 0px !important;
+	    align-items: center;
+	    margin: 2px !important;
+	}
+	.mov_dashboard_table th table td {
+	    padding: 0px !important;
+	    min-width: 41px !important;
+	    vertical-align: middle !important;
+	    font-size: 8.3px !important;
+	}
+	.mov_dashboard_table .mov_sticky th {
+    	    min-width: 41px !important;
+		    font-size: 9px !important;
+		    padding: 0rem !important;
+		    max-width: 42px !important;
+	}
+	.mov_dashboard_table .mov_sticky th table {
+	    align-items: center;
+	    margin: 1px !important;
+	}
+	.mov_dashboard_table .mov_sticky th table td {
+	    padding: 0px !important;
+	    min-width: 1px !important;
+	    font-size: 7.5px !important;
+	}
+	.mov_dashboard_table .mov_sticky{
+		padding-right: 55px;
+		position: fixed !important;
+	}
+	.mov_dashboard_table tbody td table tr td{
+		height: 20px !important;
+	    min-width: 7px !important;    
+	}
+	.mov_dashboard_table .mov_sticky + tbody td table tr td{
+	    min-width: 0px !important;
+	    margin-left: 0px !important;
+	}
+	.footer_content{
+		font-size: 12px !important;
+		text-align: justify;
+	}
+	}
+@media (max-width: 710px) and (min-width: 667px) and (orientation: landscape){
+	.mov_dashboard_table{
+		padding:10px;
+	}
+	.mov_dashboard_table tbody td{
+		min-width:7px !important;
+		font-size:9px;
+		white-space:unset !important;
+		padding: 0rem !important;
+	}
+	.mov_dashboard_table .mov_sticky + tbody {
+		width:10px !important;
 	}
 	.mov_dashboard_table .mov_sticky + tbody td{
 		min-width: 1px !important;
@@ -250,7 +327,7 @@
 	}
 	.mov_dashboard_table .mov_sticky th {
 		min-width:43px !important;
-     	font-size: 9px;
+     	font-size: 9px !important;
     	padding: 0rem !important;
 	}
 	.mov_dashboard_table .mov_sticky th table {
@@ -260,10 +337,11 @@
 	.mov_dashboard_table .mov_sticky th table td {
 	    padding: 0px !important;
 	    min-width: 1px !important;
-	    font-size: 9px !important;
+	    font-size: 7.5px !important;
 	}
 	.mov_dashboard_table .mov_sticky{
-		padding-right:55px;
+		padding-right: 55px;
+		position: fixed !important;
 	}
 	.mov_dashboard_table tbody td table tr td{
 		height: 20px !important;
@@ -275,9 +353,10 @@
 	}
 	.footer_content{
 		font-size: 12px !important;
+		text-align: justify;
 	}
 }
-@media (max-width: 1300px) and (min-width: 668px) and (orientation: landscape){
+@media (max-width: 1300px) and (min-width: 711px) and (orientation: landscape){
 	.mov_dashboard_table{
 		padding:10px;
 	}
@@ -319,24 +398,27 @@
 		min-width: 20px !important;
 		vertical-align: middle !important;
 		font-size: 8.3px !important;
+		height: 20px !important;
 	}
 	.mov_dashboard_table .mov_sticky th {
 		min-width:48px !important;
      	font-size: 9px !important;
-    	padding: 0.1rem !important;
+    	padding: 0rem !important;
 	}
 	.mov_dashboard_table .mov_sticky th table{
-		margin: 0px !important;
+		margin: 1px 1px !important;
 	}
 	.mov_dashboard_table .mov_sticky th table td{
 		min-width: 20px !important;
-		font-size: 9px !important;
+		font-size: 8px !important;
 	}
 	.mov_dashboard_table .mov_sticky{
-		padding-right:55px;	
+		padding-right:55px;
+		position: fixed !important;	
 	}
 	.footer_content{
 		font-size: 12px !important;
+		text-align: justify;
 	}
 }
 

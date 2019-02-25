@@ -5,7 +5,7 @@ import FontAwesome from "react-fontawesome";
 import { Collapse, Navbar, NavbarToggler, 
          NavbarBrand, Nav, NavItem, NavLink,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input,
-    	Dropdown, DropdownToggle, DropdownMenu, DropdownItem} from 'reactstrap';
+    	Dropdown, DropdownToggle, DropdownMenu, DropdownItem, Modal,ModalHeader, ModalBody, ModalFooter} from 'reactstrap';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import NavbarMenu from '../navbar';
@@ -64,7 +64,6 @@ class MovementLeaderboard extends Component{
 	        all_movement_rank_data:'',
 	        mcs_data:'',
 	        current_user_id:null,
-	        // mcs_date:new Date(),
 	        Movement_username:"",
 	        duration_date:{
 				"week":"",
@@ -80,7 +79,9 @@ class MovementLeaderboard extends Component{
 			selectedRange:{
 		  		dateRange:null,
 		  		rangeType:'today'
-		  	}
+		  	},
+		  	numberOfDays:null,
+		  	infoButton:false,
 		}
 		this.toggleCalendar = this.toggleCalendar.bind(this);
 		this.renderOverallMovementTable = this.renderOverallMovementTable.bind(this);
@@ -106,6 +107,8 @@ class MovementLeaderboard extends Component{
 		this.renderDate = this.renderDate.bind(this);
 		this.toggle = this.toggle.bind(this);
 		this.reanderAllHrr = this.reanderAllHrr.bind(this);
+		this.toggleInfo = this.toggleInfo.bind(this);
+		this.infoPrint = this.infoPrint.bind(this);
 		// this.doResizeCode = this.doResizeCode.bind(this);
 		// this.doOnOrientationChange = this.doOnOrientationChange.bind(this);
 	}
@@ -168,7 +171,6 @@ class MovementLeaderboard extends Component{
 	}
 	successMcsSnapshot(data){
 		this.setState({
-			// mcs_data:data.data[moment(this.state.selectedDate).format('YYYY-MM-DD')]
 			mcs_data:data.data,
 			selectedRangeMCSData:data.data[moment(this.state.selectedDate).format('YYYY-MM-DD')]
 		},()=>{
@@ -181,9 +183,13 @@ class MovementLeaderboard extends Component{
 	processDate(selectedDate){
 		this.setState({
 			selectedDate:selectedDate,
-			// mcs_date:selectedDate,
 			fetching_hrr4:true,
 			calendarOpen:!this.state.calendarOpen,
+			numberOfDays:null,
+			selectedRange:{
+		  		dateRange:null,
+		  		rangeType:'today'
+		  	},
 		},()=>{
 			fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate);
 			fetchMcsSnapshot(this.successMcsSnapshot,this.errorMcsSnapshot,this.state.selectedDate);
@@ -302,6 +308,29 @@ class MovementLeaderboard extends Component{
 	      dateRange3:!this.state.dateRange3
 	    });
    	}
+   	toggleInfo(){
+	    this.setState({
+	      infoButton:!this.state.infoButton
+	    });
+    }
+    infoPrint(){
+	    var mywindow = window.open('', 'PRINT');
+	    mywindow.document.write('<html><head><style>' +
+	        '.research-logo {margin-bottom: 20px;width: 100%; min-height: 55px; float: left;}' +
+	        '.print {visibility: hidden;}' +
+	        '.research-logo img {max-height: 100px;width: 60%;border-radius: 4px;}' +
+	        '</style><title>' + document.title  + '</title>');
+	    mywindow.document.write('</head><body >');
+	    mywindow.document.write('<h1>' + document.title  + '</h1>');
+	    mywindow.document.write(document.getElementById('modal1').innerHTML);
+	    mywindow.document.write('</body></html>');
+
+	    mywindow.document.close(); // necessary for IE >= 10
+	    mywindow.focus(); // necessary for IE >= 10*/
+
+	    mywindow.print();
+	    mywindow.close();
+   }
    	headerDates(value){
    	   let str = value;
        let d = str.split(" ");
@@ -309,8 +338,14 @@ class MovementLeaderboard extends Component{
        let date1 =moment(d1).format('MMM DD, YYYY');
        let d2 = d[2];
        let date2 =moment(d2).format('MMM DD, YYYY');
-       let date = date1 + ' to ' + date2;
-       return date;
+       if(moment(d2).isAfter(d1)){
+       	let date = date1 + ' to ' + date2;
+       	return date;
+       }
+       else{
+       	let date = date2 + ' to ' + date1;
+       	return date;
+       }
 	}
 	handleBackButton(){
   		this.setState({
@@ -425,6 +460,20 @@ class MovementLeaderboard extends Component{
 	  	
 	}
 	reanderAllHrr(all_data,rangeMCSData,value1,capt,date,selectedRange){
+		let numberOfDays;
+		if(selectedRange.rangeType !== 'today' && selectedRange.rangeType !== 'yesterday'){
+			let startDate = selectedRange.dateRange.split("to")[0].trim();
+			let endDate = selectedRange.dateRange.split("to")[1].trim();
+			let numberOfDays = Math.abs(moment(endDate).diff(moment(startDate), 'days'))+1;
+			this.setState({
+				numberOfDays:numberOfDays,
+			})
+		}
+		else{
+			this.setState({
+				numberOfDays:null,
+			})
+		}
 		this.setState({
 			all_movement_rank_data:all_data,
 			Movement_username:value1,
@@ -434,9 +483,8 @@ class MovementLeaderboard extends Component{
 			active_view:!this.state.active_view,
 			btnView:!this.state.btnView2,
 			selectedRangeMCSData:rangeMCSData,
-			selectedRange:selectedRange
+			selectedRange:selectedRange,
 		},()=>{
-
 		});
 	}
 
@@ -445,9 +493,99 @@ class MovementLeaderboard extends Component{
 		return(
 			<div className="container-fluid" >
 			<div id = "hambergar">
-		        <NavbarMenu title = {"Movement Leaderboard"} />
+		        <NavbarMenu title = {<span> Movement Leaderboard
+                <span id="infobutton"
+                onClick={this.toggleInfo}                   
+                >
+                  <a  className="infoBtn"> 
+                     <FontAwesome 
+                        name = "info-circle"
+                        size = "1x"                                      
+                      />
+                  </a>
+                </span> 
+              </span>} />
 		    </div>
 		   
+
+		    <Modal
+                            id="popover"                          
+                            placement="bottom" 
+                            isOpen={this.state.infoButton}
+                            target="infobutton" 
+                            toggle={this.toggleInfo}>
+                            <ModalHeader toggle={this.toggleInfo} style={{fontWeight:"bold"}}>
+                            <div >                      
+                            <a href="#" onClick={this.infoPrint} style={{fontSize:"15px",color:"black"}}><i className="fa fa-print">Print</i></a>
+                            </div>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1" >
+                                <div className = "row">
+						<div className = "col-sm-12">
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Note: All time periods/durations are in hours:minutes (hh:mm)
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			The Movement Leaderboard provides a robust view of your movement across a number of categories that we use to assess movement.  In our experience, people that do well across all 6 of these categories consistently over time are healthier and feel better than those that don’t.  Users can choose various time periods or select any custom range by touching “Select Range” or entering a time period in one of the “Custom Date Range” buttons.  If viewing on a mobile device, turn your mobile device to the side (landscape mode) to see all columns.  You can also see how other people are doing on this page.  We include this so that each of us are motivated/inspired to do a little better!
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Rank: Represents your overall movement rank, calculated by adding up your rank in our 6 movement categories (your rank can be seen next to each of these 6 categories in parenthesis):  (1) total non exercise steps; (2) movement consistency score (MCS), the number of inactive hours defined as when a user does not have 300 steps in an awake hour; (3) exercise duration; (4) the number of active minutes for the full 24 hours; (5) the number of active minutes for the full 24 hours excluding when you are sleeping (some users have active minutes when sleeping); (6) the number of active minutes for the full 24 hours when a user is not sleeping and exercising. 
+
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Non Exercise Steps:  steps achieved when not exercising 
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Exercise (activity) steps: steps achieved when exercising.  Users can also manually enter in exercise (activity) steps in the activity grid below question 1. of the user inputs 
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Total Steps:  total steps achieved (exercise and non exercise steps)
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			MCS Score:  total inactive hours (sum of hours each day a user does not achieve 300 steps in any hour) per day when not sleeping, napping, and exercising
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Exercise Duration:  total exercise duration each day.  Users can characterize an activity as “exercise” or “non exercise” on the activity summary for each activity below question 1. on the user inputs page. Note: users are only given credit for exercise or non exercise for each activity (not both)
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Entire 24 Hours:  the number of active minutes for the full 24 hours.  Active minutes are provided by wearable devices and a minute is considered “active” if it has 1 or more steps in that minute
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Entire Day (excluding sleep):  the number of active minutes for the full 24 hours excluding when you are sleeping (some users have active minutes when sleeping when getting up) 
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Entire Day (excluding sleep and exercise): the number of active minutes for the full 24 hours when a user is not sleeping and not exercising.  In our experience, this is the category we do the worst in, as many of us sit a large portions of the day after exercising. We encourage you to do better in this category. Get up and move 300 steps every hour (takes 3-5 minute an hour).  Set an alarm or reminder on your phone each awake hour to remind you to get up (otherwise many of us forget to do it!). Sitting is considered smoking by many. Moving each hour will extend your life and make you feel much better!
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			MCS: represents your movement for all 24 hours of the day (these colors come directly from the Movement Consistency Dashboard, check it out for more details and see below for the color key).   We include this summary so you can quickly see your 24 summary, as well as how others are doing to motivate/inspire you to do better!
+
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			<div className="rd_mch_color_legend color_legend_green"></div>
+					            <span className="rd_mch_color_legend_label">Active</span>
+					            <div className="rd_mch_color_legend color_legend_red"></div>
+					            <span className="rd_mch_color_legend_label">Inactive</span>
+					            <div className="rd_mch_color_legend color_legend_pink"></div>
+					            <span className="rd_mch_color_legend_label">Strength</span>
+					            <div className="rd_mch_color_legend color_legend_blue"></div>
+					            <span className="rd_mch_color_legend_label">Sleeping</span>
+					            <div className="rd_mch_color_legend color_legend_yellow"></div>
+					            <span className="rd_mch_color_legend_label">Exercise</span>
+					            <div className="rd_mch_color_legend color_legend_grey"></div>
+					            <span className="rd_mch_color_legend_label">No Data Yet</span>
+					            <div className="rd_mch_color_legend color_legend_tz_change"></div>
+					            <span className="rd_mch_color_legend_label">Time Zone Change</span>
+					            <div className="rd_mch_color_legend color_legend_nap_change"></div>
+					            <span className="rd_mch_color_legend_label">Nap</span>
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			*  Not included in overall Rank Points. Provided for information purposes only.  We look at exercise (getting your heart rate up above normal heart rate ranges when not exerting yourself) and non exercise (movement when your heart rate is not elevated)
+			          			</p>
+			          	</div>
+		          	</div>
+                              </ModalBody>
+                           </Modal> 
+
 		      	<div className="nav3" id='bottom-nav'>
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
                            <Navbar light toggleable className="navbar nav1 user_nav">
@@ -632,7 +770,7 @@ class MovementLeaderboard extends Component{
 					        </DropdownMenu>
 					      </Dropdown>
 					      
-				      	<span className = "weekdate"><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span>
+				      	<span className = "weekdate" style={{marginLeft:"auto",marginRight:"auto"}}><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}{this.state.numberOfDays&&<span>{" - "+"Total Days: "+this.state.numberOfDays}</span>}</span></span>
 			        </div>
 		  		<MovementLeaderboard2 
 		  			Movement_data = {this.state.all_movement_rank_data}

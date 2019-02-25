@@ -17,8 +17,7 @@ class MovementLeaderboard2 extends Component{
 	constructor(props) {
     super(props);
 	    this.state = {
-	    	//mcs_data:this.props.mcs_data,
-	    	//date_of_data:this.props.selected_date
+	    	
 	    }
 		this.renderTable = this.renderTable.bind(this);
 		//this.heartBeatsColors = this.heartBeatsColors.bind(this);
@@ -31,6 +30,7 @@ class MovementLeaderboard2 extends Component{
 		this.getStylesForExerciseduration   = this.getStylesForExerciseduration.bind(this);
 		this.minuteToHM = this.minuteToHM.bind(this);
 		this.mcsData = this.mcsData.bind(this);
+		this.exerciseDurColrsSingleDayOr2to6Days = this.exerciseDurColrsSingleDayOr2to6Days.bind(this);
 
 		//this.time99Colors = this.time99Colors.bind(this);
 		
@@ -65,31 +65,85 @@ class MovementLeaderboard2 extends Component{
 	    let s_time = hours + min;
 	    return s_time;
  	}
-	getStylesForExerciseduration(value1,rank){
+ 	exerciseDurColrsSingleDayOr2to6Days(value,background,color,value1,rank){
+ 			if(value == this.strToSecond("0:00")){
+				background = "red";
+			    color = "black";
+			}
+			else if(this.strToSecond("0:01") <= value && value < this.strToSecond("00:15")){
+				background = "orange";
+		        color = "white";
+		    }
+			else if(this.strToSecond("00:15")<=value && value<this.strToSecond("00:30")){
+				background = "yellow";
+		        color = "black";
+		    }
+			else if((this.strToSecond("00:30")<=value && value<this.strToSecond("01:00"))){
+				background = "#32CD32";
+		        color = "white";
+		    }
+			else if(this.strToSecond("01:00")<=value){
+				background = "green";
+		        color = "white";
+		    }
+		    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{value1} {'('+rank+')'}</span></td>
+	}
+	getStylesForExerciseduration(value1,rank,selectedRange){
 		let value = this.strToSecond(value1);
 		let background = "";
 		let color = "";
-		if(value == this.strToSecond("0:00")){
-			background = "red";
-		    color = "black";
+		if(selectedRange.rangeType == 'today' || selectedRange.rangeType == 'yesterday'){
+			let td = this.exerciseDurColrsSingleDayOr2to6Days(value,background,color,value1,rank);
+			return td;
+			
 		}
-		else if(this.strToSecond("0:01") <= value && value < this.strToSecond("00:15")){
-			background = "orange";
-	        color = "white";
-	    }
-		else if(this.strToSecond("00:15")<=value && value<this.strToSecond("00:30")){
-			background = "yellow";
-	        color = "black";
-	    }
-		else if((this.strToSecond("00:30")<=value && value<this.strToSecond("01:00"))){
-			background = "#32CD32";
-	        color = "white";
-	    }
-		else if(this.strToSecond("01:00")<=value){
-			background = "green";
-	        color = "white";
-	    }
-	    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{value1} {'('+rank+')'}</span></td>
+		else{
+			let startDate = selectedRange.dateRange.split("to")[0].trim();
+			let endDate = selectedRange.dateRange.split("to")[1].trim();
+			let numberOfDays = Math.abs(moment(endDate).diff(moment(startDate), 'days'))+1;
+			if(numberOfDays >= 7){
+				let avgValueInSecPer7Days = Math.round(value / numberOfDays) * 7
+				if(avgValueInSecPer7Days == this.strToSecond("0:00")){
+					background = "red";
+				    color = "black";
+				}
+				else if(avgValueInSecPer7Days > this.strToSecond("0:00") 
+						&& avgValueInSecPer7Days <= this.strToSecond("01:39")){
+					background = "orange";
+			        color = "white";
+			    }
+				else if(avgValueInSecPer7Days > this.strToSecond("01:39") 
+						&& avgValueInSecPer7Days <= this.strToSecond("02:29")){
+					background = "yellow";
+			        color = "black";
+			    }
+				else if((avgValueInSecPer7Days > this.strToSecond("02:29") 
+						&& avgValueInSecPer7Days <= this.strToSecond("04:59"))){
+					background = "#32CD32";
+			        color = "white";
+			    }
+				else if(avgValueInSecPer7Days >= this.strToSecond("05:00")){
+					background = "green";
+			        color = "white";
+			    }
+			    return (
+			    	<td className ="overall_rank_value" 
+			    		style = {{backgroundColor:background,color:color}}>
+			    		<span>{value1} {'('+rank+')'}</span>
+			    	</td>
+			    );
+			}
+			else if(numberOfDays >= 2 && numberOfDays <= 6){
+				let avgValueInSecPerDay = Math.round(value / numberOfDays)
+				let td = this.exerciseDurColrsSingleDayOr2to6Days(
+							avgValueInSecPerDay,background,color,value1,rank);
+				return td;
+			}
+			else {
+				let td = this.exerciseDurColrsSingleDayOr2to6Days(value,background,color,value1,rank);
+				return td;
+			} 	
+		}   
 	}
 
 	renderCommaSteps(value){
@@ -222,7 +276,7 @@ class MovementLeaderboard2 extends Component{
 		
 		/***********************/
 		let header = this.refs.table_header_hrr;		
-		if(screen.width < 650){
+		if(window.scrollY < 150){
 			  header.classList.remove("mov_sticky");
 		}
 
@@ -232,17 +286,11 @@ class MovementLeaderboard2 extends Component{
 	/******* sticky table header on scroll ********/
 	handleScroll = () => {
 		 let header = this.refs.table_header_hrr;	
-		 var rect = header.getBoundingClientRect()
-		 let sticky = rect.top+80;
-
-		 if(screen.width > 650){
-		 	if (window.pageYOffset > sticky) {
+		 	if (window.scrollY >= 150) {
 		    header.classList.add("mov_sticky");
 		  } else {
 		    header.classList.remove("mov_sticky");
 		  }
-		 }
-
 	};
 	mcsData(status){
   		/* adding background color to card depends upon their steps ranges*/
@@ -314,7 +362,7 @@ class MovementLeaderboard2 extends Component{
 					td_values.push(this.renderGetColors(value[key1].score.value,value[key1].rank));
 				}
 				else if(key1 == "exercise_duration"){
-					td_values.push(this.getStylesForExerciseduration(value[key1].score.value,value[key1].rank));	
+					td_values.push(this.getStylesForExerciseduration(value[key1].score.value,value[key1].rank,selectedRange));	
 				}
 				else if(key1 == "active_min_total"){
 					td_values.push(<td className ="overall_rank_value"><span>{this.minuteToHM(value[key1].score.value)} ({value[key1].rank})</span></td>);
@@ -344,7 +392,7 @@ class MovementLeaderboard2 extends Component{
 			if( MCS_data && !_.isEmpty( MCS_data[currentUserId.toString()] ) ){
 				let object = MCS_data[currentUserId.toString()]
 				td_values.push(<td className ="overall_rank_value">
-				<table cellpadding="3" cellspacing="3" style={{width:"45px"}}>
+				<table cellpadding="3" cellspacing="3" style={{width:"45px",marginLeft:"auto",marginRight:"auto"}}>
 					<tr>
 						{this.mcsData(object["12:00 AM to 12:59 AM"])}
 						{this.mcsData(object["01:00 AM to 01:59 AM"])}
@@ -418,14 +466,14 @@ class MovementLeaderboard2 extends Component{
 									<th>Exercise Duration<br />(Rank)</th>
 									<th>Entire 24 Hour Day <br/> (Rank)</th>
 									<th>During Sleep Hours</th>
-									<th>Entire 24 Hour Day Excluding Sleep <br/> (Rank)</th>
+									<th>24 Hour Day Excluding Sleep <br/> (Rank)</th>
 									<th>During Exercise Hours</th>
-									<th>Entire 24 Hour Day Excluding Sleep and Exercise <br/> (Rank)</th>
+									<th>24 Hour Day Excluding Sleep and Exercise <br/> (Rank)</th>
 									<th>Overall Movement Rank Points</th>
 									<th>MCS<br/>
 										<table>
-										<tr><td>12 AM</td><td>11:59 AM</td></tr>
-										<tr><td>12 PM</td><td>11:59 PM</td></tr>
+										<tr><td>12:00 AM</td><td>11:59 AM</td></tr>
+										<tr><td>12:00 PM</td><td>11:59 PM</td></tr>
 										</table>
 									</th>
 								</tr>
@@ -451,19 +499,76 @@ class MovementLeaderboard2 extends Component{
 						}	
 					</div>
 					<div className = "row">
-						<div className = "col-sm-9">
+						<div className = "col-sm-12">
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
-			          			*  Not included in overall Rank Points
+			          			Note: All time periods/durations are in hours:minutes (hh:mm)
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			The Movement Leaderboard provides a robust view of your movement across a number of categories that we use to assess movement.  In our experience, people that do well across all 6 of these categories consistently over time are healthier and feel better than those that don’t.  Users can choose various time periods or select any custom range by touching “Select Range” or entering a time period in one of the “Custom Date Range” buttons.  If viewing on a mobile device, turn your mobile device to the side (landscape mode) to see all columns.  You can also see how other people are doing on this page.  We include this so that each of us are motivated/inspired to do a little better!
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Rank: Represents your overall movement rank, calculated by adding up your rank in our 6 movement categories (your rank can be seen next to each of these 6 categories in parenthesis):  (1) total non exercise steps; (2) movement consistency score (MCS), the number of inactive hours defined as when a user does not have 300 steps in an awake hour; (3) exercise duration; (4) the number of active minutes for the full 24 hours; (5) the number of active minutes for the full 24 hours excluding when you are sleeping (some users have active minutes when sleeping); (6) the number of active minutes for the full 24 hours when a user is not sleeping and exercising. 
+
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Non Exercise Steps:  steps achieved when not exercising 
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Exercise (activity) steps: steps achieved when exercising.  Users can also manually enter in exercise (activity) steps in the activity grid below question 1. of the user inputs 
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Total Steps:  total steps achieved (exercise and non exercise steps)
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			MCS Score:  total inactive hours (sum of hours each day a user does not achieve 300 steps in any hour) per day when not sleeping, napping, and exercising
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Exercise Duration:  total exercise duration each day.  Users can characterize an activity as “exercise” or “non exercise” on the activity summary for each activity below question 1. on the user inputs page. Note: users are only given credit for exercise or non exercise for each activity (not both)
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Entire 24 Hours:  the number of active minutes for the full 24 hours.  Active minutes are provided by wearable devices and a minute is considered “active” if it has 1 or more steps in that minute
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Entire Day (excluding sleep):  the number of active minutes for the full 24 hours excluding when you are sleeping (some users have active minutes when sleeping when getting up) 
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			Entire Day (excluding sleep and exercise): the number of active minutes for the full 24 hours when a user is not sleeping and not exercising.  In our experience, this is the category we do the worst in, as many of us sit a large portions of the day after exercising. We encourage you to do better in this category. Get up and move 300 steps every hour (takes 3-5 minute an hour).  Set an alarm or reminder on your phone each awake hour to remind you to get up (otherwise many of us forget to do it!). Sitting is considered smoking by many. Moving each hour will extend your life and make you feel much better!
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			MCS: represents your movement for all 24 hours of the day (these colors come directly from the Movement Consistency Dashboard, check it out for more details and see below for the color key).   We include this summary so you can quickly see your 24 summary, as well as how others are doing to motivate/inspire you to do better!
+
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			<div className="rd_mch_color_legend color_legend_green"></div>
+					            <span className="rd_mch_color_legend_label">Active</span>
+					            <div className="rd_mch_color_legend color_legend_red"></div>
+					            <span className="rd_mch_color_legend_label">Inactive</span>
+					            <div className="rd_mch_color_legend color_legend_pink"></div>
+					            <span className="rd_mch_color_legend_label">Strength</span>
+					            <div className="rd_mch_color_legend color_legend_blue"></div>
+					            <span className="rd_mch_color_legend_label">Sleeping</span>
+					            <div className="rd_mch_color_legend color_legend_yellow"></div>
+					            <span className="rd_mch_color_legend_label">Exercise</span>
+					            <div className="rd_mch_color_legend color_legend_grey"></div>
+					            <span className="rd_mch_color_legend_label">No Data Yet</span>
+					            <div className="rd_mch_color_legend color_legend_tz_change"></div>
+					            <span className="rd_mch_color_legend_label">Time Zone Change</span>
+					            <div className="rd_mch_color_legend color_legend_nap_change"></div>
+					            <span className="rd_mch_color_legend_label">Nap</span>
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          			*  Not included in overall Rank Points. Provided for information purposes only.  We look at exercise (getting your heart rate up above normal heart rate ranges when not exerting yourself) and non exercise (movement when your heart rate is not elevated)
 			          			</p>
 			          	</div>
 		          	</div>
-		          	<div className = "row">
+		          	
+		          	{/*<div className = "row">
 						<div className = "col-sm-9">
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			Note: All time periods/durations are in hours:minutes (hh:mm)
 			          			</p>
 			          	</div>
-		          	</div>	
+		          	</div>	*/}
 				</div>
 			);
 	}

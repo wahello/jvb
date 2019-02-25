@@ -44,9 +44,12 @@ export function handleChangeWorkoutType(event){
     })
   }
   else{
+    
     this.setState({
       [name]:value
-    })
+    }, 
+    () => {this.AutopopulateStrengthActivities()}
+    )
   }
 }
 

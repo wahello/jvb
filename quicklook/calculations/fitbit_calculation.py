@@ -37,6 +37,8 @@ from .converter.fitbit_to_garmin_converter import fitbit_to_garmin_sleep,\
 	fitbit_to_garmin_epoch,\
 	steps_minutly_to_quartly
 
+from user_input.utils.daily_activity import get_daily_activities_in_base_format
+
 def get_fitbit_model_data(model,user,start_date, end_date,
 		order_by = None, group_by_date=False):
 
@@ -318,7 +320,7 @@ def makeformat(trans_activity_data,current_date,last_seven_days_date):
 					formated_data[actvity_date] = single_activity	
 	return formated_data
 
-def get_exercise_consistency_grade(user,current_date,user_age):
+def get_exercise_consistency_grade(user,current_date,user_age,weekly_user_input_activities):
 	trans_activity_data = []
 	last_seven_days_date = current_date - timedelta(days=6)
 	week_activity_data = UserFitbitDataActivities.objects.filter(
@@ -341,7 +343,7 @@ def get_exercise_consistency_grade(user,current_date,user_age):
 	formated_data = makeformat(trans_activity_data,current_date,last_seven_days_date)
 	weekly_combined_activities = quicklook.calculations.\
 		garmin_calculation.get_weekly_combined_activities(
-			formated_data,{},weekly_daily_strong,
+			formated_data,{},weekly_user_input_activities,
 			last_seven_days_date,current_date,user_age)
 	exe_consistency_grade,exe_consistency_point = quicklook.calculations.\
 		garmin_calculation.get_exercise_consistency_grade(
@@ -480,10 +482,11 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 				todays_daily_strong.append(daily_strong[i])
 				break
 
-		userinput_activities = quicklook.calculations.garmin_calculation.safe_get(
-			todays_daily_strong,'activities',None)
-		if userinput_activities:
-			userinput_activities = json.loads(userinput_activities)
+		weekly_user_input_activities = get_daily_activities_in_base_format(
+			user,last_seven_days_date.date(),
+			to_date = current_date.date(),
+			include_all = True)
+		userinput_activities = weekly_user_input_activities[current_date.strftime('%Y-%m-%d')]
 
 		todays_activity_data = get_fitbit_model_data(
 			UserFitbitDataActivities,user,current_date.date(),current_date.date())
@@ -721,7 +724,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 			
 		# Exercise Grade and point calculation
 		exe_consistency_grade = get_exercise_consistency_grade(
-			user,current_date,user_age)
+			user,current_date,user_age,weekly_user_input_activities)
 		grades_calculated_data['exercise_consistency_grade'] = \
 			exe_consistency_grade[0]
 		grades_calculated_data['exercise_consistency_score'] = \
