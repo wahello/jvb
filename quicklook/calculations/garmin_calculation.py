@@ -753,6 +753,11 @@ def get_renamed_to_hrr_activities(user,calendar_date,activities):
 					renamed_summaries.append(activity['summaryId'])
 	return renamed_summaries
 
+def validate_activity_duration(duration):
+		if type(duration) is not int:
+			return 0
+		return duration
+
 def is_duplicate_activity(activity, all_activities):
 	'''
 	Determine if the activity file is duplicate activity file or not
@@ -788,18 +793,20 @@ def is_duplicate_activity(activity, all_activities):
 		activity_start = datetime.utcfromtimestamp(
 			activity.get('startTimeInSeconds',0)
 			+activity.get('startTimeOffsetInSeconds',0))
+		activity_duration = activity.get('durationInSeconds',0)
 		activity_end = (activity_start 
-			+ timedelta(seconds=activity.get('durationInSeconds',0)))
+			+ timedelta(seconds=activity_duration))
 
 		for act in all_activities:
+			act_duration = activity.get('durationInSeconds',0)
 			overlapping_duration_in_sec = 0
 			act_start = datetime.utcfromtimestamp(
 				act.get('startTimeInSeconds',0)
 				+ act.get('startTimeOffsetInSeconds',0))
 			act_end = (act_start 
-				+ timedelta(seconds=act.get('durationInSeconds',0)))
+				+ timedelta(seconds=act_duration))
 			if (act_start >= activity_start and act_end <= activity_end):
-				overlapping_duration_in_sec += act.get('durationInSeconds',0)
+				overlapping_duration_in_sec += act_duration
 			elif (act_start >= activity_start and act_start <= activity_end):
 				overlapping_sec = (activity_end - act_start).seconds
 				overlapping_duration_in_sec += overlapping_sec
@@ -820,10 +827,11 @@ def is_duplicate_activity(activity, all_activities):
 			original_act = None
 			longest_duration = 0
 			for act in overlapping_activities:
-				if (act.get('durationInSeconds',0) >= longest_duration
+				act_duration = act.get('durationInSeconds',0)
+				if (act_duration >= longest_duration
 					and act.get('averageHeartRateInBeatsPerMinute',0)):
 					original_act = act
-					longest_duration = act.get('durationInSeconds',0)
+					longest_duration = act_duration
 
 			if not original_act:
 				# If no original activity is found that means all of the 
@@ -831,9 +839,10 @@ def is_duplicate_activity(activity, all_activities):
 				# So in such case pick the activity with longest duration.
 				longest_duration = 0
 				for act in overlapping_activities:
-					if (act.get('durationInSeconds',0) >= longest_duration):
+					act_duration = act.get('durationInSeconds',0)
+					if (act_duration >= longest_duration):
 						original_act = act
-						longest_duration = act.get('durationInSeconds',0)
+						longest_duration = act_duration
 
 			if (original_act 
 				and original_act.get('summaryId') != activity.get('summaryId')):
@@ -996,6 +1005,9 @@ def get_filtered_activity_stats(activities_json,user_age,
 
 			if userinput_activities:
 				obj.update(userinput_edited(obj))
+
+			obj['durationInSeconds'] = validate_activity_duration(
+											obj.get('durationInSeconds',0))
 			filtered_activities.append(obj)
 
 	# merge user created manual activities which are not provided by garmin
@@ -1004,6 +1016,8 @@ def get_filtered_activity_stats(activities_json,user_age,
 			# Manually created activities will have extra key 'created_manually'
 			# which represents that it is manually created activity 
 			activity['created_manually'] = True
+			activity['durationInSeconds'] = validate_activity_duration(
+												activity.get('durationInSeconds',0))
 		filtered_activities += userinput_activities.values()
 
 	act_renamed_to_hrr = []
@@ -1188,7 +1202,10 @@ def get_activity_stats(combined_user_activities,user_age):
 			if not activities_hr.get(obj_act, None):
 				activities_hr[obj_act] = 0
 			# weighted average
-			activities_hr[obj_act] += round((act_duration/workout_type_total_duration)*obj_avg_hr)
+			try:
+				activities_hr[obj_act] += round((act_duration/workout_type_total_duration)*obj_avg_hr)
+			except ZeroDivisionError:
+				activities_hr[obj_act] +=  obj_avg_hr
 
 			# capture lat and lon of activity with maximum duration
 			if (obj.get('durationInSeconds',0) >= max_duration) or \
