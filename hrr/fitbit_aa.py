@@ -1305,6 +1305,8 @@ def generate_hrr_charts(user,start_date):
 		hrr_act = determine_hhr_activity(user,start_date,ui_activities)
 	elif fitbit_act:
 		hrr_act = determine_hhr_activity(user,start_date,fitbit_act)
+	else:
+		hrr_act = None
 	# determine the if activtyt is HRR or not
 	# get HRR activty id
 	if hrr_act:
