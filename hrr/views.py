@@ -2441,8 +2441,8 @@ def aa_low_high_end_data(user,start_date):
 			and activities_dic
 			and activities_dic.get(single_actiivty["summaryId"])):
 
-			user_created_activity_list.append(
-				activities_dic.get(single_actiivty["summaryId"]))
+			# user_created_activity_list.append(
+			# 	activities_dic.get(single_actiivty["summaryId"]))
 			for i,k in enumerate(filtered_activities_files):
 				garmin_id = single_actiivty.get("summaryId")
 				ui_id = filtered_activities_files[i].get('summaryId')
