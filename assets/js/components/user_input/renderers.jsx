@@ -473,11 +473,14 @@ export function renderActivityGrid(){
 			}
 		}
 	}.bind(this);
-
 	return(
 		<ActivityGrid
 			updateParentActivities = {updateParentActivities}
 			activities = {this.state.activities}
+			indoor_temperature = {this.state.indoor_temperature}
+			dewPoint = {this.state.dewPoint}
+			wind = {this.state.wind}
+			temperature_feels_like = {this.state.temperature_feels_like}
 			selected_date = {this.state.selected_date}
 			editable = {this.state.editable}
 			dateTimeValidation = {this.dateTimeValidation}

@@ -38,6 +38,7 @@ from quicklook.models import UserQuickLook,\
 
 from quicklook.serializers import UserQuickLookSerializer
 import user_input.views.garmin_views
+from user_input.utils.daily_activity import get_daily_activities_in_base_format
 
 def str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
@@ -906,7 +907,6 @@ def get_activity_exercise_non_exercise_category(activity,user_age):
 	else:
 		return EXERCISE
 
-
 def get_filtered_activity_stats(activities_json,user_age,
 		manually_updated_json={},userinput_activities = None,
 		include_duplicate = False,include_deleted = False,
@@ -963,7 +963,8 @@ def get_filtered_activity_stats(activities_json,user_age,
 				# no value for fields like - avgHeartRateInBeatsPerMinute, steps
 				# etc. In that case empty value will be taken for those keys even
 				# though value exist in original summary provided by garmin 
-				if val or key == 'duplicate' or key == 'deleted':
+				if(val or key == 'duplicate' or key == 'deleted' 
+					or key == 'comments' or key == 'activity_weather'):
 					filtered_obj[key] = val
 			return filtered_obj
 		return obj
@@ -2664,12 +2665,8 @@ def get_weekly_combined_activities(weekly_activities,
 	while(current_date <= week_end_date):
 		current_date_str = current_date.strftime('%Y-%m-%d')
 		weekly_combined_activities[current_date_str] = None
-		
-		# temporarily here, with new activity architecture we don't need this
 		userinput_activities = weekly_user_input_activities[current_date_str]
-		if userinput_activities and userinput_activities.activities:
-			userinput_activities = json.loads(userinput_activities.activities)
-		else:
+		if not userinput_activities:
 			userinput_activities = None
 		
 		activities = weekly_activities.get(current_date_str,[])
@@ -2768,9 +2765,15 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		weekly_daily_strong = get_weekly_user_input_data(
 			daily_strong,current_date,last_seven_days_date)
 
+		weekly_user_input_activities = get_daily_activities_in_base_format(
+			user,last_seven_days_date.date(),
+			to_date = current_date.date(),
+			include_all = True)
+
 		weekly_combined_activities = get_weekly_combined_activities(
-			weekly_activities,weekly_manual_activities,weekly_daily_strong,
-			last_seven_days_date,current_date,user_age)
+			weekly_activities,weekly_manual_activities,
+			weekly_user_input_activities,last_seven_days_date,
+			current_date,user_age)
 
 		try:
 			tomorrow_date = current_date + timedelta(days=1)
@@ -2790,10 +2793,8 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 				todays_daily_strong.append(daily_strong[i])
 				break
 		
-		userinput_activities = safe_get(todays_daily_strong,'activities',None)
-		if userinput_activities:
-			userinput_activities = json.loads(userinput_activities)
-		
+		userinput_activities = weekly_user_input_activities[current_date.strftime('%Y-%m-%d')]
+
 		bodycmp = get_garmin_model_data(
 			UserGarminDataBodyComposition,user,
 			start_epoch,end_epoch,order_by = '-id')
