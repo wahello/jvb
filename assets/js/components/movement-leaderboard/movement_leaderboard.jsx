@@ -551,9 +551,6 @@ class MovementLeaderboard extends Component{
 			          			Entire 24 Hours:  the number of active minutes for the full 24 hours.  Active minutes are provided by wearable devices and a minute is considered “active” if it has 1 or more steps in that minute
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
-			          			Entire Day (excluding sleep):  the number of active minutes for the full 24 hours excluding when you are sleeping (some users have active minutes when sleeping when getting up) 
-			          			</p>
-			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			Entire Day (excluding sleep and exercise): the number of active minutes for the full 24 hours when a user is not sleeping and not exercising.  In our experience, this is the category we do the worst in, as many of us sit a large portions of the day after exercising. We encourage you to do better in this category. Get up and move 300 steps every hour (takes 3-5 minute an hour).  Set an alarm or reminder on your phone each awake hour to remind you to get up (otherwise many of us forget to do it!). Sitting is considered smoking by many. Moving each hour will extend your life and make you feel much better!
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>

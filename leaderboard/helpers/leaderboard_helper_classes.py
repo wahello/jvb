@@ -1244,8 +1244,6 @@ class LeaderboardOverview(object):
 					'mc':self.category_wise_data['mc'][dtype],
 					'exercise_duration':self.category_wise_data['exercise_duration'][dtype],
 					'active_min_total':self.category_wise_data['active_min_total'][dtype],
-					'active_min_exclude_sleep':self.category_wise_data[
-						'active_min_exclude_sleep'][dtype],
 					'active_min_exclude_sleep_exercise':self.category_wise_data[
 						'active_min_exclude_sleep_exercise'][dtype]
 				}
@@ -1297,8 +1295,6 @@ class LeaderboardOverview(object):
 						'mc':self.category_wise_data['mc']['custom_range'][str_range],
 						'exercise_duration':self.category_wise_data['exercise_duration']['custom_range'][str_range],
 						'active_min_total':self.category_wise_data['active_min_total']['custom_range'][str_range],
-						'active_min_exclude_sleep':self.category_wise_data[
-							'active_min_exclude_sleep']['custom_range'][str_range],
 						'active_min_exclude_sleep_exercise':self.category_wise_data[
 							'active_min_exclude_sleep_exercise']['custom_range'][str_range]
 					}

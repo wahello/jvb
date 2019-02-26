@@ -146,6 +146,40 @@ class MovementLeaderboard2 extends Component{
 		}   
 	}
 
+	getStylesForTotalActiveMinute(totalActiveDuration,rank){
+		totalActiveDuration = this.minuteToHM(totalActiveDuration);
+		let totalTimeInSeconds = this.strToSecond(totalActiveDuration);
+		let background = "";
+		let color = "";
+		if(totalTimeInSeconds >= this.strToSecond("04:06")){
+			background = "green";
+			color = "white";
+		}else if(totalTimeInSeconds >= this.strToSecond("03:13") 
+				 && totalTimeInSeconds <= this.strToSecond("04:05")){
+			background = "#32CD32";
+			color = "white";
+		}else if(totalTimeInSeconds >= this.strToSecond("02:45")
+				 && totalTimeInSeconds <= this.strToSecond("03:12")){
+			background = "yellow";
+			color = "black";
+		}else if(totalTimeInSeconds >= this.strToSecond("02:01")
+				 && totalTimeInSeconds <= this.strToSecond("02:44")){
+			background = "orange";
+			color = "white";
+		}else{
+			background = "red";
+			color = "black";
+		}
+		return (
+			<td 
+				className ="overall_rank_value"
+				style = {{backgroundColor:background,color:color}}>
+				<span>{totalActiveDuration} {'('+rank+')'}</span>
+			</td>
+		);
+
+	}
+
 	renderCommaSteps(value){
 		value += '';
      	var x = value.split('.');
@@ -180,7 +214,13 @@ class MovementLeaderboard2 extends Component{
 	        background = "red";
 	        color = "white";
 	    }
-	    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{hours_inactive} {'('+rank+')'}</span></td>
+	    return (
+	    	<td 
+	    		className ="overall_rank_value"
+	    		style = {{backgroundColor:background,color:color}}>
+	    		<span>{hours_inactive} {'('+rank+')'}</span>
+	    	</td>
+	    );
   }
 	renderStepsColor(steps,rank){
 		let background = "";
@@ -205,7 +245,13 @@ class MovementLeaderboard2 extends Component{
 	        background = "red";
 	       color = "black";
 	    }
-	    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{this.renderCommaSteps(steps)} {'('+rank+')'}</span></td>
+	    return (
+	    	<td 
+	    		className ="overall_rank_value"
+	    		style = {{backgroundColor:background,color:color}}>
+	    		<span>{this.renderCommaSteps(steps)} {'('+rank+')'}</span>
+	    	</td>
+	    );
   }
   	scrollCallback(operationCount) {
       if (objectLength === operationCount) {
@@ -328,7 +374,10 @@ class MovementLeaderboard2 extends Component{
 	renderTable(Movement_data,Movement_username,MCS_data,selectedRange){
 		let operationCount = 0;
 		let td_rows = [];
-		let keys = ["rank","username","nes","exercise_steps","total_steps","mc","exercise_duration","active_min_total","active_min_sleep","active_min_exclude_sleep","active_min_exercise","active_min_exclude_sleep_exercise","total_movement_rank_point"];
+		let keys = ["rank","username","nes","exercise_steps","total_steps","mc",
+					"exercise_duration","active_min_total","active_min_sleep",
+					"active_min_exercise", "active_min_exclude_sleep_exercise",
+					"total_movement_rank_point"];
 		objectLength = Object.keys(Movement_data).length;
 		for(let[key,value] of Object.entries(Movement_data)){
 			let td_values = [];
@@ -365,15 +414,12 @@ class MovementLeaderboard2 extends Component{
 					td_values.push(this.getStylesForExerciseduration(value[key1].score.value,value[key1].rank,selectedRange));	
 				}
 				else if(key1 == "active_min_total"){
-					td_values.push(<td className ="overall_rank_value"><span>{this.minuteToHM(value[key1].score.value)} ({value[key1].rank})</span></td>);
+					td_values.push(this.getStylesForTotalActiveMinute(value[key1].score.value,value[key1].rank));
 				}
 				  else if(key1 == "active_min_sleep"){
 				  	if(value["active_min_total"].other_scores != null) {
 						td_values.push(<td className ="overall_rank_value"><span>{this.minuteToHM(value["active_min_total"].other_scores.active_min_sleep.value)}</span></td>);
 					}
-				}
-				else if(key1 == "active_min_exclude_sleep"){
-					td_values.push(<td className ="overall_rank_value"><span>{this.minuteToHM(value[key1].score.value)} ({value[key1].rank})</span></td>);	
 				}
 			     else if(key1 == "active_min_exercise"){
 			     	if(value["active_min_total"].other_scores != null) {
@@ -466,7 +512,6 @@ class MovementLeaderboard2 extends Component{
 									<th>Exercise Duration<br />(Rank)</th>
 									<th>Entire 24 Hour Day <br/> (Rank)</th>
 									<th>During Sleep Hours</th>
-									<th>24 Hour Day Excluding Sleep <br/> (Rank)</th>
 									<th>During Exercise Hours</th>
 									<th>24 Hour Day Excluding Sleep and Exercise <br/> (Rank)</th>
 									<th>Overall Movement Rank Points</th>
@@ -527,9 +572,6 @@ class MovementLeaderboard2 extends Component{
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			Entire 24 Hours:  the number of active minutes for the full 24 hours.  Active minutes are provided by wearable devices and a minute is considered “active” if it has 1 or more steps in that minute
-			          			</p>
-			          			<p className="footer_content" style={{marginLeft:"15px"}}>
-			          			Entire Day (excluding sleep):  the number of active minutes for the full 24 hours excluding when you are sleeping (some users have active minutes when sleeping when getting up) 
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			Entire Day (excluding sleep and exercise): the number of active minutes for the full 24 hours when a user is not sleeping and not exercising.  In our experience, this is the category we do the worst in, as many of us sit a large portions of the day after exercising. We encourage you to do better in this category. Get up and move 300 steps every hour (takes 3-5 minute an hour).  Set an alarm or reminder on your phone each awake hour to remind you to get up (otherwise many of us forget to do it!). Sitting is considered smoking by many. Moving each hour will extend your life and make you feel much better!
