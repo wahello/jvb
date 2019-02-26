@@ -10,7 +10,8 @@ import 'moment-timezone';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; 
 import { ToastContainer, toast } from 'react-toastify';
-import { getUserProfile,getActivityInfo } from '../../network/auth';
+import { getUserProfile } from '../../network/auth';
+import { getActivityInfo } from '../../network/userInput';
 
 
 const activites = { "":"Select",
@@ -151,7 +152,9 @@ this.successProfile=this.successProfile.bind(this);
 this.calculateZone = this.calculateZone.bind(this);
 this.editToggleHandler_weather = this.editToggleHandler_weather.bind(this);
 this.handleChange_weather = this.handleChange_weather.bind(this);
-//this.getInfoOfActivity = this.getInfoOfActivity.bind(this);
+this.getInfoOfActivity = this.getInfoOfActivity.bind(this);
+this.successCallback = this.successCallback.bind(this);
+this.errorCallback = this.errorCallback.bind(this);
 
 this.state ={
     selected_date:selected_date,
@@ -274,12 +277,13 @@ componentWillReceiveProps(nextProps) {
 }
 
 successCallback(data){
-  console.log(data,"data");
-    this.setState({
-            "avg_heartrate": data.data.avg_heartrate,
-            "activity_category": data.data.activity_category,
-            "steps": data.data.steps
-           });
+  console.log(data,"data"); 
+     this.setState({
+                     "avg_heartrate": data.data.avg_heartrate,
+                     "activity_category": data.data.activity_category,
+                     "steps": data.data.steps
+     });
+       
   }
 
 errorCallback(error){
@@ -290,44 +294,36 @@ getInfoOfActivity(activity_display_name,activity_start_date, activity_start_hour
                   activity_start_min,activity_start_sec, activity_start_am_pm,
                   activity_end_date,activity_end_hour, activity_end_min, 
                   activity_end_sec,activity_end_am_pm){
-
+     if(activity_display_name && activity_start_date && activity_start_hour,
+                  activity_start_min && activity_start_sec && activity_start_am_pm &&
+                  activity_end_date && activity_end_hour && activity_end_min && 
+                  activity_end_sec && activity_end_am_pm){
+    console.log("entering or  not");
     let activityStartTimeMObject = this.getDTMomentObj( activity_start_date,
                                                         activity_start_hour,
                                                         activity_start_min,
                                                         activity_start_sec,
                                                         activity_start_am_pm );
+    console.log(activityStartTimeMObject,"1");
     let activityEndTimeMObject = this.getDTMomentObj( activity_end_date,
                                                       activity_end_hour,
                                                       activity_end_min,
                                                       activity_end_sec,
                                                       activity_end_am_pm );
+    console.log(activityEndTimeMObject,"2");
     let timezone = moment.tz.guess();
-   
     let date = this.state.selected_date;
-    let act_type = this.state.activities;
     let act_start_epoch = activityStartTimeMObject.unix();
     let act_end_epoch = activityEndTimeMObject.unix();
     let utc_offset = (moment.tz(moment.utc(),timezone).utcOffset())*60;
     console.log(date);
     console.log(act_start_epoch);
     console.log(act_end_epoch);
-    console.log(act_type);
-    console.log(utc_offset);
-   
-    if(this.state.date != null && this.state.act_type != null && this.state.act_start_epoch != null 
-         && this.state.act_end_epoch != null && this.state.utc_offset != null){
-    this.setState({
-
-        "date":"",
-        "act_start_epoch":"",
-        "act_end_epoch":"",
-        "act_type":"",
-        "utc_offset":"",
-
-    },() => {this.getActivityInfo(this.successCallback,this.errorCallback,this.state.date,
-                                  this.state.act_start_epoch,this.state.act_end_epoch,this.state.act_type,
-                                  this.state.utc_offset)});
-  }
+    console.log(utc_offset);   
+    console.log(activity_display_name); 
+   getActivityInfo(date,act_start_epoch,act_end_epoch,activity_display_name,utc_offset,
+                   this.successCallback,this.errorCallback);
+   }
 }
 
 addingCommaToSteps(value){
@@ -945,6 +941,7 @@ handleChange_activity(event){
     let oldActivities = _.cloneDeep(this.state.activites);
     let activity_data = this.state.activites[selectedActivityId];
     activity_data['activityType'] = value;
+    console.log(activity_data,"activityType")
 
     /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
     let avg_hr = activity_data['averageHeartRateInBeatsPerMinute'];
@@ -1320,6 +1317,7 @@ EndTimeInSecondsSaveCalender(event){
 
 
 handleChange(event){
+    console.log("changing activity")
     const target = event.target;
     const value = target.value;
     const name = target.name;//modal_duplicate_info_status
@@ -1337,7 +1335,12 @@ handleChange(event){
             modal_activity_type:"",
             modal_exercise_steps_status:steps_type
         },
-          () => this.getInfoOfActivity(actType) 
+          () => this.getInfoOfActivity(this.state.activity_display_name,this.state.activity_start_date,
+                                       this.state.activity_start_hour,this.state.activity_start_min,
+                                       this.state.activity_start_sec,this.state.activity_start_am_pm,
+                                       this.state.activity_end_date,this.state.activity_end_hour,
+                                       this.state.activity_end_min,this.state.activity_end_sec,
+                                       this.state.activity_end_am_pm) 
         );
     }
     else if(name == "activity_display_name"){
@@ -1349,7 +1352,12 @@ handleChange(event){
             modal_activity_type:value,
             modal_exercise_steps_status:steps_type
         },
-          () => this.getInfoOfActivity(actType)
+          () => this.getInfoOfActivity(this.state.activity_display_name,this.state.activity_start_date,
+                                       this.state.activity_start_hour,this.state.activity_start_min,
+                                       this.state.activity_start_sec,this.state.activity_start_am_pm,
+                                       this.state.activity_end_date,this.state.activity_end_hour,
+                                       this.state.activity_end_min,this.state.activity_end_sec,
+                                       this.state.activity_end_am_pm)
           );
     }
     else if(name == "modal_activity_heart_rate"){
@@ -1673,8 +1681,12 @@ handleChangeModelActivityStartTimeDate(date){
     this.setState({
         activity_start_date:date
     },()=>{
-            //let ActivityInfo = this.getInfoOfActivity(this.state.activity_start_date);        
-            
+            this.getInfoOfActivity( this.state.activity_display_name,this.state.activity_start_date,
+                                    this.state.activity_start_hour,this.state.activity_start_min,
+                                    this.state.activity_start_sec,this.state.activity_start_am_pm,
+                                    this.state.activity_end_date,this.state.activity_end_hour,
+                                    this.state.activity_end_min,this.state.activity_end_sec,
+                                    this.state.activity_end_am_pm);
             let duration = this.getTotalActivityDuration();
             let isActivityTimeValid = this.props.dateTimeValidation(
                 this.state.activitystarttime_calender,
@@ -1705,14 +1717,12 @@ handleChangeModelActivityEndTimeDate(date){
     this.setState({
         activity_end_date:date
     },()=>{
-           // let ActivityInfo = this.getInfoOfActivity(this.state.activity_end_date);
-          //  if(this.state.activity_display_name)
-              //  let ActivityInfo = this.getInfoOfActivity(this.state.activity_display_name,this.state.activity_start_date,
-                 //                                      this.state.activity_start_hour,this.state.activity_start_min,
-               //                                        this.state.activity_start_sec,this.state.activity_start_am_pm,
-                  //                                     this.state.activity_end_date,this.state.activity_end_hour,
-                  //                                     this.state.activity_end_min,this.state.activity_end_sec,
-                    //                                   this.state.activity_end_am_pm);
+             this.getInfoOfActivity( this.state.activity_display_name,this.state.activity_start_date,
+                                     this.state.activity_start_hour,this.state.activity_start_min,
+                                     this.state.activity_start_sec,this.state.activity_start_am_pm,
+                                     this.state.activity_end_date,this.state.activity_end_hour,
+                                     this.state.activity_end_min,this.state.activity_end_sec,
+                                     this.state.activity_end_am_pm);       
             let duration = this.getTotalActivityDuration();
             let isActivityTimeValid = this.props.dateTimeValidation(
                 this.state.activitystarttime_calender,
@@ -1745,15 +1755,6 @@ handleChangeModalActivityTime(event){
     this.setState({
         [name]: value
     },()=>{
-            //let ActivityInfo = this.getInfoOfActivity(this.state.activity_start_hour,this.state.activity_start_min,
-            //                                          this.state.activity_start_sec,this.state.activity_start_am_pm,
-             //                                         this.state.activity_end_hour,this.state.activity_end_min,
-              //                                        this.state.activity_end_sec,this.state.activity_end_am_pm);
-           // else if(this.state.activity_display_name)
-             //   let ActivityInfo = this.getActivityInfo(this.state.activity_start_hour,this.state.activity_start_min,
-               //                                         this.state.activity_start_sec,this.state.activity_start_am_pm,
-                 //                                       this.state.activity_end_hour,this.state.activity_end_min,
-                   //                                     this.state.activity_end_sec,this.state.activity_end_am_pm);
             let duration = this.getTotalActivityDuration();
             let isActivityTimeValid = this.props.dateTimeValidation(
                 this.state.activitystarttime_calender,
@@ -1764,6 +1765,12 @@ handleChangeModalActivityTime(event){
                 this.state.modalendtime_activity_hour,
                 this.state.modalendtime_activity_min,
                 this.state.modalendtime_activity_ampm);
+            let ActivityInfo = this.getInfoOfActivity( this.state.activity_display_name,this.state.activity_start_date,
+                                                       this.state.activity_start_hour,this.state.activity_start_min,
+                                                       this.state.activity_start_sec,this.state.activity_start_am_pm,
+                                                       this.state.activity_end_date,this.state.activity_end_hour,
+                                                       this.state.activity_end_min,this.state.activity_end_sec,
+                                                       this.state.activity_end_am_pm);
             if(duration && isActivityTimeValid){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
@@ -1778,6 +1785,7 @@ handleChangeModalActivityTime(event){
             }
     });
 }
+
  
 toggleInfo_duplicate(){
     this.setState({
@@ -2542,12 +2550,6 @@ renderEditActivityModal(){
     
 componentDidMount(){
     getUserProfile(this.successProfile);
-     getActivityInfo(this.state.date,this.state.act_start_epoch,this.state.act_end_epoch,
-                     this.state.act_type,this.state.utc_offset,this.successCallback,this.errorCallback);
-    // fetch('http://127.0.0.1:8000/users/daily_input/get_activity_info')
-    // .then(response =>{
-    //   console.log(response,"response");
-    // });
 }
 
 

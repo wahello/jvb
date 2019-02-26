@@ -445,3 +445,29 @@ export function userDailyInputWeatherReportFetch(date, successCallback=undefined
 		}
 	});
 }
+
+export function getActivityInfo( date, act_start_epoch, act_end_epoch, act_type, utc_offset,
+	                             successCallback, errorCallback){
+	const URL = '/users/daily_input/get_activity_info';
+	const config = {
+		url : URL,
+		method : 'get',
+		params:{
+				"date" : moment(date).format('YYYY-MM-DD'),
+				"act_start_epoch" : act_start_epoch,
+				"act_end_epoch" : act_end_epoch,
+				"act_type" : act_type ,
+				"utc_offset" : utc_offset,
+		}
+	};
+	axios(config).then(function(response){
+		console.log(response,"Response is");
+		if(successCallback != undefined){
+			successCallback(response);
+		}
+	}).catch((error) => {
+		if(errorCallback != undefined){
+			errorCallback(error);
+		}
+	});
+}

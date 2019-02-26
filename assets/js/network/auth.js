@@ -1,7 +1,6 @@
 import axiosRetry from 'axios-retry';
 import axios from 'axios';
 import Cookies from 'universal-cookie';
-import moment from 'moment'; 
 
 import {saveLocalState,destroyLocalState} from '../components/localStorage';
 
@@ -172,30 +171,5 @@ export function isLoggedIn(succesCallback=undefined,errorCallback=undefined){
 	});
 }
 
-export function getActivityInfo( date = undefined, act_start_epoch = undefined, 
-	                             act_end_epoch = undefined, act_type = undefined , 
-	                             utc_offset = undefined,successCallback = undefined, errorCallback = undefined){
-	const URL = '/users/daily_input/get_activity_info';
-	const config = {
-		url : URL,
-		method : 'get',
-		params:{
-				"date" : date,
-				"act_start_epoch" : act_start_epoch,
-				"act_end_epoch" : act_end_epoch,
-				"act_type" : act_type ,
-				"utc_offset" : utc_offset,
-		}
-	};
-	axios(config).then(function(response){
-		console.log(config,"Response is");
-		if(successCallback != undefined){
-			successCallback(response);
-		}
-	}).catch((error) => {
-		if(errorCallback != undefined){
-			errorCallback(error);
-		}
-	});
-}
+
 
