@@ -148,7 +148,21 @@ class ToMetaCumulative(object):
 
 class ToCumulativeSum(object):
 	'''
-	Convert a quicklook object to cumulative sum object
+	Creates a fake object which behaves like CumulativeSum object.
+	Basically used for creating a fake current day CumulativeSum
+	record to fit within current PA architecure and avoid special
+	handling.
+
+	We do not generate CumulativeSum record for current day until 
+	next day because for current day data will change thoughout 
+	day as soon as users sync their device.So to avoid multiple
+	database write we defer it till next day and create PA report
+	for previous day in batch.
+
+	To compensate curent day's CumulativeSum we create a fake object
+	for current day which behaves like a normal CumulativeSum object
+	and works with current PA code normally without any special
+	handling. 
 	'''
 
 	def __exclude_no_data_yet_hours(self, ql_obj):
@@ -167,6 +181,12 @@ class ToCumulativeSum(object):
 
 
 	def __init__(self,user,ql_obj,ui_obj,cum_obj=None):
+		'''
+		user(:obj:`User`)
+		ql_obj(:obj:`UserQuickLook`)
+		ui_obj(:obj:`UserDailyInput`)
+		cum_obj(:obj:`CumulativeSum`,optional)
+		'''
 
 		if ql_obj:
 			ql_obj = copy.deepcopy(ql_obj)
@@ -240,8 +260,11 @@ class ProgressReport():
 
 	def __init__(self,user, query_params):
 		self.user = user
+		# Possible PA summary types
 		self.summary_type = ['overall_health','non_exercise','sleep','mc','ec',
 		'nutrition','exercise','alcohol','sick','stress','travel','standing','other']
+
+		# Possible fixed duration types for PA report
 		self.duration_type = ['today','yesterday','week','month','year']
 		self.current_date = self._str_to_dt(query_params.get('date',None))
 		# Custom date range(s) for which report is to be created
@@ -250,6 +273,10 @@ class ProgressReport():
 
 		year_denominator = 365
 		if self.current_date:
+			# Year starts from the day user have Cumulative sums
+			# for example if user have Cumulative sum record from
+			# Jan 20, 2019 then year start date would be this and 
+			# number of days will be counted from here on. 
 			self.year_start = self._get_first_from_year_start_date()
 			yesterday = self.current_date - timedelta(days=1)
 			if not self.year_start == yesterday:
@@ -296,6 +323,8 @@ class ProgressReport():
 
 		summaries = query_params.get('summary',None)
 		if summaries:
+			# Remove all the summary types except for what
+			# is requested
 			summaries = [item.strip() for item in summaries.strip().split(',')]
 			allowed = set(summaries)
 			existing = set(self.summary_type)
@@ -303,6 +332,8 @@ class ProgressReport():
 				self.summary_type.pop(self.summary_type.index(s))
 
 		duration = query_params.get('duration',None)
+		# Remove all the duration types except for what
+		# is requested
 		if duration and self.current_date:
 			duration = [item.strip() for item in duration.strip().split(',')]
 			allowed = set(duration)
@@ -323,7 +354,8 @@ class ProgressReport():
 	def _get_todays_cum_data(self):
 		'''
 		Create todays cumulative data by merging todays raw report 
-		and yesterday cumulative sum (if available)
+		and yesterday cumulative sum (if available) and user inputs
+		data
 		'''
 		todays_ql_data = self.ql_datewise_data.get(
 				self.current_date.strftime("%Y-%m-%d"),None)
@@ -536,6 +568,24 @@ class ProgressReport():
 		return data
 
 	def _generic_custom_range_calculator(self,key,alias,summary_type,custom_avg_calculator):
+		'''
+		Generates averages for provided summary type for custom ranges,
+		similar to the _generic_summary_calculator. 
+
+		Args:
+			key(str): Key for which average need to be calculates. This
+				corresponds to the keys in 'calculated_data' dict.
+			alias(str): Duration type for which average need to be
+				calculated. In this case it will be 'custom_range'
+			summary_type(string): Summary type for which averages to be 
+				calculated. This summary type is the relative name of the
+				model which stores the cumulative data of any summary type
+				mentioned in self.summary_type. For example, model of
+				summary type "overall_health" have relative name
+				"overall_health_grade_cum"
+			custom_avg_calculator (function): A function which have average
+				logic for every field in given summary type.
+		'''
 		custom_average_data = {}
 
 		for r in self.custom_ranges:
@@ -1863,6 +1913,7 @@ class ProgressReport():
 		return calculated_data
 
 	def get_progress_report(self):
+		# Driver method to generate and return PA reports 
 		SUMMARY_CALCULATOR_BINDING = self._get_summary_calculator_binding()
 		DATA = {'summary':{}, "report_date":None}
 		for summary in self.summary_type:
