@@ -13,30 +13,7 @@ import { Collapse, Navbar, NavbarToggler,
 
 let objectLength = 0;
 
-class MovementLeaderboard2 extends Component{
-	constructor(props) {
-    super(props);
-	    this.state = {
-	    	
-	    }
-		this.renderTable = this.renderTable.bind(this);
-		//this.heartBeatsColors = this.heartBeatsColors.bind(this);
-		this.scrollCallback = this.scrollCallback.bind(this);
-		this.doOnOrientationChange = this.doOnOrientationChange.bind(this);
-		this.renderStepsColor = this.renderStepsColor.bind(this);
-		this.renderCommaSteps = this.renderCommaSteps.bind(this);
-		this.renderGetColors = this.renderGetColors.bind(this);
-		this.strToSecond = this.strToSecond.bind(this);
-		this.getStylesForExerciseduration   = this.getStylesForExerciseduration.bind(this);
-		this.minuteToHM = this.minuteToHM.bind(this);
-		this.mcsData = this.mcsData.bind(this);
-		this.exerciseDurColrsSingleDayOr2to6Days = this.exerciseDurColrsSingleDayOr2to6Days.bind(this);
-
-		//this.time99Colors = this.time99Colors.bind(this);
-		
-	}
-
-	minuteToHM(value) {
+function minuteToHM(value) {
 	var time;
 	if(value){
 		if(value == "N/A"){
@@ -56,33 +33,125 @@ class MovementLeaderboard2 extends Component{
 		time = "00:00";
 	}
 	return time;
-	}
+}
 	
-	strToSecond(value){
-	    let time = value.split(':');
-	    let hours = parseInt(time[0])*3600;
-	    let min = parseInt(time[1])*60;
-	    let s_time = hours + min;
-	    return s_time;
- 	}
+function strToSecond(value){
+    let time = value.split(':');
+    let hours = parseInt(time[0])*3600;
+    let min = parseInt(time[1])*60;
+    let s_time = hours + min;
+    return s_time;
+}
+
+function strToMin(value){
+    let time = value.split(':');
+    let hours = parseInt(time[0])*60;
+    let mins = parseInt(time[1]);
+    return hours+mins;
+}
+
+function getGradeStartEndRange(exerciseActiveDuration=null){
+	let gradeRanges = {
+		'A':["04:06","04:06"], //[lower End, higher End]
+		'B':["03:13","04:05"],
+		'C':["02:45","03:12"],
+		'D':["02:01","02:44"],
+		'F':["00:00","02:00"]
+	}
+
+	if(exerciseActiveDuration){
+		const EXERCISE_ACTIVE_TIME_CAP = 60;
+		let timeToDeduct = EXERCISE_ACTIVE_TIME_CAP;
+		exerciseActiveDuration = strToMin(exerciseActiveDuration);
+		if(exerciseActiveDuration < EXERCISE_ACTIVE_TIME_CAP)
+			timeToDeduct = exerciseActiveDuration;
+		for(let [grade,range] of Object.entries(gradeRanges)){
+			let lowEnd = strToMin(range[0]);
+			let highEnd = strToMin(range[1]);
+			if(lowEnd != 0)
+				gradeRanges[grade][0] = minuteToHM(lowEnd - timeToDeduct)
+			gradeRanges[grade][1] = minuteToHM(highEnd - timeToDeduct)
+		}
+
+	}
+
+	return gradeRanges
+}
+
+function getStylesForActiveMinute(totalActiveDuration,rank,exerciseActiveMin=null){
+	let gradeStartEndRange = getGradeStartEndRange(exerciseActiveMin);
+	totalActiveDuration = minuteToHM(totalActiveDuration);
+	let totalTimeInSeconds = strToSecond(totalActiveDuration);
+	let background = "";
+	let color = "";
+	if(totalTimeInSeconds >= strToSecond(gradeStartEndRange.A[0])){
+		background = "green";
+		color = "white";
+	}else if(totalTimeInSeconds >= strToSecond(gradeStartEndRange.B[0]) 
+			 && totalTimeInSeconds <= strToSecond(gradeStartEndRange.B[1])){
+		background = "#32CD32";
+		color = "white";
+	}else if(totalTimeInSeconds >= strToSecond(gradeStartEndRange.C[0])
+			 && totalTimeInSeconds <= strToSecond(gradeStartEndRange.C[1])){
+		background = "yellow";
+		color = "black";
+	}else if(totalTimeInSeconds >= strToSecond(gradeStartEndRange.D[0])
+			 && totalTimeInSeconds <= strToSecond(gradeStartEndRange.D[1])){
+		background = "orange";
+		color = "white";
+	}else{
+		background = "red";
+		color = "black";
+	}
+	return (
+		<td 
+			className ="overall_rank_value"
+			style = {{backgroundColor:background,color:color}}>
+			<span>{totalActiveDuration} {'('+rank+')'}</span>
+		</td>
+	);
+
+}
+
+class MovementLeaderboard2 extends Component{
+	constructor(props) {
+    super(props);
+	    this.state = {
+	    	
+	    }
+		this.renderTable = this.renderTable.bind(this);
+		//this.heartBeatsColors = this.heartBeatsColors.bind(this);
+		this.scrollCallback = this.scrollCallback.bind(this);
+		this.doOnOrientationChange = this.doOnOrientationChange.bind(this);
+		this.renderStepsColor = this.renderStepsColor.bind(this);
+		this.renderCommaSteps = this.renderCommaSteps.bind(this);
+		this.renderGetColors = this.renderGetColors.bind(this);
+		this.getStylesForExerciseduration   = this.getStylesForExerciseduration.bind(this);
+		this.mcsData = this.mcsData.bind(this);
+		this.exerciseDurColrsSingleDayOr2to6Days = this.exerciseDurColrsSingleDayOr2to6Days.bind(this);
+
+		//this.time99Colors = this.time99Colors.bind(this);
+		
+	}
+
  	exerciseDurColrsSingleDayOr2to6Days(value,background,color,value1,rank,avgHR){
- 			if(value == this.strToSecond("0:00")){
+ 			if(value == strToSecond("0:00")){
 				background = "red";
 			    color = "black";
 			}
-			else if(this.strToSecond("0:01") <= value && value < this.strToSecond("00:15")){
+			else if(strToSecond("0:01") <= value && value < strToSecond("00:15")){
 				background = "orange";
 		        color = "white";
 		    }
-			else if(this.strToSecond("00:15")<=value && value<this.strToSecond("00:30")){
+			else if(strToSecond("00:15")<=value && value<strToSecond("00:30")){
 				background = "yellow";
 		        color = "black";
 		    }
-			else if((this.strToSecond("00:30")<=value && value<this.strToSecond("01:00"))){
+			else if((strToSecond("00:30")<=value && value<strToSecond("01:00"))){
 				background = "#32CD32";
 		        color = "white";
 		    }
-			else if(this.strToSecond("01:00")<=value){
+			else if(strToSecond("01:00")<=value){
 				background = "green";
 		        color = "white";
 		    }
@@ -94,8 +163,9 @@ class MovementLeaderboard2 extends Component{
 		    	</td>
 		    )
 	}
+
 	getStylesForExerciseduration(value1,rank,avgHR,selectedRange){
-		let value = this.strToSecond(value1);
+		let value = strToSecond(value1);
 		let background = "";
 		let color = "";
 		if(!avgHR){
@@ -114,26 +184,26 @@ class MovementLeaderboard2 extends Component{
 			let numberOfDays = Math.abs(moment(endDate).diff(moment(startDate), 'days'))+1;
 			if(numberOfDays >= 7){
 				let avgValueInSecPer7Days = Math.round(value / numberOfDays) * 7
-				if(avgValueInSecPer7Days == this.strToSecond("0:00")){
+				if(avgValueInSecPer7Days == strToSecond("0:00")){
 					background = "red";
 				    color = "black";
 				}
-				else if(avgValueInSecPer7Days > this.strToSecond("0:00") 
-						&& avgValueInSecPer7Days <= this.strToSecond("01:39")){
+				else if(avgValueInSecPer7Days > strToSecond("0:00") 
+						&& avgValueInSecPer7Days <= strToSecond("01:39")){
 					background = "orange";
 			        color = "white";
 			    }
-				else if(avgValueInSecPer7Days > this.strToSecond("01:39") 
-						&& avgValueInSecPer7Days <= this.strToSecond("02:29")){
+				else if(avgValueInSecPer7Days > strToSecond("01:39") 
+						&& avgValueInSecPer7Days <= strToSecond("02:29")){
 					background = "yellow";
 			        color = "black";
 			    }
-				else if((avgValueInSecPer7Days > this.strToSecond("02:29") 
-						&& avgValueInSecPer7Days <= this.strToSecond("04:59"))){
+				else if((avgValueInSecPer7Days > strToSecond("02:29") 
+						&& avgValueInSecPer7Days <= strToSecond("04:59"))){
 					background = "#32CD32";
 			        color = "white";
 			    }
-				else if(avgValueInSecPer7Days >= this.strToSecond("05:00")){
+				else if(avgValueInSecPer7Days >= strToSecond("05:00")){
 					background = "green";
 			        color = "white";
 			    }
@@ -156,40 +226,6 @@ class MovementLeaderboard2 extends Component{
 				return td;
 			} 	
 		}   
-	}
-
-	getStylesForTotalActiveMinute(totalActiveDuration,rank){
-		totalActiveDuration = this.minuteToHM(totalActiveDuration);
-		let totalTimeInSeconds = this.strToSecond(totalActiveDuration);
-		let background = "";
-		let color = "";
-		if(totalTimeInSeconds >= this.strToSecond("04:06")){
-			background = "green";
-			color = "white";
-		}else if(totalTimeInSeconds >= this.strToSecond("03:13") 
-				 && totalTimeInSeconds <= this.strToSecond("04:05")){
-			background = "#32CD32";
-			color = "white";
-		}else if(totalTimeInSeconds >= this.strToSecond("02:45")
-				 && totalTimeInSeconds <= this.strToSecond("03:12")){
-			background = "yellow";
-			color = "black";
-		}else if(totalTimeInSeconds >= this.strToSecond("02:01")
-				 && totalTimeInSeconds <= this.strToSecond("02:44")){
-			background = "orange";
-			color = "white";
-		}else{
-			background = "red";
-			color = "black";
-		}
-		return (
-			<td 
-				className ="overall_rank_value"
-				style = {{backgroundColor:background,color:color}}>
-				<span>{totalActiveDuration} {'('+rank+')'}</span>
-			</td>
-		);
-
 	}
 
 	renderCommaSteps(value){
@@ -430,20 +466,26 @@ class MovementLeaderboard2 extends Component{
 					));	
 				}
 				else if(key1 == "active_min_total"){
-					td_values.push(this.getStylesForTotalActiveMinute(value[key1].score.value,value[key1].rank));
+					td_values.push(getStylesForActiveMinute(value[key1].score.value,value[key1].rank));
 				}
 				  else if(key1 == "active_min_sleep"){
 				  	if(value["active_min_total"].other_scores != null) {
-						td_values.push(<td className ="overall_rank_value"><span>{this.minuteToHM(value["active_min_total"].other_scores.active_min_sleep.value)}</span></td>);
+						td_values.push(<td className ="overall_rank_value"><span>{minuteToHM(value["active_min_total"].other_scores.active_min_sleep.value)}</span></td>);
 					}
 				}
 			     else if(key1 == "active_min_exercise"){
 			     	if(value["active_min_total"].other_scores != null) {
-						td_values.push(<td className ="overall_rank_value"><span>{this.minuteToHM(value["active_min_total"].other_scores.active_min_exercise.value)}</span></td>);
+						td_values.push(<td className ="overall_rank_value"><span>{minuteToHM(value["active_min_total"].other_scores.active_min_exercise.value)}</span></td>);
 					}	
 			     }
                 else if(key1 == "active_min_exclude_sleep_exercise"){
-					td_values.push(<td className ="overall_rank_value"><span>{this.minuteToHM(value[key1].score.value)} ({value[key1].rank})</span></td>);	
+					td_values.push(
+						getStylesForActiveMinute(
+							value[key1].score.value,
+							value[key1].rank,
+							minuteToHM(value["active_min_total"].other_scores.active_min_exercise.value)
+						)
+					);	
 				}
 				else if (key1 == "total_movement_rank_point"){
 					td_values.push(<td className ="overall_rank_value"><span>{value[key1]}</span></td>);
@@ -584,7 +626,7 @@ class MovementLeaderboard2 extends Component{
 			          			MCS Score:  total inactive hours (sum of hours each day a user does not achieve 300 steps in any hour) per day when not sleeping, napping, and exercising
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
-			          			Exercise Duration:  total exercise duration each day.  Users can characterize an activity as “exercise” or “non exercise” on the activity summary for each activity below question 1. on the user inputs page. Note: users are only given credit for exercise or non exercise for each activity (not both)
+			          			Exercise Duration / Average HR:  total exercise duration each day.  Users can characterize an activity as “exercise” or “non exercise” on the activity summary for each activity below question 1. on the user inputs page. Note: users are only given credit for exercise or non exercise for each activity (not both). Also includes the average heartrate of all exercise activities.
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			Entire 24 Hours:  the number of active minutes for the full 24 hours.  Active minutes are provided by wearable devices and a minute is considered “active” if it has 1 or more steps in that minute
