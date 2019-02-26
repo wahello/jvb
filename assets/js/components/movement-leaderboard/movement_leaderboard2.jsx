@@ -65,7 +65,7 @@ class MovementLeaderboard2 extends Component{
 	    let s_time = hours + min;
 	    return s_time;
  	}
- 	exerciseDurColrsSingleDayOr2to6Days(value,background,color,value1,rank){
+ 	exerciseDurColrsSingleDayOr2to6Days(value,background,color,value1,rank,avgHR){
  			if(value == this.strToSecond("0:00")){
 				background = "red";
 			    color = "black";
@@ -86,14 +86,25 @@ class MovementLeaderboard2 extends Component{
 				background = "green";
 		        color = "white";
 		    }
-		    return <td className ="overall_rank_value" style = {{backgroundColor:background,color:color}}><span>{value1} {'('+rank+')'}</span></td>
+		    return (
+		    	<td 
+		    		className ="overall_rank_value" 
+		    		style = {{backgroundColor:background,color:color}}>
+		    		<span>{value1} {'('+rank+')'} {' / '}{avgHR}</span>
+		    	</td>
+		    )
 	}
-	getStylesForExerciseduration(value1,rank,selectedRange){
+	getStylesForExerciseduration(value1,rank,avgHR,selectedRange){
 		let value = this.strToSecond(value1);
 		let background = "";
 		let color = "";
+		if(!avgHR){
+			avgHR = "NM"
+		}
+
 		if(selectedRange.rangeType == 'today' || selectedRange.rangeType == 'yesterday'){
-			let td = this.exerciseDurColrsSingleDayOr2to6Days(value,background,color,value1,rank);
+			let td = this.exerciseDurColrsSingleDayOr2to6Days(
+						value,background,color,value1,rank,avgHR);
 			return td;
 			
 		}
@@ -129,18 +140,19 @@ class MovementLeaderboard2 extends Component{
 			    return (
 			    	<td className ="overall_rank_value" 
 			    		style = {{backgroundColor:background,color:color}}>
-			    		<span>{value1} {'('+rank+')'}</span>
+			    		<span>{value1} {'('+rank+')'} {' / '}{avgHR}</span>
 			    	</td>
 			    );
 			}
 			else if(numberOfDays >= 2 && numberOfDays <= 6){
 				let avgValueInSecPerDay = Math.round(value / numberOfDays)
 				let td = this.exerciseDurColrsSingleDayOr2to6Days(
-							avgValueInSecPerDay,background,color,value1,rank);
+							avgValueInSecPerDay,background,color,value1,rank,avgHR);
 				return td;
 			}
 			else {
-				let td = this.exerciseDurColrsSingleDayOr2to6Days(value,background,color,value1,rank);
+				let td = this.exerciseDurColrsSingleDayOr2to6Days(
+							value,background,color,value1,rank,avgHR);
 				return td;
 			} 	
 		}   
@@ -411,7 +423,11 @@ class MovementLeaderboard2 extends Component{
 					td_values.push(this.renderGetColors(value[key1].score.value,value[key1].rank));
 				}
 				else if(key1 == "exercise_duration"){
-					td_values.push(this.getStylesForExerciseduration(value[key1].score.value,value[key1].rank,selectedRange));	
+					td_values.push(this.getStylesForExerciseduration(
+						value[key1].score.value, value[key1].rank,
+						value[key1].other_scores.avg_exercise_heart_rate.value,
+						selectedRange
+					));	
 				}
 				else if(key1 == "active_min_total"){
 					td_values.push(this.getStylesForTotalActiveMinute(value[key1].score.value,value[key1].rank));
@@ -509,7 +525,7 @@ class MovementLeaderboard2 extends Component{
 									<th>Exercise (Activity) <br/>Steps</th>
 									<th>Total <br />Steps *</th>
 									<th>MCS Score<br />(Rank)</th>
-									<th>Exercise Duration<br />(Rank)</th>
+									<th>Exercise Duration (Rank) / Avg HR</th>
 									<th>Entire 24 Hour Day <br/> (Rank)</th>
 									<th>During Sleep Hours</th>
 									<th>During Exercise Hours</th>

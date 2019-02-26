@@ -1058,8 +1058,16 @@ class LeaderboardOverview(object):
 						)
 					elif catg == 'exercise_duration':
 						score = data['exercise']['total_workout_duration_over_range'][dtype]
+						other_scores = {
+							'avg_exercise_heart_rate':{
+								'value':data['exercise']['avg_exercise_heart_rate'][dtype],
+								'verbose_name': "Average Exercise Heartrate"
+							}
+						}
 						score = _str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
-						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
+						category_wise_data[catg][dtype].append(
+							RankedScore(self.user,user,catg,score,other_scores=other_scores)
+						)
 					elif catg == 'exercise_steps':
 						score = data['non_exercise']['exercise_steps'][dtype]
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
@@ -1206,9 +1214,16 @@ class LeaderboardOverview(object):
 							)
 						elif catg == 'exercise_duration':
 							score = data['exercise']['total_workout_duration_over_range']['custom_range'][str_range]['data']
+							other_scores = {
+								'avg_exercise_heart_rate':{
+									'value':data['exercise']['avg_exercise_heart_rate']['custom_range'][str_range]['data'],
+									'verbose_name': "Average Exercise Heartrate"
+								}
+							}
 							score = _str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
 							category_wise_data[catg]['custom_range'][str_range].append(
-								RankedScore(self.user,user,catg,score))
+								RankedScore(self.user,user,catg,score,other_scores=other_scores)
+							)
 						elif catg == 'exercise_steps':
 							score = data['non_exercise']['exercise_steps']['custom_range'][str_range]['data']
 							category_wise_data[catg]['custom_range'][str_range].append(
