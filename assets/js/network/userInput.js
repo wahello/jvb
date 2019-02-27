@@ -461,7 +461,6 @@ export function getActivityInfo( date, act_start_epoch, act_end_epoch, act_type,
 		}
 	};
 	axios(config).then(function(response){
-		console.log(response,"Response is");
 		if(successCallback != undefined){
 			successCallback(response);
 		}

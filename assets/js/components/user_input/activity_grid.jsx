@@ -276,12 +276,11 @@ componentWillReceiveProps(nextProps) {
     }
 }
 
-successCallback(data){
-  console.log(data,"data"); 
+successCallback(data){ 
      this.setState({
-                     "avg_heartrate": data.data.avg_heartrate,
-                     "activity_category": data.data.activity_category,
-                     "steps": data.data.steps
+                     "modal_activity_heart_rate": data.data.avg_heartrate,
+                     "modal_exercise_steps_status": data.data.activity_category,
+                     "modal_exercise_steps": data.data.steps
      });
        
   }
@@ -298,29 +297,21 @@ getInfoOfActivity(activity_display_name,activity_start_date, activity_start_hour
                   activity_start_min && activity_start_sec && activity_start_am_pm &&
                   activity_end_date && activity_end_hour && activity_end_min && 
                   activity_end_sec && activity_end_am_pm){
-    console.log("entering or  not");
     let activityStartTimeMObject = this.getDTMomentObj( activity_start_date,
                                                         activity_start_hour,
                                                         activity_start_min,
                                                         activity_start_sec,
                                                         activity_start_am_pm );
-    console.log(activityStartTimeMObject,"1");
     let activityEndTimeMObject = this.getDTMomentObj( activity_end_date,
                                                       activity_end_hour,
                                                       activity_end_min,
                                                       activity_end_sec,
                                                       activity_end_am_pm );
-    console.log(activityEndTimeMObject,"2");
     let timezone = moment.tz.guess();
     let date = this.state.selected_date;
     let act_start_epoch = activityStartTimeMObject.unix();
     let act_end_epoch = activityEndTimeMObject.unix();
     let utc_offset = (moment.tz(moment.utc(),timezone).utcOffset())*60;
-    console.log(date);
-    console.log(act_start_epoch);
-    console.log(act_end_epoch);
-    console.log(utc_offset);   
-    console.log(activity_display_name); 
    getActivityInfo(date,act_start_epoch,act_end_epoch,activity_display_name,utc_offset,
                    this.successCallback,this.errorCallback);
    }
@@ -941,7 +932,6 @@ handleChange_activity(event){
     let oldActivities = _.cloneDeep(this.state.activites);
     let activity_data = this.state.activites[selectedActivityId];
     activity_data['activityType'] = value;
-    console.log(activity_data,"activityType")
 
     /************** CHANGES DONE BY BHANUCHANDAR B:STARTS *****************/
     let avg_hr = activity_data['averageHeartRateInBeatsPerMinute'];
@@ -1317,7 +1307,6 @@ EndTimeInSecondsSaveCalender(event){
 
 
 handleChange(event){
-    console.log("changing activity")
     const target = event.target;
     const value = target.value;
     const name = target.name;//modal_duplicate_info_status
@@ -1364,7 +1353,6 @@ handleChange(event){
         let actType = this.state.modal_activity_type;
         let actAvgHeartRate = parseInt(value);
         let steps_type = this.getActivityCategory(actType,actAvgHeartRate);
-
         this.setState({
             [name]: parseInt(value),
              modal_exercise_steps_status:steps_type
@@ -1623,7 +1611,6 @@ handleChangeActivityDate(date){
 }
 
 getTotalActivityDuration(){
-
     let activityStartTimeDate = this.state.activity_start_date;
     let activityStartTimeHour = this.state.activity_start_hour;
     let activityStartTimeMin = this.state.activity_start_min;
@@ -2304,7 +2291,7 @@ renderEditActivityModal(){
                           value={this.state.modal_activity_heart_rate}                               
                           onChange={this.handleChange}>
                           <option key="hours" value="">Select</option>
-                        {this.createSleepDropdown_heartrate(60,220)}     
+                        {this.createSleepDropdown_heartrate(40,220)}     
                         </Input>
                             </div> 
                             </FormGroup>   
