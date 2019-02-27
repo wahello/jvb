@@ -2763,7 +2763,8 @@ def hrr_data(user,start_date):
 	filtered_activities_files = get_filtered_activity_stats(activities_json=garmin_list,
 													user_age=user_age,
 													manually_updated_json=manually_edited_dic,
-													userinput_activities=activities_dic)
+													userinput_activities=activities_dic,
+													include_non_exercise = True)
 	count = 0
 	id_act = []
 	activities = []
@@ -2773,10 +2774,9 @@ def hrr_data(user,start_date):
 			id_act.append(int(filtered_activities_files[i]['summaryId']))
 			count = count + 1
 			activities.append(filtered_activities_files[i])
-		else:
+		elif filtered_activities_files[i]['steps_type'] == 'exercise':
 			workout_id.append(int(filtered_activities_files[i]['summaryId']))
 
-	
 	start_date_timestamp = start_date_timestamp
 	garmin_data_daily = UserGarminDataDaily.objects.filter(user=user,start_time_in_seconds=start_date_timestamp).last()
 	if garmin_data_daily:
