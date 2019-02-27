@@ -1,17 +1,17 @@
+import ast
+from datetime import datetime
+
 from django.shortcuts import render
+from django.http import Http404,HttpResponse
+from django.db.models import Q
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from django.http import Http404,HttpResponse
 
-
-from .serializers import UserAppleDataStepsSerializer
-
-from .models import UserAppleDataSteps,ApplePingNotification
-import datetime
-
+from apple.serializers import UserAppleDataStepsSerializer
+from apple.models import UserAppleDataSteps,ApplePingNotification
 
 def process_notification(user,summary_type,state):
 	""" This function will create instance of ping notification
@@ -85,3 +85,20 @@ class UserAppleDataStepsView(generics.CreateAPIView):
 		else:
 			error_notification(instance)
 			return Response("Data Not Stored in Database",status=status.HTTP_400_BAD_REQUEST)
+
+
+	
+def merge_user_data(user, start_date):
+	""" this function will merge the apple steps data based on date
+	Args: 
+		user: user instance
+		start_date: datetime object 
+	Return:
+		append data in dictionary formate 
+	"""
+	date_qs = UserAppleDataSteps.objects.filter(user=user,
+		Q(belong_to__lte=start_date) & Q(belong_to__gte=start_date))	
+	data = []
+	[data.append(ast.literal_eval(single_obj.data)[0]) for single_obj in date_qs]
+	return data
+
