@@ -439,7 +439,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 					"'steps_fitbit': {...}","'steps_fitbit': {}"))
 			if todays_steps_data.get("activities-steps-intraday"):
 				intraday_steps = todays_steps_data.get("activities-steps-intraday")
-				interval_duration = (intraday_steps.get('datasetInterval',15)*60)
+				interval_duration = 15*60
 				quarterly_dataset = steps_minutly_to_quartly(
 					current_date.date(),
 					intraday_steps.get('dataset',[]))
