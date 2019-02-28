@@ -301,7 +301,7 @@ def get_avg_sleep_grade(ui_sleep_duration,sleep_per_wearable,age,sleep_aid):
 def get_exercise_steps(trans_activity_data):
 	total_execrcise_steps = 0
 	for i,single_activity in enumerate(trans_activity_data):
-		total_execrcise_steps = total_execrcise_steps + int(single_activity.get("steps",0))
+		total_execrcise_steps = total_execrcise_steps + float(single_activity.get("steps",0))
 	return total_execrcise_steps
 
 def makeformat(trans_activity_data,current_date,last_seven_days_date):
