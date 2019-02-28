@@ -490,27 +490,27 @@ def combine_ui_fitbit_activities(user_input_activities,fitbit_activity_data):
 	Return:
 		Combined activities from userinput form and fitbit
 	"""
-
-	ui_activity_keys = list(user_input_activities.keys())
-	# print(ui_activity_keys,"ui act keys")
-	for index,single_activity_dicity in enumerate(fitbit_activity_data[0]):
-		if single_activcity.get('summaryId') in ui_activity_keys:
-			user_input_activities[single_activcity.get(
-				'summaryId')]['maxHeartRateInBeatsPerMinute'] = single_activcity.get(
+	if user_input_activities:
+		ui_activity_keys = list(user_input_activities.keys())
+	else:
+		ui_activity_keys = None	
+	for index,single_activity in enumerate(fitbit_activity_data[0]):
+		if single_activity.get('summaryId') in ui_activity_keys:
+			user_input_activities[single_activity.get(
+				'summaryId')]['maxHeartRateInBeatsPerMinute'] = single_activity.get(
 				"maxHeartRateInBeatsPerMinute",0)
-			user_input_activities[single_activcity.get(
-				'summaryId')]['distanceInMeters'] = single_activcity.get(
+			user_input_activities[single_activity.get(
+				'summaryId')]['distanceInMeters'] = single_activity.get(
 				"distanceInMeters",0)
 		else:
-			user_input_activities['summaryId'] = single_activcity.get('summaryId')
-			user_input_activities['activityType'] = single_activcity.get('summaryId')
-			user_input_activities['averageHeartRateInBeatsPerMinute'] = single_activcity.get('summaryId')
-			user_input_activities['durationInSeconds'] = single_activcity.get('summaryId')
-			user_input_activities['steps'] = single_activcity.get('summaryId')
-			user_input_activities['maxHeartRateInBeatsPerMinute'] = single_activcity.get(
+			user_input_activities['summaryId'] = single_activity.get('summaryId')
+			user_input_activities['activityType'] = single_activity.get('summaryId')
+			user_input_activities['averageHeartRateInBeatsPerMinute'] = single_activity.get('summaryId')
+			user_input_activities['durationInSeconds'] = single_activity.get('summaryId')
+			user_input_activities['steps'] = single_activity.get('summaryId')
+			user_input_activities['maxHeartRateInBeatsPerMinute'] = single_activity.get(
 												'maxHeartRateInBeatsPerMinute')
-			user_input_activities['distanceInMeters'] = single_activcity.get('distanceInMeters')
-	print(user_input_activities,"ui_activity_keysui_activity_keysui_activity_keys")
+			user_input_activities['distanceInMeters'] = single_activity.get('distanceInMeters')
 	return user_input_activities
 
 def calculate_AA2_workout(user,start_date,user_input_activities=None):
@@ -528,7 +528,6 @@ def calculate_AA2_workout(user,start_date,user_input_activities=None):
 					fitbit_to_garmin_activities,todays_activity_data)))
 	
 	modified_activities = combine_ui_fitbit_activities(user_input_activities,trans_activity_data)
-	# print(userdata,"trans_activity_data")
 	time_duration = []
 	heart_rate = []
 	max_hrr = []
@@ -613,7 +612,6 @@ def calculate_AA2_workout(user,start_date,user_input_activities=None):
 			data1['Totals'] = total
 		else:
 			data1['Totals'] = {}
-	# print(data1,'ddddddddddddddddddd')
 	if data1:
 		return data1
 	else:
