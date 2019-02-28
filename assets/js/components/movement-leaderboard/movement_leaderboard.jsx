@@ -526,10 +526,10 @@ class MovementLeaderboard extends Component{
 			          			Note: All time periods/durations are in hours:minutes (hh:mm)
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
-			          			The Movement Leaderboard provides a robust view of your movement across a number of categories that we use to assess movement.  In our experience, people that do well across all 6 of these categories consistently over time are healthier and feel better than those that don’t.  Users can choose various time periods or select any custom range by touching “Select Range” or entering a time period in one of the “Custom Date Range” buttons.  If viewing on a mobile device, turn your mobile device to the side (landscape mode) to see all columns.  You can also see how other people are doing on this page.  We include this so that each of us are motivated/inspired to do a little better!
+			          			The Movement Leaderboard provides a robust view of your movement across a number of categories that we use to assess movement.  In our experience, people that do well across all 5 of these categories consistently over time are healthier and feel better than those that don’t.  Users can choose various time periods or select any custom range by touching “Select Range” or entering a time period in one of the “Custom Date Range” buttons.  If viewing on a mobile device, turn your mobile device to the side (landscape mode) to see all columns.  You can also see how other people are doing on this page.  We include this so that each of us are motivated/inspired to do a little better!
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
-			          			Rank: Represents your overall movement rank, calculated by adding up your rank in our 6 movement categories (your rank can be seen next to each of these 6 categories in parenthesis):  (1) total non exercise steps; (2) movement consistency score (MCS), the number of inactive hours defined as when a user does not have 300 steps in an awake hour; (3) exercise duration; (4) the number of active minutes for the full 24 hours; (5) the number of active minutes for the full 24 hours excluding when you are sleeping (some users have active minutes when sleeping); (6) the number of active minutes for the full 24 hours when a user is not sleeping and exercising. 
+			          			Rank: Represents your overall movement rank, calculated by adding up your rank in our 5 movement categories (your rank can be seen next to each of these 5 categories in parenthesis):  (1) total non exercise steps; (2) movement consistency score (MCS), the number of inactive hours defined as when a user does not have 300 steps in an awake hour; (3) exercise duration; (4) the number of active minutes for the full 24 hours; (5) the number of active minutes for the full 24 hours when a user is not sleeping and exercising. 
 
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
@@ -545,13 +545,10 @@ class MovementLeaderboard extends Component{
 			          			MCS Score:  total inactive hours (sum of hours each day a user does not achieve 300 steps in any hour) per day when not sleeping, napping, and exercising
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
-			          			Exercise Duration:  total exercise duration each day.  Users can characterize an activity as “exercise” or “non exercise” on the activity summary for each activity below question 1. on the user inputs page. Note: users are only given credit for exercise or non exercise for each activity (not both)
+			          			Exercise Duration / Average HR:  total exercise duration each day.  Users can characterize an activity as “exercise” or “non exercise” on the activity summary for each activity below question 1. on the user inputs page. Note: users are only given credit for exercise or non exercise for each activity (not both). Also includes the average heartrate of all exercise activities.
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			Entire 24 Hours:  the number of active minutes for the full 24 hours.  Active minutes are provided by wearable devices and a minute is considered “active” if it has 1 or more steps in that minute
-			          			</p>
-			          			<p className="footer_content" style={{marginLeft:"15px"}}>
-			          			Entire Day (excluding sleep):  the number of active minutes for the full 24 hours excluding when you are sleeping (some users have active minutes when sleeping when getting up) 
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			Entire Day (excluding sleep and exercise): the number of active minutes for the full 24 hours when a user is not sleeping and not exercising.  In our experience, this is the category we do the worst in, as many of us sit a large portions of the day after exercising. We encourage you to do better in this category. Get up and move 300 steps every hour (takes 3-5 minute an hour).  Set an alarm or reminder on your phone each awake hour to remind you to get up (otherwise many of us forget to do it!). Sitting is considered smoking by many. Moving each hour will extend your life and make you feel much better!
