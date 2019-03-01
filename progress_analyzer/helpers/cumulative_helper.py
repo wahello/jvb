@@ -5,6 +5,7 @@ from django.db import transaction,DatabaseError
 from django.core.exceptions import ObjectDoesNotExist
 
 from hrr.models import Hrr
+from hrr.views import weekly_workout_helper
 from quicklook.models import UserQuickLook
 from user_input.models import UserDailyInput
 
@@ -77,6 +78,11 @@ def _get_blank_pa_model_fields(model):
 			"cum_workout_effort_level":None,
 			"cum_avg_exercise_hr":None,
 			"cum_vo2_max":None,
+			"cum_weekly_workout_duration_in_hours":None,
+			"cum_hr_aerobic_duration_hours":None,
+			"cum_hr_anaerobic_duration_hours":None,
+			"cum_hr_below_aerobic_duration_hours":None,
+			"cum_hr_not_recorded_duration_hours":None
 		}
 		return fields
 	elif model == "alcohol":
@@ -264,6 +270,28 @@ def _get_queryset(model,user,from_dt, to_dt):
 	qs = model.objects.select_related(*related_fields).filter(
 		user = user,created_at__range = (day_before_from_date.date(),to_dt.date()))
 	return qs
+
+def _get_datewise_aa_data(user,from_dt, to_dt):
+	data = {}
+	current_dt = from_dt
+	sec_to_hour = lambda x: round(x/3600, 3)
+	while current_dt <= to_dt:
+		current_dt_str = current_dt.strftime("%Y-%m-%d")
+		try:
+			aa_data = weekly_workout_helper(user, current_dt.date())
+			if aa_data and aa_data.get('Totals',None):
+				total_aa = aa_data['Totals']
+				data[current_dt_str] = {
+					"weekly_workout_duration": sec_to_hour(total_aa["duration"]),
+					"hr_anaerobic_duration": sec_to_hour(total_aa["duration_in_anaerobic_range"]),
+					"hr_aerobic_duration": sec_to_hour(total_aa["duration_in_aerobic_range"]),
+					"hr_below_aerobic": sec_to_hour(total_aa["duration_below_aerobic_range"]),
+					"hr_not_recorded_duration": sec_to_hour(total_aa["duration_hrr_not_recorded"])
+				}
+		except Exception as e:
+			pass
+		current_dt += timedelta(days=1)
+	return data
 
 def _update_cumulative_instance(instance, data):
 	_update_helper(instance.overall_health_grade_cum, data['overall_health_grade_cum'])
@@ -595,7 +623,54 @@ def _get_nutrition_cum_sum(today_ql_data, yday_cum_data=None):
 	return nutrition_cum_data
 
 
-def _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data=None):
+def _update_with_aa_cum_sum(today_aa_data, exercise_stats_cum_data, yday_cum_data=None):
+	if today_aa_data and yday_cum_data:
+		exercise_stats_cum_data["cum_weekly_workout_duration_in_hours"] = \
+			today_aa_data["weekly_workout_duration"]\
+			+ _safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_weekly_workout_duration_in_hours",0)
+		exercise_stats_cum_data["cum_hr_aerobic_duration_hours"] = \
+			today_aa_data["hr_aerobic_duration"]\
+			+ _safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_hr_aerobic_duration_hours",0)
+		exercise_stats_cum_data["cum_hr_anaerobic_duration_hours"] = \
+			today_aa_data["hr_anaerobic_duration"]\
+			+ _safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_hr_anaerobic_duration_hours",0)
+		exercise_stats_cum_data["cum_hr_below_aerobic_duration_hours"] = \
+			today_aa_data["hr_below_aerobic"]\
+			+ _safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_hr_below_aerobic_duration_hours",0)
+		exercise_stats_cum_data["cum_hr_not_recorded_duration_hours"] = \
+			today_aa_data["hr_not_recorded_duration"]\
+			+ _safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_hr_not_recorded_duration_hours",0)
+	elif not today_aa_data and yday_cum_data:
+		exercise_stats_cum_data["cum_weekly_workout_duration_in_hours"] = \
+			_safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_weekly_workout_duration_in_hours",0)
+		exercise_stats_cum_data["cum_hr_aerobic_duration_hours"] = \
+			_safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_hr_aerobic_duration_hours",0)
+		exercise_stats_cum_data["cum_hr_anaerobic_duration_hours"] = \
+			_safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_hr_anaerobic_duration_hours",0)
+		exercise_stats_cum_data["cum_hr_below_aerobic_duration_hours"] = \
+			_safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_hr_below_aerobic_duration_hours",0)
+		exercise_stats_cum_data["cum_hr_not_recorded_duration_hours"] = \
+			_safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_hr_not_recorded_duration_hours",0)
+	elif today_aa_data:
+		exercise_stats_cum_data["cum_weekly_workout_duration_in_hours"] = \
+			today_aa_data["weekly_workout_duration"]
+		exercise_stats_cum_data["cum_hr_aerobic_duration_hours"] = \
+			today_aa_data["hr_aerobic_duration"]
+		exercise_stats_cum_data["cum_hr_anaerobic_duration_hours"] = \
+			today_aa_data["hr_anaerobic_duration"]
+		exercise_stats_cum_data["cum_hr_below_aerobic_duration_hours"] = \
+			today_aa_data["hr_below_aerobic"]
+		exercise_stats_cum_data["cum_hr_not_recorded_duration_hours"] = \
+			today_aa_data["hr_not_recorded_duration"]
+	else:
+		exercise_stats_cum_data["cum_weekly_workout_duration_in_hours"] = 0
+		exercise_stats_cum_data["cum_hr_aerobic_duration_hours"] = 0
+		exercise_stats_cum_data["cum_hr_anaerobic_duration_hours"] = 0
+		exercise_stats_cum_data["cum_hr_below_aerobic_duration_hours"] = 0
+		exercise_stats_cum_data["cum_hr_not_recorded_duration_hours"] = 0
+
+
+def _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data=None, today_aa_data=None):
 	exercise_stats_cum_data = _get_blank_pa_model_fields("exercise_stats")
 
 	if today_ql_data and yday_cum_data:
@@ -614,6 +689,8 @@ def _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data=None):
 		exercise_stats_cum_data['cum_vo2_max'] = _safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"vo2_max",0) \
 			+ _safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_vo2_max",0)
+
+		_update_with_aa_cum_sum(today_aa_data,exercise_stats_cum_data,yday_cum_data)
 	
 	elif today_ql_data:
 		exercise_stats_cum_data['cum_workout_duration_in_hours'] = _str_to_hours_min_sec(_safe_get_mobj(
@@ -623,7 +700,8 @@ def _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data=None):
 		exercise_stats_cum_data['cum_avg_exercise_hr'] = _safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"avg_exercise_heartrate",0)
 		exercise_stats_cum_data['cum_vo2_max'] = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"vo2_max",0) 
+			today_ql_data.exercise_reporting_ql,"vo2_max",0)
+		_update_with_aa_cum_sum(today_aa_data,exercise_stats_cum_data) 
 		
 		
 	return exercise_stats_cum_data
@@ -1251,12 +1329,15 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 	userinput_datewise_data = {q.created_at.strftime('%Y-%m-%d'):q 
 		for q in _get_queryset(UserDailyInput,user,from_dt,to_dt)}
 
+	aa_datewise_data = _get_datewise_aa_data(user,from_dt,to_dt)
+
 	current_date = from_dt
 	while current_date <= to_dt:
 		data = {"created_at":current_date.strftime("%Y-%m-%d")}
 		yday_dt = current_date - timedelta(days=1)
 		today_ql_data = quicklook_datewise_data.get(current_date.strftime('%Y-%m-%d'),None)
 		today_ui_data = userinput_datewise_data.get(current_date.strftime('%Y-%m-%d'),None)
+		today_aa_data = aa_datewise_data.get(current_date.strftime("%Y-%m-%d"),None)
 		yday_cum_data = {q.created_at.strftime("%Y-%m-%d"):q 
 			for q in _get_queryset(CumulativeSum,user,yday_dt,yday_dt)}
 		yday_cum_data = yday_cum_data.get(yday_dt.strftime('%Y-%m-%d'),None)
@@ -1268,7 +1349,9 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 			data["movement_consistency_cum"] = _get_mc_cum_sum(today_ql_data,yday_cum_data)
 			data["exercise_consistency_cum"] = _get_ec_cum_sum(today_ql_data, yday_cum_data)
 			data["nutrition_cum"] = _get_nutrition_cum_sum(today_ql_data, yday_cum_data)
-			data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data)
+			data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data,
+																	 yday_cum_data,
+																	 today_aa_data)
 			data["alcohol_cum"] = _get_alcohol_cum_sum(today_ql_data, yday_cum_data)
 
 			user_hrr_data = _get_user_hrr_data(
@@ -1331,7 +1414,8 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 			data["movement_consistency_cum"] = _get_mc_cum_sum(today_ql_data)
 			data["exercise_consistency_cum"] = _get_ec_cum_sum(today_ql_data)
 			data["nutrition_cum"] = _get_nutrition_cum_sum(today_ql_data)
-			data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data)
+			data["exercise_stats_cum"] = _get_exercise_stats_cum_sum(today_ql_data,
+																	 today_aa_data = today_aa_data)
 			data["alcohol_cum"] = _get_alcohol_cum_sum(today_ql_data)
 
 			user_hrr_data = _get_user_hrr_data(
