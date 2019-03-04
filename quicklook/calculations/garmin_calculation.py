@@ -872,7 +872,9 @@ def activity_step_from_epoch(act_start, act_end, epochs):
 			+ epoch.get('startTimeOffsetInSeconds'))
 		epoch_end = (epoch_start + timedelta(
 			seconds=epoch.get('durationInSeconds')))
-		if(epoch_start >= act_start and epoch_end <= act_end):
+		if((act_start >= epoch_start and act_end <= epoch_end)
+			or(act_start >= epoch_start and act_start <= epoch_end)
+			or(act_end >= epoch_start and act_end <= epoch_end)):
 			steps += epoch_steps
 	return steps
 
@@ -889,7 +891,8 @@ def get_zones_cutoff(age):
 		}
 	return None
 
-def get_activity_exercise_non_exercise_category(activity,user_age):
+def get_activity_exercise_non_exercise_category(activity_type,
+		avg_hr,user_age,steps_type=None):
 	'''
 	Determine the category of provided activity summary. Possible
 	categories are "exercise" and "non-exercise"
@@ -898,13 +901,12 @@ def get_activity_exercise_non_exercise_category(activity,user_age):
 	NON_EXERCISE = 'non_exercise'
 	HEART_RATE_RECOVERY = 'heart_rate_recovery'
 	zones = get_zones_cutoff(user_age)
-	if activity.get("steps_type"):
-		return activity.get("steps_type")
+	if steps_type:
+		return steps_type
 
-	if activity.get('activityType','').lower() == HEART_RATE_RECOVERY:
+	if activity_type.lower() == HEART_RATE_RECOVERY:
 		return NON_EXERCISE
-	elif 'walk' in activity.get('activityType','').lower():
-		avg_hr = activity.get("averageHeartRateInBeatsPerMinute",0)
+	elif 'walk' in activity_type.lower():
 		# If average heart rate in beats per minute is not submitted by user
 		# then it would be by default empty string. In that case default it to 0 
 		if not avg_hr:
@@ -1038,8 +1040,11 @@ def get_filtered_activity_stats(activities_json,user_age,
 			
 		if act['summaryId'] in act_renamed_to_hrr and not is_edited_by_user:
 			act['activityType'] = 'HEART_RATE_RECOVERY'
-		act_category = get_activity_exercise_non_exercise_category(act,
-				user_age)
+		act_type = act.get('activityType','')
+		act_avg_hr = act.get("averageHeartRateInBeatsPerMinute",0)
+		act_step_type = act.get('steps_type')
+		act_category = get_activity_exercise_non_exercise_category(act_type,
+			act_avg_hr,user_age,act_step_type)
 		act['steps_type'] = act_category
 
 	deleted_activities = []
