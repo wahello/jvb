@@ -2307,7 +2307,7 @@ renderEditActivityModal(){
                       </div>
                          </FormGroup>
                          <FormGroup>
-                      <Label className="padding1" style={{padding:'10px'}}>4. Activity Heart Rate</Label>
+                      <Label className="padding1" style={{padding:'10px',color:'#808080'}}>4. Activity Heart Rate</Label>
                       {spinner}
                        <div className="input1 ">
                         <Input 
@@ -2368,7 +2368,7 @@ renderEditActivityModal(){
                       </div>
                       </FormGroup>
                        <FormGroup>                            
-                        <Label className="padding1" style={{padding:'10px'}}>6. Exercise Steps</Label>
+                        <Label className="padding1" style={{padding:'10px',color:'#808080'}}>6. Exercise Steps</Label>
                         {spinner}
                         <div className="input ">
                            <Input 
@@ -2382,7 +2382,7 @@ renderEditActivityModal(){
                         </div>
                        </FormGroup>
                        <FormGroup>
-                       <Label className="padding1" style={{padding:'10px'}}>7. Change Exercise Steps to Non Exercise Steps</Label>
+                       <Label className="padding1" style={{padding:'10px',color:'#808080'}}>7. Change Exercise Steps to Non Exercise Steps</Label>
                        {spinner}
                         <div className="input">                           
                               <Label className="btn radio1">
