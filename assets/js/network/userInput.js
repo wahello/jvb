@@ -446,8 +446,8 @@ export function userDailyInputWeatherReportFetch(date, successCallback=undefined
 	});
 }
 
-export function getActivityInfo( date, act_start_epoch, act_end_epoch, act_type, utc_offset,
-	                             successCallback, errorCallback){
+export function getManualActInfo( date, act_start_epoch, act_end_epoch, act_type, utc_offset,
+	                             manualActivityInfosuccess, manualActivityInfoerror){
 	const URL = '/users/daily_input/get_activity_info';
 	const config = {
 		url : URL,
@@ -461,12 +461,12 @@ export function getActivityInfo( date, act_start_epoch, act_end_epoch, act_type,
 		}
 	};
 	axios(config).then(function(response){
-		if(successCallback != undefined){
-			successCallback(response);
+		if(manualActivityInfosuccess != undefined){
+			manualActivityInfosuccess(response);
 		}
 	}).catch((error) => {
-		if(errorCallback != undefined){
-			errorCallback(error);
+		if(manualActivityInfoerror != undefined){
+			manualActivityInfoerror(error);
 		}
 	});
 }

@@ -170,6 +170,3 @@ export function isLoggedIn(succesCallback=undefined,errorCallback=undefined){
 		}
 	});
 }
-
-
-
