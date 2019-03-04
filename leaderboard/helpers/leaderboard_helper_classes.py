@@ -835,6 +835,7 @@ class LeaderboardOverview(object):
 		self.current_date = self._str_to_dt(query_params.get('date',None))
 		# Possible leader board categories
 		self.categories = self.category_meta.categories
+		self.requested_categories = deepcopy(self.category_meta.categories)
 		self.duration_type = ['today','yesterday','week','month','year']
 		# list of tuple, carrying pair of custom ranges
 		self.custom_ranges = self._get_custom_range_info(query_params)
@@ -847,9 +848,9 @@ class LeaderboardOverview(object):
 		if categories:
 			categories = [item.strip() for item in categories.strip().split(',')]
 			allowed = set(categories)
-			existing = set(self.categories.keys())
+			existing = set(self.requested_categories.keys())
 			for item in existing-allowed:
-				self.categories.pop(item)
+				self.requested_categories.pop(item)
 
 		duration = query_params.get('duration',None)
 		if duration and self.current_date:
@@ -1416,17 +1417,20 @@ class LeaderboardOverview(object):
 
 		return duration_lb
 
-	def get_leaderboard(self,format='dict',category=None):
+	def get_leaderboard(self,format='dict'):
 		'''
 		Prepare overall leader board 
 		'''
 		lb = {}
-		if not category:
-			#full leader board
-			for catg in self.categories.keys():
-				lb[catg] = self._get_category_leaderboard(catg,format)
-		else:
-			lb[category] = self._get_category_leaderboard(category,format)
-		lb["duration_date"] = self.duration_date
+		requested_lb = {}
+		
+		#full leader board
+		for catg in self.categories.keys():
+			lb[catg] = self._get_category_leaderboard(catg,format)
 
-		return lb					
+		for catg in self.requested_categories.keys():
+			requested_lb[catg] = lb[catg]
+
+		requested_lb["duration_date"] = self.duration_date
+
+		return requested_lb					

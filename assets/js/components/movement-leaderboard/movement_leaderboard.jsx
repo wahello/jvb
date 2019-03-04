@@ -191,7 +191,10 @@ class MovementLeaderboard extends Component{
 		  		rangeType:'today'
 		  	},
 		},()=>{
-			fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate);
+			fetchLeaderBoard(this.successOverallMovementRank,
+							 this.errorOverallMovementRank,
+							 this.state.selectedDate,
+							 null,null,'movement');
 			fetchMcsSnapshot(this.successMcsSnapshot,this.errorMcsSnapshot,this.state.selectedDate);
 
 		});
@@ -200,7 +203,10 @@ class MovementLeaderboard extends Component{
 		this.setState({
 			fetching_hrr4:true,
 		});
-		fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate);
+		fetchLeaderBoard(this.successOverallMovementRank,
+						 this.errorOverallMovementRank,
+						 this.state.selectedDate,
+						 null,null,'movement');
 		fetchMcsSnapshot(this.successMcsSnapshot,this.errorMcsSnapshot,this.state.selectedDate);
 	}
 	toggle(){
@@ -227,7 +233,10 @@ class MovementLeaderboard extends Component{
         custom_ranges.push(this.state.lb1_start_date);
         custom_ranges.push(this.state.lb1_end_date);
         let crange1 = this.state.lb1_start_date + " " + "to" + " " + this.state.lb1_end_date ;
-      fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,custom_ranges,crange1);
+      fetchLeaderBoard(this.successOverallMovementRank,
+      				   this.errorOverallMovementRank,
+      				   this.state.selectedDate,
+      				   custom_ranges,crange1,'movement');
     });
   }
    onSubmitDate2(event){
@@ -250,7 +259,10 @@ class MovementLeaderboard extends Component{
         custom_ranges.push(this.state.lb2_start_date);
         custom_ranges.push(this.state.lb2_end_date);
         let crange2 = this.state.lb2_start_date + " " + "to" + " " + this.state.lb2_end_date ;
-      fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,custom_ranges,crange2);
+      fetchLeaderBoard(this.successOverallMovementRank,
+      				   this.errorOverallMovementRank,
+      				   this.state.selectedDate,
+      				   custom_ranges,crange2,'movement');
     });
   }
  onSubmitDate3(event){
@@ -272,7 +284,10 @@ class MovementLeaderboard extends Component{
         custom_ranges.push(this.state.lb3_start_date);
         custom_ranges.push(this.state.lb3_end_date);
         let crange3 = this.state.lb3_start_date + " " + "to" + " " + this.state.lb3_end_date ;
-      fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,custom_ranges,crange3);
+      fetchLeaderBoard(this.successOverallMovementRank,
+      				   this.errorOverallMovementRank,
+      				   this.state.selectedDate,
+      				   custom_ranges,crange3,'movement');
     });
   }
   handleChange(event){
