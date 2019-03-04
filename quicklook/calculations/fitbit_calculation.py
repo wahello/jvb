@@ -798,6 +798,17 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		grades_calculated_data['overall_health_grade'] = overall_grade_pt[0]
 		grades_calculated_data['overall_health_gpa'] = overall_grade_pt[1]
 
+		# Average exercise heartrate grade calculation
+		avg_exercise_hr_grade_pts = quicklook.calculations.\
+			garmin_calculation.get_average_exercise_heartrate_grade(
+			combined_user_exercise_activities,todays_daily_strong,user_age)
+		hr_grade = 'N/A' if not avg_exercise_hr_grade_pts[0] else avg_exercise_hr_grade_pts[0] 
+		grades_calculated_data['avg_exercise_hr_grade'] = hr_grade
+		grades_calculated_data['avg_exercise_hr_gpa'] = avg_exercise_hr_grade_pts[1]\
+			if avg_exercise_hr_grade_pts[1] else 0
+		exercise_calculated_data['avg_exercise_heartrate'] = avg_exercise_hr_grade_pts[2]\
+			if avg_exercise_hr_grade_pts[2] else 0
+
 		# If quick look for provided date exist then update it otherwise
 		# create new quicklook instance 
 		try:
