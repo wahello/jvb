@@ -1842,7 +1842,6 @@ infoPrint(infoPrintText){
    }
 
 renderTable(){
-    //var modalStyles = {overlay: {zIndex: 1}}; 
     const activityKeys = ["summaryId","activityType","averageHeartRateInBeatsPerMinute",
         "startTimeInSeconds","endTimeInSeconds","durationInSeconds","steps","steps_type","duplicate","indoor_temperature","temperature","dewPoint","humidity","wind","temperature_feels_like","weather_condition","comments"];
         /*const WEATHER_FIELDS = ['humidity','temperature_feels_like','weather_condition','dewPoint','temperature'];*/
@@ -1897,7 +1896,6 @@ renderTable(){
                         <Modal 
                            isOpen={this.state.modal_delete && summaryId == this.state.selectedId_delete}
                            toggle={this.toggle_delete}
-                            //style={modalStyles}
                              >
                             <ModalBody toggle={this.toggle_delete}>
                                 <div className=" display_flex" >
@@ -2942,7 +2940,6 @@ return(
 }
 
 {this.renderEditActivityModal()}
-{/*{this.Spin()}*/}
 </div>
 </div>
 </div>
