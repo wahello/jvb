@@ -405,7 +405,7 @@ class LeaderBoard1 extends Component{
 	  				for(let [c_key,c_rankData] of Object.entries(value1)){
 		  				if(c_key == "user_rank"){
 		  					userName = c_rankData.username;
-			  		 		scores.push(c_rankData.total_hrr_rank_point);
+			  		 		scores.push(c_rankData.total_rank_point);
 			  		 		ranks.push({'rank':c_rankData.rank,'duration':range,'isCustomRange':true});
 		  		 		}
 	  				}
@@ -417,7 +417,7 @@ class LeaderBoard1 extends Component{
 			  		for (let [key,rankData] of Object.entries(val)){
 			  		 	if(key == "user_rank"){
 			  		 		userName = rankData.username;
-			  		 		scores.push(rankData.total_hrr_rank_point);
+			  		 		scores.push(rankData.total_rank_point);
 			  		 		ranks.push({'rank':rankData.rank,'duration':duration,'isCustomRange':false});
 			  		 	}
 			  		 	

@@ -425,7 +425,7 @@ class MovementLeaderboard2 extends Component{
 		let keys = ["rank","username","nes","exercise_steps","total_steps","mc",
 					"exercise_duration","active_min_total","active_min_sleep",
 					"active_min_exercise", "active_min_exclude_sleep_exercise",
-					"total_movement_rank_point"];
+					"total_rank_point"];
 		objectLength = Object.keys(Movement_data).length;
 		for(let[key,value] of Object.entries(Movement_data)){
 			let td_values = [];
@@ -487,7 +487,7 @@ class MovementLeaderboard2 extends Component{
 						)
 					);	
 				}
-				else if (key1 == "total_movement_rank_point"){
+				else if (key1 == "total_rank_point"){
 					td_values.push(<td className ="overall_rank_value"><span>{value[key1]}</span></td>);
 				}
 
