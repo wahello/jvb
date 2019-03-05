@@ -171,7 +171,8 @@ class LeaderboardCategories(object):
 				"(Excludes Active Minutes When Sleeping and Exercising)"),
 			"exercise_duration": "Exercise Duration",
 			"exercise_steps":"Exercise Steps",
-			"movement":"Movement"
+			"movement":"Movement",
+			"aerobic_duration": "Heartrate in Aerobic Range Duration (hh:mm)",
 		}
 
 		# default score value for each leader board category
@@ -196,7 +197,8 @@ class LeaderboardCategories(object):
 			'active_min_exclude_sleep':self.DEFAULT_MINIMUM_SCORE,
 			'active_min_exclude_sleep_exercise':self.DEFAULT_MINIMUM_SCORE,
 			'exercise_duration': self.DEFAULT_MINIMUM_SCORE,
-			'exercise_steps':self.DEFAULT_MINIMUM_SCORE
+			'exercise_steps':self.DEFAULT_MINIMUM_SCORE,
+			'aerobic_duration':self.DEFAULT_MINIMUM_SCORE
 		}
 
 		# Verbose name for score of certain category
@@ -223,7 +225,8 @@ class LeaderboardCategories(object):
 			'active_min_exclude_sleep_exercise':'Time Moving / Active '\
 				+'(when not sleeping and exercising)',
 			'exercise_duration': "Exercise Duration",
-			'exercise_steps':"Exercise Steps"
+			'exercise_steps':"Exercise Steps",
+			'aerobic_duration':"Heartrate in Aerobic Range Duration (hh:mm)"
 		}
 		self.category_score_priority = self.__get_catg_score_priority()
 
@@ -240,7 +243,7 @@ class LeaderboardCategories(object):
 		categories = self.categories.keys()
 		catg_score_priority = {}
 		lowest_first_categories = ['mc','resting_hr','awake_time','alcohol',
-			'time_99','pure_time_99',"overall_hrr"]
+			'time_99','pure_time_99',"overall_hrr","movement"]
 		for category in categories:
 			if category in lowest_first_categories:
 				catg_score_priority[category] = 'lowest_first'
@@ -320,7 +323,9 @@ class RankedScore(object):
 		'''
 		Setter for property other_scores
 		'''
-		if other_scores and self.category == 'avg_sleep':
+		duration_category = ["avg_sleep","anaerobic_duration",
+							 "below_aerobic_duration","hr_not_recorded_duration"]
+		if other_scores and self.category in duration_category:
 			if other_scores['sleep_duration']['value'] == None:
 				other_scores['sleep_duration']['value'] = self.DEFAULT_SLEEP_DURATION
 		self.__other_scores = other_scores
@@ -338,7 +343,7 @@ class RankedScore(object):
 		'''
 		Setter for property rank
 
-		If rank is not None or less than 1 then raise ValueError
+		If rank is not None and less than 1 then raise ValueError
 		'''
 		if (rank is None or (not rank < 1 and type(rank) is int)):
 			self.__rank = rank
@@ -351,7 +356,7 @@ class RankedScore(object):
 		Args:
 			privacy: Toggle between whether to show username or not.
 				If it is "private", then show 'Anonymous'. If it's 
-				"public" diaplay username of score's user. Default to 
+				"public" display username of score's user. Default to 
 				"private"
 
 		Return:
@@ -374,11 +379,14 @@ class RankedScore(object):
 			# Change default score to 'N/A'
 			score = "N/A"
 		elif self.category in ["awake_time","deep_sleep",
-			"time_99","pure_time_99","exercise_duration"]:
+			"time_99","pure_time_99","exercise_duration",
+			"aerobic_duration"]:
 			score = _hours_to_hours_min(score)
 
 		other_scores = self.other_scores
-		if other_scores and self.category == 'avg_sleep':
+		duration_category = ["avg_sleep","anaerobic_duration",
+							 "below_aerobic_duration","hr_not_recorded_duration"]
+		if other_scores and self.category in duration_category:
 			if other_scores['sleep_duration']['value'] == self.DEFAULT_SLEEP_DURATION:
 				other_scores['sleep_duration']['value'] = 'N/A'
 
@@ -732,7 +740,7 @@ class MovementLeaderboard(Leaderboard):
 						"rank":None
 					}
 				overall_scores[username][catg] = score
-				if(catg not in ['exercise_steps','total_steps']):
+				if(catg not in ['exercise_steps','total_steps','aerobic_duration']):
 					# Rank of exercise steps and total steps do not
 					# contribute to the overall movement rank 
 					overall_scores[username]["total_movement_rank_point"] += score['rank']
@@ -924,9 +932,10 @@ class LeaderboardOverview(object):
 			}
 		'''
 		user_model = get_user_model()
+		all_categories = self.categories.keys()
 		category_wise_data = {catg:{dtype:[] 
 			for dtype in self.duration_type} 
-			for catg in self.categories.keys()}
+			for catg in all_categories}
 
 		for user in user_model.objects.all():
 			data = ProgressReport(user,query_params).get_progress_report()
@@ -1072,7 +1081,42 @@ class LeaderboardOverview(object):
 					elif catg == 'exercise_steps':
 						score = data['non_exercise']['exercise_steps'][dtype]
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
-
+					elif catg == 'aerobic_duration':
+						score = data['exercise']['hr_aerobic_duration_hour_min'][dtype]
+						score = _str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
+						other_scores = {
+							'prcnt_aerobic_duration':{
+								'value':data['exercise']['prcnt_aerobic_duration'][dtype],
+								'verbose_name':"% Heartrate in Aerobic Range"
+							},
+							'anaerobic_duration':{
+								'value':data['exercise']['hr_anaerobic_duration_hour_min'][dtype],
+								'verbose_name':"Heartrate in Anaerobic Range Duration (hh:mm)"
+							},
+							'prcnt_anaerobic_duration':{
+								'value':data['exercise']['prcnt_anaerobic_duration'][dtype],
+								'verbose_name':"% Heartrate in Anaerobic Range"
+							},
+							'below_aerobic_duration':{
+								'value':data['exercise']['hr_below_aerobic_duration_hour_min'][dtype],
+								'verbose_name':"Heartrate in Below Aerobic Range Duration (hh:mm)"
+							},
+							'prcnt_below_aerobic_duration':{
+								'value':data['exercise']['prcnt_below_aerobic_duration'][dtype],
+								'verbose_name':"% Heartrate in Below Aaerobic Range"
+							},
+							'hr_not_recorded_duration':{
+								'value':data['exercise']['hr_not_recorded_duration_hour_min'][dtype],
+								'verbose_name':"Heartrate Not Recorded Duration (hh:mm)"
+							},
+							'prcnt_hr_not_recorded_duration':{
+								'value':data['exercise']['prcnt_hr_not_recorded_duration'][dtype],
+								'verbose_name':"% Heartrate Not Recorded"
+							}
+						}
+						category_wise_data[catg][dtype].append(RankedScore(
+							self.user,user,catg,score,other_scores=other_scores)
+						)
 
 				if self.custom_ranges:
 					if not category_wise_data[catg].get('custom_range',None):
@@ -1229,6 +1273,42 @@ class LeaderboardOverview(object):
 							score = data['non_exercise']['exercise_steps']['custom_range'][str_range]['data']
 							category_wise_data[catg]['custom_range'][str_range].append(
 								RankedScore(self.user,user,catg,score))
+						elif catg == 'aerobic_duration':
+							score = data['exercise']['hr_aerobic_duration_hour_min']['custom_range'][str_range]['data']
+							score = _str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
+							other_scores = {
+								'prcnt_aerobic_duration':{
+									'value':data['exercise']['prcnt_aerobic_duration']['custom_range'][str_range]['data'],
+									'verbose_name':"% Heartrate in Aerobic Range"
+								},
+								'anaerobic_duration':{
+									'value':data['exercise']['hr_anaerobic_duration_hour_min']['custom_range'][str_range]['data'],
+									'verbose_name':"Heartrate in Anaerobic Range Duration (hh:mm)"
+								},
+								'prcnt_anaerobic_duration':{
+									'value':data['exercise']['prcnt_anaerobic_duration']['custom_range'][str_range]['data'],
+									'verbose_name':"% Heartrate in Anaerobic Range"
+								},
+								'below_aerobic_duration':{
+									'value':data['exercise']['hr_below_aerobic_duration_hour_min']['custom_range'][str_range]['data'],
+									'verbose_name':"Heartrate in Below Aerobic Range Duration (hh:mm)"
+								},
+								'prcnt_below_aerobic_duration':{
+									'value':data['exercise']['prcnt_below_aerobic_duration']['custom_range'][str_range]['data'],
+									'verbose_name':"% Heartrate in Below Aaerobic Range"
+								},
+								'hr_not_recorded_duration':{
+									'value':data['exercise']['hr_not_recorded_duration_hour_min']['custom_range'][str_range]['data'],
+									'verbose_name':"Heartrate Not Recorded Duration (hh:mm)"
+								},
+								'prcnt_hr_not_recorded_duration':{
+									'value':data['exercise']['prcnt_hr_not_recorded_duration']['custom_range'][str_range]['data'],
+									'verbose_name':"% Heartrate Not Recorded"
+								}
+							}
+							category_wise_data[catg][dtype].append(RankedScore(
+								self.user,user,catg,score,other_scores=other_scores)
+							)
 		return category_wise_data
 
 	def _get_category_leaderboard(self,category,format):
@@ -1261,7 +1341,8 @@ class LeaderboardOverview(object):
 					'exercise_duration':self.category_wise_data['exercise_duration'][dtype],
 					'active_min_total':self.category_wise_data['active_min_total'][dtype],
 					'active_min_exclude_sleep_exercise':self.category_wise_data[
-						'active_min_exclude_sleep_exercise'][dtype]
+						'active_min_exclude_sleep_exercise'][dtype],
+					'aerobic_duration':self.category_wise_data['aerobic_duration'][dtype]
 				}
 				duration_lb[dtype] = MovementLeaderboard(
 					self.user, movement_data
@@ -1312,7 +1393,8 @@ class LeaderboardOverview(object):
 						'exercise_duration':self.category_wise_data['exercise_duration']['custom_range'][str_range],
 						'active_min_total':self.category_wise_data['active_min_total']['custom_range'][str_range],
 						'active_min_exclude_sleep_exercise':self.category_wise_data[
-							'active_min_exclude_sleep_exercise']['custom_range'][str_range]
+							'active_min_exclude_sleep_exercise']['custom_range'][str_range],
+						'aerobic_duration': self.category_wise_data['aerobic_duration']["custom_range"][str_range]
 					}
 					custom_range_lb[str_range] = MovementLeaderboard(
 						self.user, movement_data
@@ -1348,6 +1430,7 @@ class LeaderboardOverview(object):
 
 		for catg in self.requested_categories.keys():
 			requested_lb[catg] = lb[catg]
-
+			
 		requested_lb["duration_date"] = self.duration_date
+
 		return requested_lb					
