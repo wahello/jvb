@@ -4,14 +4,18 @@ import moment from 'moment';
 
 axiosRetry(axios, { retries: 4}); 
 
-export default function fetchLeaderBoard(successLeaderBoard,errorLeaderBoard,selectedDate,custom_ranges=undefined,custom_range=undefined){   
+export default function fetchLeaderBoard(successLeaderBoard,errorLeaderBoard,
+                                         selectedDate,custom_ranges=undefined,
+                                         custom_range=undefined,
+                                         lbcategories=undefined){   
   selectedDate = moment(selectedDate);
   const URL=`/leaderboard/`;
   const config={
    method:"get",
    params:{
    date: selectedDate.format('YYYY-MM-DD'),
-   custom_ranges:(custom_ranges && custom_ranges.length) ? custom_ranges.toString(): null
+   custom_ranges:(custom_ranges && custom_ranges.length) ? custom_ranges.toString(): null,
+   category: (lbcategories && lbcategories.length) ? lbcategories.toString():null
  },
    url:URL,
    withCredentials: true

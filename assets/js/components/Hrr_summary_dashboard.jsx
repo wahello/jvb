@@ -149,7 +149,10 @@ class Hrr_Dashboard extends Component{
 
 		},()=>{
 			fetchHrrSummaryData(this.successHrrSummaryData,this.errorHrrSummaryData,this.state.selectedDate);
-			fetchLeaderBoard(this.successLeaderboard,this.errorHrrSummaryData,this.state.selectedDate);
+			fetchLeaderBoard(this.successLeaderboard,
+							 this.errorHrrSummaryData,
+							 this.state.selectedDate,
+							 null,null,'overall_hrr');
 		});
 	}
 	renderRemoveDate(){
@@ -162,7 +165,10 @@ class Hrr_Dashboard extends Component{
 			fetching_hrr_dashboard:true,
 		},()=>{
 			fetchHrrSummaryData(this.successHrrSummaryData,this.errorHrrSummaryData,this.state.selectedDate);
-			fetchLeaderBoard(this.successLeaderboard,this.errorHrrSummaryData,this.state.selectedDate);
+			fetchLeaderBoard(this.successLeaderboard,
+							 this.errorHrrSummaryData,
+							 this.state.selectedDate,
+							 null,null,"overall_hrr");
 		});
 	}
     processDate(selectedDate){
@@ -173,7 +179,10 @@ class Hrr_Dashboard extends Component{
 			fetching_hrr_dashboard:true,
 		},()=>{
 			fetchHrrSummaryData(this.successHrrSummaryData,this.errorHrrSummaryData,this.state.selectedDate);
-			fetchLeaderBoard(this.successLeaderboard,this.errorHrrSummaryData,this.state.selectedDate);
+			fetchLeaderBoard(this.successLeaderboard,
+							 this.errorHrrSummaryData,
+							 this.state.selectedDate,
+							 null, null, "overall_hrr");
 		});
 	}
 	renderCommaInSteps(value){

@@ -2542,7 +2542,7 @@ renderEditActivityModal(){
                        </FormGroup>
                         {/*********************/}
                        <FormGroup>
-                      <Label className="padding1">9. Exercise Comments</Label>
+                      <Label className="padding1">16. Exercise Comments</Label>
                        <div className="input1 ">
                         <Textarea 
                           className="form-control"
