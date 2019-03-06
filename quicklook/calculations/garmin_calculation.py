@@ -2522,15 +2522,13 @@ def get_average_exercise_heartrate_grade(combined_user_activities,
 		todays_daily_strong, age):
 	
 	total_duration = 0
-	IGNORE_ACTIVITY = ['STRENGTH_TRAINING','OTHER','HEART_RATE_RECOVERY']
+	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
 	final_activities = []
 	# If same summary is edited manually then give it more preference.
 	
 	for i,act in enumerate(combined_user_activities):
 
 		if not act.get('averageHeartRateInBeatsPerMinute',None):
-			pass
-		elif 'swimming' in act.get('activityType','').lower():
 			pass
 		elif act.get('activityType','') in IGNORE_ACTIVITY:
 			pass
