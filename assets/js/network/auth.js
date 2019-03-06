@@ -1,6 +1,6 @@
 import axiosRetry from 'axios-retry';
 import axios from 'axios';
-import Cookies from 'universal-cookie'; 
+import Cookies from 'universal-cookie';
 
 import {saveLocalState,destroyLocalState} from '../components/localStorage';
 
