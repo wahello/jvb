@@ -20,53 +20,48 @@ from quicklook.models import (
 	Food,                                                                 
 	Alcohol
 )
-from fitbit.models import (                        
-	UserFitbitDataSleep,
-	UserFitbitDataHeartRate,
-	UserFitbitDataActivities,                                                  
-	UserFitbitDataSteps,
-	UserFitbitDatabody,
-	UserFitbitDatafoods
-)
+from apple.models import(
+						UserAppleDataSteps)
+
 
 from user_input.models import DailyUserInputStrong
 from user_input.models import DailyUserInputOptional
 from apple.views import merge_user_data
 
-from .converter.fitbit_to_garmin_converter import fitbit_to_garmin_sleep,\
-	fitbit_to_garmin_activities,\
-	fitbit_to_garmin_epoch,\
-	steps_minutly_to_quartly
+from .converter.apple_to_garmin_converter import apple_steps_minutly_to_quartly
+
+from .converter.fitbit_to_garmin_converter import fitbit_to_garmin_epoch
 
 from user_input.utils.daily_activity import get_daily_activities_in_base_format
 
-def get_fitbit_model_data(model,user,start_date, end_date,
+
+def get_apple_model_data(model,user,start_date, end_date,
 		order_by = None, group_by_date=False):
 
 	date_field = None
 	data_field = None
-	if model == UserFitbitDataSleep:
-		date_field = "date_of_sleep"
-		data_field = "sleep_data"
-	elif model == UserFitbitDataHeartRate:
-		date_field = "date_of_heartrate"
-		data_field = "heartrate_data"
-	elif model == UserFitbitDataActivities:
-		date_field = "date_of_activities"
-		data_field = "activities_data"
-	elif model == UserFitbitDataSteps:
-		date_field = "date_of_steps" 
-		data_field = "steps_data"
-	elif model == UserFitbitDatabody:
-		date_field = "date_of_body"
-		data_field = "body_data"
-	elif model == UserFitbitDatafoods:
-		date_field = "date_of_foods"
-		data_field = "foods_data"
+	# if model == UserFitbitDataSleep:
+	# 	date_field = "date_of_sleep"
+	# 	data_field = "sleep_data"
+	# elif model == UserFitbitDataHeartRate:
+	# 	date_field = "date_of_heartrate"
+	# 	data_field = "heartrate_data"
+	# elif model == UserFitbitDataActivities:
+	# 	date_field = "date_of_activities"
+	# 	data_field = "activities_data"
+	if model == UserAppleDataSteps:
+		date_field = "belong_to" 
+		data_field = "data"
+	# elif model == UserFitbitDatabody:
+	# 	date_field = "date_of_body"
+	# 	data_field = "body_data"
+	# elif model == UserFitbitDatafoods:
+	# 	date_field = "date_of_foods"
+	# 	data_field = "foods_data"
 
 	if date_field and data_field:
 		lookup_kwargs = {'{}__{}'.format(date_field,"range"):(
-			start_date,end_date)}
+			start_date,end_date+timedelta(days=1))}
 		if order_by:
 			summaries = model.objects.filter(
 					**lookup_kwargs,
@@ -396,7 +391,7 @@ def calculate_apple_steps(user,start_date):
 	total_apple_steps = 0
 	if apple_data:
 		for index,single_activity in enumerate(apple_data[0]):
-			total_apple_steps = total_apple_steps + int(single_activity.get("steps",0))
+			total_apple_steps = total_apple_steps + float(single_activity.get("steps",0))
 	return total_apple_steps
 
 
@@ -450,20 +445,21 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 
 		todays_epoch_data = []
 		total_steps_apple = calculate_apple_steps(user,current_date)
-		# todays_steps_data = get_fitbit_model_data(
-		# 	UserFitbitDataSteps,user,current_date.date(),current_date.date())
-		# if todays_steps_data:
-		# 	todays_steps_data = ast.literal_eval(todays_steps_data[0].replace(
-		# 			"'steps_fitbit': {...}","'steps_fitbit': {}"))
-		# 	if todays_steps_data.get("activities-steps-intraday"):
-		# 		intraday_steps = todays_steps_data.get("activities-steps-intraday")
-		# 		interval_duration = (intraday_steps.get('datasetInterval',15)*60)
-		# 		quarterly_dataset = steps_minutly_to_quartly(
-		# 			current_date.date(),
-		# 			intraday_steps.get('dataset',[]))
-		# 		for step in quarterly_dataset:
-		# 			todays_epoch_data.append(fitbit_to_garmin_epoch(
-		# 				step,current_date.date(),interval_duration))
+		# print(type(total_steps))
+		todays_steps_data = get_apple_model_data(
+			UserAppleDataSteps,user,current_date.date(),current_date.date())
+		if todays_steps_data:
+			todays_steps_data = ast.literal_eval(todays_steps_data[0])
+			# print(todays_steps_data,"todays_steps_data")
+			if todays_steps_data:
+				intraday_steps = todays_steps_data
+				interval_duration = 60
+				quarterly_dataset = apple_steps_minutly_to_quartly(
+					current_date.date(),
+					intraday_steps)
+				for step in quarterly_dataset:
+					todays_epoch_data.append(fitbit_to_garmin_epoch(
+						step,current_date.date(),interval_duration))
 
 		try:
 			user_inputs_qs = UserDailyInput.objects.select_related(
@@ -554,9 +550,9 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 		ui_prcnt_breath_through_nose = 0
 
 		# calling the resting hearate from fitbit models
-		resting_heartrate = fitbit_heartrate_data(user,current_date)
+		# resting_heartrate = fitbit_heartrate_data(user,current_date)
 		# passing resting heart rate value to exercise dictionary
-		exercise_calculated_data['resting_hr_last_night'] = resting_heartrate
+		# exercise_calculated_data['resting_hr_last_night'] = resting_heartrate
 
 		if todays_user_input:
 			ui_bedtime = todays_user_input.strong_input.sleep_bedtime
@@ -731,6 +727,8 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 		# steps_calculated_data['non_exercise_steps'] = non_exercise_steps
 		# steps_calculated_data['exercise_steps'] = exercise_steps
 		steps_calculated_data['total_steps'] = total_steps_apple
+		# print(steps_calculated_data['total_steps'],"KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK")
+
 
 		# # Non exercise steps grade and gpa calculation
 		# moment_non_exercise_steps_grade_point = quicklook.calculations\
@@ -789,28 +787,27 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 		# 		nap_end_time = quicklook.calculations.garmin_calculation\
 		# 			._str_duration_to_dt(current_date,ui_nap_end_time)
 
-		# movement_consistency = quicklook.calculations.garmin_calculation\
-		# 	.cal_movement_consistency_summary(
-		# 		user,
-		# 		current_date,
-		# 		todays_epoch_data,
-		# 		yesterday_bedtime = yesterday_bedtime,
-		# 		today_awake_time = today_awake_time,
-		# 		combined_user_activities = combined_user_exercise_activities,
-		# 		today_bedtime = today_bedtime,
-		# 		user_input_strength_start_time = strength_start_time,
-		#   		user_input_strength_end_time = strength_end_time,
-		#   		nap_start_time = nap_start_time,
-		#   		nap_end_time = nap_end_time
-		# 	)
+		movement_consistency = quicklook.calculations.garmin_calculation\
+			.cal_movement_consistency_summary(
+				user,
+				current_date,
+				todays_epoch_data,
+				yesterday_bedtime = None,#yesterday_bedtime,
+				today_awake_time = None,#today_awake_time,
+				combined_user_activities = None,#combined_user_exercise_activities,
+				today_bedtime = None,#today_bedtime,
+				user_input_strength_start_time = None,#strength_start_time,
+		  		user_input_strength_end_time = None,#strength_end_time,
+		  		nap_start_time = None,#nap_start_time,
+		  		nap_end_time = None,#nap_end_time
+			)
 
-		# if movement_consistency:
-		# 	steps_calculated_data['movement_consistency'] = json.dumps(movement_consistency)
-		# 	inactive_hours = movement_consistency.get("inactive_hours")
-		# 	grade = quicklook.calculations.garmin_calculation\
-		# 		.cal_movement_consistency_grade(inactive_hours)
-		# 	grades_calculated_data['movement_consistency_grade'] = grade
-
+		if movement_consistency:
+			steps_calculated_data['movement_consistency'] = json.dumps(movement_consistency)
+			inactive_hours = movement_consistency.get("inactive_hours")
+			# grade = quicklook.calculations.garmin_calculation\
+			# 	.cal_movement_consistency_grade(inactive_hours)
+			# grades_calculated_data['movement_consistency_grade'] = grade
 		# # overal grades gpa and grade
 		# overall_grade_pt = get_overall_grades(grades_calculated_data)
 		# grades_calculated_data['overall_health_grade'] = overall_grade_pt[0]
