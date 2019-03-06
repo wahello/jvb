@@ -872,7 +872,7 @@ def activity_step_from_epoch(act_start, act_end, epochs):
 			+ epoch.get('startTimeOffsetInSeconds'))
 		epoch_end = (epoch_start + timedelta(
 			seconds=epoch.get('durationInSeconds')))
-		if((act_start >= epoch_start and act_end <= epoch_end)
+		if((epoch_start >= act_start and epoch_end <= act_end)
 			or(act_start >= epoch_start and act_start <= epoch_end)
 			or(act_end >= epoch_start and act_end <= epoch_end)):
 			steps += epoch_steps

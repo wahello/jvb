@@ -153,8 +153,8 @@ this.calculateZone = this.calculateZone.bind(this);
 this.editToggleHandler_weather = this.editToggleHandler_weather.bind(this);
 this.handleChange_weather = this.handleChange_weather.bind(this);
 this.getManualActivityInfo = this.getManualActivityInfo.bind(this);
-this.manualActivityInfosuccess = this.manualActivityInfosuccess.bind(this);
-this.manualActivityInfoerror = this.manualActivityInfoerror.bind(this);
+this.manualActivityInfoSuccess = this.manualActivityInfoSuccess.bind(this);
+this.manualActivityInfoError = this.manualActivityInfoError.bind(this);
 
 this.state ={
     selected_date:selected_date,
@@ -277,7 +277,7 @@ componentWillReceiveProps(nextProps) {
     }
 }
 
-manualActivityInfosuccess(data){
+manualActivityInfoSuccess(data){
     this.setState({
                       loadingManualActInfo : false, 
                       modal_activity_heart_rate: data.data.avg_heartrate,
@@ -287,7 +287,7 @@ manualActivityInfosuccess(data){
      
   }
 
-manualActivityInfoerror(error){
+manualActivityInfoError(error){
         this.setState({
           loadingManualActInfo : false
      },
@@ -296,35 +296,36 @@ manualActivityInfoerror(error){
 }
 
 getManualActivityInfo(activity_display_name,activity_start_date, activity_start_hour,
-                  activity_start_min,activity_start_sec, activity_start_am_pm,
-                  activity_end_date,activity_end_hour, activity_end_min, 
-                  activity_end_sec,activity_end_am_pm){
-     if(activity_display_name && activity_start_date && activity_start_hour,
-                  activity_start_min && activity_start_sec && activity_start_am_pm &&
-                  activity_end_date && activity_end_hour && activity_end_min && 
-                  activity_end_sec && activity_end_am_pm){
-    let activityStartTimeMObject = this.getDTMomentObj( activity_start_date,
-                                                        activity_start_hour,
-                                                        activity_start_min,
-                                                        activity_start_sec,
-                                                        activity_start_am_pm );
-    let activityEndTimeMObject = this.getDTMomentObj( activity_end_date,
-                                                      activity_end_hour,
-                                                      activity_end_min,
-                                                      activity_end_sec,
-                                                      activity_end_am_pm );
-    let timezone = moment.tz.guess();
-    let date = this.state.selected_date;
-    let act_start_epoch = activityStartTimeMObject.unix();
-    let act_end_epoch = activityEndTimeMObject.unix();
-    let utc_offset = (moment.tz(moment.utc(),timezone).utcOffset())*60;
-    this.setState({
-      loadingManualActInfo : true
-    },
-      () =>  getManualActInfo(date,act_start_epoch,act_end_epoch,activity_display_name,utc_offset,
-                                this.manualActivityInfosuccess,this.manualActivityInfoerror) 
-     );
-   }        
+    activity_start_min,activity_start_sec, activity_start_am_pm,
+    activity_end_date,activity_end_hour, activity_end_min, 
+    activity_end_sec,activity_end_am_pm) {
+    if (activity_display_name && activity_start_date && activity_start_hour,
+        activity_start_min && activity_start_sec && activity_start_am_pm &&
+        activity_end_date && activity_end_hour && activity_end_min && 
+        activity_end_sec && activity_end_am_pm) {
+        let activityStartTimeMObject = this.getDTMomentObj( activity_start_date,
+                                                            activity_start_hour,
+                                                            activity_start_min,
+                                                            activity_start_sec,
+                                                            activity_start_am_pm );
+        let activityEndTimeMObject = this.getDTMomentObj( activity_end_date,
+                                                          activity_end_hour,
+                                                          activity_end_min,
+                                                          activity_end_sec,
+                                                          activity_end_am_pm );
+        let timezone = moment.tz.guess();
+        let date = this.state.selected_date;
+        let act_start_epoch = activityStartTimeMObject.unix();
+        let act_end_epoch = activityEndTimeMObject.unix();
+        let utc_offset = (moment.tz(moment.utc(),timezone).utcOffset())*60;
+        this.setState({
+            loadingManualActInfo : true
+          },
+            () => getManualActInfo(date,act_start_epoch,
+                                   act_end_epoch,activity_display_name,utc_offset,
+                                   this.manualActivityInfoSuccess,this.manualActivityInfoError)
+        );
+    }        
 }
 
 Spinner(){
@@ -1772,12 +1773,12 @@ handleChangeModalActivityTime(event){
                 this.state.modalendtime_activity_hour,
                 this.state.modalendtime_activity_min,
                 this.state.modalendtime_activity_ampm);
-            let ActivityInfo = this.getManualActivityInfo( this.state.activity_display_name,this.state.activity_start_date,
-                                                           this.state.activity_start_hour,this.state.activity_start_min,
-                                                           this.state.activity_start_sec,this.state.activity_start_am_pm,
-                                                           this.state.activity_end_date,this.state.activity_end_hour,
-                                                           this.state.activity_end_min,this.state.activity_end_sec,
-                                                           this.state.activity_end_am_pm);
+            this.getManualActivityInfo( this.state.activity_display_name,this.state.activity_start_date,
+                                        this.state.activity_start_hour,this.state.activity_start_min,
+                                        this.state.activity_start_sec,this.state.activity_start_am_pm,
+                                        this.state.activity_end_date,this.state.activity_end_hour,
+                                        this.state.activity_end_min,this.state.activity_end_sec,
+                                        this.state.activity_end_am_pm);
             if(duration && isActivityTimeValid){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
