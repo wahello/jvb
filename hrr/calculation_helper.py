@@ -6,6 +6,7 @@ import collections
 from django.db.models import Q
 
 from hrr.models import AaWorkoutCalculations,AaCalculations
+from user_input.utils.daily_activity import get_daily_activities_in_base_format
 from user_input.models import DailyUserInputStrong
 from fitparse import FitFile
 
@@ -81,27 +82,32 @@ def get_usernput_activities(user,start_date):
 	'''
 		Get activities from user input models
 	'''
-	try:
-		user_input_strong = DailyUserInputStrong.objects.filter(
-		user_input__created_at=(start_date),
-		user_input__user = user).order_by('-user_input__created_at')
-		activities=[]
-		activities_dic={}
-		if user_input_strong:	
-			user_input_activities =[act.activities for act in user_input_strong]
-			user_input_activities = json.loads(user_input_activities[0])
-			for i,k in user_input_activities.items():
-				summaryId = []
-				for keys in user_input_activities.keys():
-					summaryId.append(keys)
-				for i in range(len(summaryId)):
-					activities.append(user_input_activities[summaryId[i]])
-					activities_dic[summaryId[i]]=user_input_activities[summaryId[i]]
-	except (ValueError, SyntaxError):
-		activities =[]
-		activities_dic = {}
-		user_input_strong = ''
-	return activities,activities_dic,user_input_strong
+	# try:
+	# 	user_input_strong = DailyUserInputStrong.objects.filter(
+	# 	user_input__created_at=(start_date),
+	# 	user_input__user = user).order_by('-user_input__created_at')
+	# 	activities=[]
+	# 	activities_dic={}
+	# 	if user_input_strong:
+	# 		user_input_activities =[act.activities for act in user_input_strong]
+	# 		user_input_activities = json.loads(user_input_activities[0])
+	# 		for i,k in user_input_activities.items():
+	# 			summaryId = []
+	# 			for keys in user_input_activities.keys():
+	# 				summaryId.append(keys)
+	# 			for i in range(len(summaryId)):
+	# 				activities.append(user_input_activities[summaryId[i]])
+	# 				activities_dic[summaryId[i]]=user_input_activities[summaryId[i]]
+	# except (ValueError, SyntaxError):
+	# 	activities =[]
+	# 	activities_dic = {}
+	# 	user_input_strong = ''
+	# return activities,activities_dic,user_input_strong
+	activities_dic = get_daily_activities_in_base_format(user,start_date)
+	if activities_dic:
+		return activities_dic
+	else:
+		return {}
 
 def week_date(start_date):
 	'''

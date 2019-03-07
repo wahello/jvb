@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.http import Http404,HttpResponse
+
 from .serializers import UserAppleDataStepsSerializer
 from apple.models import UserAppleDataSteps,ApplePingNotification
 import datetime

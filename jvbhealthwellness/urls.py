@@ -18,6 +18,8 @@ from fitbit import urls as fitbitUrls
 from dashboards import urls as dashboardUrls
 from common import urls as commonUrls
 from apple import urls as appleUrls
+from weather import urls as weatherUrls
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -64,6 +66,7 @@ urlpatterns = [
     url(r'^fitbit/',include(fitbitUrls)),
     url(r'^common/',include(commonUrls)),
     url(r'^apple/',include(appleUrls)),
+    url(r'^weather/',include(weatherUrls)),
     url(r'^$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
     url(r'^register$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),
     url(r'^service_connect$', TemplateView.as_view(template_name='exampleapp/reg.html'), name='home'),

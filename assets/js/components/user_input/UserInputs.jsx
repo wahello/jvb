@@ -28,7 +28,7 @@ import { getGarminToken,logoutUser} from '../../network/auth';
 
 import {userDailyInputSend,userDailyInputFetch,
         userDailyInputUpdate,userDailyInputRecentFetch,
-        fetchGarminData,fetchGarminHrrData} from '../../network/userInput';
+        fetchGarminData,fetchGarminHrrData,userDailyInputWeatherReportFetch} from '../../network/userInput';
 import {getUserProfile} from '../../network/auth';
 
 class UserInputs extends React.Component{
@@ -117,7 +117,7 @@ class UserInputs extends React.Component{
         outdoor_temperature:'',
         temperature_feels_like:'',
         wind:'',
-        dewpoint:'',
+        dewPoint:'',
         humidity:'',
         weather_comment:'',
 
@@ -173,6 +173,8 @@ class UserInputs extends React.Component{
         nap_duration_hour:"",
         nap_duration_min:"",
         nap_comment:"",
+        number_of_activities:null,
+        garmin_number_of_activities:null
       };
       return initialState;
     }
@@ -225,6 +227,7 @@ class UserInputs extends React.Component{
       this.renderUpdateOverlay = renderers.renderUpdateOverlay.bind(this);
       this.renderSubmitOverlay = renderers.renderSubmitOverlay.bind(this);
       this.renderHrr = renderers.renderHrr.bind(this);
+      this.AutopopulateStrengthActivities = renderers.AutopopulateStrengthActivities.bind(this);
       this.renderActivityGrid = renderers.renderActivityGrid.bind(this);
 
       this.onSubmit = this.onSubmit.bind(this);
@@ -283,9 +286,11 @@ class UserInputs extends React.Component{
     this.extraTab = this.extraTab.bind(this);
     this.renderAddDate = this.renderAddDate.bind(this);
     this.renderRemoveDate = this.renderRemoveDate.bind(this);
-
+    this.onWeatherReportFetchSuccess = this.onWeatherReportFetchSuccess.bind(this);
+    this.onWeatherReportFetchFailure = this.onWeatherReportFetchFailure.bind(this);
     this.dateTimeValidation = this.dateTimeValidation.bind(this);
- }   
+    }
+    
     _extractDateTimeInfo(dateObj){
       let datetimeInfo = {
         calendarDate:null,
@@ -355,12 +360,48 @@ transformActivity(activity){
       "steps_type":"",
       "summaryId":"",
       "duplicate":false,
-      "deleted":false
+      "deleted":false,
+      "indoor_temperature":"",
+      "temperature" :"",
+      "dewPoint":"",
+      "humidity":"",
+      "wind":"",
+      "temperature_feels_like":"",
+      "weather_condition":"",
   }
   for(let[key,value] of Object.entries(activity)){
       defaultActivityObject[key] = value
   }
   return defaultActivityObject;
+}
+
+shouldFetchWeatherData(activities){
+    let humidity = Object.keys(activities)
+    .map(prop => activities[prop].humidity);
+    let temperature_feels_like = Object.keys(activities)
+    .map(prop => activities[prop].temperature_feels_like);
+    let weather_condition = Object.keys(activities)
+    .map(prop => activities[prop].weather_condition);
+    let temperature = Object.keys(activities)
+    .map(prop => activities[prop].temperature);
+    let dewpoint = Object.keys(activities)
+    .map(prop => activities[prop].dewPoint);
+    let wind = Object.keys(activities)
+    .map(prop => activities[prop].wind);
+    let fetchWeatherData = false;
+    let number_of_activities = Object.keys(activities).length;
+
+    if(!_.isEmpty(activities)){
+      for (let i=0;i<this.state.number_of_activities;i++){
+        if (!humidity[i] || !temperature_feels_like[i] ||
+           !weather_condition[i] || !temperature[i] ||
+           ! dewpoint[i] || !wind[i]) {
+            fetchWeatherData = true;
+            break;
+        }
+      }
+    }
+    return fetchWeatherData;
 }
     
     onFetchSuccess(data,canUpdateForm=undefined){
@@ -435,6 +476,7 @@ transformActivity(activity){
           activities = JSON.parse(data.data.strong_input.activities);
           activities = _.mapValues(activities,this.transformActivity);
         }
+        let number_of_activities = Object.keys(activities).length;
         this.setState({
           fetched_user_input_created_at:data.data.created_at,
           update_form:canUpdateForm,
@@ -552,6 +594,7 @@ transformActivity(activity){
           nap_duration_hour:(have_optional_input&&canUpdateForm)?data.data.optional_input.nap_duration.split(':')[0]:'',
           nap_duration_min:(have_optional_input&&canUpdateForm)?data.data.optional_input.nap_duration.split(':')[1]:'',
           nap_comment:have_optional_input ? data.data.optional_input.nap_comment: '',
+          number_of_activities:number_of_activities,
         },()=>{
           if((!this.state.sleep_bedtime_date && !this.state.sleep_awake_time_date)||
               (!this.state.workout || this.state.workout == 'no' || this.state.workout == 'not yet')||
@@ -566,11 +609,59 @@ transformActivity(activity){
              this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessWeight, this.onFetchGarminFailure);
             }
           }
+          if(this.shouldFetchWeatherData(this.state.activities)){
+            /******** CALLING WEATHER REPORT API *******/
+            userDailyInputWeatherReportFetch(
+              this.state.selected_date,
+              this.onWeatherReportFetchSuccess,
+              this.onWeatherReportFetchFailure,
+              true
+            );
+          }
           fetchGarminHrrData(this.state.selected_date,this.onFetchGarminSuccessHrr, this.onFetchGarminFailure);
           this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessActivities, this.onFetchGarminFailure);
           window.scrollTo(0,0);
         });
       }
+    }
+    onWeatherReportFetchSuccess(data,canUpdateForm=undefined){
+      if (!_.isEmpty(data.data)){
+        const WEATHER_FIELDS = ['humidity','temperature_feels_like','weather_condition','dewPoint','temperature','wind'];
+        let activities = this.state.activities;
+        for(let[summaryID,val] of Object.entries(data.data)) {
+          if(activities[summaryID] != null && activities[summaryID] != undefined && activities[summaryID] != "") {
+              for(let field of WEATHER_FIELDS){
+                if(field == "weather_condition"){
+                  activities[summaryID][field] = val[field];
+                }
+                else{
+                 activities[summaryID][field] = val[field].value;
+                }
+              }
+          }
+        }
+        this.setState({
+          activities:activities
+        });
+      }
+    }
+
+    onWeatherReportFetchFailure(error){
+      this.setState(
+        {
+        selected_date:this.state.selected_date,
+        gender:this.state.gender},()=>{
+          window.scrollTo(0,0);
+        });
+    }
+
+    onWeatherReportFetchFailure(error){
+      this.setState(
+        {
+        selected_date:this.state.selected_date,
+        gender:this.state.gender},()=>{
+          window.scrollTo(0,0);
+        });
     }
 
     onFetchRecentSuccessFullReport(data){
@@ -728,6 +819,7 @@ transformActivity(activity){
       }
       else if(_.isEmpty(user_activities)){
         merged_activities = garmin_activities;
+        merged_activities = _.mapValues(merged_activities,this.transformActivity);
       }
       else if(_.isEmpty(garmin_activities)){
         merged_activities = user_activities;
@@ -741,7 +833,7 @@ transformActivity(activity){
       let have_activities = data.data.have_activities;
       let activities = this.state.activities;
       activities = this.getMergedGarminAndUserActivities(data.data.activites,activities);
-     
+      let number_of_activities = Object.keys(activities).length;
       let weight = this.state.weight;
       if((!weight || weight == "i do not weigh myself today")&&
           data.data.weight.value){
@@ -783,13 +875,39 @@ transformActivity(activity){
           sleep_mins_last_night:mins,
           workout:have_activities?'yes':workout_status,
           weight: weight?weight:"i do not weigh myself today",
-          activities:activities
-      });
+          activities:activities,
+          number_of_activities:number_of_activities
+      },() => {
+          /*** WEATHER REPORT ****/
+            if(this.shouldFetchWeatherData(this.state.activities)){
+              /******** CALLING WEATHER REPORT API *******/
+                userDailyInputWeatherReportFetch(
+                    this.state.selected_date,
+                    this.onWeatherReportFetchSuccess,
+                    this.onWeatherReportFetchFailure,
+                    true
+                );
+            }
+            this.AutopopulateStrengthActivities()
+        });
      }else{
         this.setState({
           workout:have_activities?'yes':workout_status,
           weight: weight?weight:"i do not weigh myself today",
-          activities:activities
+          activities:activities,
+          number_of_activities:number_of_activities,
+        },() => {
+          /*** WEATHER REPORT ****/
+          if(this.shouldFetchWeatherData(this.state.activities)){
+            /******** CALLING WEATHER REPORT API *******/
+            userDailyInputWeatherReportFetch(
+                this.state.selected_date,
+                this.onWeatherReportFetchSuccess,
+                this.onWeatherReportFetchFailure,
+                true
+            );
+          }
+          this.AutopopulateStrengthActivities()
         });
      }
     }
@@ -801,28 +919,31 @@ transformActivity(activity){
         weight = Math.round((data.data.weight.value)*0.00220462);
 
     let activities = this.state.activities;
+    
     activities = this.getMergedGarminAndUserActivities(data.data.activites,activities);
-      
+    let number_of_activities = Object.keys(activities).length;
     let workout_status = this.state.workout;
     let have_activities = data.data.have_activities;
     this.setState({
       workout: have_activities?'yes':workout_status,
       weight: weight?weight:"i do not weigh myself today",
-      activities:activities
+      activities:activities,
     });
   }
 
   onFetchGarminSuccessWeight(data){
     let weight = this.state.weight;
     let activities = this.state.activities;
+    
     activities = this.getMergedGarminAndUserActivities(data.data.activites,activities);
+    let number_of_activities = Object.keys(activities).length;
     if(data.data.weight.value)
       // convert to pound
       weight = Math.round(data.data.weight.value*0.00220462);
 
     this.setState({
        weight: weight?weight:"i do not weigh myself today",
-       activities:activities
+       activities:activities,
     });
   }
   onFetchGarminSuccessHrr(data){
@@ -879,11 +1000,44 @@ transformActivity(activity){
   onFetchGarminSuccessActivities(data){
     let activities = this.state.activities;
     activities = this.getMergedGarminAndUserActivities(data.data.activites,activities);
+    let number_of_activities = Object.keys(activities).length;
     this.setState({
-      activities:activities
-    });
+      activities:activities,
+      garmin_number_of_activities:number_of_activities,
+    },() => {
+          /*** WEATHER REPORT ****/
+          let humidity = Object.keys(this.state.activities)
+          .map(prop => this.state.activities[prop].humidity);
+          let temperature_feels_like = Object.keys(this.state.activities)
+          .map(prop => this.state.activities[prop].temperature_feels_like);
+          let weather_condition = Object.keys(this.state.activities)
+          .map(prop => this.state.activities[prop].weather_condition);
+          let temperature = Object.keys(this.state.activities)
+          .map(prop => this.state.activities[prop].temperature);
+          let dewpoint = Object.keys(this.state.activities)
+          .map(prop => this.state.activities[prop].dewPoint);
+          let wind = Object.keys(this.state.activities)
+          .map(prop => this.state.activities[prop].wind);
+          let count = 0;
+          if(this.state.garmin_number_of_activities>0&&this.state.number_of_activities==0){
+            for(let i=0;i<this.state.garmin_number_of_activities;i++){
+              if(!humidity[i] || !temperature_feels_like[i] || !weather_condition[i] || !temperature[i] || ! dewpoint[i] || !wind[i]) {
+                count+=1;
+              }
+            }
+          }
+          if(count>0){
+            /** CALLING WEATHER REPORT API */
+              userDailyInputWeatherReportFetch(
+                this.state.selected_date,
+                this.onWeatherReportFetchSuccess,
+                this.onWeatherReportFetchFailure,
+                true
+              );
+            }
+          this.AutopopulateStrengthActivities()
+        });
   }
-  
 
 getDTMomentObj(dt,hour,min,am_pm){
   hour = hour ? parseInt(hour) : 0;
@@ -1031,6 +1185,7 @@ getTotalSleep(){
     },function(){
         const clone = true;
         userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,this.onFetchFailure,clone);
+
       }.bind(this));
   }
   renderRemoveDate(){
@@ -1059,7 +1214,7 @@ getTotalSleep(){
         garminRequestCancelSource:[],
         selected_date:date,
         fetching_data:true,
-        calendarOpen:!this.state.calendarOpen
+        calendarOpen:!this.state.calendarOpen,
       },function(){
         const clone = true;
         userDailyInputFetch(date,this.onFetchSuccess,this.onFetchFailure,clone);
@@ -1134,10 +1289,10 @@ getTotalSleep(){
       });
       userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,
                           this.onFetchFailure,true);
+      //this.fetchGarminData(this.state.selected_date,this.onFetchGarminSuccessNumberOfActivities, this.onFetchGarminFailure);
       getUserProfile(this.onProfileSuccessFetch);
       
       window.addEventListener('scroll', this.handleScroll);
-
     }
 
 createDropdown(start_num , end_num, step=1){
@@ -1385,10 +1540,12 @@ handleScroll() {
       window.scrollTo(0, scrollHeight-80);
     }
 
+
     sleepInvalidErrorPopup(){
       toast.info("Time fell asleep should be less than time woke up",{
         className:"dark"
       })
+
     }
 
     dateTimeValidation(start_time_date, start_time_hours,
@@ -1397,7 +1554,6 @@ handleScroll() {
         let sleep_bedtime_dt = null;
         if (start_time_date && start_time_hours
            && start_time_mins && start_time_am_pm){
-          console.log("Sleep bedtime date:",sleep_bedtime_dt);
           sleep_bedtime_dt = this.getDTMomentObj(start_time_date,start_time_hours,
             start_time_mins,start_time_am_pm)
         }
@@ -1412,16 +1568,12 @@ handleScroll() {
         if(sleep_bedtime_dt && sleep_awake_time_dt){
           // check if sleep bedtime is before the awake time
           return sleep_awake_time_dt.isAfter(sleep_bedtime_dt);
+
         }
         return true;
     }
-
+    
     render(){
-      const children = React.Children.map(this.props.children,
-      (child, index) => React.cloneElement(child, {
-        ref : `child${index}`
-      })
-     );
       
        const {fix} = this.props;
         return(
@@ -1994,6 +2146,7 @@ handleScroll() {
                             <FormGroup>
                            {
                               !this.state.editable &&
+                              this.state.report_type == 'full' &&
                               <div className="input">
                           
                               {(this.state.strength_workout_start_hour &&
@@ -2055,6 +2208,7 @@ handleScroll() {
                             <FormGroup>
                            {
                               !this.state.editable &&
+                              this.state.report_type == 'full' &&
                               <div className="input">
                 
                               {(this.state.strength_workout_end_hour &&
@@ -2878,8 +3032,8 @@ handleScroll() {
                               <div className="input1">
                                   <Input type="select" 
                                      className="custom-select form-control"
-                                     name="dewpoint"                                  
-                                     value={this.state.dewpoint}
+                                     name="dewPoint"                                  
+                                     value={this.state.dewPoint}
                                      onChange={this.handleChange} >
                                      <option key="select" value="">Select</option>                                    
                                      {this.createDropdown(-20,120,true)}
@@ -2889,7 +3043,7 @@ handleScroll() {
                             {
                               !this.state.editable &&
                               <div className="input">
-                                <p>{this.state.dewpoint}</p>
+                                <p>{this.state.dewPoint}</p>
                               </div>
                             }
                           </FormGroup> 
