@@ -90,7 +90,7 @@ class UserAppleDataStepsView(generics.CreateAPIView):
 			obj=UserAppleDataSteps.objects.get(user=user,belong_to__contains=obj_date)
 			return update_steps_data(obj,updated_data)
 			logging.exception("message")
-		except UserAppleDataSteps.DoesNotExist:
+		except:
 			instance=process_notification(user,summary_type,state)
 			serializer= UserAppleDataStepsSerializer(data= request.data, partial=True)
 			update_notification(instance)
