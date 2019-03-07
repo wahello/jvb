@@ -494,24 +494,27 @@ def combine_ui_fitbit_activities(user_input_activities,fitbit_activity_data):
 		ui_activity_keys = list(user_input_activities.keys())
 	else:
 		ui_activity_keys = None	
-	for index,single_activity in enumerate(fitbit_activity_data[0]):
-		if single_activity.get('summaryId') in ui_activity_keys:
-			user_input_activities[single_activity.get(
-				'summaryId')]['maxHeartRateInBeatsPerMinute'] = single_activity.get(
-				"maxHeartRateInBeatsPerMinute",0)
-			user_input_activities[single_activity.get(
-				'summaryId')]['distanceInMeters'] = single_activity.get(
-				"distanceInMeters",0)
-		else:
-			user_input_activities['summaryId'] = single_activity.get('summaryId')
-			user_input_activities['activityType'] = single_activity.get('summaryId')
-			user_input_activities['averageHeartRateInBeatsPerMinute'] = single_activity.get('summaryId')
-			user_input_activities['durationInSeconds'] = single_activity.get('summaryId')
-			user_input_activities['steps'] = single_activity.get('summaryId')
-			user_input_activities['maxHeartRateInBeatsPerMinute'] = single_activity.get(
+	if fitbit_activity_data:
+		for index,single_activity in enumerate(fitbit_activity_data[0]):
+			if single_activity.get('summaryId') in ui_activity_keys:
+				user_input_activities[single_activity.get(
+					'summaryId')]['maxHeartRateInBeatsPerMinute'] = single_activity.get(
+					"maxHeartRateInBeatsPerMinute",0)
+				user_input_activities[single_activity.get(
+					'summaryId')]['distanceInMeters'] = single_activity.get(
+					"distanceInMeters",0)
+			else:
+				user_input_activities['summaryId'] = single_activity.get('summaryId')
+				user_input_activities['activityType'] = single_activity.get('summaryId')
+				user_input_activities['averageHeartRateInBeatsPerMinute'] = single_activity.get('summaryId')
+				user_input_activities['durationInSeconds'] = single_activity.get('summaryId')
+				user_input_activities['steps'] = single_activity.get('summaryId')
+				user_input_activities['maxHeartRateInBeatsPerMinute'] = single_activity.get(
 												'maxHeartRateInBeatsPerMinute')
-			user_input_activities['distanceInMeters'] = single_activity.get('distanceInMeters')
-	return user_input_activities
+				user_input_activities['distanceInMeters'] = single_activity.get('distanceInMeters')
+		return user_input_activities
+	else:
+		return user_input_activities
 
 def calculate_AA2_workout(user,start_date,user_input_activities=None):
 	fibit_activities_qs = UserFitbitDataActivities.objects.filter(
@@ -534,9 +537,14 @@ def calculate_AA2_workout(user,start_date,user_input_activities=None):
 	data1={}
 	steps = []
 	hrr_not_recorded_list = []
-	if trans_activity_data and trans_activity_data[0]:
-		start_date_timestamp = trans_activity_data[0][0]['startTimeInSeconds']
-		start_date_timestamp = start_date_timestamp +  trans_activity_data[0][0].get("startTimeOffsetInSeconds",0)
+	if trans_activity_data and trans_activity_data[0] or modified_activities:
+		try:
+			start_date_timestamp = trans_activity_data[0][0]['startTimeInSeconds']
+			start_date_timestamp = start_date_timestamp +  trans_activity_data[0][0].get("startTimeOffsetInSeconds",0)
+		except IndexError:
+			modified_activities_values = list(modified_activities.values())
+			start_date_timestamp = modified_activities_values[0]['startTimeInSeconds']
+			start_date_timestamp = start_date_timestamp +  modified_activities_values[0].get("startTimeOffsetInSeconds",0)
 		start_date = datetime.utcfromtimestamp(start_date_timestamp)
 		date = start_date.strftime('%d-%b-%y')
 		# print(trans_activity_data,"trans_activity_data")
@@ -792,7 +800,6 @@ def get_user_created_activity(user,start_date,user_input_activities,fibit_act):
 		if start_time_seconds:
 			start_time_str,end_tine_str = get_start_end_time_act(start_time_seconds,offset,duration)
 			hr_dataset = get_fitbit_hr_data(user,start_date)
-
 			single_activity_hr_time = get_hr_timediff(
 				hr_dataset,start_time_str,end_tine_str,summaryid)
 			activity_hr_time.append(single_activity_hr_time)

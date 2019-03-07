@@ -1315,6 +1315,7 @@ def store_garmin_aa1(user,from_date,to_date):
 
 def store_fitbit_aa1(user,from_date,to_date):
 	activities_dict = get_usernput_activities(user,from_date)
+	# print(activities_dict,"activities_dict")
 	data = fitbit_aa.fitbit_aa_chart_one_new(user,from_date,user_input_activities=activities_dict)
 	if data.get('total_time'):
 		print("Fitbit AA1 calculations creating")
