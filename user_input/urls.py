@@ -11,4 +11,5 @@ urlpatterns = [
     	name='user_daily_activity'),
     url(r'^daily_input/item/recent/$', views.UserDailyInputLatestItemView.as_view()),
     url(r'^daily_input/garmin_data/$',garmin_views.GarminData.as_view()),
+    url(r'^daily_input/get_activity_info$',views.GetManualActivityInfo.as_view())
 ]
