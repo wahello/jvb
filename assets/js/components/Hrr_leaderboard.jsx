@@ -199,13 +199,13 @@ class HrrLeaderboard extends Component{
 	renderTable(Hrr_data,Hrr_username){
 		let operationCount = 0;
 		let td_rows = [];
-		let keys = ["rank","username","time_99","beat_lowered","pure_time_99","pure_beat_lowered","total_hrr_rank_point"];
+		let keys = ["rank","username","time_99","beat_lowered","pure_time_99","pure_beat_lowered","total_rank_point"];
 		objectLength = Object.keys(Hrr_data).length;
 		for(let[key,value] of Object.entries(Hrr_data)){
 			let td_values = [];
 			 let currentUser = '';
 			for(let key1 of keys){
-				if(key1 == "rank"|| key1 == "total_hrr_rank_point"){
+				if(key1 == "rank"|| key1 == "total_rank_point"){
 					td_values.push(<td className ="overall_rank_value">{value[key1]}</td>);
 				}
 				else if(key1 == "username"){
