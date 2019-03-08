@@ -527,6 +527,7 @@ class LeaderBoard1 extends Component{
 			  		 		if(category != "Pure Time To 99" 
 			  		 			&& category != "Time To 99"
 			  		 			&& category != "Active Minute Per Day (24 hours)"
+			  		 			&& category != "Alcohol"
 			  		 			&& (otherScoreObject != null
 			  		 			&& otherScoreObject != undefined 
 			  		 			&& otherScoreObject != "")){
@@ -570,7 +571,8 @@ class LeaderBoard1 extends Component{
 			  		 		}
 			  		 		if(category != "Pure Time To 99" 
 			  		 			&& category != "Time To 99"
-			  		 			&& category != "Active Minute Per Day (24 hours)" 
+			  		 			&& category != "Active Minute Per Day (24 hours)"
+			  		 			&& category != "Alcohol"
 			  		 			&& otherScoreObject != null 
 			  		 			&& otherScoreObject != undefined 
 			  		 			&& otherScoreObject != ""){

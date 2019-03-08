@@ -734,7 +734,8 @@ class ProgressDashboard extends Component{
                 let otherScoreObject = value['custom_range'][dur].user_rank.other_scores;
                 if(category != "Pure Time To 99" 
                     && category != "Time To 99"
-                    && category != "Active Minute Per Day (24 hours)" 
+                    && category != "Active Minute Per Day (24 hours)"
+                    && category != "Alcohol"
                     && (otherScoreObject != null 
                     && otherScoreObject != undefined 
                     && otherScoreObject != "")){
@@ -770,7 +771,8 @@ class ProgressDashboard extends Component{
         let otherScoreObject = value[dur].user_rank.other_scores;
         if(category != "Pure Time To 99" 
             && category != "Time To 99"
-            && category != "Active Minute Per Day (24 hours)" 
+            && category != "Active Minute Per Day (24 hours)"
+            && category != "Alcohol"
             && (otherScoreObject != null 
             && otherScoreObject != undefined 
             && otherScoreObject != "")){
