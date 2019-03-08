@@ -1191,7 +1191,7 @@ class LeaderboardOverview(object):
 							if score and score != "Not Provided":
 								score = _str_to_hours_min_sec(score,time_format="minute",time_pattern="mm:ss") if score else score
 							other_scores = {
-								"activity_end_hr":data['other']['hrr_activity_end_hr'][str_range]['data']
+								"activity_end_hr":data['other']['hrr_activity_end_hr']['custom_range'][str_range]['data']
 							}
 							category_wise_data[catg]['custom_range'][str_range].append(
 								RankedScore(self.user,user,catg,score,other_scores=other_scores))
@@ -1200,7 +1200,7 @@ class LeaderboardOverview(object):
 							if score and score != "Not Provided":
 								score = _str_to_hours_min_sec(score,time_format="minute",time_pattern="mm:ss") if score else score
 							other_scores = {
-								"activity_end_hr":data['other']['hrr_activity_end_hr'][str_range]['data']
+								"activity_end_hr":data['other']['hrr_activity_end_hr']['custom_range'][str_range]['data']
 							}
 							category_wise_data[catg]['custom_range'][str_range].append(
 								RankedScore(self.user,user,catg,score,other_scores=other_scores))
