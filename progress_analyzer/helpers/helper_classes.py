@@ -1973,6 +1973,35 @@ class ProgressReport():
 						todays_data.cum_days_garmin_stress_lvl,
 						current_data.cum_days_garmin_stress_lvl,alias)
 					return round(avg_stress_level,2)
+				elif key == "number_of_days_high_medium_stress":
+					days_medium_stress = (
+						todays_data.cum_days_medium_stress - 
+						current_data.cum_days_medium_stress
+					)
+					days_high_stress = (
+						todays_data.cum_days_high_stress - 
+						current_data.cum_days_high_stress
+					)
+					return days_medium_stress+days_high_stress
+
+				elif key == "prcnt_of_days_high_medium_stress":
+					if todays_meta_data and current_meta_data:
+						days_stress_reported = (
+							todays_meta_data.cum_reported_stress_days_count - 
+							current_meta_data.cum_reported_stress_days_count
+						)
+						days_medium_stress = (
+							todays_data.cum_days_medium_stress - 
+							current_data.cum_days_medium_stress
+						)
+						days_high_stress = (
+							todays_data.cum_days_high_stress - 
+							current_data.cum_days_high_stress
+						)
+						total_medium_high_stress_days = days_medium_stress + days_stress_reported
+						if days_stress_reported:
+							val = (total_medium_high_stress_days/days_stress_reported)*100
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 			return None
 
 		calculated_data = {
@@ -1983,7 +2012,9 @@ class ProgressReport():
 			'number_of_days_high_stress_reported':{d:None for d in self.duration_type},
 			'prcnt_of_days_high_stress':{d:None for d in self.duration_type},
 			'days_stress_level_reported':{d:None for d in self.duration_type},
-			'garmin_stress_lvl':{d:None for d in self.duration_type}
+			'garmin_stress_lvl':{d:None for d in self.duration_type},
+			'number_of_days_high_medium_stress':{d:None for d in self.duration_type},
+			'prcnt_of_days_high_medium_stress':{d:None for d in self.duration_type}
 		}
 		summary_type = "stress_cum"
 

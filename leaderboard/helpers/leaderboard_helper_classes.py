@@ -1063,6 +1063,14 @@ class LeaderboardOverview(object):
 							'prcnt_days_travel':{
 								'value': data['travel']['prcnt_days_travel_away_from_home'][dtype],
 								'verbose_name': '% of Days Travel'
+							},
+							'days_medium_high_stress':{
+								'value': data['stress']['number_of_days_high_medium_stress'][dtype],
+								'verbose_name': '# of Days Medium/High Stress'
+							},
+							'prcnt_days_medium_high_stress':{
+								'value': data['stress']['prcnt_of_days_high_medium_stress'][dtype],
+								'verbose_name': '# of Days Medium/High Stress'
 							}
 						}
 						category_wise_data[catg][dtype].append(RankedScore(
@@ -1293,6 +1301,14 @@ class LeaderboardOverview(object):
 								'prcnt_days_travel':{
 									'value': data['travel']['prcnt_days_travel_away_from_home']['custom_range'][str_range]['data'],
 									'verbose_name': '% of Days Travel'
+								},
+								'days_medium_high_stress':{
+									'value': data['stress']['number_of_days_high_medium_stress']['custom_range'][str_range]['data'],
+									'verbose_name': '# of Days Medium/High Stress'
+								},
+								'prcnt_days_medium_high_stress':{
+									'value': data['stress']['prcnt_of_days_high_medium_stress']['custom_range'][str_range]['data'],
+									'verbose_name': '% of Days Medium/High Stress'
 								}
 							}
 							category_wise_data[catg]['custom_range'][str_range].append(
@@ -1462,7 +1478,7 @@ class LeaderboardOverview(object):
 					}
 					excluded_catg = ['time_99','beat_lowered','aerobic_duration',
 									 'alcohol', 'vo2_max', 'user_daily_inputs']
-					duration_lb[str_range] = CompositeLeaderboard(
+					custom_range_lb[str_range] = CompositeLeaderboard(
 						self.user, overall_lb_data, excluded_catg
 					).get_leaderboard(format=format)
 
