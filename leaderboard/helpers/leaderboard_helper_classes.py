@@ -1149,7 +1149,7 @@ class LeaderboardOverview(object):
 							if score and score != "Not Provided":
 								score = _str_to_hours_min_sec(score,time_format="minute",time_pattern="mm:ss") if score else score
 							other_scores = {
-								"activity_end_hr":data['other']['hrr_activity_end_hr'][str_range]['data']
+								"activity_end_hr":data['other']['hrr_activity_end_hr']['custom_range'][str_range]['data']
 							}
 							category_wise_data[catg]['custom_range'][str_range].append(
 								RankedScore(self.user,user,catg,score,other_scores=other_scores))
@@ -1158,7 +1158,7 @@ class LeaderboardOverview(object):
 							if score and score != "Not Provided":
 								score = _str_to_hours_min_sec(score,time_format="minute",time_pattern="mm:ss") if score else score
 							other_scores = {
-								"activity_end_hr":data['other']['hrr_activity_end_hr'][str_range]['data']
+								"activity_end_hr":data['other']['hrr_activity_end_hr']['custom_range'][str_range]['data']
 							}
 							category_wise_data[catg]['custom_range'][str_range].append(
 								RankedScore(self.user,user,catg,score,other_scores=other_scores))
@@ -1272,26 +1272,26 @@ class LeaderboardOverview(object):
 								RankedScore(self.user,user,catg,score)
 							)
 						elif catg == 'user_daily_inputs':
-							score = data['other']['number_of_days_reported_inputs'][str_range]['data']
+							score = data['other']['number_of_days_reported_inputs']['custom_range'][str_range]['data']
 							other_scores = {
 								'prcnt_days_reported_inputs':{
-									'value': data['other']['prcnt_of_days_reported_inputs'][str_range]['data'],
+									'value': data['other']['prcnt_of_days_reported_inputs']['custom_range'][str_range]['data'],
 									'verbose_name': '% of Days Reported Inputs'
 								},
 								'days_sick':{
-									'value': data['sick']['number_of_days_sick'][str_range]['data'],
+									'value': data['sick']['number_of_days_sick']['custom_range'][str_range]['data'],
 									'verbose_name':'# of Days Sick'
 								},
 								'prcnt_days_sick':{
-									'value': data['sick']['prcnt_of_days_sick'][str_range]['data'],
+									'value': data['sick']['prcnt_of_days_sick']['custom_range'][str_range]['data'],
 									'verbose_name': '% of Days Sick'
 								},
 								'days_travel':{
-									'value':data['travel']['number_days_travel_away_from_home'][str_range]['data'],
+									'value':data['travel']['number_days_travel_away_from_home']['custom_range'][str_range]['data'],
 									'verbose_name': '# of Days Travel'
 								},
 								'prcnt_days_travel':{
-									'value': data['travel']['prcnt_days_travel_away_from_home'][str_range]['data'],
+									'value': data['travel']['prcnt_days_travel_away_from_home']['custom_range'][str_range]['data'],
 									'verbose_name': '% of Days Travel'
 								}
 							}
@@ -1462,7 +1462,7 @@ class LeaderboardOverview(object):
 					}
 					excluded_catg = ['time_99','beat_lowered','aerobic_duration',
 									 'alcohol', 'vo2_max', 'user_daily_inputs']
-					duration_lb[dtype] = CompositeLeaderboard(
+					duration_lb[str_range] = CompositeLeaderboard(
 						self.user, overall_lb_data, excluded_catg
 					).get_leaderboard(format=format)
 
