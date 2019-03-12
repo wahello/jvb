@@ -1015,11 +1015,26 @@ def get_filtered_activity_stats(activities_json,user_age,
 	# merge user created manual activities which are not provided by garmin
 	if userinput_activities:
 		for activity in userinput_activities.values():
+			guessed_steps = 0
+			if epoch_summaries:
+				# Try to guess the activity steps from epoch summaries
+				# if epoch summaries are present
+				act_start_end_time = _get_activities_start_end_time([activity])[0]
+				guessed_steps = activity_step_from_epoch(
+					act_start_end_time.start,
+					act_start_end_time.end,
+					epoch_summaries
+				)
 			# Manually created activities will have extra key 'created_manually'
 			# which represents that it is manually created activity 
 			activity['created_manually'] = True
 			activity['durationInSeconds'] = validate_activity_duration(
 												activity.get('durationInSeconds',0))
+
+			# If system detects that there are steps during activity duration
+			# then that means those guessed steps are double counted and should
+			# not be added in the total steps.
+			activity['guessed_steps'] = guessed_steps
 		filtered_activities += userinput_activities.values()
 
 	act_renamed_to_hrr = []
@@ -1965,6 +1980,7 @@ def cal_exercise_steps_total_steps(total_daily_steps,combined_user_activities,ag
 	garmin_non_exec_steps = 0
 	manual_exec_steps = 0
 	manual_non_exec_steps = 0
+	double_counted_steps = 0
 
 	if len(combined_user_activities):
 		for obj in combined_user_activities:
@@ -1986,15 +2002,26 @@ def cal_exercise_steps_total_steps(total_daily_steps,combined_user_activities,ag
 				else:
 					garmin_non_exec_steps += steps
 
+			# If system detects that there are steps during activity duration
+			# then that means those guessed steps are double counted and should
+			# not be added in the total steps.
+			if obj.get('guessed_steps') and obj.get('created_manually',False):
+				guessed_steps = obj.get('guessed_steps',0)
+				if steps >= guessed_steps:
+					double_counted_steps += guessed_steps
+				else:
+					# If manually entered steps are less than guessed
+					# steps then only deduct the manually entered steps
+					double_counted_steps += steps
 	
 	garmin_total_steps = total_daily_steps
-
 	if (garmin_total_steps 
-		and garmin_total_steps >= (garmin_exec_steps+garmin_non_exec_steps)):
+		and garmin_total_steps >= (garmin_exec_steps+garmin_non_exec_steps+double_counted_steps)):
 		garmin_non_activity_steps = (garmin_total_steps 
 			- garmin_exec_steps 
-			- garmin_non_exec_steps)
-	
+			- garmin_non_exec_steps
+			- double_counted_steps)
+
 	total_exercise_steps = garmin_exec_steps + manual_exec_steps
 	total_non_exec_steps = (garmin_non_exec_steps 
 		+ manual_non_exec_steps 
