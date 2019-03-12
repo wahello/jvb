@@ -504,6 +504,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 				get_filtered_activity_stats(
 					todays_activity_data,user_age,
 					userinput_activities = userinput_activities,
+					epoch_summaries = todays_epoch_data,
 					provide_all=True)
 
 		ui_bedtime = None
