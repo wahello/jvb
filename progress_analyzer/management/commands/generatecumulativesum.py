@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
 	
 	def _get_origin_date(self, user):
-		last_record = UserQuickLook.objects.filter(user = user).order_by('id')
+		last_record = UserQuickLook.objects.filter(user = user).order_by('created_at')
 		if last_record.exists():
 			start_time = last_record[0].created_at
 			return start_time
@@ -34,11 +34,11 @@ class Command(BaseCommand):
 
 		# give "all" flag more preference over "email" 
 		if options['all']:
-			self.email_or_all_flag= 'all'	
+			self.email_or_all_flag = 'all'	
 
 		# give "origin" flag more preference over "duration" 
 		if options['origin']:
-			self.duration_or_origin_flag= 'origin'
+			self.duration_or_origin_flag = 'origin'
 
 		return True
 
