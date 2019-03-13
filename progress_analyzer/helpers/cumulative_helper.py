@@ -675,7 +675,8 @@ def _get_hrr_api_data(user,date):
 			"hrr_activity_end_hr":0
 		}
 		measured_hrr = _safe_get_mobj(data,'Did_you_measure_HRR','')
-		if measured_hrr == 'yes' or measured_hrr == 'no':
+		include_hrr = _safe_get_mobj(data,'include_hrr',False)
+		if (measured_hrr == 'yes' or measured_hrr == 'no') and include_hrr:
 			if measured_hrr == 'yes':
 				hrr_start_beat = _safe_get_mobj(data,'HRR_start_beat',0)
 			else:
