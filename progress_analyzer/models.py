@@ -65,6 +65,11 @@ class ExerciseStatsCumulative(models.Model):
 	cum_workout_effort_level = models.FloatField(blank=True, null=True)
 	cum_avg_exercise_hr = models.IntegerField(blank=True, null=True)
 	cum_vo2_max = models.IntegerField(blank=True, null=True)
+	cum_weekly_workout_duration_in_hours = models.FloatField(blank=True,null=True)
+	cum_hr_aerobic_duration_hours = models.FloatField(blank=True,null=True)
+	cum_hr_anaerobic_duration_hours = models.FloatField(blank=True,null=True)
+	cum_hr_below_aerobic_duration_hours = models.FloatField(blank=True,null=True)
+	cum_hr_not_recorded_duration_hours = models.FloatField(blank=True,null=True)
 
 class AlcoholCumulative(models.Model):
 	user_cum  = models.OneToOneField(CumulativeSum,related_name="alcohol_cum")
