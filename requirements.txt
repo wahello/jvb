@@ -31,7 +31,7 @@ django.js-vinta==0.8.2.dev2
 djangorestframework==3.6.3
 elastic-apm==2.1.1
 enum34==1.1.6
-fitparse==1.0.1
+fitparse==1.1.0
 fixmydjango==0.2
 flake8==2.6.2
 flake8-putty==0.4.0
