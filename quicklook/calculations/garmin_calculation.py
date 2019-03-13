@@ -38,6 +38,7 @@ from quicklook.models import UserQuickLook,\
 
 from quicklook.serializers import UserQuickLookSerializer
 import user_input.views.garmin_views
+from user_input.utils.daily_activity import get_daily_activities_in_base_format
 
 def str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
@@ -752,6 +753,11 @@ def get_renamed_to_hrr_activities(user,calendar_date,activities):
 					renamed_summaries.append(activity['summaryId'])
 	return renamed_summaries
 
+def validate_activity_duration(duration):
+		if type(duration) is not int:
+			return 0
+		return duration
+
 def is_duplicate_activity(activity, all_activities):
 	'''
 	Determine if the activity file is duplicate activity file or not
@@ -787,18 +793,20 @@ def is_duplicate_activity(activity, all_activities):
 		activity_start = datetime.utcfromtimestamp(
 			activity.get('startTimeInSeconds',0)
 			+activity.get('startTimeOffsetInSeconds',0))
+		activity_duration = activity.get('durationInSeconds',0)
 		activity_end = (activity_start 
-			+ timedelta(seconds=activity.get('durationInSeconds',0)))
+			+ timedelta(seconds=activity_duration))
 
 		for act in all_activities:
+			act_duration = activity.get('durationInSeconds',0)
 			overlapping_duration_in_sec = 0
 			act_start = datetime.utcfromtimestamp(
 				act.get('startTimeInSeconds',0)
 				+ act.get('startTimeOffsetInSeconds',0))
 			act_end = (act_start 
-				+ timedelta(seconds=act.get('durationInSeconds',0)))
+				+ timedelta(seconds=act_duration))
 			if (act_start >= activity_start and act_end <= activity_end):
-				overlapping_duration_in_sec += act.get('durationInSeconds',0)
+				overlapping_duration_in_sec += act_duration
 			elif (act_start >= activity_start and act_start <= activity_end):
 				overlapping_sec = (activity_end - act_start).seconds
 				overlapping_duration_in_sec += overlapping_sec
@@ -819,10 +827,11 @@ def is_duplicate_activity(activity, all_activities):
 			original_act = None
 			longest_duration = 0
 			for act in overlapping_activities:
-				if (act.get('durationInSeconds',0) >= longest_duration
+				act_duration = act.get('durationInSeconds',0)
+				if (act_duration >= longest_duration
 					and act.get('averageHeartRateInBeatsPerMinute',0)):
 					original_act = act
-					longest_duration = act.get('durationInSeconds',0)
+					longest_duration = act_duration
 
 			if not original_act:
 				# If no original activity is found that means all of the 
@@ -830,9 +839,10 @@ def is_duplicate_activity(activity, all_activities):
 				# So in such case pick the activity with longest duration.
 				longest_duration = 0
 				for act in overlapping_activities:
-					if (act.get('durationInSeconds',0) >= longest_duration):
+					act_duration = act.get('durationInSeconds',0)
+					if (act_duration >= longest_duration):
 						original_act = act
-						longest_duration = act.get('durationInSeconds',0)
+						longest_duration = act_duration
 
 			if (original_act 
 				and original_act.get('summaryId') != activity.get('summaryId')):
@@ -862,7 +872,9 @@ def activity_step_from_epoch(act_start, act_end, epochs):
 			+ epoch.get('startTimeOffsetInSeconds'))
 		epoch_end = (epoch_start + timedelta(
 			seconds=epoch.get('durationInSeconds')))
-		if(epoch_start >= act_start and epoch_end <= act_end):
+		if((epoch_start >= act_start and epoch_end <= act_end)
+			or(act_start >= epoch_start and act_start <= epoch_end)
+			or(act_end >= epoch_start and act_end <= epoch_end)):
 			steps += epoch_steps
 	return steps
 
@@ -872,13 +884,15 @@ def get_zones_cutoff(age):
 	start heartbeat
 	'''
 	if age:
+
 		return {
 			"aerobic_zone":180-age-29,
 			"anaerobic_zone":180-age+5
 		}
 	return None
 
-def get_activity_exercise_non_exercise_category(activity,user_age):
+def get_activity_exercise_non_exercise_category(activity_type,
+		avg_hr,user_age,steps_type=None):
 	'''
 	Determine the category of provided activity summary. Possible
 	categories are "exercise" and "non-exercise"
@@ -886,26 +900,23 @@ def get_activity_exercise_non_exercise_category(activity,user_age):
 	EXERCISE = 'exercise'
 	NON_EXERCISE = 'non_exercise'
 	HEART_RATE_RECOVERY = 'heart_rate_recovery'
-
 	zones = get_zones_cutoff(user_age)
-	if activity.get("steps_type"):
-		return activity.get("steps_type")
+	if steps_type:
+		return steps_type
 
-	if activity.get('activityType','').lower() == HEART_RATE_RECOVERY:
+	if activity_type.lower() == HEART_RATE_RECOVERY:
 		return NON_EXERCISE
-	elif 'walk' in activity.get('activityType','').lower():
-		avg_hr = activity.get("averageHeartRateInBeatsPerMinute",0)
+	elif 'walk' in activity_type.lower():
 		# If average heart rate in beats per minute is not submitted by user
 		# then it would be by default empty string. In that case default it to 0 
 		if not avg_hr:
-			avg_hr = 0
+			avg_hr = 0	
 		if(not avg_hr or avg_hr < zones['aerobic_zone']):
 			return NON_EXERCISE
 		else:
 			return EXERCISE
 	else:
 		return EXERCISE
-
 
 def get_filtered_activity_stats(activities_json,user_age,
 		manually_updated_json={},userinput_activities = None,
@@ -963,7 +974,8 @@ def get_filtered_activity_stats(activities_json,user_age,
 				# no value for fields like - avgHeartRateInBeatsPerMinute, steps
 				# etc. In that case empty value will be taken for those keys even
 				# though value exist in original summary provided by garmin 
-				if val or key == 'duplicate' or key == 'deleted':
+				if(val or key == 'duplicate' or key == 'deleted' 
+					or key == 'comments' or key == 'activity_weather'):
 					filtered_obj[key] = val
 			return filtered_obj
 		return obj
@@ -995,14 +1007,34 @@ def get_filtered_activity_stats(activities_json,user_age,
 
 			if userinput_activities:
 				obj.update(userinput_edited(obj))
+
+			obj['durationInSeconds'] = validate_activity_duration(
+											obj.get('durationInSeconds',0))
 			filtered_activities.append(obj)
 
 	# merge user created manual activities which are not provided by garmin
 	if userinput_activities:
 		for activity in userinput_activities.values():
+			guessed_steps = 0
+			if epoch_summaries:
+				# Try to guess the activity steps from epoch summaries
+				# if epoch summaries are present
+				act_start_end_time = _get_activities_start_end_time([activity])[0]
+				guessed_steps = activity_step_from_epoch(
+					act_start_end_time.start,
+					act_start_end_time.end,
+					epoch_summaries
+				)
 			# Manually created activities will have extra key 'created_manually'
 			# which represents that it is manually created activity 
 			activity['created_manually'] = True
+			activity['durationInSeconds'] = validate_activity_duration(
+												activity.get('durationInSeconds',0))
+
+			# If system detects that there are steps during activity duration
+			# then that means those guessed steps are double counted and should
+			# not be added in the total steps.
+			activity['guessed_steps'] = guessed_steps
 		filtered_activities += userinput_activities.values()
 
 	act_renamed_to_hrr = []
@@ -1023,8 +1055,11 @@ def get_filtered_activity_stats(activities_json,user_age,
 			
 		if act['summaryId'] in act_renamed_to_hrr and not is_edited_by_user:
 			act['activityType'] = 'HEART_RATE_RECOVERY'
-		act_category = get_activity_exercise_non_exercise_category(act,
-				user_age)
+		act_type = act.get('activityType','')
+		act_avg_hr = act.get("averageHeartRateInBeatsPerMinute",0)
+		act_step_type = act.get('steps_type')
+		act_category = get_activity_exercise_non_exercise_category(act_type,
+			act_avg_hr,user_age,act_step_type)
 		act['steps_type'] = act_category
 
 	deleted_activities = []
@@ -1187,7 +1222,10 @@ def get_activity_stats(combined_user_activities,user_age):
 			if not activities_hr.get(obj_act, None):
 				activities_hr[obj_act] = 0
 			# weighted average
-			activities_hr[obj_act] += round((act_duration/workout_type_total_duration)*obj_avg_hr)
+			try:
+				activities_hr[obj_act] += round((act_duration/workout_type_total_duration)*obj_avg_hr)
+			except ZeroDivisionError:
+				activities_hr[obj_act] +=  obj_avg_hr
 
 			# capture lat and lon of activity with maximum duration
 			if (obj.get('durationInSeconds',0) >= max_duration) or \
@@ -1942,6 +1980,7 @@ def cal_exercise_steps_total_steps(total_daily_steps,combined_user_activities,ag
 	garmin_non_exec_steps = 0
 	manual_exec_steps = 0
 	manual_non_exec_steps = 0
+	double_counted_steps = 0
 
 	if len(combined_user_activities):
 		for obj in combined_user_activities:
@@ -1963,15 +2002,26 @@ def cal_exercise_steps_total_steps(total_daily_steps,combined_user_activities,ag
 				else:
 					garmin_non_exec_steps += steps
 
+			# If system detects that there are steps during activity duration
+			# then that means those guessed steps are double counted and should
+			# not be added in the total steps.
+			if obj.get('guessed_steps') and obj.get('created_manually',False):
+				guessed_steps = obj.get('guessed_steps',0)
+				if steps >= guessed_steps:
+					double_counted_steps += guessed_steps
+				else:
+					# If manually entered steps are less than guessed
+					# steps then only deduct the manually entered steps
+					double_counted_steps += steps
 	
 	garmin_total_steps = total_daily_steps
-
 	if (garmin_total_steps 
-		and garmin_total_steps >= (garmin_exec_steps+garmin_non_exec_steps)):
+		and garmin_total_steps >= (garmin_exec_steps+garmin_non_exec_steps+double_counted_steps)):
 		garmin_non_activity_steps = (garmin_total_steps 
 			- garmin_exec_steps 
-			- garmin_non_exec_steps)
-	
+			- garmin_non_exec_steps
+			- double_counted_steps)
+
 	total_exercise_steps = garmin_exec_steps + manual_exec_steps
 	total_non_exec_steps = (garmin_non_exec_steps 
 		+ manual_non_exec_steps 
@@ -2499,15 +2549,13 @@ def get_average_exercise_heartrate_grade(combined_user_activities,
 		todays_daily_strong, age):
 	
 	total_duration = 0
-	IGNORE_ACTIVITY = ['STRENGTH_TRAINING','OTHER','HEART_RATE_RECOVERY']
+	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
 	final_activities = []
 	# If same summary is edited manually then give it more preference.
 	
 	for i,act in enumerate(combined_user_activities):
 
 		if not act.get('averageHeartRateInBeatsPerMinute',None):
-			pass
-		elif 'swimming' in act.get('activityType','').lower():
 			pass
 		elif act.get('activityType','') in IGNORE_ACTIVITY:
 			pass
@@ -2664,12 +2712,8 @@ def get_weekly_combined_activities(weekly_activities,
 	while(current_date <= week_end_date):
 		current_date_str = current_date.strftime('%Y-%m-%d')
 		weekly_combined_activities[current_date_str] = None
-		
-		# temporarily here, with new activity architecture we don't need this
 		userinput_activities = weekly_user_input_activities[current_date_str]
-		if userinput_activities and userinput_activities.activities:
-			userinput_activities = json.loads(userinput_activities.activities)
-		else:
+		if not userinput_activities:
 			userinput_activities = None
 		
 		activities = weekly_activities.get(current_date_str,[])
@@ -2711,7 +2755,6 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 	current_date = from_dt
 	SERIALIZED_DATA = []
 	user_age = user.profile.age()
-
 	while current_date <= to_dt:
 		last_seven_days_date = current_date - timedelta(days=6)
 		start_epoch = int(current_date.replace(tzinfo=timezone.utc).timestamp())
@@ -2769,9 +2812,15 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		weekly_daily_strong = get_weekly_user_input_data(
 			daily_strong,current_date,last_seven_days_date)
 
+		weekly_user_input_activities = get_daily_activities_in_base_format(
+			user,last_seven_days_date.date(),
+			to_date = current_date.date(),
+			include_all = True)
+
 		weekly_combined_activities = get_weekly_combined_activities(
-			weekly_activities,weekly_manual_activities,weekly_daily_strong,
-			last_seven_days_date,current_date,user_age)
+			weekly_activities,weekly_manual_activities,
+			weekly_user_input_activities,last_seven_days_date,
+			current_date,user_age)
 
 		try:
 			tomorrow_date = current_date + timedelta(days=1)
@@ -2791,10 +2840,8 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 				todays_daily_strong.append(daily_strong[i])
 				break
 		
-		userinput_activities = safe_get(todays_daily_strong,'activities',None)
-		if userinput_activities:
-			userinput_activities = json.loads(userinput_activities)
-		
+		userinput_activities = weekly_user_input_activities[current_date.strftime('%Y-%m-%d')]
+
 		bodycmp = get_garmin_model_data(
 			UserGarminDataBodyComposition,user,
 			start_epoch,end_epoch,order_by = '-id')

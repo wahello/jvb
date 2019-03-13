@@ -405,7 +405,7 @@ class LeaderBoard1 extends Component{
 	  				for(let [c_key,c_rankData] of Object.entries(value1)){
 		  				if(c_key == "user_rank"){
 		  					userName = c_rankData.username;
-			  		 		scores.push(c_rankData.total_hrr_rank_point);
+			  		 		scores.push(c_rankData.total_rank_point);
 			  		 		ranks.push({'rank':c_rankData.rank,'duration':range,'isCustomRange':true});
 		  		 		}
 	  				}
@@ -417,7 +417,7 @@ class LeaderBoard1 extends Component{
 			  		for (let [key,rankData] of Object.entries(val)){
 			  		 	if(key == "user_rank"){
 			  		 		userName = rankData.username;
-			  		 		scores.push(rankData.total_hrr_rank_point);
+			  		 		scores.push(rankData.total_rank_point);
 			  		 		ranks.push({'rank':rankData.rank,'duration':duration,'isCustomRange':false});
 			  		 	}
 			  		 	
@@ -524,7 +524,12 @@ class LeaderBoard1 extends Component{
 			  		 		if(!category){
 			  		 			category = c_rankData.category;
 			  		 		}
-			  		 		if(category != "Pure Time To 99" && category != "Time To 99" && (otherScoreObject != null && otherScoreObject != undefined && otherScoreObject != "")){
+			  		 		if(category != "Pure Time To 99" 
+			  		 			&& category != "Time To 99"
+			  		 			&& category != "Active Minute Per Day (24 hours)"
+			  		 			&& (otherScoreObject != null
+			  		 			&& otherScoreObject != undefined 
+			  		 			&& otherScoreObject != "")){
 				  		 		for (let [key3,o_score] of Object.entries(otherScoreObject)){
 				  		 			if(o_score != null && o_score != undefined && o_score != "") {
 				  		 				if(!other_Scores[key3]){
@@ -563,7 +568,12 @@ class LeaderBoard1 extends Component{
 			  		 		if(!category){
 			  		 			category = rankData.category;
 			  		 		}
-			  		 		if(category != "Pure Time To 99" && category != "Time To 99" && otherScoreObject != null && otherScoreObject != undefined && otherScoreObject != ""){
+			  		 		if(category != "Pure Time To 99" 
+			  		 			&& category != "Time To 99"
+			  		 			&& category != "Active Minute Per Day (24 hours)" 
+			  		 			&& otherScoreObject != null 
+			  		 			&& otherScoreObject != undefined 
+			  		 			&& otherScoreObject != ""){
 				  		 		for (let [key3,o_score] of Object.entries(otherScoreObject)){
 				  		 			if(o_score != null && o_score != undefined && o_score != "") {
 				  		 				if(!other_Scores[key3]){

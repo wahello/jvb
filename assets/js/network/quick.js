@@ -94,13 +94,16 @@ export function quicksummaryDate(startDate,endDate,successquick, errorquick){
     });
   }
 
-export function fetchMovementConsistency(fromDate, successmovement,errormovement){   
+export function fetchMovementConsistency(fromDate, successmovement,errormovement, toDate=null,uid=null){   
   fromDate = moment(fromDate);
+  toDate = toDate !== null?moment(toDate):null
   const URL=`/quicklook/users/movement_consistency`;
   const config={
    method:"get",
    params:{
-    from_date: fromDate.format('YYYY-MM-DD') 
+    from_date: fromDate.format('YYYY-MM-DD'),
+    to_date: toDate !== null ? toDate.format('YYYY-MM-DD'):null,
+    uid:uid
    },
    url:URL,
    withCredentials: true

@@ -1243,6 +1243,17 @@ def _get_meta_cum_sum(today_ql_data, today_ui_data, user_hrr_data,
 
 
 def create_cumulative_instance(user, from_dt=None, to_dt=None):
+	'''
+	Creates or updates the cumulative sum record for certain user
+	for provided date range.
+
+	Args:
+		user(:obj:`User`): User for whom cumulative sum is created
+		from_dt(str): Date from which sums need to be created. Date
+			is in 'YYYY-MM-DD' format.
+		to_dt(str): Date upto which sums need to be created. Date
+			is in 'YYYY-MM-DD' format.
+	'''
 	from_dt = _str_to_datetime(from_dt)
 	to_dt = _str_to_datetime(to_dt)
 	quicklook_datewise_data = {q.created_at.strftime('%Y-%m-%d'):q 
@@ -1255,6 +1266,8 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 	while current_date <= to_dt:
 		data = {"created_at":current_date.strftime("%Y-%m-%d")}
 		yday_dt = current_date - timedelta(days=1)
+		# Pull required data from various sources which are 
+		# required for generating PA reports
 		today_ql_data = quicklook_datewise_data.get(current_date.strftime('%Y-%m-%d'),None)
 		today_ui_data = userinput_datewise_data.get(current_date.strftime('%Y-%m-%d'),None)
 		yday_cum_data = {q.created_at.strftime("%Y-%m-%d"):q 
@@ -1362,6 +1375,18 @@ def create_cumulative_instance(user, from_dt=None, to_dt=None):
 
 
 def create_cum_raw_data(user,today_ql_data,today_ui_data,yday_cum_data=None):
+	'''
+	Creates cumulative sum raw data and returns it. It doesn't create 
+	or update the cumulative sum records. It's a helper function 
+	used in 'ToCumulativeSum' class in 'helpers/helper_classes.py'
+
+	Args:
+		user(:obj:`User`): User for whom cumulative sum is created
+		today_ql_data(:obj:`UserQuickLook`)
+		today_ui_data(:obj:`UserDailyInput`) 
+		yday_cum_data(:obj:`CumulativeSum`,optional)
+		
+	'''
 	data = {"created_at":today_ql_data.created_at.strftime("%Y-%m-%d")}
 	if today_ql_data and yday_cum_data:
 		data["overall_health_grade_cum"] = _get_overall_health_grade_cum_sum(today_ql_data,yday_cum_data)

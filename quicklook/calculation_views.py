@@ -32,19 +32,24 @@ class movementConsistencySummary(generics.ListAPIView):
 		mc = ql.movement_consistency
 		obj = {
 			"created_at":ql.user_ql.created_at.strftime("%Y-%m-%d"),
-			"movement_consistency":ast.literal_eval(mc) if (mc != ''and mc != None) else {}, 
+			"movement_consistency":ast.literal_eval(mc) if (mc != '' and mc != None) else {}, 
 			"non_exercise_steps":ql.non_exercise_steps,
 			"exercise_steps":ql.exercise_steps,
 			"total_steps":ql.total_steps
 		}
+
 		return obj
 
-	def get_queryset(self):
+	def get_queryset(self,id=None):
+		user = self.request.user
 		from_dt = None
 		to_dt = None
+		uid = self.request.user.id
+		if self.request.query_params.get('uid'):
+			uid = int(self.request.query_params.get('uid'))
 		y,m,d = map(int,self.request.query_params.get('from_date').split('-'))
 		from_dt = datetime(y,m,d,0,0,0)
-		if self.request.query_params.get('to_date',None):
+		if self.request.query_params.get('to_date'):
 			y,m,d = map(int,self.request.query_params.get('to_date').split('-'))
 			to_dt = datetime(y,m,d,0,0,0)
 		else:
@@ -52,10 +57,10 @@ class movementConsistencySummary(generics.ListAPIView):
 
 		qs = Steps.objects.filter(Q(user_ql__created_at__gte = from_dt.date())&
 								  Q(user_ql__created_at__lte = to_dt.date()),
-								  user_ql__user = self.request.user)
+								  user_ql__user__id = uid)
 		return qs
 
-	def get(self, request, format="json"):
+	def get(self, request, format = "json"):
 		movement_consistency = []
 		qs = self.get_queryset()
 		for ql in qs:

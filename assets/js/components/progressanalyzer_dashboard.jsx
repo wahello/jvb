@@ -732,7 +732,12 @@ class ProgressDashboard extends Component{
                   verbose_name = value['custom_range'][dur].user_rank.other_scores.sleep_duration.verbose_name;
                 }*/
                 let otherScoreObject = value['custom_range'][dur].user_rank.other_scores;
-                if(category != "Pure Time To 99" && category != "Time To 99" && (otherScoreObject != null && otherScoreObject != undefined && otherScoreObject != "")){
+                if(category != "Pure Time To 99" 
+                    && category != "Time To 99"
+                    && category != "Active Minute Per Day (24 hours)" 
+                    && (otherScoreObject != null 
+                    && otherScoreObject != undefined 
+                    && otherScoreObject != "")){
                   for (let [key3,o_score] of Object.entries(otherScoreObject)){
                     if(o_score != null && o_score != undefined && o_score != "") {
                       if(!other_Scores[key3]){
@@ -763,7 +768,12 @@ class ProgressDashboard extends Component{
           verbose_name = value[dur].user_rank.other_scores.sleep_duration.verbose_name;
         }*/
         let otherScoreObject = value[dur].user_rank.other_scores;
-        if(category != "Pure Time To 99" && category != "Time To 99" && (otherScoreObject != null && otherScoreObject != undefined && otherScoreObject != "")){
+        if(category != "Pure Time To 99" 
+            && category != "Time To 99"
+            && category != "Active Minute Per Day (24 hours)" 
+            && (otherScoreObject != null 
+            && otherScoreObject != undefined 
+            && otherScoreObject != "")){
           for (let [key3,o_score] of Object.entries(otherScoreObject)){
             if(o_score != null && o_score != undefined && o_score != "") {
               if(!other_Scores[key3]){
