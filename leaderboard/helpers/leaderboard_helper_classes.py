@@ -323,11 +323,11 @@ class RankedScore(object):
 		'''
 		Setter for property other_scores
 		'''
-		duration_category = ["avg_sleep","anaerobic_duration",
-							 "below_aerobic_duration","hr_not_recorded_duration"]
+		duration_category = ["avg_sleep"]
 		if other_scores and self.category in duration_category:
 			if other_scores['sleep_duration']['value'] == None:
 				other_scores['sleep_duration']['value'] = self.DEFAULT_SLEEP_DURATION
+
 		self.__other_scores = other_scores
 
 	@property
@@ -384,8 +384,7 @@ class RankedScore(object):
 			score = _hours_to_hours_min(score)
 
 		other_scores = self.other_scores
-		duration_category = ["avg_sleep","anaerobic_duration",
-							 "below_aerobic_duration","hr_not_recorded_duration"]
+		duration_category = ["avg_sleep"]
 		if other_scores and self.category in duration_category:
 			if other_scores['sleep_duration']['value'] == self.DEFAULT_SLEEP_DURATION:
 				other_scores['sleep_duration']['value'] = 'N/A'
@@ -1192,7 +1191,7 @@ class LeaderboardOverview(object):
 							if score and score != "Not Provided":
 								score = _str_to_hours_min_sec(score,time_format="minute",time_pattern="mm:ss") if score else score
 							other_scores = {
-								"activity_end_hr":data['other']['hrr_activity_end_hr'][dtype]
+								"activity_end_hr":data['other']['hrr_activity_end_hr']['custom_range'][str_range]['data']
 							}
 							category_wise_data[catg]['custom_range'][str_range].append(
 								RankedScore(self.user,user,catg,score,other_scores=other_scores))
@@ -1201,7 +1200,7 @@ class LeaderboardOverview(object):
 							if score and score != "Not Provided":
 								score = _str_to_hours_min_sec(score,time_format="minute",time_pattern="mm:ss") if score else score
 							other_scores = {
-								"activity_end_hr":data['other']['hrr_activity_end_hr'][dtype]
+								"activity_end_hr":data['other']['hrr_activity_end_hr']['custom_range'][str_range]['data']
 							}
 							category_wise_data[catg]['custom_range'][str_range].append(
 								RankedScore(self.user,user,catg,score,other_scores=other_scores))
@@ -1306,7 +1305,7 @@ class LeaderboardOverview(object):
 									'verbose_name':"% Heartrate Not Recorded"
 								}
 							}
-							category_wise_data[catg][dtype].append(RankedScore(
+							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(
 								self.user,user,catg,score,other_scores=other_scores)
 							)
 		return category_wise_data
