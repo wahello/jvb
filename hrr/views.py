@@ -59,6 +59,9 @@ from hrr.calculation_helper import week_date,\
 
 from .serializers import AaSerializer,HeartzoneSerializer
 from .serializers import HrrSerializer
+from hrr.fitbit_aa import belowaerobic_aerobic_anaerobic,\
+							Update_AA_ranges_by_ages
+
 
 class UserHrrView(generics.ListCreateAPIView):
 	'''
@@ -1127,12 +1130,21 @@ def aa_data(user,start_date):
 				workout.append(tmp)
 			elif str(data_id) in ui_data_hrr:
 				hrr.append(tmp)		
-	user_age = user.profile.age()
-	below_aerobic_value = 180-user_age-30
-	anaerobic_value = 180-user_age+5
-	aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
-	anaerobic_range = '{} or above'.format(anaerobic_value+1)
-	below_aerobic_range = 'below {}'.format(below_aerobic_value	)
+
+	aa_ranges = belowaerobic_aerobic_anaerobic(user_age)
+	update = Update_AA_ranges_by_ages(user)
+	below_aerobic_value = update[0]
+	anaerobic_value = update[1]
+	aerobic_range = update[2]
+	anaerobic_range = update [3]
+	below_aerobic_range = update [4]
+
+	# user_age = user.profile.age()
+	# below_aerobic_value = 180-user_age-30
+	# anaerobic_value = 180-user_age+5
+	# aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
+	# anaerobic_range = '{} or above'.format(anaerobic_value+1)
+	# below_aerobic_range = 'below {}'.format(below_aerobic_value	)
 
 	all_activities_heartrate = []
 	all_activities_timestamp = []
@@ -2041,9 +2053,9 @@ def daily_aa_data(user, start_date):
 		max_hrr = ""
 	# print(workout,"workout")
 	# print(hrr,"hrr")
-	user_age = user.profile.age()
-	below_aerobic_value = 180-user_age-30
-	anaerobic_value = 180-user_age+5
+	# user_age = user.profile.age()
+	# below_aerobic_value = 180-user_age-30
+	# anaerobic_value = 180-user_age+5
 
 	all_activities_heartrate = []
 	all_activities_timestamp = []
@@ -2059,12 +2071,16 @@ def daily_aa_data(user, start_date):
 		all_activities_heartrate = [single_list for single_list in all_activities_heartrate if single_list]
 		all_activities_timestamp = [single_list for single_list in all_activities_timestamp if single_list]
 		activies_timestamp = [single_list for single_list in activies_timestamp if single_list]
-		below_aerobic_value = 180-user_age-30
-		anaerobic_value = 180-user_age+5
-		aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
-		anaerobic_range = '{} or above'.format(anaerobic_value+1)
-		below_aerobic_range = 'below {}'.format(below_aerobic_value	)
 		
+		# user_age = user.profile.age()
+		aa_ranges = belowaerobic_aerobic_anaerobic(user_age)
+		update = Update_AA_ranges_by_ages(user)
+		below_aerobic_value = update[0]
+		anaerobic_value = update[1]
+		aerobic_range = update[2]
+		anaerobic_range = update [3]
+		below_aerobic_range = update [4]	
+
 		def individual_activity(heart,time):
 			anaerobic_range_list = []
 			below_aerobic_list = []
@@ -2516,8 +2532,13 @@ def aa_low_high_end_data(user,start_date):
 				"prcnt_total_duration_in_zone":"",
 				}
 
-	below_aerobic_value = 180-user_age-30
-	anaerobic_value = 180-user_age+5
+	aa_ranges = belowaerobic_aerobic_anaerobic(user_age)
+	update = Update_AA_ranges_by_ages(user)
+	below_aerobic_value = update[0]
+	anaerobic_value = update[1]
+
+	# below_aerobic_value = 180-user_age-30
+	# anaerobic_value = 180-user_age+5
 	data2 = {}
 	classification_dic = {}
 	low_end_values = [-60,-55,-50,-45,-40,-35,-30,-25,-20,-15,-10,+1,6,10,14,19,24,
