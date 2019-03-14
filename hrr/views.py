@@ -59,8 +59,6 @@ from hrr.calculation_helper import week_date,\
 
 from .serializers import AaSerializer,HeartzoneSerializer
 from .serializers import HrrSerializer
-# from hrr.fitbit_aa import belowaerobic_aerobic_anaerobic,\
-# 							Update_AA_ranges_by_ages
 
 
 class UserHrrView(generics.ListCreateAPIView):
@@ -1139,13 +1137,6 @@ def aa_data(user,start_date):
 	anaerobic_range = update [3]
 	below_aerobic_range = update [4]
 
-	# user_age = user.profile.age()
-	# below_aerobic_value = 180-user_age-30
-	# anaerobic_value = 180-user_age+5
-	# aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
-	# anaerobic_range = '{} or above'.format(anaerobic_value+1)
-	# below_aerobic_range = 'below {}'.format(below_aerobic_value	)
-
 	all_activities_heartrate = []
 	all_activities_timestamp = []
 	activies_timestamp = []
@@ -2052,11 +2043,6 @@ def daily_aa_data(user, start_date):
 		max_hrr = max(max_hrr_list)
 	except ValueError:
 		max_hrr = ""
-	# print(workout,"workout")
-	# print(hrr,"hrr")
-	# user_age = user.profile.age()
-	# below_aerobic_value = 180-user_age-30
-	# anaerobic_value = 180-user_age+5
 
 	all_activities_heartrate = []
 	all_activities_timestamp = []
@@ -2538,8 +2524,6 @@ def aa_low_high_end_data(user,start_date):
 	below_aerobic_value = update[0]
 	anaerobic_value = update[1]
 
-	# below_aerobic_value = 180-user_age-30
-	# anaerobic_value = 180-user_age+5
 	data2 = {}
 	classification_dic = {}
 	low_end_values = [-60,-55,-50,-45,-40,-35,-30,-25,-20,-15,-10,+1,6,10,14,19,24,

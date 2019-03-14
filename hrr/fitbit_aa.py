@@ -301,13 +301,6 @@ def cal_aa1_data(user,all_activities_heartrate_list,all_activities_timestamp_lis
 	anaerobic_range = update [3]
 	below_aerobic_range = update [4]
 
-	# user_age = user_get.profile.age()
-	# below_aerobic_value = 180-user_age-30
-	# anaerobic_value = 180-user_age+5
-	# aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
-	# anaerobic_range = '{} or above'.format(anaerobic_value+1)
-	# below_aerobic_range = 'below {}'.format(below_aerobic_value)
-
 	anaerobic_range_list = []
 	below_aerobic_list = []
 	aerobic_list = []
@@ -713,12 +706,6 @@ def get_aa2_daily_data(user,hr_time_diff):
 		aerobic_range = update[2]
 		anaerobic_range = update [3]
 		below_aerobic_range = update [4]
-
-		# below_aerobic_value = 180-user_age-30
-		# anaerobic_value = 180-user_age+5
-		# aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
-		# anaerobic_range = '{} or above'.format(anaerobic_value+1)
-		# below_aerobic_range = 'below {}'.format(below_aerobic_value)
 		
 		def individual_activity(heart,time):
 			anaerobic_range_list = []
@@ -834,12 +821,9 @@ def get_fitbit_act_ids(fibit_act):
 	return fitbit_ids
 
 def get_user_created_activity(user,start_date,user_input_activities,fibit_act):
-	# print(user_input_activities,"user_input_activities")
 	fitbit_ids = get_fitbit_act_ids(fibit_act)
 	ui_act_ids = list(user_input_activities.keys())
 	manually_added_act_ids = list(set(ui_act_ids)-set(fitbit_ids))
-	# print(manually_added_act_ids,"kkkkkkkkkkkkkkkkkkkkkkk")
-	# userdata = user_input_activities[manually_added_act_ids[0]]
 	activity_hr_time = []
 	for single_id in manually_added_act_ids:
 		start_time_seconds=user_input_activities[single_id].get("startTimeInSeconds")
