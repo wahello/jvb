@@ -59,8 +59,8 @@ from hrr.calculation_helper import week_date,\
 
 from .serializers import AaSerializer,HeartzoneSerializer
 from .serializers import HrrSerializer
-from hrr.fitbit_aa import belowaerobic_aerobic_anaerobic,\
-							Update_AA_ranges_by_ages
+# from hrr.fitbit_aa import belowaerobic_aerobic_anaerobic,\
+# 							Update_AA_ranges_by_ages
 
 
 class UserHrrView(generics.ListCreateAPIView):
@@ -1131,8 +1131,8 @@ def aa_data(user,start_date):
 			elif str(data_id) in ui_data_hrr:
 				hrr.append(tmp)		
 
-	aa_ranges = belowaerobic_aerobic_anaerobic(user_age)
-	update = Update_AA_ranges_by_ages(user)
+	aa_ranges =fitbit_aa.belowaerobic_aerobic_anaerobic(user_age)
+	update =fitbit_aa.Update_AA_ranges_by_ages(user)
 	below_aerobic_value = update[0]
 	anaerobic_value = update[1]
 	aerobic_range = update[2]
@@ -2073,8 +2073,8 @@ def daily_aa_data(user, start_date):
 		activies_timestamp = [single_list for single_list in activies_timestamp if single_list]
 		
 		# user_age = user.profile.age()
-		aa_ranges = belowaerobic_aerobic_anaerobic(user_age)
-		update = Update_AA_ranges_by_ages(user)
+		aa_ranges = fitbit_aa.belowaerobic_aerobic_anaerobic(user_age)
+		update = fitbit_aa.Update_AA_ranges_by_ages(user)
 		below_aerobic_value = update[0]
 		anaerobic_value = update[1]
 		aerobic_range = update[2]
@@ -2532,8 +2532,8 @@ def aa_low_high_end_data(user,start_date):
 				"prcnt_total_duration_in_zone":"",
 				}
 
-	aa_ranges = belowaerobic_aerobic_anaerobic(user_age)
-	update = Update_AA_ranges_by_ages(user)
+	aa_ranges = fitbit_aa.belowaerobic_aerobic_anaerobic(user_age)
+	update = fitbit_aa.Update_AA_ranges_by_ages(user)
 	below_aerobic_value = update[0]
 	anaerobic_value = update[1]
 
