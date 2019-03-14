@@ -9,6 +9,7 @@ class Dashboard extends Component {
 	constructor(props){
 		super(props);
 		this.state = {
+			 shouldShowPopup:true,
 			 linked_devices:true,
 			 have_garmin_connect_token:false,
     		 have_garmin_health_token:false,
@@ -36,36 +37,52 @@ class Dashboard extends Component {
 
 	toggle() {
 	    this.setState({
-	      linked_devices: !this.state.linked_devices
+	      shouldShowPopup: !this.state.shouldShowPopup
 	    });
   	}
 
-  	/* If user haven't linked any device yet, then show this popup to remind user to link atleast on device*/
+  	/* If user haven't linked any device yet, then show this popup to remind user to link atleast one device*/
 	noDeviceLinkedModel(){
-		let modal =  <Modal isOpen={!this.state.linked_devices} 
+		let isMissingOneGarminLink = ((!this.state.have_garmin_health_token && this.state.have_garmin_connect_token)
+									  || (this.state.have_garmin_health_token && !this.state.have_garmin_connect_token));
+		
+		let shouldShowPopup = (!this.state.linked_devices || isMissingOneGarminLink) && this.state.shouldShowPopup;
+		let message = `We noticed that you have not linked any wearable device yet.
+				       Click the links below to link devices supported by us
+				       so we can provide you with lots of cool reporting, grades from your
+				       data and analysis from your workouts!`; 
+
+		if(isMissingOneGarminLink){
+			message = `We noticed that you have not linked one of the Garmin API.
+                       Click the link below to connect it so we can provide you with
+                       lots of cool reporting, grades from your data and analysis
+                       from your workouts!`;
+		}
+		let modal =  <Modal isOpen={shouldShowPopup} 
 						  toggle = {this.toggle} 
 						  className={this.props.className}>
 				          <ModalHeader>Link wearable device(s)</ModalHeader>
 				          <ModalBody>
-				          	<p>
-				            	We noticed that you have not linked any wearable device yet.
-				            	Click the links below to link devices supported by us
-				            	so we can provide you with lots of cool reporting, grades from your
-				            	data and analysis from your workouts!
-				            </p>
+				          	<p>{message}</p>
 				            <div style={{display:'flex',justifyContent:'space-between'}}>
-					            <a href='/users/request_token' 
-				          	    	className = "garminlink">
-				          	    	<Button color="primary" style = {{fontSize:"13px"}}>Garmin Health<br/></Button>
-				          	    </a>
-								<a href='/users/connect_request_token' 
-									className = "garminlink">
-									<Button color="primary" style = {{fontSize:"13px"}}>Garmin Connect<br/></Button>
-								</a>
-								<a href='/fitbit/request_token_fitbit' 
-									className = "garminlink">
-									<Button color="primary" style = {{fontSize:"13px"}}>Fitbit<br/></Button>
-								</a>
+				            	{!this.state.have_garmin_health_token && 
+						            <a href='/users/request_token' 
+					          	    	className = "garminlink">
+					          	    	<Button color="primary" style = {{fontSize:"13px"}}>Garmin Health<br/></Button>
+					          	    </a>
+				          	   	}
+				          	   	{!this.state.have_garmin_connect_token &&
+									<a href='/users/connect_request_token' 
+										className = "garminlink">
+										<Button color="primary" style = {{fontSize:"13px"}}>Garmin Connect<br/></Button>
+									</a>
+								}
+								{!this.state.have_fitbit_token && !isMissingOneGarminLink &&
+									<a href='/fitbit/request_token_fitbit' 
+										className = "garminlink">
+										<Button color="primary" style = {{fontSize:"13px"}}>Fitbit<br/></Button>
+									</a>
+								}
 							</div>
 				          </ModalBody>
 				          <ModalFooter>
