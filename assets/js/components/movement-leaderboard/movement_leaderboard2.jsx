@@ -419,13 +419,15 @@ class MovementLeaderboard2 extends Component{
 	    	</td> 
 	    )
 	}
+
 	renderTable(Movement_data,Movement_username,MCS_data,selectedRange){
 		let operationCount = 0;
 		let td_rows = [];
 		let keys = ["rank","username","nes","exercise_steps","total_steps","mc",
-					"exercise_duration","active_min_total","active_min_sleep",
-					"active_min_exercise", "active_min_exclude_sleep_exercise",
+					"aerobic_duration","exercise_duration","active_min_total",
+					"active_min_sleep","active_min_exclude_sleep_exercise",
 					"total_rank_point"];
+
 		objectLength = Object.keys(Movement_data).length;
 		for(let[key,value] of Object.entries(Movement_data)){
 			let td_values = [];
@@ -458,6 +460,32 @@ class MovementLeaderboard2 extends Component{
 				else if(key1 == "mc"){
 					td_values.push(this.renderGetColors(value[key1].score.value,value[key1].rank));
 				}
+                else if(key1 == "aerobic_duration"){
+                      if(value[key1].score.value != null && value[key1].other_scores.anaerobic_duration.value != null &&
+                          value[key1].other_scores.below_aerobic_duration.value != null && value[key1].other_scores.hr_not_recorded_duration.value != null){
+                          td_values.push(
+		                          <td className ="overall_rank_value" >
+		                      	 <table className="heartrate_zone_table" style={{marginLeft:"auto",marginRight:"auto",backgroundColor:'#FFF'}}>
+		                     	<tr><td>
+		                        {value[key1].score.value+('\n')+"("+value[key1].other_scores.prcnt_aerobic_duration.value+"%"+")"}
+		                        </td>
+		                         <td>
+		                        {value[key1].other_scores.anaerobic_duration.value+('\n')+"("+ value[key1].other_scores.prcnt_anaerobic_duration.value+"%"+")"}
+		                        </td></tr>
+		                        <tr><td>
+		                        {value[key1].other_scores.below_aerobic_duration.value+('\n')+"("+ value[key1].other_scores.prcnt_below_aerobic_duration.value+"%"+")"}
+		                        </td>
+		                        <td>
+		                        {value[key1].other_scores.hr_not_recorded_duration.value+('\n')+"("+ value[key1].other_scores.prcnt_hr_not_recorded_duration.value+"%"+")"}
+		                        </td></tr>
+		                        </table>
+		                         </td>);
+                              }
+                         else{
+                                 td_values.push(<td>{"-"}</td>);		                        
+                      	     
+                             }
+                }
 				else if(key1 == "exercise_duration"){
 					td_values.push(this.getStylesForExerciseduration(
 						value[key1].score.value, value[key1].rank,
@@ -470,14 +498,10 @@ class MovementLeaderboard2 extends Component{
 				}
 				  else if(key1 == "active_min_sleep"){
 				  	if(value["active_min_total"].other_scores != null) {
-						td_values.push(<td className ="overall_rank_value"><span>{minuteToHM(value["active_min_total"].other_scores.active_min_sleep.value)}</span></td>);
+						td_values.push(<td className ="overall_rank_value"><span>{minuteToHM(value["active_min_total"].other_scores.active_min_sleep.value)
+							              +(' ')+'/'+(' ')+minuteToHM(value["active_min_total"].other_scores.active_min_exercise.value)}</span></td>);
 					}
 				}
-			     else if(key1 == "active_min_exercise"){
-			     	if(value["active_min_total"].other_scores != null) {
-						td_values.push(<td className ="overall_rank_value"><span>{minuteToHM(value["active_min_total"].other_scores.active_min_exercise.value)}</span></td>);
-					}	
-			     }
                 else if(key1 == "active_min_exclude_sleep_exercise"){
 					td_values.push(
 						getStylesForActiveMinute(
@@ -567,10 +591,15 @@ class MovementLeaderboard2 extends Component{
 									<th>Exercise (Activity) <br/>Steps</th>
 									<th>Total <br />Steps *</th>
 									<th>MCS Score<br />(Rank)</th>
+								    <th>
+									   <table>
+									   <tr><td>AE</td><td>AN</td></tr>
+									   <tr><td>BA</td><td>NR</td></tr> 
+									   </table>
+									</th>
 									<th>Exercise Duration (Rank) / Avg HR</th>
 									<th>Entire 24 Hour Day <br/> (Rank)</th>
-									<th>During Sleep Hours</th>
-									<th>During Exercise Hours</th>
+									<th>During Sleep Hours / During Exercise Hours</th>
 									<th>24 Hour Day Excluding Sleep and Exercise <br/> (Rank)</th>
 									<th>Overall Movement Rank Points</th>
 									<th>MCS<br/>
@@ -590,7 +619,7 @@ class MovementLeaderboard2 extends Component{
 
 	render(){
 		return(
-				<div className = "container-fluid">		   
+				<div >		   
 					<div className = "mov_dashboard_table" ref="mov_dashboard_table">
 						{
 							this.renderTable(
@@ -625,6 +654,18 @@ class MovementLeaderboard2 extends Component{
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			MCS Score:  total inactive hours (sum of hours each day a user does not achieve 300 steps in any hour) per day when not sleeping, napping, and exercising
 			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+								    AE: Duration of Heart Rate in Aerobic Zone 
+                                </p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+								    BA: Duration of Heart Rate in Below Aerobic Zone  
+                                </p>
+                                <p className="footer_content" style={{marginLeft:"15px"}}>
+                                   AN: Duration of Heart Rate in Anaerobic Zone
+                                </p>
+                                <p className="footer_content" style={{marginLeft:"15px"}}>
+                                  NR: Duration Heart Rate Not Recorded
+                                </p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			Exercise Duration / Average HR:  total exercise duration each day.  Users can characterize an activity as “exercise” or “non exercise” on the activity summary for each activity below question 1. on the user inputs page. Note: users are only given credit for exercise or non exercise for each activity (not both). Also includes the average heartrate of all exercise activities. NM = Heart Rate Not Measured.
 			          			</p>
