@@ -16,7 +16,7 @@ let objectLength = 0;
 function minuteToHM(value) {
 	var time;
 	if( isNaN(value) || value == null ){
-      time = "00:00";
+      return "00:00";
 	} 
 	if(value){
 		if(value == "N/A"){
