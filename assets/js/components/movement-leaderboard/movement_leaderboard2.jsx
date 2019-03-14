@@ -15,6 +15,9 @@ let objectLength = 0;
 
 function minuteToHM(value) {
 	var time;
+	if( isNaN(value) || value == null ){
+      time = "00:00";
+	} 
 	if(value){
 		if(value == "N/A"){
 			time = "00:00";
@@ -29,7 +32,7 @@ function minuteToHM(value) {
 			time = hours+':'+minutes;
 		}
 	}
-	else if(value == 0 || value == null){
+	else if(value == 0 || value == null ){
 		time = "00:00";
 	}
 	return time;
@@ -424,7 +427,7 @@ class MovementLeaderboard2 extends Component{
 		let operationCount = 0;
 		let td_rows = [];
 		let keys = ["rank","username","nes","exercise_steps","total_steps","mc",
-					"aerobic_duration","exercise_duration","active_min_total",
+					"exercise_duration","aerobic_duration","active_min_total",
 					"active_min_sleep","active_min_exclude_sleep_exercise",
 					"total_rank_point"];
 
@@ -509,11 +512,12 @@ class MovementLeaderboard2 extends Component{
 						selectedRange
 					));	
 				}
+				
 				else if(key1 == "active_min_total"){
 					td_values.push(getStylesForActiveMinute(value[key1].score.value,value[key1].rank));
 				}
 				  else if(key1 == "active_min_sleep"){
-				  	if(value["active_min_total"].other_scores != null) {
+				  	if( value["active_min_total"].other_scores != null ) {
 						td_values.push(<td className ="overall_rank_value"><span>{minuteToHM(value["active_min_total"].other_scores.active_min_sleep.value)
 							              +(' ')+'/'+(' ')+minuteToHM(value["active_min_total"].other_scores.active_min_exercise.value)}</span></td>);
 					}
@@ -607,13 +611,13 @@ class MovementLeaderboard2 extends Component{
 									<th>Exercise (Activity) <br/>Steps</th>
 									<th>Total <br />Steps *</th>
 									<th>MCS Score<br />(Rank)</th>
-								    <th>
+									<th>Exercise Duration (Rank) / Avg HR</th>
+									<th>
 									   <table>
 									   <tr><td>AE</td><td>AN</td></tr>
 									   <tr><td>BA</td><td>NR</td></tr> 
 									   </table>
 									</th>
-									<th>Exercise Duration (Rank) / Avg HR</th>
 									<th>Entire 24 Hour Day <br/> (Rank)</th>
 									<th>During Sleep Hours / During Exercise Hours</th>
 									<th>24 Hour Day Excluding Sleep and Exercise <br/> (Rank)</th>
