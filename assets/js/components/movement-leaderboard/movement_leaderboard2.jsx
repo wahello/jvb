@@ -461,30 +461,46 @@ class MovementLeaderboard2 extends Component{
 					td_values.push(this.renderGetColors(value[key1].score.value,value[key1].rank));
 				}
                 else if(key1 == "aerobic_duration"){
-                      if(value[key1].score.value != null && value[key1].other_scores.anaerobic_duration.value != null &&
-                          value[key1].other_scores.below_aerobic_duration.value != null && value[key1].other_scores.hr_not_recorded_duration.value != null){
-                          td_values.push(
-		                          <td className ="overall_rank_value" >
-		                      	 <table className="heartrate_zone_table" style={{marginLeft:"auto",marginRight:"auto",backgroundColor:'#FFF'}}>
-		                     	<tr><td>
-		                        {value[key1].score.value+('\n')+"("+value[key1].other_scores.prcnt_aerobic_duration.value+"%"+")"}
-		                        </td>
-		                         <td>
-		                        {value[key1].other_scores.anaerobic_duration.value+('\n')+"("+ value[key1].other_scores.prcnt_anaerobic_duration.value+"%"+")"}
-		                        </td></tr>
-		                        <tr><td>
-		                        {value[key1].other_scores.below_aerobic_duration.value+('\n')+"("+ value[key1].other_scores.prcnt_below_aerobic_duration.value+"%"+")"}
-		                        </td>
-		                        <td>
-		                        {value[key1].other_scores.hr_not_recorded_duration.value+('\n')+"("+ value[key1].other_scores.prcnt_hr_not_recorded_duration.value+"%"+")"}
-		                        </td></tr>
-		                        </table>
-		                         </td>);
-                              }
-                         else{
-                                 td_values.push(<td>{"-"}</td>);		                        
-                      	     
-                             }
+                  let aerobic_prcnt = value[key1].other_scores.prcnt_aerobic_duration.value;
+                  let anaerobic_prcnt = value[key1].other_scores.prcnt_anaerobic_duration.value;
+                  let below_aerobic_prcnt =  value[key1].other_scores.prcnt_below_aerobic_duration.value;
+                  let heartrate_not_recorded_prcnt = value[key1].other_scores.prcnt_hr_not_recorded_duration.value; 
+                  if(aerobic_prcnt == null){
+                  	aerobic_prcnt = 0
+                  }
+                  if( anaerobic_prcnt == null ){
+                     anaerobic_prcnt = 0;
+                  }
+                  if( below_aerobic_prcnt == null ){
+                     below_aerobic_prcnt = 0;
+                  }
+                  if( heartrate_not_recorded_prcnt == null ){
+                         heartrate_not_recorded_prcnt = 0;
+                  }	
+                  if(value[key1].score.value != null && value[key1].other_scores.anaerobic_duration.value != null &&
+                      value[key1].other_scores.below_aerobic_duration.value != null && value[key1].other_scores.hr_not_recorded_duration.value != null){
+                      td_values.push(
+	                          <td className ="overall_rank_value" >
+	                      	 <table className="heartrate_zone_table" style={{marginLeft:"auto",marginRight:"auto",backgroundColor:'#FFF'}}>
+	                     	<tr><td>
+	                        {value[key1].score.value+('\n')+"("+aerobic_prcnt+"%"+")"}
+	                        </td>
+	                         <td>
+	                        {value[key1].other_scores.anaerobic_duration.value+('\n')+"("+anaerobic_prcnt+"%"+")"}
+	                        </td></tr>
+	                        <tr><td>
+	                        {value[key1].other_scores.below_aerobic_duration.value+('\n')+"("+ below_aerobic_prcnt+"%"+")"}
+	                        </td>
+	                        <td>
+	                        {value[key1].other_scores.hr_not_recorded_duration.value+('\n')+"("+heartrate_not_recorded_prcnt+"%"+")"}
+	                        </td></tr>
+	                        </table>
+	                         </td>);
+                          }
+                     else{
+                             td_values.push(<td>{"-"}</td>);		                        
+                  	     
+                         }
                 }
 				else if(key1 == "exercise_duration"){
 					td_values.push(this.getStylesForExerciseduration(
