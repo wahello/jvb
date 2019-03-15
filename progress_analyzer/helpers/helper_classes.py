@@ -1457,7 +1457,7 @@ class ProgressReport():
 						total_aerobic_duration = todays_data.cum_hr_aerobic_duration_hours\
 												 - current_data.cum_hr_aerobic_duration_hours
 						if total_workout_duration:
-							val = (total_aerobic_duration/total_aerobic_duration) * 100
+							val = (total_aerobic_duration/total_workout_duration) * 100
 							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 					return None
 
