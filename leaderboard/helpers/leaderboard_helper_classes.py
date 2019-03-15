@@ -1317,30 +1317,6 @@ class LeaderboardOverview(object):
 
 		return category_wise_data
 
-	def _clean_movement_scores(self,scores):
-		clean_scores = {}
-		clean_all_scores = []
-		for score_type,score_list in scores.items():
-			if score_type == 'user_rank':	
-				tmp_score = {
-					'rank': score_list['rank'],
-					'total_rank_point': score_list['total_rank_point'],
-					'user_id': score_list['user_id'],
-					'username': score_list['username']
-				}
-				clean_scores[score_type] = tmp_score
-			else:
-				for score in score_list:
-					tmp_score = {
-						'rank': score['rank'],
-						'total_rank_point': score['total_rank_point'],
-						'user_id': score['user_id'],
-						'username': score['username']
-					}
-					clean_all_scores.append(tmp_score)
-				clean_scores[score_type] = clean_all_scores
-		return clean_scores
-
 	def _get_category_leaderboard(self,category,format):
 		'''
 		Prepare leader board for certain category
@@ -1385,21 +1361,17 @@ class LeaderboardOverview(object):
 					'oh_gpa':self.lb['oh_gpa'][dtype],
 					'avg_sleep':self.lb['avg_sleep'][dtype],
 					'resting_hr':self.lb['resting_hr'][dtype],
-					'movement':self._clean_movement_scores(self.lb['movement'][dtype]),
 					'nes':self.lb['nes'][dtype],
 					'mc':self.lb['mc'][dtype],
-					'total_steps':self.lb['total_steps'][dtype],
 					'ec':self.lb['ec'][dtype],
 					'exercise_duration':self.lb['exercise_duration'][dtype],
 					'aerobic_duration':self.lb['aerobic_duration'][dtype],
-					'time_99': self.lb['time_99'][dtype],
-					'beat_lowered': self.lb['beat_lowered'][dtype],
 					'vo2_max': self.lb['vo2_max'][dtype],
+					'prcnt_uf': self.lb['prcnt_uf'][dtype],
 					'alcohol': self.lb['alcohol'][dtype],
 					'user_daily_inputs': self.lb['user_daily_inputs'][dtype]
 				}
-				excluded_catg = ['time_99','beat_lowered','aerobic_duration',
-								 'alcohol', 'vo2_max', 'user_daily_inputs']
+				excluded_catg = ['aerobic_duration','vo2_max','user_daily_inputs']
 				duration_lb[dtype] = CompositeLeaderboard(
 					self.user, overall_lb_data, excluded_catg
 				).get_leaderboard(format=format)
@@ -1463,21 +1435,17 @@ class LeaderboardOverview(object):
 						'oh_gpa':self.lb['oh_gpa']['custom_range'][str_range],
 						'avg_sleep':self.lb['avg_sleep']['custom_range'][str_range],
 						'resting_hr':self.lb['resting_hr']['custom_range'][str_range],
-						'movement':self._clean_movement_scores(self.lb['movement']['custom_range'][str_range]),
 						'nes':self.lb['nes']['custom_range'][str_range],
 						'mc':self.lb['mc']['custom_range'][str_range],
-						'total_steps':self.lb['total_steps']['custom_range'][str_range],
 						'ec':self.lb['ec']['custom_range'][str_range],
 						'exercise_duration':self.lb['exercise_duration']['custom_range'][str_range],
 						'aerobic_duration':self.lb['aerobic_duration']['custom_range'][str_range],
-						'time_99': self.lb['time_99']['custom_range'][str_range],
-						'beat_lowered': self.lb['beat_lowered']['custom_range'][str_range],
 						'vo2_max': self.lb['vo2_max']['custom_range'][str_range],
+						'prcnt_uf': self.lb['prcnt_uf']['custom_range'][str_range],
 						'alcohol': self.lb['alcohol']['custom_range'][str_range],
 						'user_daily_inputs': self.lb['user_daily_inputs']['custom_range'][str_range]
 					}
-					excluded_catg = ['time_99','beat_lowered','aerobic_duration',
-									 'alcohol', 'vo2_max', 'user_daily_inputs']
+					excluded_catg = ['aerobic_duration','vo2_max','user_daily_inputs']
 					custom_range_lb[str_range] = CompositeLeaderboard(
 						self.user, overall_lb_data, excluded_catg
 					).get_leaderboard(format=format)
@@ -1512,14 +1480,7 @@ class LeaderboardOverview(object):
 				self.lb[catg] = self._get_category_leaderboard(catg,format)
 
 		for catg in self.category_meta.COMPOSITE_LEADERBOARD:
-			# Overall leaderboard is exception since it's depends on 
-			# other composite leaderboard. So we'll generate it
-			# once other composite leaderbords are generated.
-			if catg != 'overall':
 				self.lb[catg] = self._get_category_leaderboard(catg,format)
-
-		# finally generate overall leaderboard
-		self.lb[catg] = self._get_category_leaderboard('overall',format)
 
 		for catg in self.requested_categories.keys():
 			requested_lb[catg] = self.lb[catg]
