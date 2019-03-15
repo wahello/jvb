@@ -1523,7 +1523,6 @@ class LeaderboardOverview(object):
 
 		for catg in self.requested_categories.keys():
 			requested_lb[catg] = self.lb[catg]
-
 		requested_lb["duration_date"] = self.duration_date
 
 		return requested_lb					

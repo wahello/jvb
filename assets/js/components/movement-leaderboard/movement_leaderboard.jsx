@@ -541,6 +541,13 @@ class MovementLeaderboard extends Component{
 			          			Note: All time periods/durations are in hours:minutes (hh:mm)
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          				** Represents duration (hh:mm) that the exercise range was in each of our 4 heart rate zones:
+			          				<li>Aerobic (AE): Aerobic Duration (% of total time)</li> 
+			          				<li>Anaerobic (AN): Anaerobic Duration (% of total time)</li>
+			          				<li>Below Aerobic (BA): Below Aerobic Duration (% of total time)</li>
+			          				<li>Not Recorded (NR): HR Not Recorded Duration(% of total time)</li>
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			The Movement Leaderboard provides a robust view of your movement across a number of categories that we use to assess movement.  In our experience, people that do well across all 5 of these categories consistently over time are healthier and feel better than those that don’t.  Users can choose various time periods or select any custom range by touching “Select Range” or entering a time period in one of the “Custom Date Range” buttons.  If viewing on a mobile device, turn your mobile device to the side (landscape mode) to see all columns.  You can also see how other people are doing on this page.  We include this so that each of us are motivated/inspired to do a little better!
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>

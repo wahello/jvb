@@ -4,8 +4,7 @@ import json
 from django.db import transaction,DatabaseError
 from django.core.exceptions import ObjectDoesNotExist
 
-from hrr.models import Hrr
-from hrr.views import weekly_workout_helper
+from hrr.models import Hrr,AA
 from quicklook.models import UserQuickLook
 from user_input.models import UserDailyInput
 
@@ -280,15 +279,19 @@ def _get_datewise_aa_data(user,from_dt, to_dt):
 	while current_dt <= to_dt:
 		current_dt_str = current_dt.strftime("%Y-%m-%d")
 		try:
-			aa_data = weekly_workout_helper(user, current_dt.date())
-			if aa_data and aa_data.get('Totals',None):
-				total_aa = aa_data['Totals']
+			aa_data = AA.objects.get(user=user,created_at=current_dt.date())
+			if aa_data:
+				total_workout_duration = _safe_get_mobj(aa_data,"total_time",0)
+				aerobic_duration = _safe_get_mobj(aa_data,"aerobic_zone",0)
+				anaerobic_duration = _safe_get_mobj(aa_data,"anaerobic_zone",0)
+				below_aerobic = _safe_get_mobj(aa_data,"below_aerobic_zone",0)
+				hr_not_recorded = _safe_get_mobj(aa_data,"hrr_not_recorded",0)
 				data[current_dt_str] = {
-					"weekly_workout_duration": sec_to_hour(total_aa["duration"]),
-					"hr_anaerobic_duration": sec_to_hour(total_aa["duration_in_anaerobic_range"]),
-					"hr_aerobic_duration": sec_to_hour(total_aa["duration_in_aerobic_range"]),
-					"hr_below_aerobic": sec_to_hour(total_aa["duration_below_aerobic_range"]),
-					"hr_not_recorded_duration": sec_to_hour(total_aa["duration_hrr_not_recorded"])
+					"weekly_workout_duration": sec_to_hour(total_workout_duration),
+					"hr_anaerobic_duration": sec_to_hour(anaerobic_duration),
+					"hr_aerobic_duration": sec_to_hour(aerobic_duration),
+					"hr_below_aerobic": sec_to_hour(below_aerobic),
+					"hr_not_recorded_duration": sec_to_hour(hr_not_recorded)
 				}
 		except Exception as e:
 			pass

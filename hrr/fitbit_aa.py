@@ -257,14 +257,49 @@ def all_activities_hr_and_time_diff(hr_time_diff):
 		all_activities_timestamp_list.extend(single_activity[single_activity_id[0]]["time_diff"])
 		all_activities_heartrate_list.extend(single_activity[single_activity_id[0]]["hr_values"])
 	return all_activities_heartrate_list,all_activities_timestamp_list
+def belowaerobic_aerobic_anaerobic(user_age):
 
-def cal_aa1_data(user_get,all_activities_heartrate_list,all_activities_timestamp_list):
-	user_age = user_get.profile.age()
-	below_aerobic_value = 180-user_age-30
-	anaerobic_value = 180-user_age+5
-	aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
-	anaerobic_range = '{} or above'.format(anaerobic_value+1)
+	aerobic_anaerobic = [[110,110,166],[110,110,166],[110,110,166],[110,110,165],[110,110,164],[110,110,163],
+				[110,110,162],[110,110,161],[110,110,160],[110,110,159],[110,110,158],[110,110,157],[110,110,156],
+				[110,110,155],[110,110,155],[110,110,155],[110,110,155],[110,110,155],[110,110,155],[110,110,154],
+				[110,110,153],[110,110,152],[110,110,151],[110,110,150],[110,110,149],[110,110,148],[110,110,147],
+				[110,110,146],[109,109,145],[108,108,144],[107,107,143],[106,106,142],[105,105,141],[104,104,140],
+				[103,103,139],[102,102,138],[102,102,137],[102,102,136],[102,102,135],[102,102,134],[102,102,133],
+				[102,102,132],[102,102,131],[102,102,130],[102,102,129],[102,102,128],[102,102,127],[102,102,127],
+				[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],
+				[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],
+				[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[101,101,126],[101,101,125],
+				[101,101,124],[101,101,123],[101,101,122],[101,101,121],[101,101,120],[101,101,119],[101,101,118],
+				[101,101,117],[101,101,116],[100,100,115],[99,99,114],[98,98,113],[97,97,112],[96,96,111],[95,95,110],
+				[94,94,109],[93,93,108],[92,92,107],[91,91,106],[91,90,105]]
+	
+	index_value = user_age-13
+	if user_age < 13:
+		index_value = 0
+	elif user_age > 100:
+		index_value = -1
+	return aerobic_anaerobic[index_value]
+
+def  Update_AA_ranges_by_ages(user):
+	user_age = user.profile.age()
+	aa_ranges = belowaerobic_aerobic_anaerobic(user_age)
+	below_aerobic_value = aa_ranges[0]
+	anaerobic_value = aa_ranges[2]
+	if user_age > 100:
+		aerobic_range = '{}-{}'.format(below_aerobic_value-1,anaerobic_value-1)
+	else:
+		aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value-1)
+	anaerobic_range = '{} or above'.format(anaerobic_value)
 	below_aerobic_range = 'below {}'.format(below_aerobic_value)
+	return below_aerobic_value,anaerobic_value,aerobic_range,anaerobic_range,below_aerobic_range 
+
+def cal_aa1_data(user,all_activities_heartrate_list,all_activities_timestamp_list):
+	update = Update_AA_ranges_by_ages(user)
+	below_aerobic_value = update[0]
+	anaerobic_value = update[1]
+	aerobic_range = update[2]
+	anaerobic_range = update [3]
+	below_aerobic_range = update [4]
 
 	anaerobic_range_list = []
 	below_aerobic_list = []
@@ -665,11 +700,12 @@ def get_aa2_daily_data(user,hr_time_diff):
 		all_activities_heartrate = [single_list for single_list in all_activities_hr if single_list]
 		all_activities_timestamp = [single_list for single_list in all_activities_time if single_list]
 		
-		below_aerobic_value = 180-user_age-30
-		anaerobic_value = 180-user_age+5
-		aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
-		anaerobic_range = '{} or above'.format(anaerobic_value+1)
-		below_aerobic_range = 'below {}'.format(below_aerobic_value)
+		update = Update_AA_ranges_by_ages(user)
+		below_aerobic_value = update[0]
+		anaerobic_value = update[1]
+		aerobic_range = update[2]
+		anaerobic_range = update [3]
+		below_aerobic_range = update [4]
 		
 		def individual_activity(heart,time):
 			anaerobic_range_list = []
@@ -785,12 +821,9 @@ def get_fitbit_act_ids(fibit_act):
 	return fitbit_ids
 
 def get_user_created_activity(user,start_date,user_input_activities,fibit_act):
-	# print(user_input_activities,"user_input_activities")
 	fitbit_ids = get_fitbit_act_ids(fibit_act)
 	ui_act_ids = list(user_input_activities.keys())
 	manually_added_act_ids = list(set(ui_act_ids)-set(fitbit_ids))
-	# print(manually_added_act_ids,"kkkkkkkkkkkkkkkkkkkkkkk")
-	# userdata = user_input_activities[manually_added_act_ids[0]]
 	activity_hr_time = []
 	for single_id in manually_added_act_ids:
 		start_time_seconds=user_input_activities[single_id].get("startTimeInSeconds")
@@ -908,8 +941,12 @@ def get_aa3_data(user,hr_list,timediff_list):
 				"prcnt_total_duration_in_zone":"",
 				}
 
-	below_aerobic_value = 180-user_age-30
-	anaerobic_value = 180-user_age+5
+	update = Update_AA_ranges_by_ages(user)
+	below_aerobic_value = update[0]
+	anaerobic_value = update[1]
+
+	# below_aerobic_value = 180-user_age-30
+	# anaerobic_value = 180-user_age+5
 	above_220 = 220
 	data2 = {}
 	classification_dic = {}
@@ -921,7 +958,10 @@ def get_aa3_data(user,hr_list,timediff_list):
 						38,43,48,53,58,63,68,78,88]
 
 	low_end_heart = [180-user_age+tmp for tmp in low_end_values]
+	low_end_heart = [ x for x in low_end_heart if x >= 0]
+
 	high_end_heart = [180-user_age+tmp for tmp in high_end_values]
+	high_end_heart = [ x for x in high_end_heart if x >= 0]
 
 	for a,b in zip(low_end_heart,high_end_heart):
 		if a and b > anaerobic_value:
