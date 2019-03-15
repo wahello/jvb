@@ -58,6 +58,10 @@ class ToExerciseStatsCumulative(object):
 		self.cum_workout_effort_level = raw_data["cum_workout_effort_level"]
 		self.cum_avg_exercise_hr = raw_data["cum_avg_exercise_hr"]
 		self.cum_vo2_max = raw_data["cum_vo2_max"]
+		# This stores workout duration per day from A/A chart 1
+		# For some reason we were storing weekly workout duration
+		# earlier but later we changed it. So please don't get
+		# confused with the name. 
 		self.cum_weekly_workout_duration_in_hours = raw_data["cum_weekly_workout_duration_in_hours"]
 		self.cum_hr_aerobic_duration_hours = raw_data["cum_hr_aerobic_duration_hours"]
 		self.cum_hr_anaerobic_duration_hours = raw_data["cum_hr_anaerobic_duration_hours"]
@@ -1441,109 +1445,74 @@ class ProgressReport():
 
 				elif key == 'hr_aerobic_duration_hour_min':
 					if todays_meta_data and current_meta_data:
-						val = self._get_average_for_duration(
-							todays_data.cum_hr_aerobic_duration_hours,
-							current_data.cum_hr_aerobic_duration_hours,
-							alias
-						)
+						val = todays_data.cum_hr_aerobic_duration_hours\
+							  - current_data.cum_hr_aerobic_duration_hours
 						return self._hours_to_hours_min(val)
 					return None
 
 				elif key == 'prcnt_aerobic_duration':
 					if todays_meta_data and current_meta_data:
-						avg_weekly_workout_duration = self._get_average_for_duration(
-							todays_data.cum_weekly_workout_duration_in_hours,
-							current_data.cum_weekly_workout_duration_in_hours,
-							alias
-						)
-						avg_aerobic_duration = self._get_average_for_duration(
-							todays_data.cum_hr_aerobic_duration_hours,
-							current_data.cum_hr_aerobic_duration_hours,
-							alias
-						)
-						if avg_weekly_workout_duration:
-							val = (avg_aerobic_duration/avg_weekly_workout_duration) * 100
+						total_workout_duration = todays_data.cum_weekly_workout_duration_in_hours\
+												 - current_data.cum_weekly_workout_duration_in_hours
+						total_aerobic_duration = todays_data.cum_hr_aerobic_duration_hours\
+												 - current_data.cum_hr_aerobic_duration_hours
+						if total_workout_duration:
+							val = (total_aerobic_duration/total_aerobic_duration) * 100
 							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 					return None
 
 				elif key == 'hr_anaerobic_duration_hour_min':
 					if todays_meta_data and current_meta_data:
-						val = self._get_average_for_duration(
-							todays_data.cum_hr_anaerobic_duration_hours,
-							current_data.cum_hr_anaerobic_duration_hours,
-							alias
-						)
+						val = todays_data.cum_hr_anaerobic_duration_hours\
+							  - current_data.cum_hr_anaerobic_duration_hours
 						return self._hours_to_hours_min(val)
 					return None
 
 				elif key == 'prcnt_anaerobic_duration':
 					if todays_meta_data and current_meta_data:
-						avg_weekly_workout_duration = self._get_average_for_duration(
-							todays_data.cum_weekly_workout_duration_in_hours,
-							current_data.cum_weekly_workout_duration_in_hours,
-							alias
-						)
-						avg_anaerobic_duration = self._get_average_for_duration(
-							todays_data.cum_hr_anaerobic_duration_hours,
-							current_data.cum_hr_anaerobic_duration_hours,
-							alias
-						)
-						if avg_weekly_workout_duration:
-							val = (avg_anaerobic_duration/avg_weekly_workout_duration) * 100
+						total_workout_duration = todays_data.cum_weekly_workout_duration_in_hours\
+												 - current_data.cum_weekly_workout_duration_in_hours
+						total_anaerobic_duration = todays_data.cum_hr_anaerobic_duration_hours\
+												 - current_data.cum_hr_anaerobic_duration_hours
+							
+						if total_workout_duration:
+							val = (total_anaerobic_duration/total_workout_duration) * 100
 							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 					return None
 
 				elif key == 'hr_below_aerobic_duration_hour_min':
 					if todays_meta_data and current_meta_data:
-						val = self._get_average_for_duration(
-							todays_data.cum_hr_below_aerobic_duration_hours,
-							current_data.cum_hr_below_aerobic_duration_hours,
-							alias
-						)
+						val = todays_data.cum_hr_below_aerobic_duration_hours\
+							 - current_data.cum_hr_below_aerobic_duration_hours
 						return self._hours_to_hours_min(val)
 					return None
 
 				elif key == 'prcnt_below_aerobic_duration':
 					if todays_meta_data and current_meta_data:
-						avg_weekly_workout_duration = self._get_average_for_duration(
-							todays_data.cum_weekly_workout_duration_in_hours,
-							current_data.cum_weekly_workout_duration_in_hours,
-							alias
-						)
-						avg_below_aerobic_duration = self._get_average_for_duration(
-							todays_data.cum_hr_below_aerobic_duration_hours,
-							current_data.cum_hr_below_aerobic_duration_hours,
-							alias
-						)
-						if avg_weekly_workout_duration:
-							val = (avg_below_aerobic_duration/avg_weekly_workout_duration) * 100
+						total_workout_duration = todays_data.cum_weekly_workout_duration_in_hours\
+												 - current_data.cum_weekly_workout_duration_in_hours
+						total_below_aerobic_duration = todays_data.cum_hr_below_aerobic_duration_hours\
+							 						   - current_data.cum_hr_below_aerobic_duration_hours
+						if total_workout_duration:
+							val = (total_below_aerobic_duration/total_workout_duration) * 100
 							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 					return None
 
 				elif key == 'hr_not_recorded_duration_hour_min':
 					if todays_meta_data and current_meta_data:
-						val = self._get_average_for_duration(
-							todays_data.cum_hr_not_recorded_duration_hours,
-							current_data.cum_hr_not_recorded_duration_hours,
-							alias
-						)
+						val = todays_data.cum_hr_not_recorded_duration_hours\
+							  - current_data.cum_hr_not_recorded_duration_hours
 						return self._hours_to_hours_min(val)
 					return None
 
 				elif key == 'prcnt_hr_not_recorded_duration':
 					if todays_meta_data and current_meta_data:
-						avg_weekly_workout_duration = self._get_average_for_duration(
-							todays_data.cum_weekly_workout_duration_in_hours,
-							current_data.cum_weekly_workout_duration_in_hours,
-							alias
-						)
-						avg_hr_not_recorded_duration = self._get_average_for_duration(
-							todays_data.cum_hr_not_recorded_duration_hours,
-							current_data.cum_hr_not_recorded_duration_hours,
-							alias
-						)
-						if avg_weekly_workout_duration:
-							val = (avg_hr_not_recorded_duration/avg_weekly_workout_duration) * 100
+						total_workout_duration = todays_data.cum_weekly_workout_duration_in_hours\
+												 - current_data.cum_weekly_workout_duration_in_hours
+						total_hr_not_recorded_duration = todays_data.cum_hr_not_recorded_duration_hours\
+							 							 - current_data.cum_hr_not_recorded_duration_hours
+						if total_workout_duration:
+							val = (total_hr_not_recorded_duration/total_workout_duration) * 100
 							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 					return None
 
