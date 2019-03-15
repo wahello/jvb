@@ -541,6 +541,13 @@ class MovementLeaderboard extends Component{
 			          			Note: All time periods/durations are in hours:minutes (hh:mm)
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          				** Represents duration (hh:mm) that the exercise range was in each of our 4 heart rate zones:
+			          				<li>Aerobic (AE): Aerobic Duration (% of total time)</li> 
+			          				<li>Anaerobic (AN): Anaerobic Duration (% of total time)</li>
+			          				<li>Below Aerobic (BA): Below Aerobic Duration (% of total time)</li>
+			          				<li>Not Recorded (NR): HR Not Recorded Duration(% of total time)</li>
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			The Movement Leaderboard provides a robust view of your movement across a number of categories that we use to assess movement.  In our experience, people that do well across all 5 of these categories consistently over time are healthier and feel better than those that don’t.  Users can choose various time periods or select any custom range by touching “Select Range” or entering a time period in one of the “Custom Date Range” buttons.  If viewing on a mobile device, turn your mobile device to the side (landscape mode) to see all columns.  You can also see how other people are doing on this page.  We include this so that each of us are motivated/inspired to do a little better!
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
@@ -559,18 +566,6 @@ class MovementLeaderboard extends Component{
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			MCS Score:  total inactive hours (sum of hours each day a user does not achieve 300 steps in any hour) per day when not sleeping, napping, and exercising
 			          			</p>
-			          			<p className="footer_content" style={{marginLeft:"15px"}}>
-								    AE: Duration of Heart Rate in Aerobic Zone 
-                                </p>
-			          			<p className="footer_content" style={{marginLeft:"15px"}}>
-								    BA: Duration of Heart Rate in Below Aerobic Zone  
-                                </p>
-                                <p className="footer_content" style={{marginLeft:"15px"}}>
-                                   AN: Duration of Heart Rate in Anaerobic Zone
-                                </p>
-                                <p className="footer_content" style={{marginLeft:"15px"}}>
-                                  NR: Duration Heart Rate Not Recorded
-                                </p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			Exercise Duration / Average HR:  total exercise duration each day.  Users can characterize an activity as “exercise” or “non exercise” on the activity summary for each activity below question 1. on the user inputs page. Note: users are only given credit for exercise or non exercise for each activity (not both). Also includes the average heartrate of all exercise activities. NM = Heart Rate Not Measured.
 			          			</p>
