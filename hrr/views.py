@@ -939,6 +939,7 @@ def aa_data(user,start_date):
 		for i in range(len(activity_files)):
 			one_activity_file_dict =  ast.literal_eval(activity_files[i])
 			activities_summary_id.append(one_activity_file_dict['summaryId'])
+			garmin_id = one_activity_file_dict.get('summaryId')
 			if 'averageHeartRateInBeatsPerMinute' in one_activity_file_dict.keys():
 				if (one_activity_file_dict['averageHeartRateInBeatsPerMinute'] == 0 or ''):
 					if activities_dic:

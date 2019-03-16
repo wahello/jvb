@@ -264,7 +264,7 @@ class HeartRate extends Component{
 
 	
 	renderpercentage(value){
-		// This function will add the "%" symbol for the persentage values. 
+		// This function will add the "%" symbol for the persentage values.
 		let percentage;
 		if(value){
 			percentage = Math.round(value) +"%";
@@ -481,8 +481,8 @@ class HeartRate extends Component{
 	        <td>{this.renderpercentage(totals.percent_anaerobic)}</td>,
 	        <td>{this.renderTime(totals.duration_below_aerobic_range)}</td>,
 	        <td>{this.renderpercentage(totals.percent_below_aerobic)}</td>,
-	        <td>{this.renderTime(totals.prcnt_hrr_not_recorded)}</td>,
-	        <td>{this.renderpercentage(totals.hrr_not_recorded)}</td>,
+	        <td>{this.renderTime(totals.duration_hrr_not_recorded)}</td>,
+	        <td>{this.renderpercentage(totals.percent_hrr_not_recorded)}</td>,
 	    ];
 	    td_rows.push(<tr>{td_values}</tr>);
 	    }
