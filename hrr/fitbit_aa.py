@@ -954,7 +954,6 @@ def add_totals(modified_data):
 	'''
 	modified_data_total = modified_data.copy()
 	for key,value in modified_data.items():
-		print(value,"value")
 		if not modified_data_total.get('Totals'):
 			modified_data_total['Totals'] = {}
 		if value.get('total_duration',0.0):
