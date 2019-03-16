@@ -316,9 +316,10 @@ def  Update_AA_ranges_by_ages(user):
 
 def get_hr_not_recorded_duration(user_input_activities):
 	hr_not_recorded = 0
-	for key,activity in user_input_activities.items():
-		if not activity.get("averageHeartRateInBeatsPerMinute"):
-			hr_not_recorded =+ activity.get("durationInSeconds",0)
+	if user_input_activities:
+		for key,activity in user_input_activities.items():
+			if not activity.get("averageHeartRateInBeatsPerMinute"):
+				hr_not_recorded =+ activity.get("durationInSeconds",0)
 	return hr_not_recorded
 
 def cal_aa1_data(
@@ -639,6 +640,9 @@ def calculate_AA2_workout(user,start_date,user_input_activities=None):
 		user=user,created_at=start_date)
 	if user_input_activities:
 		user_input_activities,deleted_activities,ui_exercise_act = get_filtered_activities(user_input_activities)
+	else:
+		deleted_activities = []
+		ui_exercise_act = []
 	trans_activity_data = []
 	if fibit_activities_qs:
 		for i in range(0,len(fibit_activities_qs)):
@@ -1079,7 +1083,7 @@ def calculate_AA2_daily(user,start_date,user_input_activities=None):
 		user_input_activities,deleted_activities,ui_exercise_act = get_filtered_activities(user_input_activities)
 	else:
 		deleted_activities =[]
-
+		ui_exercise_act = []
 	hr_time_diff = fitbit_hr_diff_calculation(user,start_date,user_input_activities)
 	hr_time_diff = deleted_fitbit_activity(hr_time_diff,deleted_activities)
 	AA_data = AaCalculations.objects.filter(user_aa=user,created_at=start_date)
@@ -1286,6 +1290,9 @@ def calculate_AA_chart3(
 def calculate_AA3(user,start_date,user_input_activities=None):
 	if user_input_activities:
 		user_input_activities,deleted_activities,ui_exercise_act = get_filtered_activities(user_input_activities)
+	else:
+		deleted_activities = []
+		ui_exercise_act = []
 	hr_time_diff = fitbit_hr_diff_calculation(user,start_date,user_input_activities)
 	hr_time_diff = deleted_fitbit_activity(hr_time_diff,deleted_activities)
 	if hr_time_diff and hr_time_diff[0]:
