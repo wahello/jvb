@@ -88,6 +88,7 @@ def _get_blank_pa_model_fields(model):
 		fields = {
 			"cum_average_drink_per_week":None,
 			"cum_alcohol_drink_per_week_gpa":None,
+			"cum_alcohol_drink_consumed":None
 		}
 		return fields
 
@@ -147,7 +148,8 @@ def _get_blank_pa_model_fields(model):
 			"cum_hrr_pure_1_minute_beat_lowered_days_count":None,
 			"cum_hrr_pure_time_to_99_days_count":None,
 			"cum_hrr_activity_end_hr_days_count":None,
-			"cum_sleep_reported_days_count":None
+			"cum_sleep_reported_days_count":None,
+			"cum_inputs_reported_days_count":None
 		}
 		return fields
 
@@ -711,6 +713,17 @@ def _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data=None, today_aa_data
 
 
 def _get_alcohol_cum_sum(today_ql_data, yday_cum_data=None):
+
+	def validate_alcohol(alcohol_drink_consumed):
+		if alcohol_drink_consumed:
+			if alcohol_drink_consumed == "20+":
+				alcohol_drink_consumed = 21
+			else:
+				alcohol_drink_consumed = int(alcohol_drink_consumed)
+		else:
+			alcohol_drink_consumed = 0
+		return alcohol_drink_consumed
+
 	alcohol_cum_data = _get_blank_pa_model_fields("alcohol")
 	
 	if today_ql_data and yday_cum_data:
@@ -721,13 +734,25 @@ def _get_alcohol_cum_sum(today_ql_data, yday_cum_data=None):
 		alcohol_cum_data['cum_alcohol_drink_per_week_gpa'] = _safe_get_mobj(
 			today_ql_data.grades_ql,"alcoholic_drink_per_week_gpa",0) \
 			+ _safe_get_mobj(yday_cum_data.alcohol_cum, "cum_alcohol_drink_per_week_gpa",0)
+
+		alcohol_drink_consumed = validate_alcohol(
+			_safe_get_mobj(today_ql_data.alcohol_ql,"alcohol_day",0))
+			
+		alcohol_cum_data['cum_alcohol_drink_consumed'] = alcohol_drink_consumed \
+			+ _safe_get_mobj(yday_cum_data.alcohol_cum,"cum_alcohol_drink_consumed",0)
 	
 	elif today_ql_data:
 		alcohol_cum_data['cum_average_drink_per_week'] = _safe_get_mobj(
 			today_ql_data.alcohol_ql,"alcohol_week",0) 
 
 		alcohol_cum_data['cum_alcohol_drink_per_week_gpa'] = _safe_get_mobj(
-			today_ql_data.grades_ql,"alcoholic_drink_per_week_gpa",0) 
+			today_ql_data.grades_ql,"alcoholic_drink_per_week_gpa",0)
+
+		alcohol_drink_consumed = validate_alcohol(
+			_safe_get_mobj(today_ql_data.alcohol_ql,"alcohol_day",0))
+			
+		alcohol_cum_data['cum_alcohol_drink_consumed'] = alcohol_drink_consumed
+
 	return alcohol_cum_data
 
 
@@ -1198,6 +1223,10 @@ def _get_meta_cum_sum(today_ql_data, today_ui_data, user_hrr_data,
 		meta_cum_data['cum_sleep_reported_days_count'] = sleep_dur \
 			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_sleep_reported_days_count",0)
 
+		reported_inputs = 1 if today_ui_data else 0
+		meta_cum_data['cum_inputs_reported_days_count'] = reported_inputs\
+			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_inputs_reported_days_count",0)
+
 
 	elif today_ql_data:
 		workout_dur = _str_to_hours_min_sec(_safe_get_mobj(
@@ -1282,6 +1311,9 @@ def _get_meta_cum_sum(today_ql_data, today_ui_data, user_hrr_data,
 			sleep_dur = _safe_get_mobj(today_ql_data.sleep_ql,"sleep_per_wearable",None)
 		sleep_dur = 1 if sleep_dur else 0
 		meta_cum_data['cum_sleep_reported_days_count'] = sleep_dur
+
+		reported_inputs = 1 if today_ui_data else 0
+		meta_cum_data['cum_inputs_reported_days_count'] = reported_inputs
 		
 	return meta_cum_data
 
