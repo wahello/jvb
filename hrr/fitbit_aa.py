@@ -166,6 +166,8 @@ def get_exercise_act(act_cal,user_input_activities=None):
 	exercise_act = []
 	if user_input_activities:
 		ui_keys = list(user_input_activities.keys())
+	else:
+		ui_keys = []
 	for key,activity in act_cal.items():
 		if ((activity.get("steps_type") == "exercise" or 
 			activity.get("activityType") == "HEART_RATE_RECOVERY") and 
