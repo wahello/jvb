@@ -810,6 +810,8 @@ def add_created_activity1(
 	data_copy["below_aerobic_range"] = below_aerobic_range
 	for i,single_activity in enumerate(di):
 		avg_hr = single_activity.get("averageHeartRateInBeatsPerMinute",0.0)
+		if not avg_hr:
+			avg_hr = ''
 		if avg_hr != '' and int(avg_hr) >= anaerobic:
 			data_anaerobic_zone = data_copy.get("anaerobic_zone",0)
 			if data_anaerobic_zone:
@@ -1096,7 +1098,8 @@ def aa_data(user,start_date):
 					remove_in_workout.append(int(k["summaryId"]))
 
 	for single_activity in created_activity_dict.values():
-		if single_activity.get('averageHeartRateInBeatsPerMinute',0) == 0 or single_activity.get('averageHeartRateInBeatsPerMinute',0) == '':
+		hr_value = single_activity.get('averageHeartRateInBeatsPerMinute',0)
+		if hr_value == 0 or hr_value == '' or not hr_value:
 			if activities_dic:
 				ui_activity = activities_dic.get(single_activity["summaryId"],0)
 				if ui_activity:
@@ -1754,6 +1757,8 @@ def add_created_activity(di,data,below_aerobic,anaerobic):
 		data_copy["total_duration"] = single_activity.get("durationInSeconds",0.0)
 		data_copy["avg_heart_rate"] = single_activity.get("averageHeartRateInBeatsPerMinute",0.0)
 		avg_hr = single_activity.get("averageHeartRateInBeatsPerMinute",0.0)
+		if not avg_hr:
+			avg_hr = 0 
 		if avg_hr != '' and int(avg_hr) >= anaerobic:
 			data_copy["duration_in_anaerobic_range"] = single_activity.get("durationInSeconds",0.0)
 			data_copy["percent_anaerobic"] = 100
@@ -1868,7 +1873,7 @@ def daily_aa_data(user, start_date):
 	
 	for i,single_activity in enumerate(filtered_activities_only):
 		avg_hr = single_activity.get('averageHeartRateInBeatsPerMinute',0)
-		if avg_hr == '' or avg_hr == 0:
+		if avg_hr == '' or avg_hr == 0 or not avg_hr:
 			user_created_activity_list.append(single_activity)
 	remove_in_workout = []
 	act_from_ui = []
@@ -2049,6 +2054,15 @@ def daily_aa_data(user, start_date):
 	all_activities_timestamp = []
 	activies_timestamp = []
 	daily_aa_data={}
+
+	aa_ranges = fitbit_aa.belowaerobic_aerobic_anaerobic(user_age)
+	update = fitbit_aa.Update_AA_ranges_by_ages(user)
+	below_aerobic_value = update[0]
+	anaerobic_value = update[1]
+	aerobic_range = update[2]
+	anaerobic_range = update [3]
+	below_aerobic_range = update [4]
+
 	if workout and workout_data:
 		for tmp in workout:
 			workout_activities = fitfile_parse([tmp],offset,start_date_str)
@@ -2058,16 +2072,7 @@ def daily_aa_data(user, start_date):
 			activies_timestamp.append(workout_timestamp)
 		all_activities_heartrate = [single_list for single_list in all_activities_heartrate if single_list]
 		all_activities_timestamp = [single_list for single_list in all_activities_timestamp if single_list]
-		activies_timestamp = [single_list for single_list in activies_timestamp if single_list]
-		
-		# user_age = user.profile.age()
-		aa_ranges = fitbit_aa.belowaerobic_aerobic_anaerobic(user_age)
-		update = fitbit_aa.Update_AA_ranges_by_ages(user)
-		below_aerobic_value = update[0]
-		anaerobic_value = update[1]
-		aerobic_range = update[2]
-		anaerobic_range = update [3]
-		below_aerobic_range = update [4]	
+		activies_timestamp = [single_list for single_list in activies_timestamp if single_list]	
 
 		def individual_activity(heart,time):
 			anaerobic_range_list = []
@@ -2276,6 +2281,8 @@ def add_hr_nor_recorded_heartbeat(
 	data={}
 	for i,single_data in enumerate(no_hr_data):
 		heart_beat = single_data.get('averageHeartRateInBeatsPerMinute',0)
+		if not heart_beat:
+			heart_beat = 0
 		if heart_beat != '' and heart_beat != 0 and int(heart_beat) <= below_aerobic_value:
 			low_hr,high_hr = low_high_hr(low_end_heart,high_end_heart,int(heart_beat))
 			if not data.get(low_hr):
@@ -2316,6 +2323,8 @@ def add_hr_nor_recorded(no_hr_data,totals_data):
 	data["classificaton"] = "heart_rate_not_recorded"
 	for i,single_data in enumerate(no_hr_data):
 		heart_beat = single_data.get('averageHeartRateInBeatsPerMinute',0)
+		if not heart_beat:
+			heart_beat = 0
 		if heart_beat == '' or int(heart_beat) == 0:
 			data["time_in_zone"]=single_data.get(
 			"durationInSeconds",0) +  data.get("time_in_zone",0)
