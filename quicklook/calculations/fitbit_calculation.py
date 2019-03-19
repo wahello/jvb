@@ -702,6 +702,8 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		exercise_calculated_data['did_workout'] = quicklook.calculations.garmin_calculation.\
 			did_workout_today(have_activities=activity_stats['have_activity']
 				,user_did_workout=ui_did_workout)
+		exercise_calculated_data['total_exercise_activities'] = activity_stats['total_exercise_activities']
+		exercise_calculated_data['total_strength_activities'] = activity_stats['total_strength_activities']
 		
 		# Steps calculation
 		daily_total_steps = fitbit_steps_data(todays_steps_data)
@@ -808,6 +810,14 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		grades_calculated_data['avg_exercise_hr_gpa'] = avg_exercise_hr_grade_pts[1]\
 			if avg_exercise_hr_grade_pts[1] else 0
 		exercise_calculated_data['avg_exercise_heartrate'] = avg_exercise_hr_grade_pts[2]\
+			if avg_exercise_hr_grade_pts[2] else 0
+
+		#Average non strength exercise heartrate calculation
+		avg_non_strength_hr_grade_pts = quicklook.calculations.\
+			garmin_calculation.get_average_exercise_heartrate_grade(
+			combined_user_exercise_activities,todays_daily_strong,user_age,
+			non_strength_only=True)
+		exercise_calculated_data['avg_non_strength_heartrate'] = avg_non_strength_hr_grade_pts[2]\
 			if avg_exercise_hr_grade_pts[2] else 0
 
 		# If quick look for provided date exist then update it otherwise

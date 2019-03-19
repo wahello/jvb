@@ -237,6 +237,9 @@ def get_blank_model_fields(model):
 			'avg_heartrate':json.dumps({}),
 			'activities_duration':json.dumps({}),
 			'avg_exercise_heartrate':0,
+			'avg_non_strength_heartrate':0,
+			'total_exercise_activities':0,
+			'total_strength_activities':0,
 			'elevation_gain':0,
 			'elevation_loss':0,
 			'effort_level':0,
@@ -1169,11 +1172,12 @@ def do_user_has_exercise_activity(combined_user_activities,user_age):
 
 def is_strength_activity(activity_name):
 	STRENGTH_ACTIVITIES = ("barre_class", "gardening", "pilates",
-						   "piyo-pilates/yoga","yoga", "heart_rate_recovery",
-						   "jvb_strength_exercises","weights","strength_training")
+						   "piyo-pilates/yoga","yoga","weights",
+						   "snow_shoveling")
 
 	if activity_name and (activity_name.lower() in STRENGTH_ACTIVITIES
-	   					  or "strength" in activity_name):
+	   					  or "strength" in activity_name.lower()
+	   					  or "skiing" in activity_name.lower()):
 		return True
 	return False
 
@@ -2582,7 +2586,6 @@ def get_average_exercise_heartrate_grade(combined_user_activities,
 		else:
 			final_activities.append(act)
 			total_duration += act.get('durationInSeconds',0)
-
 	if final_activities:
 		avg_hr = 0
 		for act in final_activities:
