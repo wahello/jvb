@@ -56,7 +56,10 @@ class ToExerciseStatsCumulative(object):
 	def __init__(self,raw_data):
 		self.cum_workout_duration_in_hours = raw_data["cum_workout_duration_in_hours"]
 		self.cum_workout_effort_level = raw_data["cum_workout_effort_level"]
-		self.cum_avg_exercise_hr = raw_data["cum_avg_exercise_hr"]
+		self.cum_avg_exercise_hr = raw_data["cum_avg_exercise_hr"],
+		self.cum_avg_non_strength_exercise_hr = raw_data["cum_avg_non_strength_exercise_hr"]
+		self.cum_total_exercise_activities = raw_data["cum_total_exercise_activities"]
+		self.cum_total_strength_activities = raw_data["cum_total_strength_activities"]
 		self.cum_vo2_max = raw_data["cum_vo2_max"]
 		# This stores workout duration per day from A/A chart 1
 		# For some reason we were storing weekly workout duration
@@ -1433,6 +1436,29 @@ class ProgressReport():
 						)
 						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 
+				elif key == 'avg_non_strength_exercise_heart_rate':
+					if todays_meta_data and current_meta_data:
+						avg_exercise_hr_days = (todays_meta_data.cum_avg_exercise_hr_days_count - 
+							current_meta_data.cum_avg_exercise_hr_days_count)
+						val = _cal_avg_exercise_hr_average(
+							todays_data.cum_avg_non_strength_exercise_hr,
+							current_data.cum_avg_non_strength_exercise_hr,
+							avg_exercise_hr_days
+						)
+						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+
+				elif key == 'total_non_strength_activities':
+					total_exercise = todays_data.cum_total_exercise_activities\
+						  - current_data.cum_total_exercise_activities
+					total_strength = todays_data.cum_total_strength_activities\
+						  - current_data.cum_total_strength_activities
+					return total_exercise - total_strength
+
+				elif key == 'total_strength_activities':
+					val = todays_data.cum_total_strength_activities\
+						  - current_data.cum_total_strength_activities
+					return val
+
 				elif key == 'vo2_max':
 					if todays_meta_data and current_meta_data:
 						vo2max_days = (todays_meta_data.cum_vo2_max_days_count - 
@@ -1524,6 +1550,9 @@ class ProgressReport():
 			'workout_duration_hours_min':{d:None for d in self.duration_type},
 			'workout_effort_level':{d:None for d in self.duration_type},
 			'avg_exercise_heart_rate':{d:None for d in self.duration_type},
+			'avg_non_strength_exercise_heart_rate':{d:None for d in self.duration_type},
+			'total_non_strength_activities':{d:None for d in self.duration_type},
+			'total_strength_activities':{d:None for d in self.duration_type},
 			'vo2_max':{d:None for d in self.duration_type},
 			'total_workout_duration_over_range':{d:None for d in self.duration_type},
 			'hr_aerobic_duration_hour_min':{d:None for d in self.duration_type},
