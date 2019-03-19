@@ -740,6 +740,7 @@ class LeaderboardOverview(object):
 						"duration":"today,yesterday,year"
 					 }
 		'''
+		query_params = self._clean_query_params(query_params)
 		self.category_meta = LeaderboardCategories()
 		# current logged user
 		self.user = user
@@ -774,6 +775,14 @@ class LeaderboardOverview(object):
 				self.duration_type.pop(self.duration_type.index(d))
 
 		self.category_wise_data = self._get_category_wise_data(query_params)
+
+	def _clean_query_params(self, query_params):
+		VALID_KEYS = ['date','duration', 'custom_ranges','category']
+		cleaned = {}
+		for key,value in query_params.items():
+			if key in VALID_KEYS:
+				cleaned[key] = value
+		return cleaned
 
 	def _str_to_dt(self,dt_str):
 		'''
@@ -849,7 +858,6 @@ class LeaderboardOverview(object):
 		category_wise_data = {catg:{dtype:[] 
 			for dtype in self.duration_type} 
 			for catg in all_categories}
-
 		for user in user_model.objects.all():
 			data = ProgressReport(user,query_params).get_progress_report()
 			if not self.duration_date:
