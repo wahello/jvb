@@ -1967,7 +1967,7 @@ class ProgressReport():
 							todays_data.cum_days_high_stress - 
 							current_data.cum_days_high_stress
 						)
-						total_medium_high_stress_days = days_medium_stress + days_stress_reported
+						total_medium_high_stress_days = days_medium_stress + days_high_stress
 						if days_stress_reported:
 							val = (total_medium_high_stress_days/days_stress_reported)*100
 							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
