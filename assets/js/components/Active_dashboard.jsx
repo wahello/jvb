@@ -190,7 +190,10 @@ class ActiveDashboard extends Component{
 				     		userName = value[dur].user_rank.username;
 				     		category = value[dur].user_rank.category;
 				     		let otherScoreObject = value[dur].user_rank.other_scores;
-				     		if(otherScoreObject != null && otherScoreObject != undefined && otherScoreObject != ""){
+				     		if(otherScoreObject != null 
+				     		   && otherScoreObject != undefined 
+				     		   && otherScoreObject != ""
+				     		   && key1 !== 'total_active_time'){
 					            for (let [key3,o_score] of Object.entries(otherScoreObject)){
 					            	if(o_score != null && o_score != undefined && o_score != "") {
 					                      if(!other_Scores[key3]){

@@ -72,6 +72,7 @@ class ToAlcoholCumulative(object):
 	def __init__(self,raw_data):
 		self.cum_average_drink_per_week = raw_data["cum_average_drink_per_week"]
 		self.cum_alcohol_drink_per_week_gpa = raw_data["cum_alcohol_drink_per_week_gpa"]
+		self.cum_alcohol_drink_consumed = raw_data["cum_alcohol_drink_consumed"]
 
 class ToSickCumulative(object):
 	def __init__(self,raw_data):
@@ -113,6 +114,7 @@ class ToOtherStatsCumulative(object):
 
 class ToMetaCumulative(object):
 	def __init__(self,raw_data):
+		self.cum_inputs_reported_days_count = raw_data["cum_inputs_reported_days_count"]
 		self.cum_workout_days_count = raw_data["cum_workout_days_count"]
 		self.cum_resting_hr_days_count = raw_data["cum_resting_hr_days_count"]
 		self.cum_effort_level_days_count = raw_data["cum_effort_level_days_count"]
@@ -1551,7 +1553,20 @@ class ProgressReport():
 		def _calculate(key,alias,todays_data,current_data,
 			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
-				if key =='avg_drink_per_week':
+				if key =='avg_drink_per_day':
+					if todays_meta_data and current_meta_data:
+						alcohol_reported_days = (todays_meta_data.cum_reported_alcohol_days_count -
+							current_meta_data.cum_reported_alcohol_days_count)
+
+						if alcohol_reported_days: 
+							val = self._get_average_for_duration(
+								todays_data.cum_alcohol_drink_consumed,
+								current_data.cum_alcohol_drink_consumed,alias)
+							return round(val,2)
+						else:
+							return 'Not Reported'
+
+				elif key =='avg_drink_per_week':
 					if todays_meta_data and current_meta_data:
 						alcohol_reported_days = (todays_meta_data.cum_reported_alcohol_days_count -
 							current_meta_data.cum_reported_alcohol_days_count)
@@ -1586,6 +1601,7 @@ class ProgressReport():
 			return None
 
 		calculated_data = {
+			'avg_drink_per_day':{d:None for d in self.duration_type},
 			'avg_drink_per_week':{d:None for d in self.duration_type},
 			'alcoholic_drinks_per_week_grade':{d:None for d in self.duration_type},
 			'alcoholic_drinks_per_week_gpa':{d:None for d in self.duration_type},
@@ -1739,6 +1755,23 @@ class ProgressReport():
 						todays_data.cum_floors_climbed,
 						current_data.cum_floors_climbed,alias)
 					return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+				elif key == 'number_of_days_reported_inputs':
+					if todays_meta_data and current_meta_data:
+						days_reported_inputs = (
+							todays_meta_data.cum_inputs_reported_days_count 
+							- current_meta_data.cum_inputs_reported_days_count
+						)
+						if days_reported_inputs:
+							return days_reported_inputs
+						else:
+							return "Not Reported"
+				elif key == 'prcnt_of_days_reported_inputs':
+					if todays_meta_data and current_meta_data:
+						val = self._get_average_for_duration(
+							todays_meta_data.cum_inputs_reported_days_count,
+							current_meta_data.cum_inputs_reported_days_count,alias
+						) * 100
+						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 			return None
 
 		calculated_data = {
@@ -1750,7 +1783,9 @@ class ProgressReport():
 			'hrr_pure_1_minute_beat_lowered':{d:None for d in self.duration_type},
 			'hrr_pure_time_to_99':{d:None for d in self.duration_type},
 			'hrr_activity_end_hr':{d:None for d in self.duration_type},
-			'floors_climbed':{d:None for d in self.duration_type}
+			'floors_climbed':{d:None for d in self.duration_type},
+			'number_of_days_reported_inputs': {d:None for d in self.duration_type},
+			'prcnt_of_days_reported_inputs': {d:None for d in self.duration_type}
 		}
 		summary_type = "other_stats_cum"
 
@@ -1907,6 +1942,35 @@ class ProgressReport():
 						todays_data.cum_days_garmin_stress_lvl,
 						current_data.cum_days_garmin_stress_lvl,alias)
 					return round(avg_stress_level,2)
+				elif key == "number_of_days_high_medium_stress":
+					days_medium_stress = (
+						todays_data.cum_days_medium_stress - 
+						current_data.cum_days_medium_stress
+					)
+					days_high_stress = (
+						todays_data.cum_days_high_stress - 
+						current_data.cum_days_high_stress
+					)
+					return days_medium_stress+days_high_stress
+
+				elif key == "prcnt_of_days_high_medium_stress":
+					if todays_meta_data and current_meta_data:
+						days_stress_reported = (
+							todays_meta_data.cum_reported_stress_days_count - 
+							current_meta_data.cum_reported_stress_days_count
+						)
+						days_medium_stress = (
+							todays_data.cum_days_medium_stress - 
+							current_data.cum_days_medium_stress
+						)
+						days_high_stress = (
+							todays_data.cum_days_high_stress - 
+							current_data.cum_days_high_stress
+						)
+						total_medium_high_stress_days = days_medium_stress + days_stress_reported
+						if days_stress_reported:
+							val = (total_medium_high_stress_days/days_stress_reported)*100
+							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 			return None
 
 		calculated_data = {
@@ -1917,7 +1981,9 @@ class ProgressReport():
 			'number_of_days_high_stress_reported':{d:None for d in self.duration_type},
 			'prcnt_of_days_high_stress':{d:None for d in self.duration_type},
 			'days_stress_level_reported':{d:None for d in self.duration_type},
-			'garmin_stress_lvl':{d:None for d in self.duration_type}
+			'garmin_stress_lvl':{d:None for d in self.duration_type},
+			'number_of_days_high_medium_stress':{d:None for d in self.duration_type},
+			'prcnt_of_days_high_medium_stress':{d:None for d in self.duration_type}
 		}
 		summary_type = "stress_cum"
 

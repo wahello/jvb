@@ -73,6 +73,7 @@ class ExerciseStatsCumulative(models.Model):
 
 class AlcoholCumulative(models.Model):
 	user_cum  = models.OneToOneField(CumulativeSum,related_name="alcohol_cum")
+	cum_alcohol_drink_consumed = models.FloatField(blank=True, null=True)
 	cum_average_drink_per_week = models.FloatField(blank=True, null=True)
 	cum_alcohol_drink_per_week_gpa = models.FloatField(blank=True, null=True)
 
@@ -109,6 +110,7 @@ class StressCumulative(models.Model):
 
 class MetaCumulative(models.Model):
 	user_cum = models.OneToOneField(CumulativeSum, related_name='meta_cum')
+	cum_inputs_reported_days_count = models.IntegerField(blank=True,null=True)
 	cum_workout_days_count = models.IntegerField(blank=True,null=True)
 	cum_resting_hr_days_count = models.IntegerField(blank=True,null=True)
 	cum_effort_level_days_count = models.IntegerField(blank=True,null=True)
