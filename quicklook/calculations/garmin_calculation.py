@@ -1228,7 +1228,9 @@ def get_activity_stats(combined_user_activities,user_age):
 
 			if is_strength_activity(obj_act):
 				activity_stats['total_strength_activities'] += 1
-			activity_stats['total_exercise_activities'] += 1
+				
+			if obj_act not in IGNORE_ACTIVITY:
+				activity_stats['total_exercise_activities'] += 1
 
 			workout_type_total_duration = workout_wise_total_duration.get(obj_act)
 			if not obj_avg_hr:
