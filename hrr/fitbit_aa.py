@@ -316,9 +316,10 @@ def  Update_AA_ranges_by_ages(user):
 
 def get_hr_not_recorded_duration(user_input_activities):
 	hr_not_recorded = 0
-	for key,activity in user_input_activities.items():
-		if not activity.get("averageHeartRateInBeatsPerMinute"):
-			hr_not_recorded =+ activity.get("durationInSeconds",0)
+	if user_input_activities:
+		for key,activity in user_input_activities.items():
+			if not activity.get("averageHeartRateInBeatsPerMinute"):
+				hr_not_recorded =+ activity.get("durationInSeconds",0)
 	return hr_not_recorded
 
 def cal_aa1_data(
@@ -594,8 +595,20 @@ def fitbit_aa_twentyfour_hour_chart_one(user_get,start_date,hr_time_diff, user_i
 	else:
 		return {}
 
+def convert_ui_format(fitbit_activity_data,user_get,start_date):
+	new_activities = {}
+	act_cal = user_input.views.garmin_views._get_fitbit_activities_data(
+		user_get,start_date)
+	fitbit_activity_data = fitbit_activity_data[0]
+	for i,activity in enumerate(fitbit_activity_data):
+		for key,value in act_cal.items():
+			if value.get("steps_type") == "exercise" and activity.get("summaryId") == key:
+				new_activities[key] = {}
+				new_activities[key] = activity
+	return new_activities
 
-def combine_ui_fitbit_activities(user_input_activities,fitbit_activity_data):
+
+def combine_ui_fitbit_activities(user_input_activities,fitbit_activity_data,user_get,start_date):
 	"""This function will combine both userinput activities and fitbit activities
 
 	Args:
@@ -609,7 +622,7 @@ def combine_ui_fitbit_activities(user_input_activities,fitbit_activity_data):
 	if user_input_activities:
 		ui_activity_keys = list(user_input_activities.keys())
 	else:
-		ui_activity_keys = None	
+		ui_activity_keys = []	
 	if fitbit_activity_data:
 		for index,single_activity in enumerate(fitbit_activity_data[0]):
 			if single_activity.get('summaryId') in ui_activity_keys:
@@ -619,7 +632,7 @@ def combine_ui_fitbit_activities(user_input_activities,fitbit_activity_data):
 				user_input_activities[single_activity.get(
 					'summaryId')]['distanceInMeters'] = single_activity.get(
 					"distanceInMeters",0)
-			else:
+			elif user_input_activities:
 				key = single_activity.get('summaryId')
 				user_input_activities[key] = {}
 				user_input_activities[key]['summaryId'] = single_activity.get('summaryId')
@@ -630,6 +643,9 @@ def combine_ui_fitbit_activities(user_input_activities,fitbit_activity_data):
 				user_input_activities[key]['maxHeartRateInBeatsPerMinute'] = single_activity.get(
 												'maxHeartRateInBeatsPerMinute')
 				user_input_activities[key]['distanceInMeters'] = single_activity.get('distanceInMeters')
+			else:
+				new_activities = convert_ui_format(fitbit_activity_data,user_get,start_date)	
+				return new_activities
 		return user_input_activities
 	else:
 		return user_input_activities
@@ -639,6 +655,9 @@ def calculate_AA2_workout(user,start_date,user_input_activities=None):
 		user=user,created_at=start_date)
 	if user_input_activities:
 		user_input_activities,deleted_activities,ui_exercise_act = get_filtered_activities(user_input_activities)
+	else:
+		deleted_activities = []
+		ui_exercise_act = []
 	trans_activity_data = []
 	if fibit_activities_qs:
 		for i in range(0,len(fibit_activities_qs)):
@@ -654,7 +673,7 @@ def calculate_AA2_workout(user,start_date,user_input_activities=None):
 				trans_activity_data.append(list(map(
 					fitbit_to_garmin_activities,todays_activity_data)))
 	
-	modified_activities = combine_ui_fitbit_activities(user_input_activities,trans_activity_data)
+	modified_activities = combine_ui_fitbit_activities(user_input_activities,trans_activity_data,user,start_date)
 	time_duration = []
 	heart_rate = []
 	max_hrr = []
@@ -1079,7 +1098,7 @@ def calculate_AA2_daily(user,start_date,user_input_activities=None):
 		user_input_activities,deleted_activities,ui_exercise_act = get_filtered_activities(user_input_activities)
 	else:
 		deleted_activities =[]
-
+		ui_exercise_act = []
 	hr_time_diff = fitbit_hr_diff_calculation(user,start_date,user_input_activities)
 	hr_time_diff = deleted_fitbit_activity(hr_time_diff,deleted_activities)
 	AA_data = AaCalculations.objects.filter(user_aa=user,created_at=start_date)
@@ -1244,7 +1263,7 @@ def add_hr_to_third_chart(hr_not_recorded_ids,user_input_activities,final_data):
 def calculate_AA_chart3(
 	user,start_date,user_input_activities,AA_data,
 	all_activities_heartrate_list,all_activities_timestamp_list,
-	deleted_activities):
+	deleted_activities=None):
 	if not user_input_activities and not AA_data:
 		data = get_aa3_data(
 		user,all_activities_heartrate_list,all_activities_timestamp_list)
@@ -1286,6 +1305,9 @@ def calculate_AA_chart3(
 def calculate_AA3(user,start_date,user_input_activities=None):
 	if user_input_activities:
 		user_input_activities,deleted_activities,ui_exercise_act = get_filtered_activities(user_input_activities)
+	else:
+		deleted_activities = []
+		ui_exercise_act = []
 	hr_time_diff = fitbit_hr_diff_calculation(user,start_date,user_input_activities)
 	hr_time_diff = deleted_fitbit_activity(hr_time_diff,deleted_activities)
 	if hr_time_diff and hr_time_diff[0]:
