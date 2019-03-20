@@ -245,6 +245,7 @@ class Quicklook extends Component{
 		        pace: data.exercise_reporting_ql.pace,
 		        avg_heartrate: data.exercise_reporting_ql.avg_heartrate,
 		        avg_exercise_heartrate:data.exercise_reporting_ql.avg_exercise_heartrate,
+		        avg_non_strength_heartrate: data.exercise_reporting_ql.avg_non_strength_heartrate,
 		        elevation_gain: data.exercise_reporting_ql.elevation_gain,
 		        elevation_loss: data.exercise_reporting_ql.elevation_loss,
 		        effort_level: data.exercise_reporting_ql.effort_level,

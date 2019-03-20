@@ -237,6 +237,9 @@ def get_blank_model_fields(model):
 			'avg_heartrate':json.dumps({}),
 			'activities_duration':json.dumps({}),
 			'avg_exercise_heartrate':0,
+			'avg_non_strength_heartrate':0,
+			'total_exercise_activities':0,
+			'total_strength_activities':0,
 			'elevation_gain':0,
 			'elevation_loss':0,
 			'effort_level':0,
@@ -1167,6 +1170,17 @@ def do_user_has_exercise_activity(combined_user_activities,user_age):
 
 	return have_activities
 
+def is_strength_activity(activity_name):
+	STRENGTH_ACTIVITIES = ("barre_class", "gardening", "pilates",
+						   "piyo-pilates/yoga","yoga","weights",
+						   "snow_shoveling")
+
+	if activity_name and (activity_name.lower() in STRENGTH_ACTIVITIES
+	   					  or "strength" in activity_name.lower()
+	   					  or "skiing" in activity_name.lower()):
+		return True
+	return False
+
 def get_activity_stats(combined_user_activities,user_age):
 
 	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
@@ -1183,7 +1197,9 @@ def get_activity_stats(combined_user_activities,user_age):
 		"activities_duration":json.dumps({}),
 		"hr90_duration_15min":False, # exercised for at least 15 min with atleast avg hr 90
 		"latitude":None,
-		"longitude":None
+		"longitude":None,
+		"total_exercise_activities":0,
+		"total_strength_activities":0
 	}
 	
 	activities_hr = {}
@@ -1209,6 +1225,13 @@ def get_activity_stats(combined_user_activities,user_age):
 			act_duration = obj.get('durationInSeconds',0)
 			obj_act = obj.get('activityType')
 			obj_avg_hr = obj.get('averageHeartRateInBeatsPerMinute')
+
+			if is_strength_activity(obj_act):
+				activity_stats['total_strength_activities'] += 1
+				
+			if obj_act not in IGNORE_ACTIVITY:
+				activity_stats['total_exercise_activities'] += 1
+
 			workout_type_total_duration = workout_wise_total_duration.get(obj_act)
 			if not obj_avg_hr:
 				obj_avg_hr = 0
@@ -2546,7 +2569,7 @@ def get_workout_effort_grade(todays_daily_strong):
 	return cal_workout_effort_level_grade(workout_easy_hard, workout_effort_level)
 
 def get_average_exercise_heartrate_grade(combined_user_activities,
-		todays_daily_strong, age):
+		todays_daily_strong, age, non_strength_only = False):
 	
 	total_duration = 0
 	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
@@ -2554,17 +2577,17 @@ def get_average_exercise_heartrate_grade(combined_user_activities,
 	# If same summary is edited manually then give it more preference.
 	
 	for i,act in enumerate(combined_user_activities):
-
 		if not act.get('averageHeartRateInBeatsPerMinute',None):
 			pass
 		elif act.get('activityType','') in IGNORE_ACTIVITY:
 			pass
 		elif act.get('durationInSeconds',0) < 600: #less than 10 min (600 seconds)
 			pass
+		elif non_strength_only and is_strength_activity(act.get('activityType','')):
+			pass
 		else:
 			final_activities.append(act)
 			total_duration += act.get('durationInSeconds',0)
-
 	if final_activities:
 		avg_hr = 0
 		for act in final_activities:
@@ -2904,6 +2927,8 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		exercise_calculated_data['avg_heartrate'] = activity_stats['avg_heartrate']
 		exercise_calculated_data['workout_duration'] = sec_to_hours_min_sec(activity_stats['total_duration'])
 		exercise_calculated_data['activities_duration'] = activity_stats['activities_duration']
+		exercise_calculated_data['total_exercise_activities'] = activity_stats['total_exercise_activities']
+		exercise_calculated_data['total_strength_activities'] = activity_stats['total_strength_activities']
 
 		# Meters to foot and rounding half up
 		exercise_calculated_data['elevation_gain'] = int(round(safe_sum(combined_user_exercise_activities,
@@ -3038,6 +3063,13 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		grades_calculated_data['avg_exercise_hr_gpa'] = avg_exercise_hr_grade_pts[1]\
 			if avg_exercise_hr_grade_pts[1] else 0
 		exercise_calculated_data['avg_exercise_heartrate'] = avg_exercise_hr_grade_pts[2]\
+			if avg_exercise_hr_grade_pts[2] else 0
+
+		#Average non strength exercise heartrate calculation
+		avg_non_strength_hr_grade_pts = get_average_exercise_heartrate_grade(
+			combined_user_exercise_activities,todays_daily_strong,user_age,
+			non_strength_only=True)
+		exercise_calculated_data['avg_non_strength_heartrate'] = avg_non_strength_hr_grade_pts[2]\
 			if avg_exercise_hr_grade_pts[2] else 0
 
 		# Overall workout grade calculation
