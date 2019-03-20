@@ -76,6 +76,9 @@ def _get_blank_pa_model_fields(model):
 			"cum_workout_duration_in_hours":None,
 			"cum_workout_effort_level":None,
 			"cum_avg_exercise_hr":None,
+			"cum_avg_non_strength_exercise_hr": None,
+			"cum_total_exercise_activities": None,
+			"cum_total_strength_activities": None,
 			"cum_vo2_max":None,
 			"cum_weekly_workout_duration_in_hours":None,
 			"cum_hr_aerobic_duration_hours":None,
@@ -691,6 +694,18 @@ def _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data=None, today_aa_data
 			today_ql_data.exercise_reporting_ql,"avg_exercise_heartrate",0) \
 			+ _safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_avg_exercise_hr",0)
 
+		exercise_stats_cum_data['cum_avg_non_strength_exercise_hr'] = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"avg_non_strength_heartrate",0) \
+			+ _safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_avg_non_strength_exercise_hr",0)
+
+		exercise_stats_cum_data['cum_total_exercise_activities'] = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"total_exercise_activities",0) \
+			+ _safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_total_exercise_activities",0)
+
+		exercise_stats_cum_data['cum_total_strength_activities'] = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"total_strength_activities",0) \
+			+ _safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_total_strength_activities",0)
+
 		exercise_stats_cum_data['cum_vo2_max'] = _safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"vo2_max",0) \
 			+ _safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_vo2_max",0)
@@ -706,6 +721,12 @@ def _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data=None, today_aa_data
 			today_ql_data.exercise_reporting_ql,"avg_exercise_heartrate",0)
 		exercise_stats_cum_data['cum_vo2_max'] = _safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"vo2_max",0)
+		exercise_stats_cum_data['cum_avg_non_strength_exercise_hr'] = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"avg_non_strength_heartrate",0)
+		exercise_stats_cum_data['cum_total_exercise_activities'] = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"total_exercise_activities",0) 
+		exercise_stats_cum_data['cum_total_strength_activities'] = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"total_strength_activities",0)
 		_update_with_aa_cum_sum(today_aa_data,exercise_stats_cum_data) 
 		
 		

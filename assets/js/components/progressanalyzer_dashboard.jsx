@@ -107,9 +107,10 @@ class ProgressDashboard extends Component{
             },
         "exercise":{                
             "workout_duration_hours_min":this.getInitialDur(), 
-                "avg_exercise_heart_rate":this.getInitialDur(),                                      
+                "avg_exercise_heart_rate":this.getInitialDur(),
+                "avg_non_strength_exercise_heart_rate": this.getInitialDur(),                                      
                 "workout_effort_level":this.getInitialDur(),
-                      "vo2_max":this.getInitialDur()              
+                "vo2_max":this.getInitialDur()              
                 },
          "sleep": {
              "prcnt_days_sleep_aid_taken_in_period": this.getInitialDur(),
@@ -1705,6 +1706,17 @@ getGarminStressColors(stressValue){
 					          	<hr  
 	          						
           						/>
+                      <div className = "row justify-content-center">
+                        <div className = "col-md-7 col-sm-7 col-lg-7 text_center1">
+                          AVG Non Strength Activities Heart Rate
+                        </div>
+                        <div className = "col-md-5 col-sm-5 col-lg-5 text_center">
+                          { this.exerciseStatsNoWorkOut(this.renderValue(value.avg_non_strength_exercise_heart_rate,dur)) }
+                        </div>
+                      </div>
+                      <hr  
+                        
+                      />
 					          	<div className = "row justify-content-center">
 					          		<div className = "col-md-7 col-sm-7 col-lg-7 text_center1">
 					          			VO2 Max
