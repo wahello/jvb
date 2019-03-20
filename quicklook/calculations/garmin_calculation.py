@@ -39,6 +39,7 @@ from quicklook.models import UserQuickLook,\
 from quicklook.serializers import UserQuickLookSerializer
 import user_input.views.garmin_views
 from user_input.utils.daily_activity import get_daily_activities_in_base_format
+from hrr.fitbit_aa import belowaerobic_aerobic_anaerobic
 
 def str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
@@ -887,10 +888,10 @@ def get_zones_cutoff(age):
 	start heartbeat
 	'''
 	if age:
-
+		aa_ranges = belowaerobic_aerobic_anaerobic(age)
 		return {
-			"aerobic_zone":180-age-29,
-			"anaerobic_zone":180-age+5
+			"aerobic_zone":aa_ranges[1],
+			"anaerobic_zone":aa_ranges[2]
 		}
 	return None
 
