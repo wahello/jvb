@@ -719,7 +719,7 @@ def _get_alcohol_cum_sum(today_ql_data, yday_cum_data=None):
 			if alcohol_drink_consumed == "20+":
 				alcohol_drink_consumed = 21
 			else:
-				alcohol_drink_consumed = int(alcohol_drink_consumed)
+				alcohol_drink_consumed = float(alcohol_drink_consumed)
 		else:
 			alcohol_drink_consumed = 0
 		return alcohol_drink_consumed
