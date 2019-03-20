@@ -56,7 +56,7 @@ class ToExerciseStatsCumulative(object):
 	def __init__(self,raw_data):
 		self.cum_workout_duration_in_hours = raw_data["cum_workout_duration_in_hours"]
 		self.cum_workout_effort_level = raw_data["cum_workout_effort_level"]
-		self.cum_avg_exercise_hr = raw_data["cum_avg_exercise_hr"],
+		self.cum_avg_exercise_hr = raw_data["cum_avg_exercise_hr"]
 		self.cum_avg_non_strength_exercise_hr = raw_data["cum_avg_non_strength_exercise_hr"]
 		self.cum_total_exercise_activities = raw_data["cum_total_exercise_activities"]
 		self.cum_total_strength_activities = raw_data["cum_total_strength_activities"]
@@ -1996,7 +1996,7 @@ class ProgressReport():
 							todays_data.cum_days_high_stress - 
 							current_data.cum_days_high_stress
 						)
-						total_medium_high_stress_days = days_medium_stress + days_stress_reported
+						total_medium_high_stress_days = days_medium_stress + days_high_stress
 						if days_stress_reported:
 							val = (total_medium_high_stress_days/days_stress_reported)*100
 							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
