@@ -217,6 +217,7 @@ this.state ={
     selectedDate:new Date() ,
     avg_hr: '',
     loadingManualActInfo : false,
+    aa_ranges: {}
 }
 }
 
@@ -352,12 +353,9 @@ addingCommaToSteps(value){
     return x1 + x2;
 }
 successProfile(data){
-    // let today_date = new Date();
-    // let date_of_birth = moment(data.data.date_of_birth);
-    // let today_date1 = moment(moment(today_date).format('YYYY-MM-DD'));
-    // let age = Math.abs(today_date1.diff(date_of_birth, 'years'));
     this.setState({
-        age:data.data.user_age
+        age:data.data.user_age,
+        aa_ranges:data.data.aa_ranges
     })
 }
 
@@ -913,12 +911,13 @@ editToggleHandlerDuration(event){
 }
 
 calculateZone(){
-    let age = this.state.age;
-    let aerobic_zone = 180-age-29;
-    let anaerobic_zone = 180-age+5;
-
+    // let age = this.state.age;
+    // let aerobic_zone = 180-age-29;
+    // let anaerobic_zone = 180-age+5;
+    let aerobic_zone = this.state.aa_ranges.aerobic_range_start
+    let anaerobic_zone = this.state.aa_ranges.anaerobic_range_start
     return {
-        aerobic_zone: aerobic_zone ,
+        aerobic_zone: aerobic_zone,
         anaerobic_zone: anaerobic_zone
     };
 }   

@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from .models import Profile,TermsConditionsText,TermsConditions
+from hrr.fitbit_aa import belowaerobic_aerobic_anaerobic
 
 class UserSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -50,6 +51,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
 		else:
 			return obj.user_age
 
+	def get_user_aa_ranges(self, obj):
+		age = self.get_user_age(obj)
+		aa_ranges = belowaerobic_aerobic_anaerobic(age)
+		return {
+			"aerobic_range_start":aa_ranges[1],
+			"anaerobic_range_start":aa_ranges[2]
+		}
+
 	class Meta:
 		model = Profile
 		fields = ('id','username','email','password','first_name','last_name',
@@ -89,4 +98,5 @@ class UserProfileSerializer(serializers.ModelSerializer):
 	def to_representation(self,instance):
 		serialized_data = super().to_representation(instance)
 		serialized_data['user_age'] = self.get_user_age(instance)
+		serialized_data['aa_ranges'] = self.get_user_aa_ranges(instance)
 		return serialized_data
