@@ -55,11 +55,11 @@ function strToMin(value){
 
 function getGradeStartEndRange(exerciseActiveDuration=null){
 	let gradeRanges = {
-		'A':["04:06","04:06"], //[lower End, higher End]
-		'B':["03:13","04:05"],
-		'C':["02:45","03:12"],
-		'D':["02:01","02:44"],
-		'F':["00:00","02:00"]
+		'A':["03:06","03:06"], //[lower End, higher End]
+		'B':["02:13","03:05"],
+		'C':["01:45","02:12"],
+		'D':["01:01","01:44"],
+		'F':["00:00","01:00"]
 	}
 
 	if(exerciseActiveDuration){
