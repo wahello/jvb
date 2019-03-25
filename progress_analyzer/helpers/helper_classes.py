@@ -623,6 +623,8 @@ class ProgressReport():
 			day_before_from_date = r[0] - timedelta(days=1)
 			todays_ui_data = self.ui_datewise_data.get(
 			self.current_date.strftime("%Y-%m-%d"),None)
+			todays_aa_data = self.aa_datewise_data.get(
+			self.current_date.strftime("%Y-%m-%d"),None)
 		
 			range_start_data = self.cumulative_datewise_data_custom_range.get(
 				day_before_from_date.strftime("%Y-%m-%d"),None
@@ -641,7 +643,7 @@ class ProgressReport():
 				)
 				if range_end_data and yesterday_cum_data:
 					range_end_data = ToCumulativeSum(
-						self.user,range_end_data,todays_ui_data,yesterday_cum_data
+						self.user,range_end_data,todays_ui_data,todays_aa_data,yesterday_cum_data
 					)
 					format_summary_name = False
 
