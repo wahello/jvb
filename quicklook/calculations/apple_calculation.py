@@ -21,14 +21,15 @@ from quicklook.models import (
 	Alcohol
 )
 from apple.models import(
-						UserAppleDataSteps)
+						UserAppleDataSteps,
+						UserAppleDataActivities)
 
 
 from user_input.models import DailyUserInputStrong
 from user_input.models import DailyUserInputOptional
 from apple.views import merge_user_data
 
-from .converter.apple_to_garmin_converter import apple_steps_minutly_to_quartly
+from .converter.apple_to_garmin_converter import apple_steps_minutly_to_quartly,apple_to_garmin_activities
 
 from .converter.fitbit_to_garmin_converter import fitbit_to_garmin_epoch
 
@@ -46,10 +47,10 @@ def get_apple_model_data(model,user,start_date, end_date,
 	# elif model == UserFitbitDataHeartRate:
 	# 	date_field = "date_of_heartrate"
 	# 	data_field = "heartrate_data"
-	# elif model == UserFitbitDataActivities:
-	# 	date_field = "date_of_activities"
-	# 	data_field = "activities_data"
-	if model == UserAppleDataSteps:
+	if model == UserAppleDataActivities:
+	 	date_field = "belong_to"
+	 	data_field = "data"
+	elif model == UserAppleDataSteps:
 		date_field = "belong_to" 
 		data_field = "data"
 	# elif model == UserFitbitDatabody:
@@ -502,17 +503,13 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 			include_all = True)
 		userinput_activities = weekly_user_input_activities[current_date.strftime('%Y-%m-%d')]
 
-		# todays_activity_data = get_fitbit_model_data(
-		# 	UserFitbitDataActivities,user,current_date.date(),current_date.date())
-		# if todays_activity_data:
-		# 	todays_activity_data = ast.literal_eval(todays_activity_data[0].replace(
-		# 		"'activity_fitbit': {...}","'activity_fitbit': {}"))
-		# 	todays_activity_data = todays_activity_data['activities']
+		todays_activity_data = get_apple_model_data(
+			UserAppleDataActivities,user,current_date.date(),current_date.date())
 
-		# if todays_activity_data:
-		# 	todays_activity_data = list(map(fitbit_to_garmin_activities,
-		# 		todays_activity_data))
-
+		if todays_activity_data:
+			todays_activity_data = list(map(apple_to_garmin_activities,
+				todays_activity_data))
+		
 		# combined_user_exercise_activities,combined_user_exec_non_exec_activities =\
 		# 	quicklook.calculations.garmin_calculation.\
 		# 		get_filtered_activity_stats(
