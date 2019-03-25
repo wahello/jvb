@@ -2464,6 +2464,76 @@ def cal_avg_exercise_heartrate_grade(avg_heartrate,workout_easy_hard,age):
 		return (grade, point, avg_heartrate)
 	return (None, None, avg_heartrate)
 
+def cal_resting_hr_grade(resting_hr):
+	if resting_hr >= 30 and resting_hr <= 60:
+		return 'A'
+	elif resting_hr >= 61 and resting_hr <= 68:
+		return 'B'
+	elif resting_hr >= 69 and resting_hr <= 74:
+		return 'C'
+	elif resting_hr >= 75 and resting_hr <= 79:
+		return 'D'
+	elif resting_hr >= 80 or resting_hr < 30:
+		return 'F'
+	else:
+		return 'F'
+
+def cal_active_duration_grade_start_end_range(exercise_active_duration_in_sec=None):
+	grade_ranges = {
+		'A':["03:06","03:06"], #[lower End, higher End]
+		'B':["02:13","03:05"],
+		'C':["01:45","02:12"],
+		'D':["01:01","01:44"],
+		'F':["00:00","01:00"]
+	}
+	if exercise_active_duration_in_sec:
+		EXERCISE_ACTIVE_TIME_CAP_IN_SEC = 3600
+		time_to_deduct = EXERCISE_ACTIVE_TIME_CAP_IN_SEC
+		if exercise_active_duration_in_sec < EXERCISE_ACTIVE_TIME_CAP_IN_SEC:
+			time_to_deduct = exercise_active_duration_in_sec
+		for grade,trange in grade_ranges.items():
+			low_end = _str_to_hours_min_sec(trange[0],"second","hh:mm")
+			high_end = _str_to_hours_min_sec(trange[1],"second","hh:mm")
+			if low_end:
+				grade_ranges[grade][0] = sec_to_hours_min_sec(low_end - time_to_deduct,False)
+			grade_ranges[grade][1]  = sec_to_hours_min_sec(high_end - time_to_deduct, False)
+	return grade_ranges
+
+def get_active_duration_grade(total_duration_in_sec,
+							  exercise_duration_in_sec=None):
+	start_end_range = cal_active_duration_grade_start_end_range(exercise_duration_in_sec)
+	# convert ranges to seconds
+	for grade, ranges in start_end_range.items():
+		start = round(_str_to_hours_min_sec(ranges[0],"seconds","hh:mm"))
+		end = round(_str_to_hours_min_sec(ranges[1],"seconds","hh:mm"))
+		start_end_range[grade][0] = start
+		start_end_range[grade][1] = end
+
+	if total_duration_in_sec >= start_end_range['A'][0]:
+		return 'A'
+	elif total_duration_in_sec >= start_end_range['B'][0]\
+		 and total_duration_in_sec <= start_end_range['B'][1]:
+		return 'B'
+	elif total_duration_in_sec >= start_end_range['C'][0]\
+		 and total_duration_in_sec <= start_end_range['C'][1]:
+		return 'C'
+	elif total_duration_in_sec >= start_end_range['D'][0]\
+		 and total_duration_in_sec <= start_end_range['D'][1]:
+		return 'D'
+	else:
+		return 'F'
+
+def get_garmin_stress_grade(stress):
+	if stress >= 0 and stress <= 25:
+		return 'A'
+	elif stress >= 26 and stress <= 50:
+		return 'B'
+	elif stress >= 51 and stress <= 75:
+		return 'C'
+	else:
+		#there is no 'D' grade for this!
+		return 'F'
+
 def get_avg_sleep_grade(sleep_calendar_date,yesterday_sleep_data,today_sleep_data,
 	user_input_bedtime, user_input_awake_time,user_input_sleep_duration,
 	user_input_timezone,sleep_aid,age):
