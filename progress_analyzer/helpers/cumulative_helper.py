@@ -25,135 +25,70 @@ from progress_analyzer.models import CumulativeSum,\
 	MetaCumulative,\
 	ProgressReportUpdateMeta
 
+def _get_model_not_related_concrete_fields(model):
+	fields_name = [f.name for f in model._meta.get_fields()
+		if f.concrete
+		and not f.auto_created
+		and not f.is_relation
+	]
+	return fields_name
+
 def _get_blank_pa_model_fields(model):
 	if model == "overall_health_grade":
-		fields = {
-			"cum_total_gpa_point":None,
-			"cum_overall_health_gpa_point":None,
-		}
+		fields = {field: None for field
+				  in _get_model_not_related_concrete_fields(OverallHealthGradeCumulative)}
 		return fields
 	elif model == "non_exercise_steps":
-		fields = {
-			"cum_non_exercise_steps":None,
-			"cum_non_exercise_steps_gpa":None,
-			"cum_total_steps":None,
-		}
+		fields = {field: None for field
+				  in _get_model_not_related_concrete_fields(NonExerciseStepsCumulative)}
 		return fields
 	elif model == "sleep_per_night":
-		fields = {
-			"cum_total_sleep_in_hours":None,
-			"cum_overall_sleep_gpa":None,
-			"cum_days_sleep_aid_taken":None,
-			"cum_deep_sleep_in_hours":None,
-			"cum_awake_duration_in_hours":None
-		}
+		fields = {field: None for field
+				  in _get_model_not_related_concrete_fields(SleepPerNightCumulative)}
 		return fields
 	elif model == "mc":
-		fields = {
-			"cum_movement_consistency_gpa":None,
-			"cum_movement_consistency_score":None,
-			"cum_total_active_min":None,
-			"cum_sleep_active_min":None,
-			"cum_exercise_active_min":None,
-			"cum_sleep_hours":None,
-			"cum_exercise_hours":None
-		}
+		fields = {field: None for field
+			  in _get_model_not_related_concrete_fields(MovementConsistencyCumulative)}
 		return fields
 	elif model == "ec":
-		fields = {
-			"cum_avg_exercise_day":None,
-			"cum_exercise_consistency_gpa":None,
-		}
+		fields = {field: None for field
+				  in _get_model_not_related_concrete_fields(ExerciseConsistencyCumulative)}
 		return fields
 	elif model == "nutrition":
-		fields = {
-			"cum_prcnt_unprocessed_food_consumed":None,
-			"cum_prcnt_unprocessed_food_consumed_gpa":None,
-		}
+		fields = {field: None for field
+				  in _get_model_not_related_concrete_fields(NutritionCumulative)}
 		return fields
 	elif model == "exercise_stats":
-		fields = {
-			"cum_workout_duration_in_hours":None,
-			"cum_workout_effort_level":None,
-			"cum_avg_exercise_hr":None,
-			"cum_avg_non_strength_exercise_hr": None,
-			"cum_total_exercise_activities": None,
-			"cum_total_strength_activities": None,
-			"cum_vo2_max":None,
-			"cum_weekly_workout_duration_in_hours":None,
-			"cum_hr_aerobic_duration_hours":None,
-			"cum_hr_anaerobic_duration_hours":None,
-			"cum_hr_below_aerobic_duration_hours":None,
-			"cum_hr_not_recorded_duration_hours":None
-		}
+		fields = {field: None for field
+				  in _get_model_not_related_concrete_fields(ExerciseStatsCumulative)}
 		return fields
 	elif model == "alcohol":
-		fields = {
-			"cum_average_drink_per_week":None,
-			"cum_alcohol_drink_per_week_gpa":None,
-			"cum_alcohol_drink_consumed":None
-		}
+		fields = {field: None for field
+				  in _get_model_not_related_concrete_fields(AlcoholCumulative)}
 		return fields
-
 	elif model == 'sick':
-		fields = {
-			"cum_days_sick":None
-		}
+		fields = {field: None for field
+				  in _get_model_not_related_concrete_fields(SickCumulative)}
 		return fields
 	elif model == 'standing':
-		fields = {
-			"cum_days_stand_three_hour":None
-		}
+		fields = {field: None for field
+				  in _get_model_not_related_concrete_fields(StandingCumulative)}
 		return fields
 	elif model == 'travel':
-		fields = {
-			"cum_days_travel_away_from_home":None
-		}
+		fields = {field: None for field
+				  in _get_model_not_related_concrete_fields(TravelCumulative)}
 		return fields
 	elif model == 'stress':
-		fields = {
-			"cum_days_low_stress":None,
-			"cum_days_medium_stress":None,
-			"cum_days_high_stress":None,
-			"cum_days_garmin_stress_lvl":None
-		}
+		fields = {field: None for field
+				  in _get_model_not_related_concrete_fields(StressCumulative)}
 		return fields
 	elif model == "other_stats":
-		fields = {
-			"cum_resting_hr":None,
-			"cum_hrr_time_to_99_in_mins":None,
-			"cum_hrr_beats_lowered_in_first_min":None,
-			"cum_highest_hr_in_first_min":None,
-			"cum_hrr_lowest_hr_point":None,
-			"cum_hrr_pure_1_min_beats_lowered":None,
-			"cum_hrr_pure_time_to_99":None,
-			"cum_hrr_activity_end_hr":None,
-			"cum_floors_climbed":None
-		}
+		fields = {field: None for field
+				  in _get_model_not_related_concrete_fields(OtherStatsCumulative)}
 		return fields
-
 	elif model == "meta":
-		fields = {
-			"cum_workout_days_count":None,
-			"cum_resting_hr_days_count":None,
-			"cum_effort_level_days_count":None,
-			"cum_vo2_max_days_count":None,
-			"cum_avg_exercise_hr_days_count":None,
-			"cum_hrr_to_99_days_count":None,
-			"cum_hrr_beats_lowered_in_first_min_days_count":None,
-			"cum_highest_hr_in_first_min_days_count":None,
-			"cum_hrr_lowest_hr_point_days_count":None,
-			"cum_mc_recorded_days_count":None,
-			"cum_reported_sick_days_count":None,
-			"cum_reported_stand_three_hours_days_count":None,
-			"cum_reported_stress_days_count":None,
-			"cum_reported_alcohol_days_count":None,
-			"cum_hrr_pure_1_minute_beat_lowered_days_count":None,
-			"cum_hrr_pure_time_to_99_days_count":None,
-			"cum_hrr_activity_end_hr_days_count":None,
-			"cum_sleep_reported_days_count":None,
-			"cum_inputs_reported_days_count":None
-		}
+		fields = {field: None for field
+				  in _get_model_not_related_concrete_fields(MetaCumulative)}
 		return fields
 
 def _str_to_datetime(str_date):
@@ -254,14 +189,6 @@ def _get_model_related_fields_names(model):
 		if (f.one_to_many or f.one_to_one)
 		and f.auto_created and not f.concrete]
 	return related_fields_names
-
-def _get_model_not_related_concrete_fields(model):
-	fields_name = [f.name for f in model._meta.get_fields()
-		if f.concrete 
-		and not f.auto_created 
-		and not f.is_relation
-	]
-	return fields_name
 
 def _get_object_field_data_pair(obj):
 	fields = _get_model_not_related_concrete_fields(obj.__class__)
