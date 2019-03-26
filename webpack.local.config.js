@@ -6,16 +6,16 @@ var path = require('path');
 var nodeModulesDir = path.resolve(__dirname, 'node_modules');
 
 baseConfig[1].entry = [
-  'webpack-dev-server/client?http://localhost:3000',
+  'webpack-dev-server/client?http://192.168.10.91:3000',
   'webpack/hot/only-dev-server',
   'bootstrap-loader',
   './assets/js/index',
 ]
 
-baseConfig[0].output['publicPath'] = 'http://localhost:3000/assets/bundles/';
+baseConfig[0].output['publicPath'] = 'http://192.168.10.91:3000/assets/bundles/';
 baseConfig[1].output = {
   path: path.resolve('./assets/bundles/'),
-  publicPath: 'http://localhost:3000/assets/bundles/',
+  publicPath: 'http://192.168.10.91:3000/assets/bundles/',
   filename: '[name].js',
 }
 
