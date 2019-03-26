@@ -847,6 +847,8 @@ rawDataExportReportOverlay(){
                                       {moment(this.state.selected_date).format('MMMM D, YYYY')}
                                       </span> */}
                                   </span>
+                                  
+                                  </span>
                                   <span  className="calendar_date" onClick={this.toggleDate} id="daterange" style={{color:"white"}}>
 									         {moment(this.state.start_date).format('MMM D, YYYY')} - {moment(this.state.end_date).format('MMM D, YYYY')}
 									        </span>
@@ -867,11 +869,9 @@ rawDataExportReportOverlay(){
                                            </a>
                                           </abbr>
                                           </span>
-                                  </span>
-
                                     
 </div>
-
+								
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
 
 
