@@ -390,8 +390,8 @@ render(){
       
   return(
     <div className="row justify-content-center">
-    
-              <span id="navlink" onClick={this.toggle} id="progress" style={{paddingRight:"20px"}} className={css(styles.cal)}>
+    <div>
+              <span id="navlink" onClick={this.toggle} id="progress" style={{paddingRight:"20px"}}>
                 <FontAwesome
                     name = "calendar"
                     size = "2x"
@@ -401,7 +401,7 @@ render(){
       <Popover placement="bottom" isOpen={this.state.popoverOpen} target="progress" toggle={this.toggle}>
           <PopoverBody> <CalendarWidget onDaySelect={this.processDate}/></PopoverBody>
         </Popover>
-    
+    </div>
      <Table
           rowsCount={rowsCount}
           rowHeight={50}
