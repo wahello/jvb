@@ -1,0 +1,718 @@
+
+.overall_Leaderboard th {
+  font-size: 11px !important;
+  min-width: 48px;
+  padding: 6px;
+}
+.overall_Leaderbord th table td{
+	font-size: 9px ;
+	padding: 5px;
+}
+.overall_Leaderboard tbody td{
+	font-size: 12px !important;
+	padding: 1px;
+}
+.overall_Leaderboard .mov_sticky th{
+	font-size: 11px !important;
+	max-width: 113px !important;
+    min-width: 98px;
+}
+.overall_Leaderboard .mov_sticky + tbody td{
+	font-size: 12px !important;
+	min-width: 90px !important ;
+	padding: 0px !important;	
+}
+.overall_Leaderboard .mov_sticky {
+	position: fixed;
+	top: 0;
+	width: inherit; 
+	background:#fff;
+	border: none;
+}
+.overall_Leaderboard .mov_sticky + tbody .rnk{
+	width:20px;
+	padding:10px !important;
+}
+.overall_Leaderboard .mov_sticky + tbody .slp{
+	width:20px;
+	padding:10px !important;
+}
+.overall_Leaderboard .mov_sticky + tbody .ogpa{
+	width:20px;
+	padding:10px !important;
+}
+.overall_Leaderboard .mov_sticky + tbody .usr{
+	width:20px;
+	padding:10px !important;
+}
+.overall_Leaderboard .mov_sticky + tbody .rhr{
+	width:20px;
+	padding:10px !important;
+}
+.overall_Leaderboard .mov_sticky + tbody .Nes{
+	width:20px;
+	padding:10px !important;
+}
+.overall_Leaderboard .mov_sticky + tbody .MC{
+	width:20px;
+	padding:10px !important;
+}
+.overall_Leaderboard .mov_sticky + tbody .EC{
+	width:20px;
+	padding:10px !important;
+}
+.overall_Leaderboard .mov_sticky + tbody .ed{
+	width:20px;
+	padding:10px !important;
+}
+.overall_Leaderboard .mov_sticky + tbody .ad{
+	width:20px;
+	max-width: 89px !important;
+}
+.overall_Leaderboard .mov_sticky + tbody .vmax{
+	width:20px;
+	padding:10px !important;
+}
+.overall_Leaderboard .mov_sticky + tbody .upf{
+	width:23px;
+	padding:10px !important;
+}
+.overall_Leaderboard .mov_sticky + tbody .alchl_drnk{
+	width:20px;
+	padding:10px !important;
+}
+.overall_Leaderboard .mov_sticky + tbody .ad table tr td{ 
+	    min-width: 48px !important;
+	    max-width: 45px !important;
+	    font-size: 11px !important;
+}
+
+
+@media(max-width: 1300px) and (min-width: 711px) and (orientation: landscape){
+
+	.overall_Leaderboard th{
+		font-size: 11px !important;
+		min-width: 47px !important;
+	}
+	.overall_Leaderboard .mov_sticky th{
+	font-size: 11px !important;
+	max-width: 77px !important;
+	min-width: 70px !important;
+	padding: 5px;
+   }
+   .overall_Leaderboard .mov_sticky th .aa td{
+   	padding:0px !important;
+   }
+   .overall_Leaderboard tbody td{
+	max-width: 55px !important;
+	min-width: 48px !important;
+	font-size: 11px !important;
+	padding: 0px !important;
+   }
+   .overall_Leaderboard tbody .ad table tr td{
+   	min-width: 32px !important;
+   	font-size: 11px !important;
+   }
+   .overall_Leaderboard .mov_sticky + tbody .rnk{
+	min-width: 64px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .usr{
+	min-width: 64px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .slp{
+	min-width: 64px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .ogpa{
+	min-width: 64px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .Nes{
+	min-width: 64px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .MC{
+	min-width: 64px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .EC{
+	min-width: 70px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .rhr{
+	min-width: 64px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .ed{
+	min-width: 64px !important;
+	padding:10px !important;
+ }
+ .overall_Leaderboard .mov_sticky + tbody .ad{
+	min-width: 64px !important;
+ }
+ .overall_Leaderboard .mov_sticky + tbody .vmax{
+	min-width: 64px !important;
+	padding:10px !important;
+ }
+ .overall_Leaderboard .mov_sticky + tbody .upf{
+	min-width: 68px !important;
+	padding:10px !important;
+ }
+ .overall_Leaderboard .mov_sticky + tbody .alchl_drnk{
+	min-width: 63px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .ad table tr td{ 
+	    min-width: 30px !important;
+	    font-size: 10px !important;
+ } 
+}
+
+@media(max-width: 1024px) and (min-width: 320px) and (orientation: portrait){
+ .overall_Leaderboard .mov_sticky + tbody .ad table tr td{ 
+	    min-width: 48px !important;
+	    max-width: 45px !important;
+	    font-size: 10px !important;
+ }
+}
+
+
+
+
+/*I-phone  : x */
+@media(max-width: 813px) and (min-width: 811px) and (orientation: landscape){
+ .overall_Leaderboard .mov_sticky th {
+ 	min-width: 58px !important;
+ 	font-size: 9px !important;
+ 	padding: 6.7px !important;
+ }
+ .overall_Leaderboard th .aa td {
+ 	padding:0px !important;
+ 	height: 25px;
+ }
+  .overall_Leaderboard .mov_sticky th .aa td{
+   	padding:0px !important;
+   	height: 25px;
+   }
+   .overall_Leaderboard tbody .ad table tr td{
+   	min-width: 26px !important;
+   	font-size: 9px !important;
+   }
+.overall_Leaderboard .mov_sticky + tbody .rnk{
+	min-width: 58px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .usr{
+	min-width: 52px !important;
+	padding:10px !important;
+	max-width: 58px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .ogpa{
+	min-width: 58px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .slp{
+	min-width: 58px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .rhr{
+	min-width: 58px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .Nes{
+	min-width: 58px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .MC{
+	min-width: 58px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .EC{
+	min-width: 68px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ed{
+	min-width: 58px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ad{
+	min-width: 58px !important;
+	padding:0px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .vmax{
+	min-width: 58px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .upf{
+	min-width: 72px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .alchl_drnk{
+	min-width: 58px !important;
+	padding:10px !important;
+  }
+
+ .overall_Leaderboard .mov_sticky + tbody .ad table tr td{ 
+	    min-width: 24px !important;
+	    max-width: 45px !important;
+	    font-size: 8px !important;
+ }
+}
+/*iphone -6/7/8 plus*/
+@media(max-width: 737px) and (min-width: 735px) and (orientation: landscape){
+
+	.overall_Leaderboard th{
+		font-size: 9px !important;
+		min-width: 48px !important;
+	}
+	.overall_Leaderboard .mov_sticky th {
+ 	min-width: 50px !important;
+ 	font-size: 9px !important;
+ 	padding: 6.8px !important;
+   }
+    .overall_Leaderboard th .aa td {
+ 	padding:0px !important;
+ 	height: 25px;
+ }
+  .overall_Leaderboard .mov_sticky th .aa td{
+   	padding:0px !important;
+   	height: 25px;
+   }
+   .overall_Leaderboard tbody .ad table tr td{
+   	min-width: 26px !important;
+   	font-size: 8px !important;
+   }
+   .overall_Leaderboard .mov_sticky + tbody td{
+       font-size: 10px !important;
+   }
+   .overall_Leaderboard .mov_sticky + tbody .rnk{
+	min-width: 50px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .usr{
+	min-width: 46px !important;
+	padding:10px !important;
+	max-width: 50px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ogpa{
+	min-width: 50px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .slp{
+	min-width: 50px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .rhr{
+	min-width: 50px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .Nes{
+	min-width: 52px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .MC{
+	min-width: 50px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .EC{
+	min-width: 69px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ed{
+	min-width: 49px !important;
+	padding:10px !important;
+	max-width: 52px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ad{
+	min-width: 50px !important;
+	padding:0px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .vmax{
+	min-width: 49px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .upf{
+	min-width: 71px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .alchl_drnk{
+	min-width: 50px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ad table tr td{ 
+	    min-width: 24px !important;
+	    font-size: 7px !important;
+ }
+
+}
+
+/*pixel 2 -xl*/
+
+@media(max-width: 825px) and (min-width: 822px) and (orientation: landscape){
+
+.overall_Leaderboard .mov_sticky th {
+ 	min-width: 59px !important;
+ 	font-size: 9px !important;
+ 	padding: 6.7px !important;
+ }
+   .overall_Leaderboard th .aa td {
+ 	padding:0px !important;
+ 	height: 25px;
+ }
+  .overall_Leaderboard .mov_sticky th .aa td{
+   	padding:0px !important;
+   	height: 25px;
+   }
+    .overall_Leaderboard tbody .ad table tr td{
+   	min-width: 26px !important;
+   	font-size: 9px !important;
+   }
+ .overall_Leaderboard .mov_sticky + tbody td{
+       font-size: 10px !important;
+   }
+   .overall_Leaderboard .mov_sticky + tbody .rnk{
+	min-width: 53px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .usr{
+	min-width: 46px !important;
+	padding:10px !important;
+	max-width: 53px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ogpa{
+	min-width: 53px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .slp{
+	min-width: 53px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .rhr{
+	min-width: 53px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .Nes{
+	min-width: 53px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .MC{
+	min-width: 53px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .EC{
+	min-width: 61px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ed{
+	min-width: 53px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ad{
+	min-width: 53px !important;
+	padding:0px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .vmax{
+	min-width: 52px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .upf{
+	min-width: 64px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .alchl_drnk{
+	min-width: 51px !important;
+	padding:10px !important;
+  }
+    .overall_Leaderboard .mov_sticky + tbody .ad table tr td{ 
+	    min-width: 24px !important;
+	    font-size: 7px !important;
+ }
+
+}
+
+/*i phone 6/7/8*/
+@media(max-width: 668px) and (min-width: 665px) and (orientation: landscape){
+
+.overall_Leaderboard th {
+  font-size: 7px !important;
+  min-width: 48px;
+  padding: 0px;
+}
+.overall_Leaderboard .mov_sticky th {
+ 	min-width: 46px !important;
+ 	font-size: 8px !important;
+ 	padding: 5.5px !important;
+ }
+
+   .overall_Leaderboard th .aa td {
+ 	padding:0px !important;
+ 	height: 25px;
+ }
+  .overall_Leaderboard .mov_sticky th .aa td{
+   	padding:0px !important;
+   	height: 25px;
+   }
+   .overall_Leaderboard tbody .ad table tr td{
+   	min-width: 26px !important;
+   	font-size: 8px !important;
+   }
+    .overall_Leaderboard tbody td{
+	max-width: 55px !important;
+	min-width: 48px !important;
+	font-size: 9px !important;
+	padding: 0px !important;
+   }
+
+   .overall_Leaderboard .mov_sticky +tbody td{
+   	font-size: 8px !important;
+   }
+
+  .overall_Leaderboard .mov_sticky + tbody .rnk{
+	min-width: 46px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .usr{
+	min-width: 39px !important;
+	padding:10px !important;
+	max-width: 46px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ogpa{
+	min-width: 46px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .slp{
+	min-width: 46px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .rhr{
+	min-width: 46px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .Nes{
+	min-width: 46px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .MC{
+	min-width: 46px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .EC{
+	min-width: 60px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ed{
+	min-width: 46px !important;
+	padding:10px !important;
+	max-width: 46px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ad{
+	min-width: 46px !important;
+	padding:0px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .vmax{
+	min-width: 46px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .upf{
+	min-width: 62px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .alchl_drnk{
+	min-width: 44px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ad table tr td{ 
+	    min-width: 21px !important;
+	    font-size: 7px !important;
+ }
+
+}
+/*galaxy s5*/ /*not mandatory*/
+@media(max-width: 641px) and (min-width: 639px) and (orientation: landscape){
+
+ .overall_Leaderboard th {
+  font-size: 8px !important;
+  min-width: 42px;
+  padding: 0px;
+ }
+ .overall_Leaderboard .mov_sticky th {
+ 	min-width: 52px !important;
+ 	font-size: 8px !important;
+ 	padding: 6px !important;
+  }
+   .overall_Leaderboard  tbody td{
+  	font-size: 8px !important;
+  }
+   .overall_Leaderboard .mov_sticky +tbody td{
+   	font-size: 8px !important;
+   	padding: 0px !important;
+   }
+  .overall_Leaderboard .mov_sticky + tbody .rnk{
+	min-width: 52px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .usr{
+	min-width: 39px !important;
+	padding:10px !important;
+	max-width: 52px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ogpa{
+	min-width: 52px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .slp{
+	min-width: 52px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .rhr{
+	min-width: 52px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .Nes{
+	min-width: 52px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .MC{
+	min-width: 52px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .EC{
+	min-width: 61px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ed{
+	min-width: 52px !important;
+	padding:10px !important;
+	max-width: 50px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ad{
+	min-width: 52px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .vmax{
+	min-width: 52px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .upf{
+	min-width: 64px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .alchl_drnk{
+	min-width: 50px !important;
+	padding:10px !important;
+  }
+
+}
+/*pixel 2*/
+@media(max-width: 733px) and (min-width: 729px) and (orientation: landscape){
+  
+  .overall_Leaderboard th {
+  font-size: 8px !important;
+  min-width: 31px;
+  padding: 6px;
+  }
+  .overall_Leaderboard .mov_sticky th {
+ 	min-width: 52px !important;
+ 	font-size: 8px !important;
+ 	padding: 6px !important;
+  }
+  .overall_Leaderboard  tbody td{
+  	font-size: 8px !important;
+  }
+   .overall_Leaderboard th .aa td {
+ 	padding:0px !important;
+ 	height: 25px;
+ }
+  .overall_Leaderboard .mov_sticky th .aa td{
+   	padding:0px !important;
+   	height: 25px;
+   }
+   .overall_Leaderboard tbody .ad table tr td{
+   	min-width: 26px !important;
+   	font-size: 8px !important;
+   }
+  .overall_Leaderboard .mov_sticky + tbody td{
+  	font-size: 8px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .rnk{
+	min-width: 52px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .usr{
+	min-width: 39px !important;
+	padding:10px !important;
+	max-width: 52px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ogpa{
+	min-width: 52px !important;
+	padding:10px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .slp{
+	min-width: 52px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .rhr{
+	min-width: 52px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .Nes{
+	min-width: 52px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .MC{
+	min-width: 52px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .EC{
+	min-width: 61px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ed{
+	min-width: 52px !important;
+	padding:10px !important;
+	max-width: 50px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ad{
+	min-width: 52px !important;
+	padding:0px !important;
+  }
+  .overall_Leaderboard .mov_sticky + tbody .vmax{
+	min-width: 52px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .upf{
+	min-width: 64px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .alchl_drnk{
+	min-width: 50px !important;
+	padding:10px !important;
+  }
+   .overall_Leaderboard .mov_sticky + tbody .ad table tr td{ 
+	    min-width: 25px !important;
+	    font-size: 7px !important;
+ }
+  
+}
+
+
+@media(max-width: 769px) and (min-width: 766px) and (orientation: portrait){
+.overall_Leaderboard{
+	padding:20px ;
+ }
+ .overall_Leaderboard th {
+  font-size: 8px !important;
+  min-width: 31px;
+  padding: 6px;
+  }
+  .overall_Leaderboard .mov_sticky th {
+ 	min-width: 52px !important;
+ 	font-size: 8px !important;
+ 	padding: 6px !important;
+  }
+  .overall_Leaderboard  tbody td{
+  	font-size: 8px !important;
+  }
+}
