@@ -25,6 +25,12 @@ from progress_analyzer.models import CumulativeSum,\
 	MetaCumulative,\
 	ProgressReportUpdateMeta
 
+from quicklook.calculations.garmin_calculation import\
+	cal_non_exercise_step_grade,\
+	get_active_duration_grade,\
+	cal_resting_hr_grade,\
+	get_garmin_stress_grade
+
 def _get_model_not_related_concrete_fields(model):
 	fields_name = [f.name for f in model._meta.get_fields()
 		if f.concrete
@@ -264,6 +270,88 @@ def _create_cumulative_instance(user, data):
 	StressCumulative.objects.create(user_cum = user_cum, **data['stress_cum'])
 	MetaCumulative.objects.create(user_cum = user_cum, **data['meta_cum'])
 
+def _update_grade_days_cum_sum(grade,grade_days_prefix,catg_data,
+							   today_ql_data,yday_catg_cum_data=None):
+	'''
+	It's small framework to get the cumulative sum for the grade
+	bifurcation keys for various categories dynamically. For example -
+	cum_days_ohg_got_a,cum_days_ohg_got_b, cum_days_nes_got_a etc.
+
+	It's worth noting that all the fields have on thing common,
+	they all ends with some grade ('a', 'b', 'c', 'd', 'f') and
+	only prefix is changing. For example in [cum_days_ohg_got_a,
+	cum_days_ohg_got_b, cum_days_ohg_got_c, cum_days_ohg_got_d,
+	cum_days_ohg_got_f], they have common prefix "cum_days_ohg_got".
+	So we can dynamicall generate the keys for all grades and
+	calculate the cumulative sum without writing extra lines of
+	code for each grade.
+
+	Args:
+		grade(string): Grade for particular category
+		grade_days_prefix(string): string preceding the grade
+			in category key. For example in "cum_days_ohg_got_b"
+			"cum_days_ohg_got" is the prefix.
+		catg_data(dict): Dictionary which holds cumulative sum
+			for given category.
+		today_ql_data: Today quick look data
+		yday_catg_cum_data: Cumulative data for given category
+	'''
+	grades = ['a','b','c','d','f']
+	grade_days_keys = [grade_days_prefix+'_'+grade for grade in grades]
+	target_grade_key = None
+	if grade:
+		target_grade_key = grade_days_prefix+'_'+grade.lower()
+	for key in grade_days_keys:
+		if today_ql_data and yday_catg_cum_data:
+			if target_grade_key and target_grade_key == key:
+				catg_data[key] = 1 + _safe_get_mobj(yday_catg_cum_data,key,0)
+			else:
+				catg_data[key] = _safe_get_mobj(yday_catg_cum_data,key,0)
+		elif today_ql_data:
+			if target_grade_key and target_grade_key == key:
+				catg_data[key] = 1
+			else:
+				catg_data[key] = 0
+	return catg_data
+
+def _update_steps_milestone_cum_sum(steps, steps_days_prefix, catg_data,
+									today_ql_data, yday_catg_cum_data=None):
+	'''
+	It's small framework to get the cumulative sum for the steps
+	bifurcation keys for total and non-exercise steps category
+	dynamically. It's very similar to the framework for grade
+	bifurcation.
+	'''
+	milestones = ['10k','20k','25k','30k','40k']
+	steps_days_keys = [steps_days_prefix+'_'+m for m in milestones]
+	if steps > 40000:
+		milestone_key = '40k'
+	elif steps >= 30000:
+		milestone_key = '30k'
+	elif steps >= 25000:
+		milestone_key = '25k'
+	elif steps >= 20000:
+		milestone_key = '20k'
+	elif steps > 10000:
+		milestone_key = '10k'
+	else:
+		milestone_key = None
+
+	if milestone_key:
+		milestone_key = steps_days_prefix+'_'+milestone_key
+
+	for key in steps_days_keys:
+		if today_ql_data and yday_catg_cum_data:
+			if milestone_key and milestone_key == key:
+				catg_data[key] = 1 + _safe_get_mobj(yday_catg_cum_data,key,0)
+			else:
+				catg_data[key] = _safe_get_mobj(yday_catg_cum_data,key,0)
+		elif today_ql_data:
+			if milestone_key and milestone_key == key:
+				catg_data[key] = 1
+			else:
+				catg_data[key] = 0
+	return catg_data
 
 def _get_overall_health_grade_cum_sum(today_ql_data, yday_cum_data=None):
 	overall_health_grade_cal_data = _get_blank_pa_model_fields("overall_health_grade")
@@ -293,6 +381,7 @@ def _get_overall_health_grade_cum_sum(today_ql_data, yday_cum_data=None):
 
 	if today_ql_data and yday_cum_data:
 		total_gpa_point = _cal_total_point(today_ql_data)
+		today_ohg_grade = _safe_get_mobj(today_ql_data.grades_ql,"overall_health_grade",'')
 
 		overall_health_grade_cal_data['cum_total_gpa_point'] = _safe_get_mobj(
 			yday_cum_data.overall_health_grade_cum,"cum_total_gpa_point",0) + total_gpa_point
@@ -300,40 +389,87 @@ def _get_overall_health_grade_cum_sum(today_ql_data, yday_cum_data=None):
 		overall_health_grade_cal_data['cum_overall_health_gpa_point'] = _safe_get_mobj(
 			today_ql_data.grades_ql,"overall_health_gpa",0)\
 			+ _safe_get_mobj(yday_cum_data.overall_health_grade_cum,"cum_overall_health_gpa_point",0)
+		
+		_update_grade_days_cum_sum(today_ohg_grade, 'cum_days_ohg_got',
+								   overall_health_grade_cal_data, today_ql_data,
+								   yday_cum_data.overall_health_grade_cum)
+
 	elif today_ql_data:
+		today_ohg_grade = _safe_get_mobj(today_ql_data.grades_ql,"overall_health_grade",'')
 		overall_health_grade_cal_data['cum_total_gpa_point'] = _cal_total_point(today_ql_data)
 		overall_health_grade_cal_data['cum_overall_health_gpa_point'] = _safe_get_mobj(
 			today_ql_data.grades_ql,"overall_health_gpa",0)
 
-	return overall_health_grade_cal_data
+		_update_grade_days_cum_sum(today_ohg_grade, 'cum_days_ohg_got',
+								   overall_health_grade_cal_data, today_ql_data)
 
+	return overall_health_grade_cal_data
 
 def _get_non_exercise_steps_cum_sum(today_ql_data, yday_cum_data=None):
 	non_exercise_steps_cum_data = _get_blank_pa_model_fields("non_exercise_steps")
-	GRADE_POINT = _get_grading_sheme()
 
 	if today_ql_data and yday_cum_data:
+		nes_grade = _safe_get_mobj(today_ql_data.grades_ql,"movement_non_exercise_steps_grade",'')
+
+		ts_grade = cal_non_exercise_step_grade(
+			_safe_get_mobj(today_ql_data.steps_ql,"total_steps",0))[0]
+
+		non_exercise_steps = _safe_get_mobj(today_ql_data.steps_ql, "non_exercise_steps",0)
+		total_steps = _safe_get_mobj(today_ql_data.steps_ql, "total_steps",0)
+
 		non_exercise_steps_cum_data['cum_non_exercise_steps_gpa'] = _safe_get_mobj(
 			today_ql_data.grades_ql,"movement_non_exercise_steps_gpa",0)\
 			+ _safe_get_mobj(yday_cum_data.non_exercise_steps_cum,"cum_non_exercise_steps_gpa",0)
 
-		non_exercise_steps_cum_data['cum_non_exercise_steps'] = _safe_get_mobj(
-			today_ql_data.steps_ql, "non_exercise_steps",0)\
+		non_exercise_steps_cum_data['cum_non_exercise_steps'] = non_exercise_steps\
 			+ _safe_get_mobj(yday_cum_data.non_exercise_steps_cum,"cum_non_exercise_steps",0)
 
-		non_exercise_steps_cum_data['cum_total_steps'] = _safe_get_mobj(
-			today_ql_data.steps_ql, "total_steps",0)\
+		non_exercise_steps_cum_data['cum_total_steps'] = total_steps\
 			+ _safe_get_mobj(yday_cum_data.non_exercise_steps_cum,"cum_total_steps",0)
 
-	elif today_ql_data:
-		non_exercise_steps_cum_data['cum_non_exercise_steps_gpa'] = GRADE_POINT[_safe_get_mobj(
-			today_ql_data.grades_ql,"movement_non_exercise_steps_grade",'F')]
-			
-		non_exercise_steps_cum_data['cum_non_exercise_steps'] = _safe_get_mobj(
-			today_ql_data.steps_ql, "non_exercise_steps",0)
+		_update_grade_days_cum_sum(nes_grade, 'cum_days_nes_got',
+								   non_exercise_steps_cum_data, today_ql_data,
+								   yday_cum_data.non_exercise_steps_cum)
 
-		non_exercise_steps_cum_data['cum_total_steps'] = _safe_get_mobj(
-			today_ql_data.steps_ql, "total_steps",0)
+		_update_grade_days_cum_sum(ts_grade, 'cum_days_ts_got',
+								   non_exercise_steps_cum_data, today_ql_data,
+								   yday_cum_data.non_exercise_steps_cum)
+
+		_update_steps_milestone_cum_sum(non_exercise_steps, 'cum_days_nes_above',
+										non_exercise_steps_cum_data, today_ql_data,
+										yday_cum_data.non_exercise_steps_cum)
+
+		_update_steps_milestone_cum_sum(total_steps, 'cum_days_ts_above',
+										non_exercise_steps_cum_data, today_ql_data,
+										yday_cum_data.non_exercise_steps_cum)
+
+	elif today_ql_data:
+		nes_grade = _safe_get_mobj(today_ql_data.grades_ql,"movement_non_exercise_steps_grade",'')
+		
+		ts_grade = cal_non_exercise_step_grade(
+			_safe_get_mobj(today_ql_data.steps_ql,"total_steps",0))[0]
+
+		non_exercise_steps = _safe_get_mobj(today_ql_data.steps_ql, "non_exercise_steps",0)
+		total_steps = _safe_get_mobj(today_ql_data.steps_ql, "total_steps",0)
+
+		non_exercise_steps_cum_data['cum_non_exercise_steps_gpa'] = _safe_get_mobj(
+			today_ql_data.grades_ql,"movement_non_exercise_steps_gpa",0)
+			
+		non_exercise_steps_cum_data['cum_non_exercise_steps'] = non_exercise_steps
+
+		non_exercise_steps_cum_data['cum_total_steps'] = total_steps
+
+		_update_grade_days_cum_sum(nes_grade, 'cum_days_nes_got',
+								   non_exercise_steps_cum_data, today_ql_data)
+
+		_update_grade_days_cum_sum(ts_grade, 'cum_days_ts_got',
+								   non_exercise_steps_cum_data, today_ql_data)
+
+		_update_steps_milestone_cum_sum(non_exercise_steps, 'cum_days_nes_above',
+										non_exercise_steps_cum_data, today_ql_data)
+
+		_update_steps_milestone_cum_sum(total_steps, 'cum_days_ts_above',
+										non_exercise_steps_cum_data, today_ql_data)
 
 	return non_exercise_steps_cum_data
 
@@ -347,6 +483,7 @@ def _get_sleep_per_night_cum_sum(today_ql_data, yday_cum_data=None):
 		return _str_to_hours_min_sec(sleep_duration)
 
 	if today_ql_data and yday_cum_data:
+		sleep_grade = _safe_get_mobj(today_ql_data.grades_ql,"avg_sleep_per_night_grade","")
 		sleep_per_night_cum_data['cum_overall_sleep_gpa'] = _safe_get_mobj(
 			today_ql_data.grades_ql,"avg_sleep_per_night_gpa",0) \
 			+ _safe_get_mobj(yday_cum_data.sleep_per_night_cum,"cum_overall_sleep_gpa",0)
@@ -370,7 +507,12 @@ def _get_sleep_per_night_cum_sum(today_ql_data, yday_cum_data=None):
 			)+_safe_get_mobj(yday_cum_data.sleep_per_night_cum,"cum_awake_duration_in_hours",0),3
 		)
 
+		_update_grade_days_cum_sum(sleep_grade,"cum_days_sleep_got",
+								   sleep_per_night_cum_data,today_ql_data,
+								   yday_cum_data.sleep_per_night_cum)
+
 	elif today_ql_data:
+		sleep_grade = _safe_get_mobj(today_ql_data.grades_ql,"avg_sleep_per_night_grade","")
 		sleep_per_night_cum_data['cum_overall_sleep_gpa'] =_safe_get_mobj(
 			today_ql_data.grades_ql,"avg_sleep_per_night_gpa",0)
 			
@@ -390,6 +532,8 @@ def _get_sleep_per_night_cum_sum(today_ql_data, yday_cum_data=None):
 				_safe_get_mobj(today_ql_data.sleep_ql,"awake_time",None),time_pattern="hh:mm"
 			),3
 		)
+		_update_grade_days_cum_sum(sleep_grade,"cum_days_sleep_got",
+								   sleep_per_night_cum_data,today_ql_data)
 
 	return sleep_per_night_cum_data
 
@@ -440,6 +584,12 @@ def _get_mc_active_min_sleep_exercise_hours(ql_data):
 def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 	mc_cum_data = _get_blank_pa_model_fields("mc")
 	GRADE_POINT = _get_grading_sheme()
+	
+	def have_mc_data(today_ql_data):
+		have_mc = _safe_get_mobj(
+			today_ql_data.steps_ql,"movement_consistency",None)
+		return True if have_mc else False
+
 	def _get_mc_score(ql_data):
 		mc = _safe_get_mobj(ql_data.steps_ql,"movement_consistency",None)
 		if mc:
@@ -448,6 +598,7 @@ def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 			inactive_hours += int(mc.get('no_data_hours',0))
 			return inactive_hours
 		return 0
+
 	if today_ql_data and yday_cum_data:
 		active_min_sleep_exercise_hours = (
 			_get_mc_active_min_sleep_exercise_hours(today_ql_data))
@@ -456,6 +607,20 @@ def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 		exercise_active_min = active_min_sleep_exercise_hours[2]
 		sleep_mins = active_min_sleep_exercise_hours[3]
 		exercise_mins = active_min_sleep_exercise_hours[4]
+		total_active_dur_sec = round(total_active_min * 60)
+		exercise_active_dur_sec = round(exercise_active_min * 60)
+		mc_grade = _safe_get_mobj(
+			today_ql_data.grades_ql,"movement_consistency_grade","")
+		total_act_min_grade = get_active_duration_grade(total_active_dur_sec)
+		act_dur_no_sleep_exec_grade = get_active_duration_grade(total_active_dur_sec,
+														  		exercise_active_dur_sec)
+		if not have_mc_data(today_ql_data):
+			# If there is no movement consistency data then
+			# total active duration and active duration excluding
+			# sleep and exercise will get default 'F' grade
+			# which should be ignored
+			total_act_min_grade = ""
+			act_dur_no_sleep_exec_grade = ""
 
 		mc_cum_data['cum_movement_consistency_gpa'] = (GRADE_POINT[
 			_safe_get_mobj(
@@ -488,6 +653,19 @@ def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 			+ _safe_get_mobj(yday_cum_data.movement_consistency_cum,
 			"cum_exercise_hours",0))
 
+		_update_grade_days_cum_sum(mc_grade, 'cum_days_mcs_got',
+								   mc_cum_data, today_ql_data,
+								   yday_cum_data.movement_consistency_cum)
+
+		_update_grade_days_cum_sum(total_act_min_grade, 'cum_days_total_act_min_got',
+								   mc_cum_data, today_ql_data,
+								   yday_cum_data.movement_consistency_cum)
+
+		_update_grade_days_cum_sum(act_dur_no_sleep_exec_grade,
+								   'cum_days_act_min_no_sleep_exec_got',
+								   mc_cum_data, today_ql_data,
+								   yday_cum_data.movement_consistency_cum)
+
 	elif today_ql_data:
 		active_min_sleep_exercise_hours = (
 			_get_mc_active_min_sleep_exercise_hours(today_ql_data))
@@ -496,6 +674,20 @@ def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 		exercise_active_min = active_min_sleep_exercise_hours[2]
 		sleep_mins = active_min_sleep_exercise_hours[3]
 		exercise_mins = active_min_sleep_exercise_hours[4]
+		total_active_dur_sec = round(total_active_min * 60)
+		exercise_active_dur_sec = round(exercise_active_min * 60)
+		mc_grade = _safe_get_mobj(
+			today_ql_data.grades_ql,"movement_consistency_grade","")
+		total_act_min_grade = get_active_duration_grade(total_active_dur_sec)
+		act_dur_no_sleep_exec_grade = get_active_duration_grade(total_active_dur_sec,
+														  exercise_active_dur_sec)
+		if not have_mc_data(today_ql_data):
+			# If there is no movement consistency data then
+			# total active duration and active duration excluding
+			# sleep and exercise will get default 'F' grade
+			# which should be ignored
+			total_act_min_grade = ""
+			act_dur_no_sleep_exec_grade = ""
 		
 		mc_cum_data['cum_movement_consistency_gpa'] = GRADE_POINT[
 			_safe_get_mobj(
@@ -509,6 +701,15 @@ def _get_mc_cum_sum(today_ql_data, yday_cum_data=None):
 		mc_cum_data['cum_exercise_active_min'] = exercise_active_min
 		mc_cum_data['cum_sleep_hours'] = sleep_mins
 		mc_cum_data['cum_exercise_hours'] = exercise_mins
+
+		_update_grade_days_cum_sum(mc_grade, 'cum_days_mcs_got',
+								   mc_cum_data, today_ql_data)
+
+		_update_grade_days_cum_sum(total_act_min_grade, 'cum_days_total_act_min_got',
+								   mc_cum_data, today_ql_data)
+
+		_update_grade_days_cum_sum(act_dur_no_sleep_exec_grade, 'cum_days_act_min_no_sleep_exec_got',
+								   mc_cum_data, today_ql_data)
 		
 	return mc_cum_data
 
@@ -518,6 +719,9 @@ def _get_ec_cum_sum(today_ql_data, yday_cum_data=None):
 	GRADE_POINT = _get_grading_sheme()
 
 	if today_ql_data and yday_cum_data:
+		ec_grade = _safe_get_mobj(today_ql_data.grades_ql,
+								  "exercise_consistency_grade","")
+
 		ec_cum_data['cum_exercise_consistency_gpa'] = GRADE_POINT[_safe_get_mobj(
 			today_ql_data.grades_ql,"exercise_consistency_grade","F")] \
 			+ _safe_get_mobj(yday_cum_data.exercise_consistency_cum,"cum_exercise_consistency_gpa",0)
@@ -525,13 +729,23 @@ def _get_ec_cum_sum(today_ql_data, yday_cum_data=None):
 		ec_cum_data["cum_avg_exercise_day"] = _safe_get_mobj(
 			today_ql_data.grades_ql,"exercise_consistency_score",0) \
 			+ _safe_get_mobj(yday_cum_data.exercise_consistency_cum,"cum_avg_exercise_day",0)
+
+		_update_grade_days_cum_sum(ec_grade, 'cum_days_ec_got',
+								   ec_cum_data, today_ql_data,
+								   yday_cum_data.exercise_consistency_cum)
 	
 	elif today_ql_data:
+		ec_grade = _safe_get_mobj(today_ql_data.grades_ql,
+								  "exercise_consistency_grade","")
+
 		ec_cum_data['cum_exercise_consistency_gpa'] = GRADE_POINT[_safe_get_mobj(
 			today_ql_data.grades_ql,"exercise_consistency_grade","F")] 
 
 		ec_cum_data["cum_avg_exercise_day"] = _safe_get_mobj(
 			today_ql_data.grades_ql,"exercise_consistency_score",0)
+
+		_update_grade_days_cum_sum(ec_grade, 'cum_days_ec_got',
+								   ec_cum_data, today_ql_data)
 	
 	return ec_cum_data
 
@@ -540,20 +754,32 @@ def _get_nutrition_cum_sum(today_ql_data, yday_cum_data=None):
 	nutrition_cum_data = _get_blank_pa_model_fields("nutrition")
 
 	if today_ql_data and yday_cum_data:
+		ufood_grade = _safe_get_mobj(today_ql_data.grades_ql,
+									 "prcnt_unprocessed_food_consumed_grade","")
 		nutrition_cum_data['cum_prcnt_unprocessed_food_consumed_gpa'] = _safe_get_mobj(
 			today_ql_data.grades_ql,"prcnt_unprocessed_food_consumed_gpa",0) \
 			+ _safe_get_mobj(yday_cum_data.nutrition_cum,"cum_prcnt_unprocessed_food_consumed_gpa",0)
 
 		nutrition_cum_data['cum_prcnt_unprocessed_food_consumed'] = _safe_get_mobj(
 			today_ql_data.food_ql,"prcnt_non_processed_food",0)\
-			+ _safe_get_mobj(yday_cum_data.nutrition_cum,"cum_prcnt_unprocessed_food_consumed",0)	 
+			+ _safe_get_mobj(yday_cum_data.nutrition_cum,"cum_prcnt_unprocessed_food_consumed",0)
+
+		_update_grade_days_cum_sum(ufood_grade, 'cum_days_ufood_got',
+								   nutrition_cum_data, today_ql_data,
+								   yday_cum_data.nutrition_cum)
 	
 	elif today_ql_data:
+		ufood_grade = _safe_get_mobj(today_ql_data.grades_ql,
+									 "prcnt_unprocessed_food_consumed_grade","")
+
 		nutrition_cum_data['cum_prcnt_unprocessed_food_consumed_gpa'] = _safe_get_mobj(
 			today_ql_data.grades_ql,"prcnt_unprocessed_food_consumed_gpa",0)
 
 		nutrition_cum_data['cum_prcnt_unprocessed_food_consumed'] = _safe_get_mobj(
 			today_ql_data.food_ql,"prcnt_non_processed_food",0)
+
+		_update_grade_days_cum_sum(ufood_grade, 'cum_days_ufood_got',
+								   nutrition_cum_data, today_ql_data)
 
 	return nutrition_cum_data
 
@@ -607,8 +833,22 @@ def _update_with_aa_cum_sum(today_aa_data, exercise_stats_cum_data, yday_cum_dat
 
 def _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data=None, today_aa_data=None):
 	exercise_stats_cum_data = _get_blank_pa_model_fields("exercise_stats")
+	def is_valid_grade(grade, today_ql_data):
+		if grade.lower() == 'f':
+			# Check if there is actually some workout duration or not.
+			# If there is no workout duration, that means this 'F' grade
+			# is given by default and should be ignored.
+			workout_dur = _str_to_hours_min_sec(_safe_get_mobj(
+				today_ql_data.exercise_reporting_ql,"workout_duration",None
+			))
+			return True if workout_dur else False
+		return True
 
 	if today_ql_data and yday_cum_data:
+		workout_grade = _safe_get_mobj(today_ql_data.grades_ql,"workout_duration_grade","")
+		if not is_valid_grade(workout_grade, today_ql_data):
+			workout_grade = ""
+
 		exercise_stats_cum_data['cum_workout_duration_in_hours'] = round(_str_to_hours_min_sec(_safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"workout_duration",None)) \
 			+ _safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_workout_duration_in_hours",0),3)
@@ -638,8 +878,16 @@ def _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data=None, today_aa_data
 			+ _safe_get_mobj(yday_cum_data.exercise_stats_cum,"cum_vo2_max",0)
 
 		_update_with_aa_cum_sum(today_aa_data,exercise_stats_cum_data,yday_cum_data)
+
+		_update_grade_days_cum_sum(workout_grade,"cum_days_workout_dur_got",
+								   exercise_stats_cum_data,today_ql_data,
+								   yday_cum_data.exercise_stats_cum)
 	
 	elif today_ql_data:
+		workout_grade = _safe_get_mobj(today_ql_data.grades_ql,"workout_duration_grade","")
+		if not is_valid_grade(workout_grade, today_ql_data):
+			workout_grade = ""
+
 		exercise_stats_cum_data['cum_workout_duration_in_hours'] = _str_to_hours_min_sec(_safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"workout_duration",None)) 
 		exercise_stats_cum_data['cum_workout_effort_level'] = _safe_get_mobj(
@@ -654,7 +902,11 @@ def _get_exercise_stats_cum_sum(today_ql_data, yday_cum_data=None, today_aa_data
 			today_ql_data.exercise_reporting_ql,"total_exercise_activities",0) 
 		exercise_stats_cum_data['cum_total_strength_activities'] = _safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"total_strength_activities",0)
-		_update_with_aa_cum_sum(today_aa_data,exercise_stats_cum_data) 
+
+		_update_with_aa_cum_sum(today_aa_data,exercise_stats_cum_data)
+
+		_update_grade_days_cum_sum(workout_grade,"cum_days_workout_dur_got",
+								   exercise_stats_cum_data,today_ql_data)
 		
 		
 	return exercise_stats_cum_data
@@ -675,6 +927,9 @@ def _get_alcohol_cum_sum(today_ql_data, yday_cum_data=None):
 	alcohol_cum_data = _get_blank_pa_model_fields("alcohol")
 	
 	if today_ql_data and yday_cum_data:
+		alcohol_grade = _safe_get_mobj(today_ql_data.grades_ql,
+									   "alcoholic_drink_per_week_grade","")
+
 		alcohol_cum_data['cum_average_drink_per_week'] = _safe_get_mobj(
 			today_ql_data.alcohol_ql,"alcohol_week",0) \
 			+ _safe_get_mobj(yday_cum_data.alcohol_cum,"cum_average_drink_per_week",0)
@@ -688,8 +943,15 @@ def _get_alcohol_cum_sum(today_ql_data, yday_cum_data=None):
 			
 		alcohol_cum_data['cum_alcohol_drink_consumed'] = alcohol_drink_consumed \
 			+ _safe_get_mobj(yday_cum_data.alcohol_cum,"cum_alcohol_drink_consumed",0)
+
+		_update_grade_days_cum_sum(alcohol_grade,"cum_days_alcohol_week_got",
+								   alcohol_cum_data, today_ql_data,
+								   yday_cum_data.alcohol_cum)
 	
 	elif today_ql_data:
+		alcohol_grade = _safe_get_mobj(today_ql_data.grades_ql,
+									   "alcoholic_drink_per_week_grade","")
+
 		alcohol_cum_data['cum_average_drink_per_week'] = _safe_get_mobj(
 			today_ql_data.alcohol_ql,"alcohol_week",0) 
 
@@ -700,6 +962,9 @@ def _get_alcohol_cum_sum(today_ql_data, yday_cum_data=None):
 			_safe_get_mobj(today_ql_data.alcohol_ql,"alcohol_day",0))
 			
 		alcohol_cum_data['cum_alcohol_drink_consumed'] = alcohol_drink_consumed
+
+		_update_grade_days_cum_sum(alcohol_grade,"cum_days_alcohol_week_got",
+								   alcohol_cum_data, today_ql_data)
 
 	return alcohol_cum_data
 
@@ -840,8 +1105,13 @@ def _get_other_stats_cum_sum(today_ql_data,user_hrr_data,yday_cum_data=None):
 	other_stats_cum_data = _get_blank_pa_model_fields("other_stats")
 
 	if today_ql_data and yday_cum_data:
-		other_stats_cum_data['cum_resting_hr'] = _safe_get_mobj(
-			today_ql_data.exercise_reporting_ql,"resting_hr_last_night",0) \
+		resting_hr = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"resting_hr_last_night",0)
+		resting_hr_grade = None
+		if resting_hr:
+			resting_hr_grade = cal_resting_hr_grade(resting_hr)
+
+		other_stats_cum_data['cum_resting_hr'] = resting_hr\
 			+ _safe_get_mobj(yday_cum_data.other_stats_cum, "cum_resting_hr",0)
 
 		other_stats_cum_data['cum_hrr_time_to_99_in_mins'] = (
@@ -901,9 +1171,18 @@ def _get_other_stats_cum_sum(today_ql_data,user_hrr_data,yday_cum_data=None):
 			today_ql_data.steps_ql,"floor_climed",0) \
 			+ _safe_get_mobj(yday_cum_data.other_stats_cum,"cum_floors_climbed",0)
 
+		_update_grade_days_cum_sum(resting_hr_grade,"cum_days_resting_hr_got",
+								   other_stats_cum_data,today_ql_data,
+								   yday_cum_data.other_stats_cum)
+
 	elif today_ql_data:
-		other_stats_cum_data['cum_resting_hr'] = _safe_get_mobj(
+		resting_hr = _safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"resting_hr_last_night",0)
+		resting_hr_grade = None
+		if resting_hr:
+			resting_hr_grade = cal_resting_hr_grade(resting_hr)
+
+		other_stats_cum_data['cum_resting_hr'] = resting_hr
 
 		other_stats_cum_data['cum_hrr_time_to_99_in_mins'] = user_hrr_data[
 			'hrr_time_to_99'
@@ -934,6 +1213,8 @@ def _get_other_stats_cum_sum(today_ql_data,user_hrr_data,yday_cum_data=None):
 		other_stats_cum_data['cum_floors_climbed'] = _safe_get_mobj(
 			today_ql_data.steps_ql,"floor_climed",0)
 
+		_update_grade_days_cum_sum(resting_hr_grade,"cum_days_resting_hr_got",
+								   other_stats_cum_data,today_ql_data)
 	return other_stats_cum_data
 
 def _get_sick_cum_sum(today_ql_data, yday_cum_data=None):
@@ -1025,8 +1306,17 @@ def _get_stress_cum_sum(today_ql_data, yday_cum_data=None):
 
 		garmin_stress_level = _safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"heartrate_variability_stress",-1)
+		garmin_stress_level_grade = ''
+		if garmin_stress_level and garmin_stress_level > 0:
+			garmin_stress_level_grade = get_garmin_stress_grade(garmin_stress_level)
+
 		stress_cum_data["cum_days_garmin_stress_lvl"] = garmin_stress_level + \
 			_safe_get_mobj(yday_cum_data.stress_cum,"cum_days_garmin_stress_lvl",0)
+
+		_update_grade_days_cum_sum(garmin_stress_level_grade,
+								   "cum_garmin_stress_days_got",
+								   stress_cum_data,today_ql_data,
+								   yday_cum_data.stress_cum)
 
 	elif today_ql_data:
 		stress_level = _safe_get_mobj(
@@ -1043,7 +1333,15 @@ def _get_stress_cum_sum(today_ql_data, yday_cum_data=None):
 
 		garmin_stress_level = _safe_get_mobj(
 			today_ql_data.exercise_reporting_ql,"heartrate_variability_stress",-1)
+		garmin_stress_level_grade = ''
+		if garmin_stress_level and garmin_stress_level > 0:
+			garmin_stress_level_grade = get_garmin_stress_grade(garmin_stress_level)
+
 		stress_cum_data["cum_days_garmin_stress_lvl"] = garmin_stress_level
+
+		_update_grade_days_cum_sum(garmin_stress_level_grade,
+								   "cum_garmin_stress_days_got",
+								   stress_cum_data,today_ql_data)
 
 	return stress_cum_data
 
@@ -1176,6 +1474,11 @@ def _get_meta_cum_sum(today_ql_data, today_ui_data, user_hrr_data,
 		meta_cum_data['cum_inputs_reported_days_count'] = reported_inputs\
 			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_inputs_reported_days_count",0)
 
+		garmin_stress_level = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"heartrate_variability_stress",-1)
+		have_garmin_stress = 1 if garmin_stress_level and garmin_stress_level > 0 else 0
+		meta_cum_data['cum_have_garmin_stress_days_count'] = have_garmin_stress\
+			+ _safe_get_mobj(yday_cum_data.meta_cum,"cum_have_garmin_stress_days_count",0)
 
 	elif today_ql_data:
 		workout_dur = _str_to_hours_min_sec(_safe_get_mobj(
@@ -1263,6 +1566,11 @@ def _get_meta_cum_sum(today_ql_data, today_ui_data, user_hrr_data,
 
 		reported_inputs = 1 if today_ui_data else 0
 		meta_cum_data['cum_inputs_reported_days_count'] = reported_inputs
+
+		garmin_stress_level = _safe_get_mobj(
+			today_ql_data.exercise_reporting_ql,"heartrate_variability_stress",-1)
+		have_garmin_stress = 1 if garmin_stress_level and garmin_stress_level > 0 else 0
+		meta_cum_data['cum_have_garmin_stress_days_count'] = have_garmin_stress
 		
 	return meta_cum_data
 
