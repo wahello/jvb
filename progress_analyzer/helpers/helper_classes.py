@@ -10,156 +10,108 @@ from .cumulative_helper import _get_datewise_aa_data
 from quicklook.calculations import garmin_calculation
 from quicklook.models import UserQuickLook
 from user_input.models import UserDailyInput
-from progress_analyzer.models import CumulativeSum
-from progress_analyzer.helpers.cumulative_helper import create_cum_raw_data
+from progress_analyzer.models import CumulativeSum,\
+	OverallHealthGradeCumulative, \
+	NonExerciseStepsCumulative, \
+	SleepPerNightCumulative, \
+	MovementConsistencyCumulative, \
+	ExerciseConsistencyCumulative, \
+	NutritionCumulative, \
+	ExerciseStatsCumulative, \
+	AlcoholCumulative,\
+	SickCumulative,\
+	StandingCumulative,\
+	TravelCumulative,\
+	StressCumulative,\
+	OtherStatsCumulative,\
+	MetaCumulative
+from progress_analyzer.helpers.cumulative_helper import\
+	create_cum_raw_data,\
+	_get_model_not_related_concrete_fields
 
 class ToOverallHealthGradeCumulative(object):
 	def __init__(self,raw_data):
-		self.cum_total_gpa_point = raw_data["cum_total_gpa_point"]
-		self.cum_overall_health_gpa_point = raw_data["cum_overall_health_gpa_point"]
+		fields = _get_model_not_related_concrete_fields(OverallHealthGradeCumulative)
+		for field in fields:
+			setattr(self, field, raw_data[field])
 
 class ToNonExerciseStepsCumulative(object):
 	def __init__(self,raw_data):
-		self.cum_non_exercise_steps = raw_data["cum_non_exercise_steps"]
-		self.cum_non_exercise_steps_gpa = raw_data["cum_non_exercise_steps_gpa"]
-		self.cum_total_steps = raw_data["cum_total_steps"]
+		fields = _get_model_not_related_concrete_fields(NonExerciseStepsCumulative)
+		for field in fields:
+			setattr(self, field, raw_data[field])
 
 class ToSleepPerNightCumulative(object):
 	def __init__(self,raw_data):
-		self.cum_total_sleep_in_hours = raw_data["cum_total_sleep_in_hours"]
-		self.cum_overall_sleep_gpa = raw_data["cum_overall_sleep_gpa"]
-		self.cum_days_sleep_aid_taken = raw_data["cum_days_sleep_aid_taken"]
-		self.cum_deep_sleep_in_hours = raw_data["cum_deep_sleep_in_hours"]
-		self.cum_awake_duration_in_hours = raw_data["cum_awake_duration_in_hours"]
+		fields = _get_model_not_related_concrete_fields(SleepPerNightCumulative)
+		for field in fields:
+			setattr(self, field, raw_data[field])
 
 class ToMovementConsistencyCumulative(object):
 	def __init__(self,raw_data):
-		self.cum_movement_consistency_gpa = raw_data["cum_movement_consistency_gpa"]
-		self.cum_movement_consistency_score = raw_data["cum_movement_consistency_score"]
-		self.cum_total_active_min = raw_data["cum_total_active_min"]
-		self.cum_sleep_active_min = raw_data["cum_sleep_active_min"]
-		self.cum_exercise_active_min = raw_data["cum_exercise_active_min"]
-		self.cum_sleep_hours = raw_data["cum_sleep_hours"]
-		self.cum_exercise_hours = raw_data["cum_exercise_hours"]
+		fields = _get_model_not_related_concrete_fields(MovementConsistencyCumulative)
+		for field in fields:
+			setattr(self, field, raw_data[field])
 
 class ToExerciseConsistencyCumulative(object):
 	def __init__(self,raw_data):
-		self.cum_avg_exercise_day = raw_data["cum_avg_exercise_day"]
-		self.cum_exercise_consistency_gpa = raw_data["cum_exercise_consistency_gpa"]
+		fields = _get_model_not_related_concrete_fields(ExerciseConsistencyCumulative)
+		for field in fields:
+			setattr(self, field, raw_data[field])
 
 class ToNutritionCumulative(object):
 	def __init__(self,raw_data):
-		self.cum_prcnt_unprocessed_food_consumed = raw_data["cum_prcnt_unprocessed_food_consumed"]
-		self.cum_prcnt_unprocessed_food_consumed_gpa = raw_data["cum_prcnt_unprocessed_food_consumed_gpa"]
+		fields = _get_model_not_related_concrete_fields(NutritionCumulative)
+		for field in fields:
+			setattr(self, field, raw_data[field])
 
 class ToExerciseStatsCumulative(object):
 	def __init__(self,raw_data):
-		self.cum_workout_duration_in_hours = raw_data["cum_workout_duration_in_hours"]
-		self.cum_workout_effort_level = raw_data["cum_workout_effort_level"]
-		self.cum_avg_exercise_hr = raw_data["cum_avg_exercise_hr"]
-		self.cum_avg_non_strength_exercise_hr = raw_data["cum_avg_non_strength_exercise_hr"]
-		self.cum_total_exercise_activities = raw_data["cum_total_exercise_activities"]
-		self.cum_total_strength_activities = raw_data["cum_total_strength_activities"]
-		self.cum_vo2_max = raw_data["cum_vo2_max"]
-		# This stores workout duration per day from A/A chart 1
-		# For some reason we were storing weekly workout duration
-		# earlier but later we changed it. So please don't get
-		# confused with the name. 
-		self.cum_weekly_workout_duration_in_hours = raw_data["cum_weekly_workout_duration_in_hours"]
-		self.cum_hr_aerobic_duration_hours = raw_data["cum_hr_aerobic_duration_hours"]
-		self.cum_hr_anaerobic_duration_hours = raw_data["cum_hr_anaerobic_duration_hours"]
-		self.cum_hr_below_aerobic_duration_hours = raw_data["cum_hr_below_aerobic_duration_hours"]
-		self.cum_hr_not_recorded_duration_hours = raw_data["cum_hr_not_recorded_duration_hours"]
+		fields = _get_model_not_related_concrete_fields(ExerciseStatsCumulative)
+		for field in fields:
+			setattr(self, field, raw_data[field])
 
 class ToAlcoholCumulative(object):
 	def __init__(self,raw_data):
-		self.cum_average_drink_per_week = raw_data["cum_average_drink_per_week"]
-		self.cum_alcohol_drink_per_week_gpa = raw_data["cum_alcohol_drink_per_week_gpa"]
-		self.cum_alcohol_drink_consumed = raw_data["cum_alcohol_drink_consumed"]
+		fields = _get_model_not_related_concrete_fields(AlcoholCumulative)
+		for field in fields:
+			setattr(self, field, raw_data[field])
 
 class ToSickCumulative(object):
 	def __init__(self,raw_data):
-		self.cum_days_sick = raw_data["cum_days_sick"]
+		fields = _get_model_not_related_concrete_fields(SickCumulative)
+		for field in fields:
+			setattr(self, field, raw_data[field])
 
 class ToStressCumulative(object):
 	def __init__(self,raw_data):
-		self.cum_days_low_stress = raw_data["cum_days_low_stress"]
-		self.cum_days_medium_stress = raw_data["cum_days_medium_stress"]
-		self.cum_days_high_stress = raw_data["cum_days_high_stress"]
-		self.cum_days_garmin_stress_lvl = raw_data["cum_days_garmin_stress_lvl"]
+		fields = _get_model_not_related_concrete_fields(StressCumulative)
+		for field in fields:
+			setattr(self, field, raw_data[field])
 
 class ToTravelCumulative(object):
 	def __init__(self,raw_data):
-		self.cum_days_travel_away_from_home = raw_data["cum_days_travel_away_from_home"]
+		fields = _get_model_not_related_concrete_fields(TravelCumulative)
+		for field in fields:
+			setattr(self, field, raw_data[field])
 
 class ToStandingCumulative(object):
 	def __init__(self,raw_data):
-		self.cum_days_stand_three_hour = raw_data["cum_days_stand_three_hour"]
+		fields = _get_model_not_related_concrete_fields(StandingCumulative)
+		for field in fields:
+			setattr(self, field, raw_data[field])
 
 class ToOtherStatsCumulative(object):
 	def __init__(self,raw_data):
-		self.cum_resting_hr = raw_data["cum_resting_hr"]
-		self.cum_hrr_time_to_99_in_mins = raw_data[
-			"cum_hrr_time_to_99_in_mins"]
-		self.cum_hrr_beats_lowered_in_first_min = raw_data[
-			"cum_hrr_beats_lowered_in_first_min"]
-		self.cum_highest_hr_in_first_min = raw_data[
-			"cum_highest_hr_in_first_min"]
-		self.cum_hrr_lowest_hr_point = raw_data[
-			"cum_hrr_lowest_hr_point"]
-		self.cum_hrr_pure_1_min_beats_lowered = raw_data[
-			"cum_hrr_pure_1_min_beats_lowered"]
-		self.cum_hrr_pure_time_to_99 = raw_data[
-			"cum_hrr_pure_time_to_99"]
-		self.cum_hrr_activity_end_hr = raw_data[
-			"cum_hrr_activity_end_hr"]
-		self.cum_floors_climbed = raw_data["cum_floors_climbed"]
+		fields = _get_model_not_related_concrete_fields(OtherStatsCumulative)
+		for field in fields:
+			setattr(self, field, raw_data[field])
 
 class ToMetaCumulative(object):
 	def __init__(self,raw_data):
-		self.cum_inputs_reported_days_count = raw_data["cum_inputs_reported_days_count"]
-		self.cum_workout_days_count = raw_data["cum_workout_days_count"]
-		self.cum_resting_hr_days_count = raw_data["cum_resting_hr_days_count"]
-		self.cum_effort_level_days_count = raw_data["cum_effort_level_days_count"]
-		self.cum_vo2_max_days_count = raw_data["cum_vo2_max_days_count"]
-		self.cum_avg_exercise_hr_days_count = raw_data["cum_avg_exercise_hr_days_count"]
-		self.cum_hrr_to_99_days_count = raw_data["cum_hrr_to_99_days_count"]
-		self.cum_hrr_beats_lowered_in_first_min_days_count = raw_data[
-			"cum_hrr_beats_lowered_in_first_min_days_count"
-		]
-		self.cum_highest_hr_in_first_min_days_count = raw_data[
-			"cum_highest_hr_in_first_min_days_count"
-		]
-		self.cum_hrr_lowest_hr_point_days_count = raw_data[
-			"cum_hrr_lowest_hr_point_days_count"
-		]
-		self.cum_mc_recorded_days_count = raw_data[
-			"cum_mc_recorded_days_count"
-		]
-		self.cum_reported_alcohol_days_count = raw_data[
-			"cum_reported_alcohol_days_count"
-		]
-		self.cum_reported_sick_days_count = raw_data[
-			"cum_reported_sick_days_count"
-		]
-		self.cum_reported_stand_three_hours_days_count = raw_data[
-			"cum_reported_stand_three_hours_days_count"
-		]
-		self.cum_reported_stress_days_count = raw_data[
-			"cum_reported_stress_days_count"
-		]
-		self.cum_hrr_pure_1_minute_beat_lowered_days_count = raw_data[
-			"cum_hrr_pure_1_minute_beat_lowered_days_count"
-		]
-		self.cum_hrr_pure_time_to_99_days_count = raw_data[
-			"cum_hrr_pure_time_to_99_days_count"
-		]
-		self.cum_hrr_activity_end_hr_days_count = raw_data[
-			"cum_hrr_activity_end_hr_days_count"
-		]
-		self.cum_sleep_reported_days_count = raw_data[
-			"cum_sleep_reported_days_count"
-		]
+		fields = _get_model_not_related_concrete_fields(MetaCumulative)
+		for field in fields:
+			setattr(self, field, raw_data[field])
 
 class ToCumulativeSum(object):
 	'''
@@ -1488,6 +1440,10 @@ class ProgressReport():
 
 				elif key == 'prcnt_aerobic_duration':
 					if todays_meta_data and current_meta_data:
+						# This stores workout duration per day from A/A chart 1
+						# For some reason we were storing weekly workout duration
+						# earlier but later we changed it. So please don't get
+						# confused with the name.
 						total_workout_duration = todays_data.cum_weekly_workout_duration_in_hours\
 												 - current_data.cum_weekly_workout_duration_in_hours
 						total_aerobic_duration = todays_data.cum_hr_aerobic_duration_hours\
