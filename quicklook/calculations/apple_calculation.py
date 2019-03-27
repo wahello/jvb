@@ -294,58 +294,6 @@ def get_avg_sleep_grade(ui_sleep_duration,sleep_per_wearable,age,sleep_aid):
 		return grade_point
 	return (None,None)
 
-def get_exercise_steps(trans_activity_data):
-	total_execrcise_steps = 0
-	for i,single_activity in enumerate(trans_activity_data):
-		total_execrcise_steps = total_execrcise_steps + float(single_activity.get("steps",0))
-	return total_execrcise_steps
-
-def makeformat(trans_activity_data,current_date,last_seven_days_date):
-	formated_data = OrderedDict()
-	while(last_seven_days_date <= current_date):
-		formated_data[last_seven_days_date.strftime('%Y-%m-%d')]=[]
-		last_seven_days_date += timedelta(days=1)
-	fitbt_act = None
-	if trans_activity_data:
-			for i,single_activity in enumerate(trans_activity_data):
-				activity_start_time = trans_activity_data[i][0]["startTimeInSeconds"]
-				activity_offset = trans_activity_data[i][0]["startTimeOffsetInSeconds"]
-				actvity_date = datetime.utcfromtimestamp(activity_start_time
-					+ activity_offset).strftime("%Y-%m-%d")
-				if actvity_date:
-					# if datetime.strptime(actvity_date,'%Y-%m-%d') <= current_date:
-					formated_data[actvity_date] = single_activity	
-	return formated_data
-
-def get_exercise_consistency_grade(user,current_date,user_age,weekly_user_input_activities):
-	trans_activity_data = []
-	last_seven_days_date = current_date - timedelta(days=6)
-	week_activity_data = UserFitbitDataActivities.objects.filter(
-		Q(created_at__gte = last_seven_days_date)&
-		Q(created_at__lte = current_date),
-		user=user).order_by('created_at')
-	daily_strong = list(DailyUserInputStrong.objects.filter(
-			Q(user_input__created_at__gte = last_seven_days_date)&
-			Q(user_input__created_at__lte = current_date),
-			user_input__user = user).order_by('user_input__created_at'))
-	weekly_daily_strong = quicklook.calculations.garmin_calculation.get_weekly_user_input_data(
-		daily_strong,current_date,last_seven_days_date)
-	if week_activity_data:
-		for i in range(0,len(week_activity_data)):
-			todays_activity_data = ast.literal_eval(week_activity_data[i].activities_data.replace(
-				"'activity_fitbit': {...}","'activity_fitbit': {}"))
-			todays_activity_data = todays_activity_data.get('activities')
-			if todays_activity_data:
-				trans_activity_data.append(list(map(fitbit_to_garmin_activities,todays_activity_data)))
-	formated_data = makeformat(trans_activity_data,current_date,last_seven_days_date)
-	weekly_combined_activities = quicklook.calculations.\
-		garmin_calculation.get_weekly_combined_activities(
-			formated_data,{},weekly_user_input_activities,
-			last_seven_days_date,current_date,user_age)
-	exe_consistency_grade,exe_consistency_point = quicklook.calculations.\
-		garmin_calculation.get_exercise_consistency_grade(
-			weekly_daily_strong,weekly_combined_activities,7,user_age)
-	return (exe_consistency_grade,exe_consistency_point)
 
 def get_unprocessed_food_grade(daily_strong_input,current_date):
 	'''
@@ -393,8 +341,14 @@ def calculate_apple_steps(user,start_date):
 	if apple_data:
 		for index,single_activity in enumerate(apple_data[0]):
 			total_apple_steps = total_apple_steps + float(single_activity.get("steps",0))
+
 	return total_apple_steps
 
+def get_exercise_steps_apple(todays_activity_data):
+	total_steps = 0
+	for i,single_activity in enumerate(todays_activity_data):
+		total_steps = total_steps + int(single_activity.get("steps",0))
+	return total_steps
 
 def create_apple_quick_look(user,from_date=None,to_date=None):
 	'''
@@ -505,11 +459,16 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 
 		todays_activity_data = get_apple_model_data(
 			UserAppleDataActivities,user,current_date.date(),current_date.date())
-
+		
 		if todays_activity_data:
 			todays_activity_data = list(map(apple_to_garmin_activities,
 				todays_activity_data))
 		
+		if todays_activity_data:
+			apple_exrcise_steps = get_exercise_steps_apple(todays_activity_data[0])
+		else:
+			return todays_activity_data
+
 		# combined_user_exercise_activities,combined_user_exec_non_exec_activities =\
 		# 	quicklook.calculations.garmin_calculation.\
 		# 		get_filtered_activity_stats(
@@ -721,8 +680,8 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 		# 		combined_user_exec_non_exec_activities,
 		# 		user_age
 		# 	)	
-		# steps_calculated_data['non_exercise_steps'] = non_exercise_steps
-		# steps_calculated_data['exercise_steps'] = exercise_steps
+		steps_calculated_data['non_exercise_steps'] = total_steps_apple - apple_exrcise_steps
+		steps_calculated_data['exercise_steps'] = apple_exrcise_steps
 		steps_calculated_data['total_steps'] = total_steps_apple
 		# print(steps_calculated_data['total_steps'],"KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK")
 
