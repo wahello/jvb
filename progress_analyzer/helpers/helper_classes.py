@@ -704,8 +704,103 @@ class ProgressReport():
 		}
 		return SUMMARY_CALCULATOR_BINDING
 
+	def _create_grade_keys(self, prefix, grades=[]):
+		if not grades:
+			grades = ['a','b','c','d','f']
+		return [prefix+'_'+grade for grade in grades]
+
+	def _create_prcnt_grade_keys(self, prefix, grades=[]):
+		if not grades:
+			grades = ['a','b','c','d','f']
+		return ['prcnt_'+prefix+'_'+grade for grade in grades]
+
+	def _create_steps_milestone_keys(self, prefix, milestones=[]):
+		if not milestones:
+			milestones = ['10k','20k','25k','30k','40k']
+		return [prefix+'_'+milestone for milestone in milestones]
+
+	def _create_prcnt_steps_milestone_keys(self, prefix, milestones=[]):
+		if not milestones:
+			milestones = ['10k','20k','25k','30k','40k']
+		return ['prcnt_'+prefix+'_'+milestone for milestone in milestones]
+
+	def _cal_grade_days_over_period(self, today_catg_data, current_catg_data,
+									key, days_over_period=None):
+		'''
+		Calculate the grade bifurcation for given category for example,
+		number of days got A for overall health gpa (cum_ohg_days_got_a)
+		etc.
+		'''
+		days_till_today = today_catg_data.__dict__[key]
+		days_till_current = current_catg_data.__dict__[key]
+		val = days_till_today - days_till_current
+		if val and days_over_period is not None and not days_over_period:
+			return 0
+		return val
+
+	def _cal_prcnt_grade_over_period(self, today_catg_data,current_catg_data,
+										  key,duration_type, days_over_period=None):
+		'''
+		Calculate the percentage for grade bifurcation for given
+		category for example, percentage number of days got A for
+		overall health gpa (prcnt_ohg_days_got_a) for given duration
+		etc.
+
+		Args:
+			duration_type(string): today, yesterday, week, month, year etc.
+			days_over_period (int): Manual Number of days over the period
+				default to None
+		'''
+		denominator = self.duration_denominator.get(duration_type)
+		if days_over_period:
+			denominator = days_over_period
+		# create grade key from percentage key
+		# example - prcnt_ohg_days_got_a -> cum_ohg_days_got_a
+		grade_key = key.replace("prcnt","cum")
+		days_till_today = today_catg_data.__dict__[grade_key]
+		days_till_current = current_catg_data.__dict__[grade_key]
+		val = days_till_today - days_till_current
+		prcnt = 0
+		if denominator:
+			prcnt = (val/denominator)*100
+			prcnt = int(Decimal(prcnt).quantize(0,ROUND_HALF_UP))
+		return prcnt
+
+	def _cal_steps_milestone_days_over_period(self, today_catg_data, current_catg_data, key):
+		'''
+		Calculate the steps bifurcation for non-exercise or total steps.
+		for example, number of days got total steps over 10,000
+		(cum_ts_days_above_10k) etc.
+		'''
+		days_till_today = today_catg_data.__dict__[key]
+		days_till_current = current_catg_data.__dict__[key]
+		val = days_till_today - days_till_current
+		return val
+
+	def _cal_prcnt_steps_milestone_over_period(self, today_catg_data, current_catg_data,
+											   key, duration_type):
+		'''
+		Calculate the percentage for steps bifurcation for total or
+		non-exercise steps for example, percentage number of days got
+		steps over 10,000 (prcnt_ts_days_above_10k)for given duration.
+
+		Args:
+			duration_type(string): today, yesterday, week, month, year etc.
+		'''
+		denominator = self.duration_denominator.get(duration_type)
+		grade_key = key.replace("prcnt","cum")
+		days_till_today = today_catg_data.__dict__[grade_key]
+		days_till_current = current_catg_data.__dict__[grade_key]
+		val = days_till_today - days_till_current
+		prcnt = 0
+		if denominator:
+			prcnt = (val/denominator)*100
+			prcnt = int(Decimal(prcnt).quantize(0,ROUND_HALF_UP))
+		return prcnt
 
 	def _cal_overall_health_summary(self,custom_daterange = False):
+		grades_bifurcation_keys = self._create_grade_keys('cum_days_ohg_got')
+		grades_prcnt_bifurcation_keys = self._create_prcnt_grade_keys('days_ohg_got')
 
 		def _calculate(key,alias,todays_data,current_data,
 			todays_meta_data,current_meta_data):
@@ -731,6 +826,15 @@ class ProgressReport():
 							current_data.cum_overall_health_gpa_point,alias
 						)
 					)[0]
+
+				elif key in grades_bifurcation_keys:
+					return self._cal_grade_days_over_period(todays_data,
+															current_data,
+															key)
+				elif key in grades_prcnt_bifurcation_keys:
+					return self._cal_prcnt_grade_over_period(todays_data,
+																  current_data,
+																  key, alias)
 			return None
 
 		calculated_data = {
@@ -738,6 +842,11 @@ class ProgressReport():
 			'overall_health_gpa':{d:None for d in self.duration_type},
 			'overall_health_gpa_grade':{d:None for d in self.duration_type}
 		}
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_bifurcation_keys})
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_prcnt_bifurcation_keys})
+
 		summary_type = "overall_health_grade_cum"
 
 		if custom_daterange:
@@ -752,6 +861,16 @@ class ProgressReport():
 		return calculated_data
 
 	def _cal_non_exercise_summary(self,custom_daterange = False):
+		grades_bifurcation_keys = self._create_grade_keys('cum_days_nes_got')
+		grades_bifurcation_keys += self._create_grade_keys('cum_days_ts_got')
+		grades_prcnt_bifurcation_keys = self._create_prcnt_grade_keys('days_ts_got')
+		grades_prcnt_bifurcation_keys += self._create_prcnt_grade_keys('days_nes_got')
+		milestone_bifurcation_keys = self._create_steps_milestone_keys('cum_days_nes_above')
+		milestone_bifurcation_keys += self._create_steps_milestone_keys('cum_days_ts_above')
+		milestone_prcnt_bifurcation_keys = self._create_prcnt_steps_milestone_keys(
+			'days_nes_above')
+		milestone_prcnt_bifurcation_keys += self._create_prcnt_steps_milestone_keys(
+			'days_ts_above')
 
 		def _calculate(key, alias,todays_data,current_data,
 			todays_meta_data,current_meta_data):
@@ -792,6 +911,23 @@ class ProgressReport():
 					exercise_steps = total_steps - non_exec_steps
 					return int(Decimal(exercise_steps).quantize(0,ROUND_HALF_UP))
 
+				elif key in grades_bifurcation_keys:
+					return self._cal_grade_days_over_period(todays_data,
+															current_data,
+															key)
+				elif key in grades_prcnt_bifurcation_keys:
+					return self._cal_prcnt_grade_over_period(todays_data,
+															 current_data,
+															 key, alias)
+				elif key in milestone_bifurcation_keys:
+					return self._cal_steps_milestone_days_over_period(todays_data,
+															current_data,
+															key)
+				elif key in milestone_prcnt_bifurcation_keys:
+					return self._cal_prcnt_steps_milestone_over_period(todays_data,
+															 current_data,
+															 key, alias)
+
 			return None
 
 		calculated_data = {
@@ -801,6 +937,15 @@ class ProgressReport():
 			'total_steps':{d:None for d in self.duration_type},
 			'exercise_steps':{d:None for d in self.duration_type}
 		}
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_bifurcation_keys})
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_prcnt_bifurcation_keys})
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in milestone_bifurcation_keys})
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in milestone_prcnt_bifurcation_keys})
+
 		summary_type = "non_exercise_steps_cum"
 
 		if custom_daterange:
@@ -815,6 +960,8 @@ class ProgressReport():
 		return calculated_data
 
 	def _cal_sleep_summary(self,custom_daterange = False):
+		grades_bifurcation_keys = self._create_grade_keys('cum_days_sleep_got')
+		grades_prcnt_bifurcation_keys = self._create_prcnt_grade_keys('days_sleep_got')
 
 		def _get_sleep_grade_from_point_for_ranges(point):
 			if point < 1:
@@ -932,6 +1079,23 @@ class ProgressReport():
 							prcnt = int(Decimal(prcnt).quantize(0,ROUND_HALF_UP))
 						return prcnt
 
+				elif key in grades_bifurcation_keys:
+					if todays_meta_data and current_meta_data:
+						sleep_days = (
+							todays_meta_data.cum_sleep_reported_days_count - 
+							current_meta_data.cum_sleep_reported_days_count
+						)
+						return self._cal_grade_days_over_period(todays_data,current_data,
+																key, sleep_days)
+				elif key in grades_prcnt_bifurcation_keys:
+					if todays_meta_data and current_meta_data:
+						sleep_days = (
+							todays_meta_data.cum_sleep_reported_days_count - 
+							current_meta_data.cum_sleep_reported_days_count
+						)
+						return self._cal_prcnt_grade_over_period(todays_data,current_data,
+																 key, alias, sleep_days)
+
 			return None
 
 		calculated_data = {
@@ -943,6 +1107,11 @@ class ProgressReport():
 			'prcnt_days_sleep_aid_taken_in_period':{d:None for d in self.duration_type},
 			'overall_sleep_gpa':{d:None for d in self.duration_type},
 		}
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_bifurcation_keys})
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_prcnt_bifurcation_keys})
+
 		summary_type = "sleep_per_night_cum"
 
 		if custom_daterange:
@@ -957,6 +1126,12 @@ class ProgressReport():
 		return calculated_data
 
 	def _cal_movement_consistency_summary(self,custom_daterange = False):
+		grades_bifurcation_keys = self._create_grade_keys('cum_days_mcs_got')
+		grades_bifurcation_keys += self._create_grade_keys('cum_days_total_act_min_got')
+		grades_bifurcation_keys += self._create_grade_keys('cum_days_act_min_no_sleep_exec_got')
+		grades_prcnt_bifurcation_keys = self._create_prcnt_grade_keys('days_mcs_got')
+		grades_prcnt_bifurcation_keys += self._create_prcnt_grade_keys('days_total_act_min_got')
+		grades_prcnt_bifurcation_keys += self._create_prcnt_grade_keys('days_act_min_no_sleep_exec_got')
 
 		def _cal_custom_average(stat1, stat2,days):
 			if not stat1 == None and not stat2 == None and days:
@@ -1213,6 +1388,18 @@ class ProgressReport():
 						else:
 							return "Not Reported"
 
+				elif key in grades_bifurcation_keys:
+					mc_days = todays_meta_data.cum_mc_recorded_days_count\
+							  - current_meta_data.cum_mc_recorded_days_count
+					return self._cal_grade_days_over_period(todays_data,current_data,
+															key, mc_days)
+				elif key in grades_prcnt_bifurcation_keys:
+					if todays_meta_data and current_meta_data:
+						mc_days = todays_meta_data.cum_mc_recorded_days_count\
+							  	  - current_meta_data.cum_mc_recorded_days_count
+						return self._cal_prcnt_grade_over_period(todays_data,current_data,
+															 	 key, alias, mc_days)
+
 			return None
 
 		calculated_data = {
@@ -1228,6 +1415,11 @@ class ProgressReport():
 			'active_minutes_without_sleep_exercise':{d:None for d in self.duration_type},
 			'active_minutes_without_sleep_exercise_prcnt':{d:None for d in self.duration_type},
 		}
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_bifurcation_keys})
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_prcnt_bifurcation_keys})
+
 		summary_type = "movement_consistency_cum"
 
 		if custom_daterange:
@@ -1242,6 +1434,8 @@ class ProgressReport():
 		return calculated_data
 
 	def _cal_exercise_consistency_summary(self,custom_daterange = False):
+		grades_bifurcation_keys = self._create_grade_keys('cum_days_ec_got')
+		grades_prcnt_bifurcation_keys = self._create_prcnt_grade_keys('days_ec_got')
 
 		def _calculate(key,alias,todays_data,current_data,
 			todays_meta_data,current_meta_data):
@@ -1264,6 +1458,15 @@ class ProgressReport():
 							current_data.cum_avg_exercise_day,alias
 						)
 					)[0]
+
+				elif key in grades_bifurcation_keys:
+					return self._cal_grade_days_over_period(todays_data,
+															current_data,
+															key)
+				elif key in grades_prcnt_bifurcation_keys:
+					return self._cal_prcnt_grade_over_period(todays_data,
+															 current_data,
+															 key, alias)
 			return None
 
 		calculated_data = {
@@ -1271,6 +1474,11 @@ class ProgressReport():
 			'exercise_consistency_grade':{d:None for d in self.duration_type},
 			'exercise_consistency_gpa':{d:None for d in self.duration_type},
 		}
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_bifurcation_keys})
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_prcnt_bifurcation_keys})
+
 		summary_type = "exercise_consistency_cum"
 
 		if custom_daterange:
@@ -1285,7 +1493,9 @@ class ProgressReport():
 		return calculated_data
 
 	def _cal_nutrition_summary(self, custom_daterange = False):
-		
+		grades_bifurcation_keys = self._create_grade_keys('cum_days_ufood_got')
+		grades_prcnt_bifurcation_keys = self._create_prcnt_grade_keys('days_ufood_got')
+
 		def _calculate(key,alias,todays_data,current_data,
 			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
@@ -1306,6 +1516,15 @@ class ProgressReport():
 							current_data.cum_prcnt_unprocessed_food_consumed,alias
 						)
 					)[0]
+
+				elif key in grades_bifurcation_keys:
+					return self._cal_grade_days_over_period(todays_data,
+															current_data,
+															key)
+				elif key in grades_prcnt_bifurcation_keys:
+					return self._cal_prcnt_grade_over_period(todays_data,
+															 current_data,
+															 key, alias)
 			return None
 
 		calculated_data = {
@@ -1313,6 +1532,11 @@ class ProgressReport():
 			'prcnt_unprocessed_food_grade':{d:None for d in self.duration_type},
 			'prcnt_unprocessed_food_gpa':{d:None for d in self.duration_type},
 		}
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_bifurcation_keys})
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_prcnt_bifurcation_keys})
+
 		summary_type = "nutrition_cum"
 
 		if custom_daterange:
@@ -1328,6 +1552,9 @@ class ProgressReport():
 		return calculated_data
 
 	def _cal_exercise_summary(self, custom_daterange = False):
+		grades_bifurcation_keys = self._create_grade_keys('cum_days_workout_dur_got')
+		grades_prcnt_bifurcation_keys = self._create_prcnt_grade_keys('days_workout_dur_got')
+
 		def _cal_workout_dur_average(stat1, stat2,workout_days):
 			if not stat1 == None and not stat2 == None and workout_days:
 				avg = (stat1 - stat2)/workout_days
@@ -1508,6 +1735,19 @@ class ProgressReport():
 							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
 					return None
 
+				elif key in grades_bifurcation_keys:
+					if todays_meta_data and current_meta_data:
+						workout_days = (todays_meta_data.cum_workout_days_count - 
+							current_meta_data.cum_workout_days_count)
+						return self._cal_grade_days_over_period(todays_data,current_data,
+																key,workout_days)
+				elif key in grades_prcnt_bifurcation_keys:
+					if todays_meta_data and current_meta_data:
+						workout_days = (todays_meta_data.cum_workout_days_count - 
+							current_meta_data.cum_workout_days_count)
+						return self._cal_prcnt_grade_over_period(todays_data,current_data,
+															 	 key, alias, workout_days)
+
 			return None
 
 		calculated_data = {
@@ -1528,6 +1768,11 @@ class ProgressReport():
 			'hr_not_recorded_duration_hour_min':{d:None for d in self.duration_type},
 			'prcnt_hr_not_recorded_duration':{d:None for d in self.duration_type}
 		}
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_bifurcation_keys})
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_prcnt_bifurcation_keys})
+
 		summary_type = "exercise_stats_cum"
 
 		if custom_daterange:
@@ -1543,6 +1788,9 @@ class ProgressReport():
 		return calculated_data
 
 	def _cal_alcohol_summary(self, custom_daterange = False):
+		grades_bifurcation_keys = self._create_grade_keys('cum_days_alcohol_week_got')
+		grades_prcnt_bifurcation_keys = self._create_prcnt_grade_keys('days_alcohol_week_got')
+
 		def _calculate(key,alias,todays_data,current_data,
 			todays_meta_data,current_meta_data):
 			if todays_data and current_data:
@@ -1591,6 +1839,19 @@ class ProgressReport():
 							current_meta_data.cum_reported_alcohol_days_count,alias
 						) * 100
 						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+
+				elif key in grades_bifurcation_keys:
+					if todays_meta_data and current_meta_data:
+						alcohol_reported_days = (todays_meta_data.cum_reported_alcohol_days_count -
+							current_meta_data.cum_reported_alcohol_days_count)
+						return self._cal_grade_days_over_period(todays_data,current_data,
+																key, alcohol_reported_days)
+				elif key in grades_prcnt_bifurcation_keys:
+					if todays_meta_data and current_meta_data:
+						alcohol_reported_days = (todays_meta_data.cum_reported_alcohol_days_count -
+							current_meta_data.cum_reported_alcohol_days_count)
+						return self._cal_prcnt_grade_over_period(todays_data,current_data,
+																 key, alias,alcohol_reported_days)
 			return None
 
 		calculated_data = {
@@ -1600,6 +1861,11 @@ class ProgressReport():
 			'alcoholic_drinks_per_week_gpa':{d:None for d in self.duration_type},
 			'prcnt_alcohol_consumption_reported':{d:None for d in self.duration_type}
 		}
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_bifurcation_keys})
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_prcnt_bifurcation_keys})
+
 		summary_type = "alcohol_cum"
 
 		if custom_daterange:
@@ -1615,6 +1881,8 @@ class ProgressReport():
 		return calculated_data
 
 	def _cal_other_summary(self, custom_daterange = False):
+		grades_bifurcation_keys = self._create_grade_keys('cum_days_resting_hr_got')
+		grades_prcnt_bifurcation_keys = self._create_prcnt_grade_keys('days_resting_hr_got')
 
 		def _cal_custom_average(stat1, stat2,days):
 			if not stat1 == None and not stat2 == None and days:
@@ -1765,6 +2033,18 @@ class ProgressReport():
 							current_meta_data.cum_inputs_reported_days_count,alias
 						) * 100
 						return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+
+				elif key in grades_bifurcation_keys:
+					if todays_meta_data and current_meta_data:
+						resting_hr_days = (todays_meta_data.cum_resting_hr_days_count - 
+							current_meta_data.cum_resting_hr_days_count)
+						return self._cal_grade_days_over_period(todays_data,current_data,
+																key, resting_hr_days)
+				elif key in grades_prcnt_bifurcation_keys:
+					resting_hr_days = (todays_meta_data.cum_resting_hr_days_count - 
+							current_meta_data.cum_resting_hr_days_count)
+					return self._cal_prcnt_grade_over_period(todays_data,current_data,
+															 key, alias, resting_hr_days)
 			return None
 
 		calculated_data = {
@@ -1780,6 +2060,11 @@ class ProgressReport():
 			'number_of_days_reported_inputs': {d:None for d in self.duration_type},
 			'prcnt_of_days_reported_inputs': {d:None for d in self.duration_type}
 		}
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_bifurcation_keys})
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_prcnt_bifurcation_keys})
+
 		summary_type = "other_stats_cum"
 
 		if custom_daterange:
@@ -1859,6 +2144,8 @@ class ProgressReport():
 		return calculated_data
 
 	def _cal_stress_summary(self,custom_daterange = False):
+		grades_bifurcation_keys = self._create_grade_keys('cum_garmin_stress_days_got')
+		grades_prcnt_bifurcation_keys = self._create_prcnt_grade_keys('garmin_stress_days_got')
 
 		def _calculate(key,alias,todays_data,current_data,
 			todays_meta_data,current_meta_data):
@@ -1964,6 +2251,19 @@ class ProgressReport():
 						if days_stress_reported:
 							val = (total_medium_high_stress_days/days_stress_reported)*100
 							return int(Decimal(val).quantize(0,ROUND_HALF_UP))
+
+				elif key in grades_bifurcation_keys:
+					if todays_meta_data and current_meta_data:
+						reported_days = todays_meta_data.cum_have_garmin_stress_days_count\
+							- current_meta_data.cum_have_garmin_stress_days_count
+						return self._cal_grade_days_over_period(todays_data, current_data,
+																key, reported_days)
+				elif key in grades_prcnt_bifurcation_keys:
+					if todays_meta_data and current_meta_data:
+						reported_days = todays_meta_data.cum_have_garmin_stress_days_count\
+							- current_meta_data.cum_have_garmin_stress_days_count
+						return self._cal_prcnt_grade_over_period(todays_data, current_data,
+																 key, alias, reported_days)
 			return None
 
 		calculated_data = {
@@ -1978,6 +2278,11 @@ class ProgressReport():
 			'number_of_days_high_medium_stress':{d:None for d in self.duration_type},
 			'prcnt_of_days_high_medium_stress':{d:None for d in self.duration_type}
 		}
+		calculated_data.update({key:{d:None for d in self.duration_type}
+						for key in grades_bifurcation_keys})
+		calculated_data.update({key:{d:None for d in self.duration_type}
+								for key in grades_prcnt_bifurcation_keys})
+		
 		summary_type = "stress_cum"
 
 		if custom_daterange:
