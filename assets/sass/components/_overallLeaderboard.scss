@@ -23,12 +23,18 @@
 	padding: 0px !important;	
 }
 .overall_Leaderboard .mov_sticky {
-	position: fixed;
+	position: fixed;                          
 	top: 0;
 	width: inherit; 
 	background:#fff;
 	border: none;
 }
+/*.overall_Leaderboard .mov_sticky th {
+ 	min-width: 46px !important;
+ 	font-size: 8px !important;
+ 	padding: 5.5px !important;
+ }
+*/
 .overall_Leaderboard .mov_sticky + tbody .rnk{
 	width:20px;
 	padding:10px !important;
@@ -44,6 +50,8 @@
 .overall_Leaderboard .mov_sticky + tbody .usr{
 	width:20px;
 	padding:10px !important;
+	white-space: inherit;
+    word-wrap: break-word;
 }
 .overall_Leaderboard .mov_sticky + tbody .rhr{
 	width:20px;
@@ -120,6 +128,8 @@
   .overall_Leaderboard .mov_sticky + tbody .usr{
 	min-width: 64px !important;
 	padding:10px !important;
+	white-space: inherit;
+    word-wrap: break-word;
   }
   .overall_Leaderboard .mov_sticky + tbody .slp{
 	min-width: 64px !important;
@@ -205,9 +215,10 @@
 	padding:10px !important;
   }
   .overall_Leaderboard .mov_sticky + tbody .usr{
-	min-width: 52px !important;
+	min-width: 58px !important;
 	padding:10px !important;
 	max-width: 58px !important;
+	word-break: break-all;
   }
   .overall_Leaderboard .mov_sticky + tbody .ogpa{
 	min-width: 58px !important;
@@ -295,6 +306,8 @@
 	min-width: 46px !important;
 	padding:10px !important;
 	max-width: 50px !important;
+	white-space: inherit;
+    word-wrap: break-word;
   }
    .overall_Leaderboard .mov_sticky + tbody .ogpa{
 	min-width: 50px !important;
@@ -380,6 +393,8 @@
 	min-width: 46px !important;
 	padding:10px !important;
 	max-width: 55px !important;
+	white-space: inherit;
+    word-wrap: break-word;
   }
    .overall_Leaderboard .mov_sticky + tbody .ogpa{
 	min-width: 55px !important;
@@ -422,7 +437,7 @@
 	padding:10px !important;
   }
    .overall_Leaderboard .mov_sticky + tbody .alchl_drnk{
-	min-width: 55px !important;
+	min-width: 54px !important;
 	padding:10px !important;
   }
     .overall_Leaderboard .mov_sticky + tbody .ad table tr td{ 
@@ -477,6 +492,8 @@
 	min-width: 39px !important;
 	padding:10px !important;
 	max-width: 46px !important;
+	white-space: inherit;
+    word-wrap: break-word;
   }
    .overall_Leaderboard .mov_sticky + tbody .ogpa{
 	min-width: 46px !important;
@@ -520,7 +537,7 @@
 	padding:10px !important;
   }
    .overall_Leaderboard .mov_sticky + tbody .alchl_drnk{
-	min-width: 44px !important;
+	min-width: 48px !important;
 	padding:10px !important;
   }
    .overall_Leaderboard .mov_sticky + tbody .ad table tr td{ 
@@ -557,6 +574,8 @@
 	min-width: 39px !important;
 	padding:10px !important;
 	max-width: 52px !important;
+	white-space: inherit;
+    word-wrap: break-word;
   }
    .overall_Leaderboard .mov_sticky + tbody .ogpa{
 	min-width: 52px !important;
@@ -644,6 +663,8 @@
 	min-width: 39px !important;
 	padding:10px !important;
 	max-width: 52px !important;
+	white-space: inherit;
+    word-wrap: break-word;
   }
    .overall_Leaderboard .mov_sticky + tbody .ogpa{
 	min-width: 52px !important;
@@ -687,7 +708,7 @@
 	padding:10px !important;
   }
    .overall_Leaderboard .mov_sticky + tbody .alchl_drnk{
-	min-width: 50px !important;
+	min-width: 51px !important;
 	padding:10px !important;
   }
    .overall_Leaderboard .mov_sticky + tbody .ad table tr td{ 

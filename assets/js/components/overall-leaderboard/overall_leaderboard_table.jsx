@@ -135,6 +135,16 @@ class OverallLeaderboardTable extends Component{
 		this.getFoodColors = this.getFoodColors.bind(this);
 		this.getAlcoholColors = this.getAlcoholColors.bind(this);
 		this.getAlcoholGrades = this.getAlcoholGrades.bind(this);
+		this.getExerciseConsistencyGrades = this.getExerciseConsistencyGrades.bind(this);
+		this.getExerciseConsistencyColors = this.getExerciseConsistencyColors.bind(this);
+		this.getMomentConsistencyGrades = this.getMomentConsistencyGrades.bind(this);
+		this.getMomentConsistencyColors = this.getMomentConsistencyColors.bind(this);
+		this.getRestingHeartRateColors = this.getRestingHeartRateColors.bind(this);
+		this.getRestingHeartRateGrades = this.getRestingHeartRateGrades.bind(this);
+		this.getSleepGrades = this.getSleepGrades.bind(this);
+		this.getSleepColors = this.getSleepColors.bind(this);
+		this.getOverallGpaColors = this.getOverallGpaColors.bind(this);
+		this.getOverallGpaGrades = this.getOverallGpaGrades.bind(this);
 	}
 1
     scrollCallback(operationCount) {
@@ -175,24 +185,40 @@ class OverallLeaderboardTable extends Component{
   	getFoodColors(score,rank){
       let background = "";
       let color = "";
-      if (score<50){
-      	background = "red";
-      	color = "black";
-      }
-      else if (score>=50 && score<70){
-      	background = "yellow";
-      	color = "black";
-      }
-      else if (score >= 70){
-      	background ='green';
-      	color = 'white';
-      }
-       return (
-			    	<td className ="overall_rank_value upf" 
+     
+	      if (score<50){
+	      	background = "red";
+	      	color = "black";
+	      }
+	      else if (score>=50 && score<70){
+	      	background = "yellow";
+	      	color = "black";
+	      }
+	      else if (score >= 70){
+	      	background ='green';
+	      	color = 'white';
+	      }
+
+      	else if(score == null || score == 'N/A'){
+             score = 'NA';
+             return (
+ 			    	<td className ="overall_rank_value upf" 
 			    		style = {{backgroundColor:background,color:color}}>
-			    		<span>{score} {'('+rank+')'}</span>
-			    	</td>
-			    );
+			    		<span>{score}{'('+rank+')'}</span>
+			    	</td> 
+           );
+
+          }
+      return (
+ 			    	<td className ="overall_rank_value upf" 
+			    		style = {{backgroundColor:background,color:color}}>
+			    		<span>{score}{'%'}{'('+rank+')'}</span>
+			    	</td> 
+           );
+           
+
+	   
+			    
     }
     getAlcoholGrades(drink_avg){
 		let grade='';
@@ -247,13 +273,242 @@ class OverallLeaderboardTable extends Component{
 			}
 		}
 		return (
-			<td className ="overall_rank_value upf" 
+			<td className ="overall_rank_value alchl_drnk" 
 			style = {{backgroundColor:background,color:color}}>
-			<span>{alcoholperday}{'/'}{alcoholperweek}{'('+rank+')'}</span>
+			<span>{alcoholperday}{'/'}<br/>{alcoholperweek}{'('+rank+')'}</span>
 			</td>
 		);
 	}
 
+    getExerciseConsistencyGrades(ecscore){
+    	let grade = '';
+    	    grade = 'F'
+    if (ecscore >= 4){
+        grade = 'A'
+    }
+    else if (ecscore >= 3 && ecscore < 4){
+        grade =  'B'
+    }
+    else if (ecscore >= 2 && ecscore < 3){
+        grade =  'C'
+    }
+    else if (ecscore >= 1 && ecscore < 2){
+        grade =  'D'
+    }
+    else if (ecscore < 1){
+        grade = 'F'
+    }
+    return grade;
+    }   
+    getExerciseConsistencyColors(ecscore,rank){
+    	let background= '';
+		let color='';
+		if(isNaN(ecscore) || ecscore == null){
+			background = '';
+			color = '';   
+		}
+		else {
+			let grade = this.getExerciseConsistencyGrades(ecscore); 	
+			if(grade == 'A'){
+				background='green';
+				color='white';
+			}
+			else if(grade == 'B'){
+				background='#32CD32';
+				color='white';
+			}
+			else if(grade == 'C'){
+				background='yellow';
+				color='balck';
+			}
+			else if(grade == 'D'){
+				background='#FF8C00';
+				color='white';
+			}
+			else if(grade == 'F'){
+				background='red';
+				color='black';
+			}
+		}
+		return (
+			<td className ="overall_rank_value EC" 
+			style = {{backgroundColor:background,color:color}}>
+			<span>{ecscore}<br/>{'('+rank+')'}</span>
+			</td>
+		);
+
+    }
+    getMomentConsistencyGrades(mcscore){
+      let grade = '';
+      if (mcscore <= 4.5){
+        grade = 'A';
+    }
+    else if (mcscore > 4.5 && mcscore <= 6){
+        grade = 'B'
+    }
+    else if (mcscore > 6 && mcscore <= 7){
+        grade = 'C'
+    }
+    else if (mcscore > 7 && mcscore <= 10)
+        grade = 'D'
+    else if (mcscore > 10 ){
+        grade = 'F'
+    }
+    return grade;
+    }
+    getMomentConsistencyColors(mcscore,rank){
+        let background= '';
+		let color='';
+		if(isNaN(mcscore) || mcscore == null){
+			background = '';
+			color = '';   
+		}
+		else {
+			let grade = this.getMomentConsistencyGrades(mcscore); 	
+			if(grade == 'A'){
+				background='green';
+				color='white';
+			}
+			else if(grade == 'B'){
+				background='#32CD32';
+				color='white';
+			}
+			else if(grade == 'C'){
+				background='yellow';
+				color='balck';
+			}
+			else if(grade == 'D'){
+				background='#FF8C00';
+				color='white';
+			}
+			else if(grade == 'F'){
+				background='red';
+				color='black';
+			}
+		}
+		return (
+			<td className ="overall_rank_value MC" 
+			style = {{backgroundColor:background,color:color}}>
+			<span>{mcscore}<br/>{'('+rank+')'}</span>
+			</td>
+		);
+    }
+    getRestingHeartRateGrades(rhrscore){
+       let grade = '';
+       if (rhrscore >= 30 && rhrscore <= 60){
+        grade = 'A';
+    }
+    else if (rhrscore >= 61 && rhrscore <= 68){
+        grade = 'B'
+    }
+    else if (rhrscore >= 69 && rhrscore <= 74){
+        grade = 'C'
+    }
+    else if (rhrscore >= 75 && rhrscore <= 79){
+        grade = 'D'
+    }
+    else if( rhrscore >= 80 || rhrscore < 30){
+        grade = 'F'
+    }
+    else{
+        grade = 'F'
+    }
+    return grade;
+      
+    }
+    getRestingHeartRateColors(rhrscore,rank){
+     let background= '';
+		let color='';
+		if(isNaN(rhrscore) || rhrscore == null){
+			background = '';
+			color = '';   
+		}
+		else {
+			let grade = this.getRestingHeartRateGrades(rhrscore); 	
+			if(grade == 'A'){
+				background='green';
+				color='white';
+			}
+			else if(grade == 'B'){
+				background='#32CD32';
+				color='white';
+			}
+			else if(grade == 'C'){
+				background='yellow';
+				color='balck';
+			}
+			else if(grade == 'D'){
+				background='#FF8C00';
+				color='white';
+			}
+			else if(grade == 'F'){
+				background='red';
+				color='black';
+			}
+		}
+		return (
+			<td className ="overall_rank_value rhr" 
+			style = {{backgroundColor:background,color:color}}>
+			<span>{rhrscore}<br/>{'('+rank+')'}</span>
+			</td>
+		);
+    }
+   
+    getOverallGpaGrades(ogpascore){
+      let grade = '';
+      if (ogpascore >= 3.4){
+        grade = 'A';
+    }
+    else if (ogpascore >= 3 && ogpascore < 3.4)
+        grade = 'B';
+    else if (ogpascore >= 2 && ogpascore < 3){
+        grade = 'C';
+    }
+    else if (ogpascore >= 1 && ogpascore < 2){
+        grade = 'D';
+    }
+    else if (ogpascore < 1){
+        grade = 'F';
+     }
+     return grade;
+    }
+    getOverallGpaColors(ogpascore,rank){
+     let background= '';
+		let color='';
+		if(isNaN(ogpascore) || ogpascore == null){
+			background = '';
+			color = '';   
+		}
+		else {
+			let grade = this.getOverallGpaGrades(ogpascore); 	
+			if(grade == 'A'){
+				background='green';
+				color='white';
+			}
+			else if(grade == 'B'){
+				background='#32CD32';
+				color='white';
+			}
+			else if(grade == 'C'){
+				background='yellow';
+				color='balck';
+			}
+			else if(grade == 'D'){
+				background='#FF8C00';
+				color='white';
+			}
+			else if(grade == 'F'){
+				background='red';
+				color='black';
+			}
+		}
+		return (
+			<td className ="overall_rank_value ogpa" 
+			style = {{backgroundColor:background,color:color}}>
+			<span>{ogpascore}<br/>{'('+rank+')'}</span>
+			</td>
+		);
+    }
   	doOnOrientationChange() {
 	   let screen1 = screen.orientation.angle;
 	   let window1 = window.orientation;
@@ -333,7 +588,7 @@ class OverallLeaderboardTable extends Component{
 	    	<td 
 	    		className ="overall_rank_value Nes"
 	    		style = {{backgroundColor:background,color:color}}>
-	    		<span>{this.renderCommaSteps(steps)} {'('+rank+')'}</span>
+	    		<span>{this.renderCommaSteps(steps)}<br/>{'('+rank+')'}</span>
 	    	</td>
 	    );
     }
@@ -349,7 +604,64 @@ class OverallLeaderboardTable extends Component{
         }
         return x1 + x2;
 	}
-
+     getSleepGrades(sleepduration){
+        let grade = '';
+          if (sleepduration < 4.5){
+        grade = 'F';
+    }
+    else if (sleepduration >= 4.5 && sleepduration < 6){
+        grade = 'D';
+    }
+    else if (sleepduration >= 6 && sleepduration < 7){
+        grade = 'C';
+    }
+    else if (sleepduration >= 7 && sleepduration < 10){
+         grade = 'B'
+    }
+    else if (hours_inactive > 10){
+    }
+    else{
+         grade = 'A';
+     }
+     return grade;
+    }
+    getSleepColors(sleepduration,rank){
+       let background= '';
+		let color='';
+		if(isNaN(sleepduration) || sleepduration == null){
+			background = '';
+			color = '';   
+		}
+		else {
+			let grade = this.getSleepGrades(sleepduration); 	
+			if(grade == 'A'){
+				background='green';
+				color='white';
+			}
+			else if(grade == 'B'){
+				background='#32CD32';
+				color='white';
+			}
+			else if(grade == 'C'){
+				background='yellow';
+				color='balck';
+			}
+			else if(grade == 'D'){
+				background='#FF8C00';
+				color='white';
+			}
+			else if(grade == 'F'){
+				background='red';
+				color='black';
+			}
+		}
+		return (
+			<td className ="overall_rank_value slp" 
+			style = {{backgroundColor:background,color:color}}>
+			<span>{sleepduration}<br/>{'('+rank+')'}</span>
+			</td>
+		);
+    }
 	renderGetColors(hours_inactive,rank){
 		let background = "";
 		let color = "";
@@ -375,7 +687,7 @@ class OverallLeaderboardTable extends Component{
 	    }
 	    return (
 	    	<td 
-	    		className ="overall_rank_value slp MC alchl_drnk"
+	    		className ="overall_rank_value"
 	    		style = {{backgroundColor:background,color:color}}>
 	    		<span>{hours_inactive} {'('+rank+')'}</span>
 	    	</td>
@@ -426,9 +738,9 @@ class OverallLeaderboardTable extends Component{
 			        color = "white";
 			    }
 			    return (
-			    	<td className ="overall_rank_value" 
+			    	<td className ="overall_rank_value ed" 
 			    		style = {{backgroundColor:background,color:color}}>
-			    		<span>{value1} {'('+rank+')'} {' / '}{avgHR}</span>
+			    		<span>{value1}{'('+rank+')'}<br/>{' / '}{avgHR}</span>
 			    	</td>
 			    );
 			}
@@ -503,9 +815,9 @@ class OverallLeaderboardTable extends Component{
 		    }
 		    return (
 		    	<td 
-		    		className ="overall_rank_value" 
+		    		className ="overall_rank_value ed" 
 		    		style = {{backgroundColor:background,color:color}}>
-		    		<span>{value1} {'('+rank+')'} {' / '}{avgHR}</span>
+		    		<span>{value1}{'('+rank+')'}<br/> {' / '}{avgHR}</span>
 		    	</td>
 		    )
 	}
@@ -538,22 +850,47 @@ class OverallLeaderboardTable extends Component{
 					}
 				}
 				else if( key1 == "oh_gpa" ){
-					td_values.push(this.renderStepsColor(value[key1].score.value,value[key1].rank));
+					let  overallGpaScore = value[key1].score.value;
+                    if(overallGpaScore = 'N/A'){
+                    	overallGpaScore = 'NA'
+                    }
+					td_values.push(this.getOverallGpaColors(overallGpaScore,value[key1].rank));
 				}
 				else if( key1 == "avg_sleep" ){
-				    td_values.push(this.renderGetColors(value[key1].score.value,value[key1].rank)); 	
+					let  avgSleepScore = value[key1].other_scores.sleep_duration.value;
+                    if(avgSleepScore = 'N/A'){
+                    	avgSleepScore = 'NA'
+                    }
+				    td_values.push(this.getSleepColors(avgSleepScore,value[key1].rank)); 	
 				}
                 else if( key1 == "resting_hr" ){
-                    td_values.push(this.renderStepsColor(value[key1].score.value,value[key1].rank));   
+                	let  restingHeartRateScore = value[key1].score.value;
+                    if(restingHeartRateScore = 'N/A'){
+                    	restingHeartRateScore = 'NA'
+                    } 
+                    td_values.push(this.getRestingHeartRateColors(restingHeartRateScore,value[key1].rank));   
                 }
                 else if( key1 == "nes" ){
-                     td_values.push(this.renderStepsColor(value[key1].score.value,value[key1].rank));
+                	let  nonExerciseStepsScore = value[key1].score.value;
+                    if(nonExerciseStepsScore = 'N/A'){
+                    	nonExerciseStepsScore = 'NA'
+                    } 
+                     td_values.push(this.renderStepsColor(nonExerciseStepsScore,value[key1].rank));
                 }
                 else if( key1 == "mc" ){
-                	td_values.push(this.renderGetColors(value[key1].score.value,value[key1].rank));
+                	let  momentConsistencyScore = value[key1].score.value;
+                    if(momentConsistencyScore = 'N/A'){
+                    	momentConsistencyScore = 'NA'
+                    } 
+                	td_values.push(this.getMomentConsistencyColors(momentConsistencyScore,value[key1].rank));
                 }
                 else if( key1 == "ec" ){
-                     td_values.push(this.renderStepsColor(value[key1].score.value,value[key1].rank));
+                    let  exerciseConsistencyScore = value[key1].score.value;
+                    if(exerciseConsistencyScore = 'N/A'){
+                    	exerciseConsistencyScore = 'NA'
+                    } 
+                	
+                     td_values.push(this.getExerciseConsistencyColors(exerciseConsistencyScore,value[key1].rank));
                 }
                 else if( key1 == "exercise_duration" ){
                 	let avg_exercise_heart_rate = value[key1].other_scores.avg_exercise_heart_rate.value; 
@@ -609,18 +946,15 @@ class OverallLeaderboardTable extends Component{
                 }
                 else if( key1 == "prcnt_uf" ){
                 	
-                	if( value[key1].score.value == null  ){
-                		value[key1].score.value = 'NA';
-                		td_values.push(this.getFoodColors(value[key1].score.value,value[key1].rank)); 
-                	}
-                	else if( value[key1].score.value != null ){
+                
                 	    td_values.push(this.getFoodColors(value[key1].score.value,value[key1].rank)); 	
-                	}
+                	
                         
                 }
                 else if( key1 == "alcohol" ){
                 	let alcohol_drink_per_day = value[key1].other_scores.alcohol_drink_per_day.value;
-                	if( alcohol_drink_per_day == null ){
+                	//let alcohol_drink_per_week = value[key1].scores.value;
+                	if( alcohol_drink_per_day == null || alcohol_drink_per_day == 'N/A'  ){
                 		alcohol_drink_per_day = 'NA';
                 	}
                 	if( alcohol_drink_per_day == "Not Reported"){
@@ -697,7 +1031,7 @@ class OverallLeaderboardTable extends Component{
 								   	 </th>
 								   	<th>VO2 Max</th>
 								    <th>% Unprocessed</th>
-								    <th>Drinks Yesterday / Per Week</th>
+								    <th>Drinks yesterday / Per Week</th>
 								    {/*<th>
 								   	   <table className="userip">
 									    <tr><td>Travel</td><td>Sick</td></tr>
@@ -729,16 +1063,16 @@ class OverallLeaderboardTable extends Component{
 					</div>   
                     <div className = "row">
 						<div className = "col-sm-12">
-			          	  <p className="footer_content" style={{marginLeft:"13px"}}>	 
+			          	  <p className="footer_content" style={{marginLeft:"15px"}}>	 
 						  MCS: Movement Consistency Score
 						  </p>
-                    	  <p className="footer_content" style={{marginLeft:"13px"}}>
+                    	  <p className="footer_content" style={{marginLeft:"15px"}}>
                           ECS: Exercise Consistency Score
                           </p>
                           <p className="footer_content" style={{marginLeft:"15px"}}>
                           NR = Not Reported; NA = Not Available
                           </p>
-                          <p className="footer_content" style={{marginLeft:"13px"}}>
+                          <p className="footer_content" style={{marginLeft:"15px"}}>
                           <span className="row">
                            Grades:&nbsp;
                            <span className="col-sm-1" style={{backgroundColor:"green","text-align":"center"}}>A</span>&nbsp;
@@ -748,7 +1082,7 @@ class OverallLeaderboardTable extends Component{
                            <span className="col-sm-1" style={{backgroundColor:"red","text-align":"center"}}>E</span>
                           </span>
                           </p>
-                          <p className="footer_content" style={{marginLeft:"13px"}}>
+                          <p className="footer_content" style={{marginLeft:"15px"}}>
                           Numbers in (parenthesis) represent overall rank in category (where (1) is best)
                           </p>
                          </div>
