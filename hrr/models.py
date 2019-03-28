@@ -165,3 +165,12 @@ class TwentyfourHourTimeHeartZones(models.Model):
 			models.Index(fields=['user', '-created_at']),
 			models.Index(fields=['created_at']),
 		]
+
+class AACustomRanges(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	aerobic_range = models.CharField(null=True,blank=True,max_length=255)
+	anaerobic_range = models.CharField(null=True,blank=True,max_length=255)
+	below_aerobic_range = models.CharField(null=True,blank=True,max_length=255)
+
+	def __str__(self):
+		return str((self.user))
