@@ -10,15 +10,13 @@ class UserAppleDataStepsSerializer(serializers.ModelSerializer):
 	
 	class Meta:
 		model = UserAppleDataSteps
-		fields = ('user','summary_id','data')
+		fields = ('user','summary_id','belong_to','data')
 
 class UserAppleDataActivitiesSerializer(serializers.ModelSerializer):
 	"""	This class is for serializing the Apple steps
 	"""
-
 	data = serializers.JSONField()
-	
 	class Meta:
 		model = UserAppleDataActivities
-		fields = ('user','data')
+		fields = ('user','belong_to','data')
 

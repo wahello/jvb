@@ -1,3 +1,4 @@
+import ast
 from datetime import datetime, timezone, time
 from decimal import Decimal, ROUND_HALF_UP
 import datetime, pytz, time, json
@@ -50,9 +51,12 @@ def get_epoch_offset_from_timestamp(timestamp, timezone):
 	Args:
 		timestamp(str): Timestamp in string
 	'''
+	if timezone == 'nil' or timezone == '(null)':
+		timezone = 0
+
 	if timestamp and timezone:
-
-
+		continent,country = timezone.split("-")
+		timezone = continent+'/'+country
 		local = pytz.timezone(timezone)
 		naive = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
 		local_dt = local.localize(naive, is_dst=None)
@@ -63,14 +67,18 @@ def get_epoch_offset_from_timestamp(timestamp, timezone):
 		zone = pytz.timezone(timezone)
 		offset = zone.utcoffset(datetime.datetime.now()).total_seconds()
 		return (time_in_utc_seconds,offset)
-	
+	else:
+		naive = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
+		utc_dt = naive.timetuple()
+		time_in_utc_seconds = int(time.mktime(utc_dt))
+		return (time_in_utc_seconds,0) 
 
 def apple_to_garmin_activities(active_summary):
 
 	if active_summary:
 		result_reponse = []
 
-		for each in json.loads(active_summary):
+		for each in ast.literal_eval(active_summary):
 			
 			garmin_activites = {
 				'summaryId': '',
@@ -97,7 +105,6 @@ def apple_to_garmin_activities(active_summary):
 				'resting_hr_last_night'     : None
 
 			}
-
 			start_time_in_sec,start_time_offset_in_sec = get_epoch_offset_from_timestamp(each['Start date'],each['TimeZone'])
 
 			garmin_activites['summaryId'] = str(each['ActivityID'])
