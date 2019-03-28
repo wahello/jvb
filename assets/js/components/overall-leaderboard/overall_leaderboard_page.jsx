@@ -121,7 +121,7 @@ class OverallLeaderboard extends Component{
 			overall_data:data.data.overall,
 			duration_date:data.data.duration_date,
 			all_movement_rank_data:data.data.overall.today.all_rank,
-			// current_user_id:data.data.overall.today.user_rank.total_steps.user_id,
+			//current_user_id:data.data.overall.today.user_rank.total_steps.user_id,
 			date:moment(date).format("MMM D, YYYY"),
 			capt:"Today",
 			fetching_hrr1:false,
@@ -565,7 +565,14 @@ class OverallLeaderboard extends Component{
 	                          NR = Not Reported; NA = Not Available
 	                          </p>
 	                          <p className="footer_content" style={{marginLeft:"15px"}}>
-	                           Grades: A
+	                          <span className="row">
+	                          Grades:&nbsp;
+	                           <span className="col-sm-1" style={{backgroundColor:"green","text-align":"center"}}>A</span>&nbsp;
+	                           <span className="col-sm-1" style={{backgroundColor:"#32CD32","text-align":"center"}}>B</span>&nbsp;
+	                           <span className="col-sm-1" style={{backgroundColor:"yellow","text-align":"center"}}>C</span>&nbsp;
+	                           <span className="col-sm-1" style={{backgroundColor:"orange","text-align":"center"}}>D</span>&nbsp;
+	                           <span className="col-sm-1" style={{backgroundColor:"red","text-align":"center"}}>E</span>
+	                          </span>
 	                          </p>
 	                          <p className="footer_content" style={{marginLeft:"15px"}}>
 	                          Numbers in (parenthesis) represent overall rank in category (where (1) is best)

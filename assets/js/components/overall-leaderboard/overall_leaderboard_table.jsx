@@ -132,8 +132,11 @@ class OverallLeaderboardTable extends Component{
 		this.getStylesForExerciseduration   = this.getStylesForExerciseduration.bind(this);
 		this.mcsData = this.mcsData.bind(this);
 		this.exerciseDurColrsSingleDayOr2to6Days = this.exerciseDurColrsSingleDayOr2to6Days.bind(this);
+		this.getFoodColors = this.getFoodColors.bind(this);
+		this.getAlcoholColors = this.getAlcoholColors.bind(this);
+		this.getAlcoholGrades = this.getAlcoholGrades.bind(this);
 	}
-
+1
     scrollCallback(operationCount) {
       if (objectLength === operationCount) {
           setTimeout(function () {
@@ -169,7 +172,88 @@ class OverallLeaderboardTable extends Component{
           },100);
       }
   	}
-  	
+  	getFoodColors(score,rank){
+      let background = "";
+      let color = "";
+      if (score<50){
+      	background = "red";
+      	color = "black";
+      }
+      else if (score>=50 && score<70){
+      	background = "yellow";
+      	color = "black";
+      }
+      else if (score >= 70){
+      	background ='green';
+      	color = 'white';
+      }
+       return (
+			    	<td className ="overall_rank_value upf" 
+			    		style = {{backgroundColor:background,color:color}}>
+			    		<span>{score} {'('+rank+')'}</span>
+			    	</td>
+			    );
+    }
+    getAlcoholGrades(drink_avg){
+		let grade='';
+		if (drink_avg <= 5){
+        	grade = 'A'
+        }   
+        else if (drink_avg > 5 && drink_avg < 12){
+            grade = 'B'
+        }
+        else if (drink_avg >= 12 && drink_avg < 15){
+            grade = 'C';
+        }
+        else if (drink_avg >= 15 && drink_avg < 16){
+            grade = 'D';
+        }
+        else if (drink_avg >= 16 && drink_avg <= 21){
+            grade = 'F';
+        }
+        else if( drink_avg > 21){
+            grade = 'F';
+        }
+        return grade;
+    }
+	getAlcoholColors(alcoholperday,alcoholperweek,rank){
+		let background= '';
+		let color='';
+		if(isNaN(alcoholperweek) || alcoholperweek == null){
+			background = '';
+			color = '';   
+		}
+		else {
+			let grade = this.getAlcoholGrades(alcoholperweek); 	
+			if(grade == 'A'){
+				background='green';
+				color='white';
+			}
+			else if(grade == 'B'){
+				background='#32CD32';
+				color='white';
+			}
+			else if(grade == 'C'){
+				background='yellow';
+				color='balck';
+			}
+			else if(grade == 'D'){
+				background='#FF8C00';
+				color='white';
+			}
+			else if(grade == 'F'){
+				background='red';
+				color='black';
+			}
+		}
+		return (
+			<td className ="overall_rank_value upf" 
+			style = {{backgroundColor:background,color:color}}>
+			<span>{alcoholperday}{'/'}{alcoholperweek}{'('+rank+')'}</span>
+			</td>
+		);
+	}
+
   	doOnOrientationChange() {
 	   let screen1 = screen.orientation.angle;
 	   let window1 = window.orientation;
@@ -247,7 +331,7 @@ class OverallLeaderboardTable extends Component{
 	    }
 	    return (
 	    	<td 
-	    		className ="overall_rank_value"
+	    		className ="overall_rank_value Nes"
 	    		style = {{backgroundColor:background,color:color}}>
 	    		<span>{this.renderCommaSteps(steps)} {'('+rank+')'}</span>
 	    	</td>
@@ -291,7 +375,7 @@ class OverallLeaderboardTable extends Component{
 	    }
 	    return (
 	    	<td 
-	    		className ="overall_rank_value"
+	    		className ="overall_rank_value slp MC alchl_drnk"
 	    		style = {{backgroundColor:background,color:color}}>
 	    		<span>{hours_inactive} {'('+rank+')'}</span>
 	    	</td>
@@ -454,32 +538,29 @@ class OverallLeaderboardTable extends Component{
 					}
 				}
 				else if( key1 == "oh_gpa" ){
-					td_values.push(<td className="ogpa">{value[key1].score.value,value[key1].rank}</td>);
+					td_values.push(this.renderStepsColor(value[key1].score.value,value[key1].rank));
 				}
 				else if( key1 == "avg_sleep" ){
-				    td_values.push(<td className="slp">{value[key1].score.value,value[key1].rank}</td>); 	
+				    td_values.push(this.renderGetColors(value[key1].score.value,value[key1].rank)); 	
 				}
                 else if( key1 == "resting_hr" ){
-                    td_values.push(<td className="rhr">{value[key1].score.value,value[key1].rank}</td>);   
+                    td_values.push(this.renderStepsColor(value[key1].score.value,value[key1].rank));   
                 }
                 else if( key1 == "nes" ){
-                     td_values.push(<td className="Nes">{value[key1].score.value,value[key1].rank}</td>);
+                     td_values.push(this.renderStepsColor(value[key1].score.value,value[key1].rank));
                 }
                 else if( key1 == "mc" ){
-                	td_values.push(<td className="MC">{value[key1].score.value,value[key1].rank}</td>);
+                	td_values.push(this.renderGetColors(value[key1].score.value,value[key1].rank));
                 }
                 else if( key1 == "ec" ){
-                     td_values.push(<td className="EC">{value[key1].score.value,value[key1].rank}</td>);
+                     td_values.push(this.renderStepsColor(value[key1].score.value,value[key1].rank));
                 }
                 else if( key1 == "exercise_duration" ){
                 	let avg_exercise_heart_rate = value[key1].other_scores.avg_exercise_heart_rate.value; 
                      if( avg_exercise_heart_rate == null ){
-                     	 avg_exercise_heart_rate = 'N/A'; 
+                     	 avg_exercise_heart_rate = 'NA'; 
                      	}
-                     td_values.push(
-                     	            <td className="ed">
-                     	            {value[key1].score.value,(value[key1].rank)+(' ')+'/'+(' ')+avg_exercise_heart_rate}
-                     	            </td>);	
+                     td_values.push(this.getStylesForExerciseduration(value[key1].score.value,value[key1].rank,avg_exercise_heart_rate,selectedRange));	
                 }
                 else if( key1 == "aerobic_duration" ){
                   let aerobic_prcnt = value[key1].other_scores.prcnt_aerobic_duration.value;
@@ -527,25 +608,25 @@ class OverallLeaderboardTable extends Component{
                     td_values.push(<td className="vmax">{value[key1].score.value}</td>);	
                 }
                 else if( key1 == "prcnt_uf" ){
-                	let percent_unprocessed_food = value[key1].other_scores.percent_unprocessed_food.value;
-                	if( percent_unprocessed_food == null ){
-                		percent_unprocessed_food = 'N/A';
+                	
+                	if( value[key1].score.value == null  ){
+                		value[key1].score.value = 'NA';
+                		td_values.push(this.getFoodColors(value[key1].score.value,value[key1].rank)); 
                 	}
-                    td_values.push(<td className="upf">
-                    	            {percent_unprocessed_food+"%"+"("+value[key1].score.value+")"}
-                    	           </td>);     
+                	else if( value[key1].score.value != null ){
+                	    td_values.push(this.getFoodColors(value[key1].score.value,value[key1].rank)); 	
+                	}
+                        
                 }
                 else if( key1 == "alcohol" ){
                 	let alcohol_drink_per_day = value[key1].other_scores.alcohol_drink_per_day.value;
                 	if( alcohol_drink_per_day == null ){
-                		alcohol_drink_per_day = 'N/A';
+                		alcohol_drink_per_day = 'NA';
                 	}
                 	if( alcohol_drink_per_day == "Not Reported"){
-                		alcohol_drink_per_day = 'N/R';
+                		alcohol_drink_per_day = 'NR';
                 	}
-                	td_values.push(<td className = "alchl_drnk">
-                		           {alcohol_drink_per_day+'/'+value[key1].score.value}
-                		           </td>);
+                	td_values.push(this.getAlcoholColors(alcohol_drink_per_day,value[key1].score.value,value[key1].rank));
                 }
                 //  else if( key1 == "user_daily_inputs" ){
                 //   let reported_inputs = value[key1].other_scores.prcnt_days_reported_inputs.value;
@@ -648,20 +729,26 @@ class OverallLeaderboardTable extends Component{
 					</div>   
                     <div className = "row">
 						<div className = "col-sm-12">
-			          	  <p className="footer_content" style={{marginLeft:"15px"}}>	 
+			          	  <p className="footer_content" style={{marginLeft:"13px"}}>	 
 						  MCS: Movement Consistency Score
 						  </p>
-                    	  <p className="footer_content" style={{marginLeft:"15px"}}>
+                    	  <p className="footer_content" style={{marginLeft:"13px"}}>
                           ECS: Exercise Consistency Score
                           </p>
                           <p className="footer_content" style={{marginLeft:"15px"}}>
                           NR = Not Reported; NA = Not Available
                           </p>
-                          <p className="footer_content" style={{marginLeft:"15px"}}>
-                          Grades:
-                          <span style={{height:'15px',width:'40px',backgroundColor:'#008000'}}>A</span>
+                          <p className="footer_content" style={{marginLeft:"13px"}}>
+                          <span className="row">
+                           Grades:&nbsp;
+                           <span className="col-sm-1" style={{backgroundColor:"green","text-align":"center"}}>A</span>&nbsp;
+                           <span className="col-sm-1" style={{backgroundColor:"#32CD32","text-align":"center"}}>B</span>&nbsp;
+                           <span className="col-sm-1" style={{backgroundColor:"yellow","text-align":"center"}}>C</span>&nbsp;
+                           <span className="col-sm-1" style={{backgroundColor:"orange","text-align":"center"}}>D</span>&nbsp;
+                           <span className="col-sm-1" style={{backgroundColor:"red","text-align":"center"}}>E</span>
+                          </span>
                           </p>
-                          <p className="footer_content" style={{marginLeft:"15px"}}>
+                          <p className="footer_content" style={{marginLeft:"13px"}}>
                           Numbers in (parenthesis) represent overall rank in category (where (1) is best)
                           </p>
                          </div>

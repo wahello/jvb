@@ -96,9 +96,9 @@
 	}
 	.overall_Leaderboard .mov_sticky th{
 	font-size: 11px !important;
-	max-width: 77px !important;
-	min-width: 70px !important;
-	padding: 5px;
+	max-width: 81px !important;
+	min-width: 75px !important;
+	padding: 6.5px;
    }
    .overall_Leaderboard .mov_sticky th .aa td{
    	padding:0px !important;
@@ -138,7 +138,7 @@
 	padding:10px !important;
   }
   .overall_Leaderboard .mov_sticky + tbody .EC{
-	min-width: 70px !important;
+	min-width: 68px !important;
 	padding:10px !important;
   }
   .overall_Leaderboard .mov_sticky + tbody .rhr{
@@ -165,8 +165,8 @@
 	padding:10px !important;
   }
   .overall_Leaderboard .mov_sticky + tbody .ad table tr td{ 
-	    min-width: 30px !important;
-	    font-size: 10px !important;
+	    min-width: 29px !important;
+	    font-size: 9px !important;
  } 
 }
 
@@ -373,56 +373,56 @@
        font-size: 10px !important;
    }
    .overall_Leaderboard .mov_sticky + tbody .rnk{
-	min-width: 53px !important;
+	min-width: 55px !important;
 	padding:10px !important;
   }
   .overall_Leaderboard .mov_sticky + tbody .usr{
 	min-width: 46px !important;
 	padding:10px !important;
-	max-width: 53px !important;
+	max-width: 55px !important;
   }
    .overall_Leaderboard .mov_sticky + tbody .ogpa{
-	min-width: 53px !important;
+	min-width: 55px !important;
 	padding:10px !important;
   }
   .overall_Leaderboard .mov_sticky + tbody .slp{
-	min-width: 53px !important;
+	min-width: 55px !important;
 	padding:10px !important;
   }
    .overall_Leaderboard .mov_sticky + tbody .rhr{
-	min-width: 53px !important;
+	min-width: 55px !important;
 	padding:10px !important;
   }
    .overall_Leaderboard .mov_sticky + tbody .Nes{
-	min-width: 53px !important;
+	min-width: 55px !important;
 	padding:10px !important;
   }
    .overall_Leaderboard .mov_sticky + tbody .MC{
-	min-width: 53px !important;
+	min-width: 55px !important;
 	padding:10px !important;
   }
    .overall_Leaderboard .mov_sticky + tbody .EC{
-	min-width: 61px !important;
+	min-width: 63px !important;
 	padding:10px !important;
   }
    .overall_Leaderboard .mov_sticky + tbody .ed{
-	min-width: 53px !important;
+	min-width: 55px !important;
 	padding:10px !important;
   }
    .overall_Leaderboard .mov_sticky + tbody .ad{
-	min-width: 53px !important;
+	min-width: 55px !important;
 	padding:0px !important;
   }
   .overall_Leaderboard .mov_sticky + tbody .vmax{
-	min-width: 52px !important;
+	min-width: 55px !important;
 	padding:10px !important;
   }
    .overall_Leaderboard .mov_sticky + tbody .upf{
-	min-width: 64px !important;
+	min-width: 65px !important;
 	padding:10px !important;
   }
    .overall_Leaderboard .mov_sticky + tbody .alchl_drnk{
-	min-width: 51px !important;
+	min-width: 55px !important;
 	padding:10px !important;
   }
     .overall_Leaderboard .mov_sticky + tbody .ad table tr td{ 
@@ -699,6 +699,13 @@
 
 
 @media(max-width: 769px) and (min-width: 766px) and (orientation: portrait){
+
+ p {
+ 	margin-top: 25px;
+ }
+ .mov_sticky p{
+ 	margin-top: 38px;
+ }
 .overall_Leaderboard{
 	padding:20px ;
  }
