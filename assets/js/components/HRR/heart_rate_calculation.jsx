@@ -381,7 +381,7 @@ class HeartRateCal extends Component{
     toggleEditForm(){
        this.setState({
 		 editable:!this.state.editable,
-		 include_hrr:!this.state.include_hrr
+		 include_hrr:this.state.include_hrr
        });
 	}
 	
