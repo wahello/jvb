@@ -35,10 +35,12 @@ from hrr.models import (AaCalculations,
 					AA, TwentyfourHourAA, 
 					TwentyfourHourTimeHeartZones)
 
+from hrr.calculation_helper import get_usernput_activities
 import quicklook.calculations.converter
 from quicklook.calculations.converter.fitbit_to_garmin_converter import fitbit_to_garmin_activities
 from quicklook.calculations.fitbit_calculation import get_fitbit_model_data
 import user_input
+
 
 def get_time_from_timestamp(time_stamp):
 	'''
@@ -476,7 +478,45 @@ def fitbit_aa_twentyfour_hour_chart_one(user_get,start_date,hr_time_diff, user_i
 	else:
 		return {}
 
-def calculate_AA2_workout(user,start_date):
+
+def combine_ui_fitbit_activities(user_input_activities,fitbit_activity_data):
+	"""This function will combine both userinput activities and fitbit activities
+
+	Args:
+		user_input_activities(dict):containes activities submitted by user through
+									user input form
+		fitbit_activity_data(list):containes list of activities which came from fitbit
+									wareable device
+	Return:
+		Combined activities from userinput form and fitbit
+	"""
+	if user_input_activities:
+		ui_activity_keys = list(user_input_activities.keys())
+	else:
+		ui_activity_keys = None	
+	if fitbit_activity_data:
+		for index,single_activity in enumerate(fitbit_activity_data[0]):
+			if single_activity.get('summaryId') in ui_activity_keys:
+				user_input_activities[single_activity.get(
+					'summaryId')]['maxHeartRateInBeatsPerMinute'] = single_activity.get(
+					"maxHeartRateInBeatsPerMinute",0)
+				user_input_activities[single_activity.get(
+					'summaryId')]['distanceInMeters'] = single_activity.get(
+					"distanceInMeters",0)
+			else:
+				user_input_activities['summaryId'] = single_activity.get('summaryId')
+				user_input_activities['activityType'] = single_activity.get('summaryId')
+				user_input_activities['averageHeartRateInBeatsPerMinute'] = single_activity.get('summaryId')
+				user_input_activities['durationInSeconds'] = single_activity.get('summaryId')
+				user_input_activities['steps'] = single_activity.get('summaryId')
+				user_input_activities['maxHeartRateInBeatsPerMinute'] = single_activity.get(
+												'maxHeartRateInBeatsPerMinute')
+				user_input_activities['distanceInMeters'] = single_activity.get('distanceInMeters')
+		return user_input_activities
+	else:
+		return user_input_activities
+
+def calculate_AA2_workout(user,start_date,user_input_activities=None):
 	fibit_activities_qs = UserFitbitDataActivities.objects.filter(
 		user=user,created_at=start_date)
 	trans_activity_data = []
@@ -489,19 +529,26 @@ def calculate_AA2_workout(user,start_date):
 			if todays_activity_data:
 				trans_activity_data.append(list(map(
 					fitbit_to_garmin_activities,todays_activity_data)))
-	# print(trans_activity_data,"trans_activity_data")
+	
+	modified_activities = combine_ui_fitbit_activities(user_input_activities,trans_activity_data)
 	time_duration = []
 	heart_rate = []
 	max_hrr = []
 	data1={}
 	steps = []
 	hrr_not_recorded_list = []
-	if trans_activity_data and trans_activity_data[0]:
-		start_date_timestamp = trans_activity_data[0][0]['startTimeInSeconds']
-		start_date_timestamp = start_date_timestamp +  trans_activity_data[0][0].get("startTimeOffsetInSeconds",0)
+	if trans_activity_data and trans_activity_data[0] or modified_activities:
+		try:
+			start_date_timestamp = trans_activity_data[0][0]['startTimeInSeconds']
+			start_date_timestamp = start_date_timestamp +  trans_activity_data[0][0].get("startTimeOffsetInSeconds",0)
+		except IndexError:
+			modified_activities_values = list(modified_activities.values())
+			start_date_timestamp = modified_activities_values[0]['startTimeInSeconds']
+			start_date_timestamp = start_date_timestamp +  modified_activities_values[0].get("startTimeOffsetInSeconds",0)
 		start_date = datetime.utcfromtimestamp(start_date_timestamp)
 		date = start_date.strftime('%d-%b-%y')
-		for workout in trans_activity_data[0]:
+		# print(trans_activity_data,"trans_activity_data")
+		for keys,workout in modified_activities.items():			
 			act_date = date
 			summaryId = workout['summaryId']
 			workout_type = workout['activityType']
@@ -573,7 +620,6 @@ def calculate_AA2_workout(user,start_date):
 			data1['Totals'] = total
 		else:
 			data1['Totals'] = {}
-	# print(data1,'ddddddddddddddddddd')
 	if data1:
 		return data1
 	else:
@@ -743,6 +789,8 @@ def get_user_created_activity(user,start_date,user_input_activities,fibit_act):
 	fitbit_ids = get_fitbit_act_ids(fibit_act)
 	ui_act_ids = list(user_input_activities.keys())
 	manually_added_act_ids = list(set(ui_act_ids)-set(fitbit_ids))
+	# print(manually_added_act_ids,"kkkkkkkkkkkkkkkkkkkkkkk")
+	# userdata = user_input_activities[manually_added_act_ids[0]]
 	activity_hr_time = []
 	for single_id in manually_added_act_ids:
 		start_time_seconds=user_input_activities[single_id].get("startTimeInSeconds")
@@ -755,8 +803,7 @@ def get_user_created_activity(user,start_date,user_input_activities,fibit_act):
 			single_activity_hr_time = get_hr_timediff(
 				hr_dataset,start_time_str,end_tine_str,summaryid)
 			activity_hr_time.append(single_activity_hr_time)
-
-	return activity_hr_time
+		return activity_hr_time
 
 def total_percent(modified_data_total):
 	'''
@@ -810,15 +857,18 @@ def add_totals(modified_data):
 	return(percent_added)
 
 def generate_totals(user_added_data,data):
-	# print(user_added_data,"user_added_data")
-	# print(data,"data")
-	user_added_data.pop('Totals')
-	data.update(user_added_data)
-	data.pop('Totals')
-	final_data = add_totals(data)
-	return final_data
+	
+	if data and user_added_data:
+		user_added_data.pop('Totals')
+		data.update(user_added_data)
+		data.pop('Totals')
+		final_data = add_totals(data)
+		return final_data
+	elif user_added_data and not data:
+		return user_added_data
 
 def calculate_AA2_daily(user,start_date,user_input_activities=None):
+	# print(user_input_activities,"user_input_activities")
 	hr_time_diff = fitbit_hr_diff_calculation(user,start_date)
 	# all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(user_get,start_date)
 	AA_data = AaCalculations.objects.filter(user_aa=user,created_at=start_date)
@@ -846,6 +896,7 @@ def calculate_AA2_daily(user,start_date,user_input_activities=None):
 
 	else:
 		return {}
+
 
 def get_aa3_data(user,hr_list,timediff_list):
 
@@ -1283,18 +1334,35 @@ def lowest_hrr_1min_no_hrr(time_diff_sum,hr):
 			one_min_hr.append(hr)
 	return one_min_hr
 
+def get_latest_activities(ui_activities,detected_activities):
+	ui_activities_copy = ui_activities.copy()
+	for key,activity in detected_activities.items():
+		if not ui_activities.get(key) and not activity.get('duplicate'):
+			ui_activities_copy[key] = activity
+	return ui_activities_copy
 
 def generate_hrr_charts(user,start_date):
 	'''
 		This function will generate the HRR charts for the Fitbit device
 	'''
 	# get activities from the user input form
+
 	fitbit_act = user_input.views.garmin_views._get_fitbit_activities_data(
 		user,start_date)
+	user_input_activities = get_usernput_activities(user,start_date)
+	if user_input_activities and fitbit_act:
+		ui_activities = get_latest_activities(user_input_activities,fitbit_act)
+		hrr_act = determine_hhr_activity(user,start_date,ui_activities)
+	elif fitbit_act:
+		hrr_act = determine_hhr_activity(user,start_date,fitbit_act)
+	else:
+		hrr_act = None
 	# determine the if activtyt is HRR or not
-	hrr_act = determine_hhr_activity(user,start_date,fitbit_act)
 	# get HRR activty id
-	hrr_act_id = get_hrr_activity(hrr_act)
+	if hrr_act:
+		hrr_act_id = get_hrr_activity(hrr_act)
+	else:
+		hrr_act_id = None
 	# get all activities start time and end time
 	activities_start_end_time_list = fitbit_aa_chart_one(user,start_date)
 	# get activity that is related to HRR activity
@@ -1382,6 +1450,16 @@ def generate_hrr_charts(user,start_date):
 			pure_time_99 = time_99 + diff_actity_hrr
 		else:
 			pure_time_99 = -1
+		if Did_heartrate_reach_99 == 'no' and hrr_act:
+			hr_time_diff,hr,time_to_99_time = get_time_to_99_no_hrr(hrr_act[0].get(
+															'act_start'),hr_data_set)
+			if hr_time_diff:
+				time_99 = sum(hr_time_diff)
+				pure_time_99 = time_99 + diff_actity_hrr
+			else:
+				time_99 = None
+				pure_time_99 = None
+
 		data = {"Did_you_measure_HRR":Did_you_measure_HRR,
 				"Did_heartrate_reach_99":Did_heartrate_reach_99,
 				"time_99":time_99,

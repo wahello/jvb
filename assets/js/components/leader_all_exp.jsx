@@ -37,9 +37,6 @@ class AllRank_Data1 extends Component{
           isOpen: !this.state.isOpen,
         });
       }
-      componentDidUpdate() {
-          console.log("Hello componentDidUpdate");
-      }
 
   scrollCallback(operationCount) {
       if (objectLength === operationCount) {
@@ -90,21 +87,21 @@ class AllRank_Data1 extends Component{
   }
   renderScoreHeader(data,c_name){
      let category = ["rank","username","score","other_scores"];
-                for (let [key1,value1] of Object.entries(data)){
-                    let values =[];
-                    let currentUser = '';
-                    for (let cat of category){
-                        if(cat == "score"){
-                          if(c_name == "Percent Unprocessed Food"){
-                            names = null;
-                          }
-                          else{
-                            names = <th className = "myranking_all">{value1[cat].verbose_name}</th>;
-                          }
-                        }
-                    }
+      for (let [key1,value1] of Object.entries(data)){
+          let values =[];
+          let currentUser = '';
+          for (let cat of category){
+              if(cat == "score"){
+                if(c_name == "Percent Unprocessed Food"){
+                  names = null;
                 }
-                return names;
+                else{
+                  names = <th className = "myranking_all">{value1[cat].verbose_name}</th>;
+                }
+              }
+          }
+      }
+      return names;
   }
 renderScoreHeader1(otherScoreObject){
   let name = [];

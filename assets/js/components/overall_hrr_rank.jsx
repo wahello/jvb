@@ -131,14 +131,20 @@ class OverallRank extends Component{
 			selectedDate:selectedDate,
 			fetching_hrr4:true,
 			calendarOpen:!this.state.calendarOpen,
-		},()=>{fetchLeaderBoard(this.successOverallHrrRank,this.errorOverallHrrRank,this.state.selectedDate);
+		},()=>{fetchLeaderBoard(this.successOverallHrrRank,
+								this.errorOverallHrrRank,
+								this.state.selectedDate,
+								null,null,'overall_hrr');
 		});
 	}
 	componentDidMount(){
 		this.setState({
 			fetching_hrr4:true,
 		});
-		fetchLeaderBoard(this.successOverallHrrRank,this.errorOverallHrrRank,this.state.selectedDate,true);
+		fetchLeaderBoard(this.successOverallHrrRank,
+						 this.errorOverallHrrRank,
+						 this.state.selectedDate,
+						 null,null,'overall_hrr');
 	}
 	toggle(){
 		this.setState({
@@ -163,7 +169,10 @@ class OverallRank extends Component{
         }
         custom_ranges.push(this.state.lb1_start_date);
         custom_ranges.push(this.state.lb1_end_date);
-      fetchLeaderBoard(this.successOverallHrrRank,this.errorOverallHrrRank,this.state.selectedDate,custom_ranges);
+      fetchLeaderBoard(this.successOverallHrrRank,
+      				   this.errorOverallHrrRank,
+      				   this.state.selectedDate,
+      				   custom_ranges,null,'overall_hrr');
     });
   }
    onSubmitDate2(event){
@@ -185,7 +194,10 @@ class OverallRank extends Component{
 
         custom_ranges.push(this.state.lb2_start_date);
         custom_ranges.push(this.state.lb2_end_date);
-      fetchLeaderBoard(this.successOverallHrrRank,this.errorOverallHrrRank,this.state.selectedDate,custom_ranges);
+      fetchLeaderBoard(this.successOverallHrrRank,
+      				  this.errorOverallHrrRank,
+      				  this.state.selectedDate,
+      				  custom_ranges,null,"overall_hrr");
     });
   }
  onSubmitDate3(event){
@@ -206,7 +218,10 @@ class OverallRank extends Component{
         }
         custom_ranges.push(this.state.lb3_start_date);
         custom_ranges.push(this.state.lb3_end_date);
-      fetchLeaderBoard(this.successOverallHrrRank,this.errorOverallHrrRank,this.state.selectedDate,custom_ranges);
+      fetchLeaderBoard(this.successOverallHrrRank,
+      				   this.errorOverallHrrRank,
+      				   this.state.selectedDate,
+      				   custom_ranges,null,"overall_hrr");
     });
   }
   handleChange(event){

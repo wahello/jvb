@@ -423,3 +423,50 @@ export function fetchGarminHrrData(start_date, successCallback=undefined, errorC
 	});
 }
 
+export function userDailyInputWeatherReportFetch(date, successCallback=undefined, errorCallback=undefined,clone){
+	const URL = 'weather/activity_weather_report/';
+	
+    const created_at = moment(date).format('YYYY-MM-DD');
+	const config = {
+		url : URL,
+		params:{
+   			start_date:created_at
+  		},
+		method: 'get',
+		withCredentials: true
+	};
+	axios(config).then(function(response){
+		if(successCallback != undefined){
+			successCallback(response,clone);
+		}
+	}).catch((error) => {
+		if(errorCallback != undefined){
+			errorCallback(error);
+		}
+	});
+}
+
+export function getManualActInfo( date, act_start_epoch, act_end_epoch, act_type, utc_offset,
+	                             manualActivityInfosuccess, manualActivityInfoerror){
+	const URL = '/users/daily_input/get_activity_info';
+	const config = {
+		url : URL,
+		method : 'get',
+		params:{
+				"date" : moment(date).format('YYYY-MM-DD'),
+				"act_start_epoch" : act_start_epoch,
+				"act_end_epoch" : act_end_epoch,
+				"act_type" : act_type ,
+				"utc_offset" : utc_offset,
+		}
+	};
+	axios(config).then(function(response){
+		if(manualActivityInfosuccess != undefined){
+			manualActivityInfosuccess(response);
+		}
+	}).catch((error) => {
+		if(manualActivityInfoerror != undefined){
+			manualActivityInfoerror(error);
+		}
+	});
+}

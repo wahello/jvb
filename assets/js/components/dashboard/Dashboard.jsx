@@ -9,6 +9,7 @@ class Dashboard extends Component {
 	constructor(props){
 		super(props);
 		this.state = {
+			 shouldShowPopup:true,
 			 linked_devices:true,
 			 have_garmin_connect_token:false,
     		 have_garmin_health_token:false,
@@ -36,36 +37,52 @@ class Dashboard extends Component {
 
 	toggle() {
 	    this.setState({
-	      linked_devices: !this.state.linked_devices
+	      shouldShowPopup: !this.state.shouldShowPopup
 	    });
   	}
 
-  	/* If user haven't linked any device yet, then show this popup to remind user to link atleast on device*/
+  	/* If user haven't linked any device yet, then show this popup to remind user to link atleast one device*/
 	noDeviceLinkedModel(){
-		let modal =  <Modal isOpen={!this.state.linked_devices} 
+		let isMissingOneGarminLink = ((!this.state.have_garmin_health_token && this.state.have_garmin_connect_token)
+									  || (this.state.have_garmin_health_token && !this.state.have_garmin_connect_token));
+		
+		let shouldShowPopup = (!this.state.linked_devices || isMissingOneGarminLink) && this.state.shouldShowPopup;
+		let message = `We noticed that you have not linked any wearable device yet.
+				       Click the links below to link devices supported by us
+				       so we can provide you with lots of cool reporting, grades from your
+				       data and analysis from your workouts!`; 
+
+		if(isMissingOneGarminLink){
+			message = `We noticed that you have not linked one of the Garmin API.
+                       Click the link below to connect it so we can provide you with
+                       lots of cool reporting, grades from your data and analysis
+                       from your workouts!`;
+		}
+		let modal =  <Modal isOpen={shouldShowPopup} 
 						  toggle = {this.toggle} 
 						  className={this.props.className}>
 				          <ModalHeader>Link wearable device(s)</ModalHeader>
 				          <ModalBody>
-				          	<p>
-				            	We noticed that you have not linked any wearable device yet.
-				            	Click the links below to link devices supported by us
-				            	so we can provide you with lots of cool reporting, grades from your
-				            	data and analysis from your workouts!
-				            </p>
+				          	<p>{message}</p>
 				            <div style={{display:'flex',justifyContent:'space-between'}}>
-					            <a href='/users/request_token' 
-				          	    	className = "garminlink">
-				          	    	<Button color="primary" style = {{fontSize:"13px"}}>Garmin Health<br/></Button>
-				          	    </a>
-								<a href='/users/connect_request_token' 
-									className = "garminlink">
-									<Button color="primary" style = {{fontSize:"13px"}}>Garmin Connect<br/></Button>
-								</a>
-								<a href='/fitbit/request_token_fitbit' 
-									className = "garminlink">
-									<Button color="primary" style = {{fontSize:"13px"}}>Fitbit<br/></Button>
-								</a>
+				            	{!this.state.have_garmin_health_token && 
+						            <a href='/users/request_token' 
+					          	    	className = "garminlink">
+					          	    	<Button color="primary" style = {{fontSize:"13px"}}>Garmin Health<br/></Button>
+					          	    </a>
+				          	   	}
+				          	   	{!this.state.have_garmin_connect_token &&
+									<a href='/users/connect_request_token' 
+										className = "garminlink">
+										<Button color="primary" style = {{fontSize:"13px"}}>Garmin Connect<br/></Button>
+									</a>
+								}
+								{!this.state.have_fitbit_token && !isMissingOneGarminLink &&
+									<a href='/fitbit/request_token_fitbit' 
+										className = "garminlink">
+										<Button color="primary" style = {{fontSize:"13px"}}>Fitbit<br/></Button>
+									</a>
+								}
 							</div>
 				          </ModalBody>
 				          <ModalFooter>
@@ -90,6 +107,9 @@ class Dashboard extends Component {
 						    <div className="social-login-buttons">
 
 							 <Link to='/userinputs'>User Inputs Daily Form</Link><br/>
+							 <h3 id="link_style">Leaderboards</h3>
+							  <Link to='/movement_leaderboard'>Movement Leaderboard</Link><br/>
+							  <Link to='/overall_hrr_rank'>HRR Leaderboard</Link><br/>		  
 							 <h3 id="link_style">Dashboards</h3>
 				  		 	  <Link to='/movement_dashboard'>Movement Dashboard</Link><br/>
 				  		 	  <Link to='/grades_dashboard'>Grades Dashboard</Link><br/>
@@ -107,20 +127,17 @@ class Dashboard extends Component {
 							  <h3 id="link_style">Heart Rate Recovery (HRR)</h3>
 							  <Link to='/hrr_summary_dashboard'>HRR Dashboard</Link><br/>
 							  <Link to='/hrr_recovery'>HRR Daily Summary Details</Link><br/>
-							  <Link to='/overall_hrr_rank'>HRR Leaderboard</Link><br/>
+
 							  <h3 id="link_style">Reporting</h3>
 							  <Link to='/progressanalyzer'>Progress Analyzer</Link><br/>
 							  <Link to='/leaderboard'>My Rankings</Link><br/>
 							   <Link to='/heartrate'>Heartrate Aerobic/Anaerobic Ranges</Link><br/>
-							   
 							   <Link to='/heartrate_zone'>Time in Heart-Rate Zones Chart</Link><br/>
-							   
-
-							   {/*<Link to='/workout_stats'>Heartrate Workout</Link><br/>*/}
-							   
+								{/*<Link to='/workout_stats'>Heartrate Workout</Link><br/>*/}
+							  
 							  <h3 id="link_style">Raw Data</h3>		  
 							  <Link to='/rawdata'>Raw Data</Link><br/>
-							  <Link to='/rawdata#movementconsistency'>Movement Consistency</Link><br/>
+							  <Link to='/rawdata?rtype=mc'>Movement Consistency</Link><br/>
 							  <Link to='/rawdata#grades'>Grades</Link><br/>
 							  <a target="_blank" href = "/static/quicklook/grades_key.pdf">Grades Key</a><br/>
 							  {/*<Link to='/movement_consistency'>movement Consistency</Link><br/>*/}
@@ -156,6 +173,10 @@ class Dashboard extends Component {
 							  {/*<h3 id="link_style">Other</h3>
 							  <Link to='/raw/garmin'>Garmin Pull Down</Link><br/>
 							  <Link to='/raw/fitbit'>Fitbit Pull Down</Link><br/>*/}
+
+							<h3 id="link_style">Data Backfill Request</h3>
+							<Link to='/backfill'>Historical Data Backfill Request</Link><br/>
+
 						  </div>
 						</div>
 					</div>

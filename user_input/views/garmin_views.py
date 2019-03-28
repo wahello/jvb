@@ -118,7 +118,6 @@ def _get_activities(user,target_date):
 			workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_activities
 			all_activities_heartrate.append(workout_final_heartrate)
 			all_activities_timestamp.append(workout_final_timestamp)
-	
 	sum_timestamp = []
 	for single_timestamp in all_activities_timestamp:
 		if single_timestamp:

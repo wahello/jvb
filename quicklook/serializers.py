@@ -154,3 +154,4 @@ class UserQuickLookSerializer(serializers.ModelSerializer):
 
 		alcohol_obj = instance.alcohol_ql
 		self._update_helper(alcohol_obj,alcohol_data)
+
