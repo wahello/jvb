@@ -16,11 +16,10 @@ import {updateHeartData} from '../../network/heart_cal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 import {renderHrrSelectedDateFetchOverlay} from '../dashboard_healpers';
+import HeartRateCal from './heart_rate_calculation';
 
 class No_Hrr_Data extends Component{
-
 	getInitialState(props){
-		
 		let end_time = this.renderTime(props.hrr.end_time_activity);
 		let end_time_split = null;
 		let end_time_am_pm = null;
@@ -100,7 +99,6 @@ class No_Hrr_Data extends Component{
 			no_file_beats_recovered:props.hrr.no_file_beats_recovered,
 			end_time_activity:props.hrr.end_time_activity,
 			no_fitfile_hrr_time_reach_99:props.hrr.no_fitfile_hrr_time_reach_99,
-
 		 }
 		 return initialState;
     }
@@ -215,15 +213,10 @@ class No_Hrr_Data extends Component{
 					lowest_hrr_no_fitfile:lowest_hrr_no_fitfile,
 					no_file_beats_recovered:no_file_beats_recovered,
 					end_time_activity:nextProps.hrr.end_time_activity,
-					no_fitfile_hrr_time_reach_99:nextProps.hrr.no_fitfile_hrr_time_reach_99
+					no_fitfile_hrr_time_reach_99:nextProps.hrr.no_fitfile_hrr_time_reach_99, 
 				});
         }  
-  	}
-  	/*componentDidUpdate(nextProps) {
-  		console.log( 'INSIDE ComponentDidUpdate ======> this.state ::: ' + JSON.stringify( this.state ) );
-  		console.log( 'INSIDE ComponentDidUpdate ======> this.props ::: ' + JSON.stringify( this.props ) );
-  		
-  	}*/
+	  }
 	editEndTimeActivity(){
 		this.setState({
 			editable_end_time_activity:!this.state.editable_end_time_activity,
@@ -407,6 +400,7 @@ class No_Hrr_Data extends Component{
 					heart_rate_down_up:data.data.heart_rate_down_up,
 					pure_1min_heart_beats:data.data.pure_1min_heart_beats,
 					pure_time_99:data.data.pure_time_99,
+	                use_updated_hrr:data.data.use_updated_hrr,
 
 					no_fitfile_hrr_time_reach_99:data.data.no_fitfile_hrr_time_reach_99,
 					no_fitfile_hrr_reach_99:data.data.no_fitfile_hrr_reach_99,
@@ -451,8 +445,10 @@ class No_Hrr_Data extends Component{
 			"time_heart_rate_reached_99":timeHeartRateReach99.utc().valueOf(),
 			"end_heartrate_activity":this.state.end_heartrate_activity,
 			"lowest_hrr_no_fitfile":this.state.lowest_hrr_no_fitfile,
-			"no_file_beats_recovered":this.state.no_file_beats_recovered,
+			"no_file_beats_recovered":this.state.no_file_beats_recovered,			
+			"use_updated_hrr":true
 		},() => {
+  			this.props.updateText(this.state.use_updated_hrr);
 			let data = {
 				"end_time_activity":endTimeActivity.utc().valueOf(),
 				"Did_you_measure_HRR":this.state.Did_you_measure_HRR,
@@ -462,11 +458,11 @@ class No_Hrr_Data extends Component{
 				"end_heartrate_activity": parseInt(this.state.end_heartrate_activity),
 				"lowest_hrr_no_fitfile": parseInt(this.state.lowest_hrr_no_fitfile),
 				"no_file_beats_recovered": parseInt(this.state.no_file_beats_recovered),
+				"use_updated_hrr":this.state.use_updated_hrr,
+				"include_hrr":this.props.shouldIncludeHRR,	
 			}
 			updateHeartData(data, this.props.selectedDate, this.successHeart, this.errorHeart);
-			//this.props.renderHrrData(data);
-		});
-			
+		});		
 	}
 	render(){
 		return(
