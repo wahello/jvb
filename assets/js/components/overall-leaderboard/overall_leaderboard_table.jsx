@@ -702,60 +702,78 @@ class OverallLeaderboardTable extends Component{
 					}
 					else if( key1 == "oh_gpa" ){
 					  let  overallGpaScore = value[key1].score.value;
-						if(overallGpaScore == 'N/A'){
-							overallGpaScore = 'NA'
+						if( overallGpaScore == 'N/A' || overallGpaScore == null ){
+							overallGpaScore = 'NA';
+						}
+						if( overallGpaScore == 'Not Reported' ){
+							overallGpaScore = 'NR';
 						}
 					td_values.push(this.getOverallGpaColors(overallGpaScore,value[key1].rank));
 					}
 					else if( key1 == "avg_sleep" ){
 					  let  avgSleepScore = value[key1].other_scores.sleep_duration.value;
-						if(avgSleepScore == 'N/A'){
-							avgSleepScore = 'NA'
+						if( avgSleepScore == 'N/A' || avgSleepScore == null ){
+							avgSleepScore = 'NA';
+						}
+						if( avgSleepScore == 'Not Reported' ){
+							avgSleepScore = 'NR';
 						}
 					td_values.push(this.getSleepColors(avgSleepScore,value[key1].rank,value[key1].score.value)); 	
 					}
 					else if( key1 == "resting_hr" ){
 					  let  restingHeartRateScore = value[key1].score.value;
-						if(restingHeartRateScore == 'N/A'){
-							restingHeartRateScore = 'NA'
+						if( restingHeartRateScore == 'N/A' || restingHeartRateScore == null ){
+							restingHeartRateScore = 'NA';
 						} 
+						if( restingHeartRateScore == 'Not Reported' ){
+							restingHeartRateScore == 'NR';
+						}
 					td_values.push(this.getRestingHeartRateColors(restingHeartRateScore,value[key1].rank));   
 					}
 					else if( key1 == "nes" ){
 					  let  nonExerciseStepsScore = value[key1].score.value;
-						if(nonExerciseStepsScore == 'N/A'){
-							nonExerciseStepsScore = 'NA'
+						if( nonExerciseStepsScore == 'N/A' || nonExerciseStepsScore == null ){
+							nonExerciseStepsScore = 'NA';
 						} 
+						if( nonExerciseStepsScore == 'Not Reported' ){
+							nonExerciseStepsScore = 'NR';
+						}
 					 td_values.push(this.renderStepsColor(nonExerciseStepsScore,value[key1].rank));
 					}
 					else if( key1 == "mc" ){
 					  let  momentConsistencyScore = value[key1].score.value;
-						if(momentConsistencyScore == 'N/A'){
-							momentConsistencyScore = 'NA'
+						if( momentConsistencyScore == 'N/A' || momentConsistencyScore == null ){
+							momentConsistencyScore = 'NA';
 						} 
+						if( momentConsistencyScore == 'Not Reported' ){
+							momentConsistencyScore = 'NR';
+						}
 					td_values.push(this.getMomentConsistencyColors(momentConsistencyScore,value[key1].rank));
 					}
 					else if( key1 == "ec" ){
 					  let  exerciseConsistencyScore = value[key1].score.value;
-						if(exerciseConsistencyScore == 'N/A'){
+						if( exerciseConsistencyScore == 'N/A' || exerciseConsistencyScore == null ){
 							exerciseConsistencyScore = 'NA'
 						} 
+						if( exerciseConsistencyScore == 'Not Reported' ){
+							exerciseConsistencyScore = 'NR';
+						}
 					 td_values.push(this.getExerciseConsistencyColors(exerciseConsistencyScore,value[key1].rank));
 					}
 					else if( key1 == "exercise_duration" ){
 					  let avg_exercise_heart_rate = value[key1].other_scores.avg_exercise_heart_rate.value;
 					  let exerciseduartionScore = value[key1].score.value;
 						if( avg_exercise_heart_rate == null || avg_exercise_heart_rate == 'N/A' ){
-						avg_exercise_heart_rate = 'NA'; 
+						    avg_exercise_heart_rate = 'NA'; 
 						}
-						if( avg_exercise_heart_rate == "Not Reported"){
-						avg_exercise_heart_rate = 'NR';
+						if( avg_exercise_heart_rate == "Not Reported" ){
+						   avg_exercise_heart_rate = 'NR';
 						}
-						if(exerciseduartionScore == null || exerciseduartionScore == 'N/A'){
-						exerciseduartionScore = 'NA';
+						if( exerciseduartionScore == null || exerciseduartionScore == 'N/A' ){
+						    exerciseduartionScore = 'NA';
 						}	
-						if(exerciseduartionScore == "Not Reported"){
-						exerciseduartionScore = 'NR';
+						if( exerciseduartionScore == "Not Reported" ){
+						    exerciseduartionScore = 'NR';
 						}
 					 td_values.push(this.getStylesForExerciseduration(exerciseduartionScore,value[key1].rank,avg_exercise_heart_rate,selectedRange));	
 					}
@@ -764,17 +782,17 @@ class OverallLeaderboardTable extends Component{
 						let anaerobic_prcnt = value[key1].other_scores.prcnt_anaerobic_duration.value;
 						let below_aerobic_prcnt =  value[key1].other_scores.prcnt_below_aerobic_duration.value;
 						let heartrate_not_recorded_prcnt = value[key1].other_scores.prcnt_hr_not_recorded_duration.value; 
-							if(aerobic_prcnt == null){
-							aerobic_prcnt = 0
+							if( aerobic_prcnt == null ){
+							    aerobic_prcnt = 0;
 							}
 							if( anaerobic_prcnt == null ){
-							anaerobic_prcnt = 0;
+							    anaerobic_prcnt = 0;
 							}
 							if( below_aerobic_prcnt == null ){
-							below_aerobic_prcnt = 0;
+							    below_aerobic_prcnt = 0;
 							}
 							if( heartrate_not_recorded_prcnt == null ){
-							heartrate_not_recorded_prcnt = 0;
+							    heartrate_not_recorded_prcnt = 0;
 							}	
 							if(value[key1].score.value != null && value[key1].other_scores.anaerobic_duration.value != null &&
 							value[key1].other_scores.below_aerobic_duration.value != null && value[key1].other_scores.hr_not_recorded_duration.value != null){
@@ -802,10 +820,24 @@ class OverallLeaderboardTable extends Component{
 							}
 					}
 					else if( key1 == "vo2_max" ){
-					 td_values.push(<td className="vmax">{value[key1].score.value}</td>);	
+                       let vmax = value[key1].score.value; 
+					   if( vmax == null || vmax == 'N/A' ){
+					   	   vmax = 'NA';
+					   }
+					   if( vmax == "Not Reported" ){
+					   	   vmax = 'NR';
+					   }
+					  td_values.push(<td>{vmax}</td>);	
 					}
 					else if( key1 == "prcnt_uf" ){
-					    td_values.push(this.getFoodColors(value[key1].score.value,value[key1].rank)); 	
+						let foodUnproc = value[key1].score.value;
+						 if( foodUnproc == null || foodUnproc == 'N/A'){
+						 	  foodUnproc = 'NA';
+						 }
+						 if( foodUnproc == 'Not Reported' ){
+						 	  foodUnproc = 'NR';
+						 }
+					    td_values.push(this.getFoodColors(foodUnproc,value[key1].rank)); 	
 					}
 					else if( key1 == "alcohol" ){
 						let alcohol_drink_per_day = value[key1].other_scores.alcohol_drink_per_day.value;
