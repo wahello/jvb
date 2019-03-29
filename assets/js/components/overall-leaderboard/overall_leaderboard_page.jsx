@@ -6,13 +6,13 @@ import FontAwesome from "react-fontawesome";
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import OverallLeaderboardTable from './overall_leaderboard_table';
-import fetchLeaderBoard, {fetchMcsSnapshot} from '../../network/leaderBoard';
+import fetchLeaderBoard from '../../network/leaderBoard';
 import { Collapse,Button,Modal,ModalHeader,ModalBody,ModalFooter,Navbar,NavbarToggler, 
          NavbarBrand,Nav,NavItem,NavLink,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input,
          Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
-import {renderOverallMovement1FetchOverlay,renderOverallMovement2FetchOverlay,
-	    renderOverallMovement3FetchOverlay,renderOverallMovementSelectedDateFetchOverlay} from '../leaderboard_healpers';
-import { getGarminToken,logoutUser} from '../../network/auth';	    
+import {renderOverallLeaderBoard1FetchOverlay,renderOverallLeaderBoard2FetchOverlay,
+	    renderOverallLeaderBoard3FetchOverlay,renderOverallLeaderBoardSelectedDateFetchOverlay} from '../leaderboard_healpers';
+import { getGarminToken,logoutUser,getUserProfile } from '../../network/auth';	    
 
 var CalendarWidget = require('react-calendar-widget');  
 var ReactDOM = require('react-dom');
@@ -55,6 +55,7 @@ class OverallLeaderboard extends Component{
 					calendarOpen:false,
 					isOpen1:false,
 					dateRange1:false,
+					gender:'',
 
 
 			        dateRange2:false,
@@ -64,7 +65,6 @@ class OverallLeaderboard extends Component{
 					btnView:false,
 			        all_movement_rank_data:'',
 			        mcs_data:'',
-			        current_user_id:null,
 			        Movement_username:"",
 			        duration_date:{
 						"week":"",
@@ -91,8 +91,6 @@ class OverallLeaderboard extends Component{
 		this.renderOverallMovementTable = this.renderOverallMovementTable.bind(this);
 		this.successOverallMovementRank = this.successOverallMovementRank.bind(this);
 		this.errorOverallMovementRank = this.errorOverallMovementRank.bind(this);
-		this.successMcsSnapshot = this.successMcsSnapshot.bind(this);
-		this.errorMcsSnapshot = this.errorMcsSnapshot.bind(this);
 		this.processDate = this.processDate.bind(this);
 		this.toggle1 = this.toggle1.bind(this);
 		this.toggleDate1 = this.toggleDate1.bind(this);
@@ -104,10 +102,10 @@ class OverallLeaderboard extends Component{
 		this.handleChange = this.handleChange.bind(this);
 		this.headerDates = this.headerDates.bind(this);
 		this.handleBackButton = this.handleBackButton.bind(this);
-		this.renderOverallMovement1FetchOverlay = renderOverallMovement1FetchOverlay.bind(this);
-		this.renderOverallMovement2FetchOverlay = renderOverallMovement2FetchOverlay.bind(this);
-		this.renderOverallMovement3FetchOverlay = renderOverallMovement3FetchOverlay.bind(this);
-		this.renderOverallMovementSelectedDateFetchOverlay = renderOverallMovementSelectedDateFetchOverlay.bind(this);
+		this.renderOverallLeaderBoard1FetchOverlay = renderOverallLeaderBoard1FetchOverlay.bind(this);
+		this.renderOverallLeaderBoard2FetchOverlay = renderOverallLeaderBoard2FetchOverlay.bind(this);
+		this.renderOverallLeaderBoard3FetchOverlay = renderOverallLeaderBoard3FetchOverlay.bind(this);
+		this.renderOverallLeaderBoardSelectedDateFetchOverlay = renderOverallLeaderBoardSelectedDateFetchOverlay.bind(this);
 		this.renderDate = this.renderDate.bind(this);
 		this.toggle = this.toggle.bind(this);
 		this.reanderAllHrr = this.reanderAllHrr.bind(this);
@@ -121,7 +119,6 @@ class OverallLeaderboard extends Component{
 			overall_data:data.data.overall,
 			duration_date:data.data.duration_date,
 			all_movement_rank_data:data.data.overall.today.all_rank,
-			//current_user_id:data.data.overall.today.user_rank.total_steps.user_id,
 			date:moment(date).format("MMM D, YYYY"),
 			capt:"Today",
 			fetching_hrr1:false,
@@ -167,20 +164,12 @@ class OverallLeaderboard extends Component{
 	        fetching_hrr4:false,
 		})
 	}
-
-	successMcsSnapshot(data){
-		this.setState({
-			mcs_data:data.data,
-			selectedRangeMCSData:data.data[moment(this.state.selectedDate).format('YYYY-MM-DD')]
-		},()=>{
-			
-		})
-	}
-
-	errorMcsSnapshot(error){
-		console.log(error.message);
-	}
-
+    
+    successProfile(data){
+	    this.setState({
+	        gender: data.data.gender
+	    });
+    }
 	processDate(selectedDate){
 		this.setState({
 			selectedDate:selectedDate,
@@ -196,7 +185,6 @@ class OverallLeaderboard extends Component{
 							 this.errorOverallMovementRank,
 							 this.state.selectedDate,
 							 null,null,'overall');
-			fetchMcsSnapshot(this.successMcsSnapshot,this.errorMcsSnapshot,this.state.selectedDate);
 
 		});
 	}
@@ -392,7 +380,7 @@ class OverallLeaderboard extends Component{
 						 this.errorOverallMovementRank,
 						 this.state.selectedDate,
 						 null,null,'overall');
-		fetchMcsSnapshot(this.successMcsSnapshot,this.errorMcsSnapshot,this.state.selectedDate);
+		getUserProfile(this.successProfile);
 	}
 
 	  	renderOverallMovementTable(value,mcs_data,value5){
@@ -564,19 +552,25 @@ class OverallLeaderboard extends Component{
 	                          <p className="footer_content" style={{marginLeft:"15px"}}>
 	                          NR = Not Reported; NA = Not Available
 	                          </p>
-	                          <p className="footer_content" style={{marginLeft:"15px"}}>
-	                          <span className="row">
-	                          Grades:&nbsp;
-	                           <span className="col-sm-1" style={{backgroundColor:"green","text-align":"center"}}>A</span>&nbsp;
-	                           <span className="col-sm-1" style={{backgroundColor:"#32CD32","text-align":"center"}}>B</span>&nbsp;
-	                           <span className="col-sm-1" style={{backgroundColor:"yellow","text-align":"center"}}>C</span>&nbsp;
-	                           <span className="col-sm-1" style={{backgroundColor:"orange","text-align":"center"}}>D</span>&nbsp;
-	                           <span className="col-sm-1" style={{backgroundColor:"red","text-align":"center"}}>E</span>
-	                          </span>
-	                          </p>
+		          			 <p className="footer_content" style={{marginLeft:"15px"}}>
+		          			 Grades:&nbsp;
+		          			  <div className="rd_mch_color_legend color_legend_green"></div>
+					           <span className="rd_mch_color_legend_label">A</span>
+					           <div className="rd_mch_color_legend color_legend_parrot_green"></div>
+					           <span className="rd_mch_color_legend_label">B</span>
+					           <div className="rd_mch_color_legend color_legend_yelow"></div>
+					           <span className="rd_mch_color_legend_label">C</span>
+					           <div className="rd_mch_color_legend color_legend_orange"></div>
+					           <span className="rd_mch_color_legend_label">D</span>
+					           <div className="rd_mch_color_legend color_legend_red"></div>
+					           <span className="rd_mch_color_legend_label">F</span>
+			          	     </p>      
 	                          <p className="footer_content" style={{marginLeft:"15px"}}>
 	                          Numbers in (parenthesis) represent overall rank in category (where (1) is best)
 	                          </p>
+	                           <p className="footer_content" style={{marginLeft:"15px"}}>
+		                        See the Movement Leaderboard for more details regarding Overall Movement Rank
+		                        </p>
                              </div>
                           </div>
                          </ModalBody> 
@@ -767,12 +761,13 @@ class OverallLeaderboard extends Component{
 		  			overall_data = {this.state.all_movement_rank_data}
 	  				Movement_username = {this.state.Movement_username}
 	  				mcs_data = {this.state.selectedRangeMCSData}
-	  				selectedRange = {this.state.selectedRange}/>
+	  				selectedRange = {this.state.selectedRange}
+	  				gender={this.state.gender}/>
                     </div>                     
-		        {this.renderOverallMovementSelectedDateFetchOverlay()}
-                {this.renderOverallMovement1FetchOverlay()}
-                {this.renderOverallMovement2FetchOverlay()}
-                {this.renderOverallMovement3FetchOverlay()}
+		        {this.renderOverallLeaderBoard1FetchOverlay()}
+                {this.renderOverallLeaderBoard2FetchOverlay()}
+                {this.renderOverallLeaderBoard3FetchOverlay()}
+                {this.renderOverallLeaderBoardSelectedDateFetchOverlay()}
                            
          </div>
 	  );

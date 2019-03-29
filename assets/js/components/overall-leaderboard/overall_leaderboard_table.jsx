@@ -12,31 +12,7 @@ import { Collapse, Navbar, NavbarToggler,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 
 let objectLength = 0;
-function minuteToHM(value) {
-	var time;
-	if( isNaN(value) || value == null ){
-      return "00:00";
-	} 
-	if(value){
-		if(value == "N/A"){
-			time = "00:00";
-		}
-		else if(value>0){
-			var min_num = parseInt(value); 
-			var hours   = Math.floor(min_num / 60);
-			var minutes = Math.floor(min_num % 60);
 
-			if (hours   < 10) {hours   = "0"+hours;}
-			if (minutes < 10) {minutes = "0"+minutes;}
-			time = hours+':'+minutes;
-		}
-	}
-	else if(value == 0 || value == null ){
-		time = "00:00";
-	}
-	return time;
-}
-	
 function strToSecond(value){
     let time = value.split(':');
     let hours = parseInt(time[0])*3600;
@@ -45,94 +21,20 @@ function strToSecond(value){
     return s_time;
 }
 
-function strToMin(value){
-    let time = value.split(':');
-    let hours = parseInt(time[0])*60;
-    let mins = parseInt(time[1]);
-    return hours+mins;
-}
-
-function getGradeStartEndRange(exerciseActiveDuration=null){
-	let gradeRanges = {
-		'A':["04:06","04:06"], //[lower End, higher End]
-		'B':["03:13","04:05"],
-		'C':["02:45","03:12"],
-		'D':["02:01","02:44"],
-		'F':["00:00","02:00"]
-	}
-
-	if(exerciseActiveDuration){
-		const EXERCISE_ACTIVE_TIME_CAP = 60;
-		let timeToDeduct = EXERCISE_ACTIVE_TIME_CAP;
-		exerciseActiveDuration = strToMin(exerciseActiveDuration);
-		if(exerciseActiveDuration < EXERCISE_ACTIVE_TIME_CAP)
-			timeToDeduct = exerciseActiveDuration;
-		for(let [grade,range] of Object.entries(gradeRanges)){
-			let lowEnd = strToMin(range[0]);
-			let highEnd = strToMin(range[1]);
-			if(lowEnd != 0)
-				gradeRanges[grade][0] = minuteToHM(lowEnd - timeToDeduct)
-			gradeRanges[grade][1] = minuteToHM(highEnd - timeToDeduct)
-		}
-
-	}
-
-	return gradeRanges
-}
-
-function getStylesForActiveMinute(totalActiveDuration,rank,exerciseActiveMin=null){
-	let gradeStartEndRange = getGradeStartEndRange(exerciseActiveMin);
-	totalActiveDuration = minuteToHM(totalActiveDuration);
-	let totalTimeInSeconds = strToSecond(totalActiveDuration);
-	let background = "";
-	let color = "";
-	if(totalTimeInSeconds >= strToSecond(gradeStartEndRange.A[0])){
-		background = "green";
-		color = "white";
-	}else if(totalTimeInSeconds >= strToSecond(gradeStartEndRange.B[0]) 
-			 && totalTimeInSeconds <= strToSecond(gradeStartEndRange.B[1])){
-		background = "#32CD32";
-		color = "white";
-	}else if(totalTimeInSeconds >= strToSecond(gradeStartEndRange.C[0])
-			 && totalTimeInSeconds <= strToSecond(gradeStartEndRange.C[1])){
-		background = "yellow";
-		color = "black";
-	}else if(totalTimeInSeconds >= strToSecond(gradeStartEndRange.D[0])
-			 && totalTimeInSeconds <= strToSecond(gradeStartEndRange.D[1])){
-		background = "orange";
-		color = "white";
-	}else{
-		background = "red";
-		color = "black";
-	}
-	return (
-		<td 
-			className ="overall_rank_value"
-			style = {{backgroundColor:background,color:color}}>
-			<span>{totalActiveDuration} {'('+rank+')'}</span>
-		</td>
-	);
-
-}
-
 class OverallLeaderboardTable extends Component{
 
 	constructor(props){
 		super(props);
-       
-        this.setState = {
-
-        }
+		
         this.renderTable = this.renderTable.bind(this);
         this.scrollCallback = this.scrollCallback.bind(this);
 		this.doOnOrientationChange = this.doOnOrientationChange.bind(this);
 		this.renderStepsColor = this.renderStepsColor.bind(this);
 		this.renderCommaSteps = this.renderCommaSteps.bind(this);
-		this.renderGetColors = this.renderGetColors.bind(this);
 		this.getStylesForExerciseduration   = this.getStylesForExerciseduration.bind(this);
-		this.mcsData = this.mcsData.bind(this);
 		this.exerciseDurColrsSingleDayOr2to6Days = this.exerciseDurColrsSingleDayOr2to6Days.bind(this);
 		this.getFoodColors = this.getFoodColors.bind(this);
+		this.getFoodGrades = this.getFoodGrades.bind(this);
 		this.getAlcoholColors = this.getAlcoholColors.bind(this);
 		this.getAlcoholGrades = this.getAlcoholGrades.bind(this);
 		this.getExerciseConsistencyGrades = this.getExerciseConsistencyGrades.bind(this);
@@ -141,7 +43,6 @@ class OverallLeaderboardTable extends Component{
 		this.getMomentConsistencyColors = this.getMomentConsistencyColors.bind(this);
 		this.getRestingHeartRateColors = this.getRestingHeartRateColors.bind(this);
 		this.getRestingHeartRateGrades = this.getRestingHeartRateGrades.bind(this);
-		this.getSleepGrades = this.getSleepGrades.bind(this);
 		this.getSleepColors = this.getSleepColors.bind(this);
 		this.getOverallGpaColors = this.getOverallGpaColors.bind(this);
 		this.getOverallGpaGrades = this.getOverallGpaGrades.bind(this);
@@ -182,67 +83,119 @@ class OverallLeaderboardTable extends Component{
           },100);
       }
   	}
+
+  	getFoodGrades(score){
+  		let grade = "";
+			if (score >= 80){
+			 grade = 'A';
+		   }
+			else if (score >= 70 && score < 80){
+			grade = 'B';
+		    }
+			else if (score >= 60 && score < 70){
+			grade = 'C'
+	        } 
+			else if (score >= 50 && score < 60){
+			grade = 'D'
+		    }
+			else if (score < 50){
+			grade = 'F';
+		    }
+		return grade;
+  	}
   	getFoodColors(score,rank){
       let background = "";
       let color = "";
-     
-	      if (score<50){
-	      	background = "red";
-	      	color = "black";
-	      }
-	      else if (score>=50 && score<70){
-	      	background = "yellow";
-	      	color = "black";
-	      }
-	      else if (score >= 70){
-	      	background ='green';
-	      	color = 'white';
-	      }
+      if(isNaN(score) || score == null){
+      	background = '';
+      	color = '';
+      }
+      	else{
 
-      	else if(score == null || score == 'N/A'){
-             score = 'NA';
-             return (
- 			    	<td className ="overall_rank_value upf" 
-			    		style = {{backgroundColor:background,color:color}}>
-			    		<span>{score}{'('+rank+')'}</span>
-			    	</td> 
-           );
+      		let grade = this.getFoodGrades(score);
+				if ( grade == 'A' ){    				
+					background ='green';
+					color = 'white';
+				}
+				else if ( grade == 'B' ){
+					background = "#32CD32";
+					color = "white";
+				}
+				else if ( grade == 'C'){
+					background = "yellow";
+					color = "black"
+				}	
+				else if ( grade == 'D'){
+					background ='#FF8C00';
+					color = 'white';
+				}	
+				else if ( grade == 'F'){
+					background = "red";
+					color = "black";
+				}					
+				else if(score == null || score == 'N/A'){
+					     score = 'NA';
+					return (
+					<td className ="overall_rank_value upf" 
+					style = {{backgroundColor:background,color:color}}>
+					<span>{score}{' '}{'('+rank+')'}</span>
+					</td> 
+				  );
+				}
+			}
+				return (
+					<td className ="overall_rank_value" 
+					style = {{backgroundColor:background,color:color}}>
+					<span>{score}{'%'}{' '}{'('+rank+')'}</span>
+					</td> 
+		);
 
-          }
-      return (
- 			    	<td className ="overall_rank_value upf" 
-			    		style = {{backgroundColor:background,color:color}}>
-			    		<span>{score}{'%'}{'('+rank+')'}</span>
-			    	</td> 
-           );
-           
-
-	   
-			    
     }
-    getAlcoholGrades(drink_avg){
-		let grade='';
-		if (drink_avg <= 5){
+    getAlcoholGrades(drink_avg, gender){
+		let grade = '';
+		if (gender === 'F') {
+			if (drink_avg <= 3){
+        		grade = 'A'
+	        }   
+	        else if (drink_avg > 3 && drink_avg < 5){
+	            grade = 'B'
+	        }
+	        else if (drink_avg >= 5 && drink_avg < 7){
+	            grade = 'C';
+	        }
+	        else if (drink_avg >= 7 && drink_avg < 9){
+	            grade = 'D';
+	        }
+	        else if (drink_avg >= 9 && drink_avg <= 14){
+	            grade = 'F';
+	        }
+	        else if( drink_avg > 14){
+	            grade = 'F';
+	        }
+		} 
+		else{
+			if (drink_avg <= 5){
         	grade = 'A'
-        }   
-        else if (drink_avg > 5 && drink_avg < 12){
-            grade = 'B'
-        }
-        else if (drink_avg >= 12 && drink_avg < 15){
-            grade = 'C';
-        }
-        else if (drink_avg >= 15 && drink_avg < 16){
-            grade = 'D';
-        }
-        else if (drink_avg >= 16 && drink_avg <= 21){
-            grade = 'F';
-        }
-        else if( drink_avg > 21){
-            grade = 'F';
-        }
+	        }   
+	        else if (drink_avg > 5 && drink_avg < 12){
+	            grade = 'B'
+	        }
+	        else if (drink_avg >= 12 && drink_avg < 15){
+	            grade = 'C';
+	        }
+	        else if (drink_avg >= 15 && drink_avg < 16){
+	            grade = 'D';
+	        }
+	        else if (drink_avg >= 16 && drink_avg <= 21){
+	            grade = 'F';
+	        }
+	        else if( drink_avg > 21){
+	            grade = 'F';
+	        }
+		}
         return grade;
     }
-	getAlcoholColors(alcoholperday,alcoholperweek,rank){
+	getAlcoholColors(alcoholperday,alcoholperweek,rank, gender){
 		let background= '';
 		let color='';
 		if(isNaN(alcoholperweek) || alcoholperweek == null){
@@ -250,7 +203,7 @@ class OverallLeaderboardTable extends Component{
 			color = '';   
 		}
 		else {
-			let grade = this.getAlcoholGrades(alcoholperweek); 	
+			let grade = this.getAlcoholGrades(alcoholperweek, gender); 	
 			if(grade == 'A'){
 				background='green';
 				color='white';
@@ -261,7 +214,7 @@ class OverallLeaderboardTable extends Component{
 			}
 			else if(grade == 'C'){
 				background='yellow';
-				color='balck';
+				color='black';
 			}
 			else if(grade == 'D'){
 				background='#FF8C00';
@@ -273,42 +226,43 @@ class OverallLeaderboardTable extends Component{
 			}
 		}
 		return (
-			<td className ="overall_rank_value alchl_drnk" 
+			<td className ="overall_rank_value" 
 			style = {{backgroundColor:background,color:color}}>
-			<span>{alcoholperday}{'/'}<br/>{alcoholperweek}{'('+rank+')'}</span>
+			<span>{alcoholperday}{' '}{'/'}<br/>{alcoholperweek}{' '}{'('+rank+')'}</span>
 			</td>
 		);
 	}
 
     getExerciseConsistencyGrades(ecscore){
     	let grade = '';
-    	    grade = 'F'
-    if (ecscore >= 4){
-        grade = 'A'
-    }
-    else if (ecscore >= 3 && ecscore < 4){
-        grade =  'B'
-    }
-    else if (ecscore >= 2 && ecscore < 3){
-        grade =  'C'
-    }
-    else if (ecscore >= 1 && ecscore < 2){
-        grade =  'D'
-    }
-    else if (ecscore < 1){
-        grade = 'F'
-    }
+		    if (ecscore >= 4){
+		        grade = 'A'
+		    }
+		    else if (ecscore >= 3 && ecscore < 4){
+		        grade =  'B'
+		    }
+		    else if (ecscore >= 2 && ecscore < 3){
+		        grade =  'C'
+		    }
+		    else if (ecscore >= 1 && ecscore < 2){
+		        grade =  'D'
+		    }
+		    else if (ecscore < 1){
+		        grade = 'F'
+		    }
     return grade;
     }   
     getExerciseConsistencyColors(ecscore,rank){
     	let background= '';
 		let color='';
-		if(isNaN(ecscore) || ecscore == null){
+		
+		if( isNaN(ecscore) || ecscore == null ){
 			background = '';
 			color = '';   
 		}
 		else {
 			let grade = this.getExerciseConsistencyGrades(ecscore); 	
+			ecscore = parseFloat(ecscore).toFixed(2);
 			if(grade == 'A'){
 				background='green';
 				color='white';
@@ -319,7 +273,7 @@ class OverallLeaderboardTable extends Component{
 			}
 			else if(grade == 'C'){
 				background='yellow';
-				color='balck';
+				color='black';
 			}
 			else if(grade == 'D'){
 				background='#FF8C00';
@@ -330,8 +284,9 @@ class OverallLeaderboardTable extends Component{
 				color='black';
 			}
 		}
+		
 		return (
-			<td className ="overall_rank_value EC" 
+			<td className ="overall_rank_value" 
 			style = {{backgroundColor:background,color:color}}>
 			<span>{ecscore}<br/>{'('+rank+')'}</span>
 			</td>
@@ -339,32 +294,34 @@ class OverallLeaderboardTable extends Component{
 
     }
     getMomentConsistencyGrades(mcscore){
-      let grade = '';
-      if (mcscore <= 4.5){
-        grade = 'A';
-    }
-    else if (mcscore > 4.5 && mcscore <= 6){
-        grade = 'B'
-    }
-    else if (mcscore > 6 && mcscore <= 7){
-        grade = 'C'
-    }
-    else if (mcscore > 7 && mcscore <= 10)
-        grade = 'D'
-    else if (mcscore > 10 ){
-        grade = 'F'
-    }
-    return grade;
+	    let grade = '';
+		  	if (mcscore <= 4.5){
+		    	grade = 'A';
+		    }
+		    else if (mcscore > 4.5 && mcscore <= 6){
+		        grade = 'B'
+		    }
+		    else if (mcscore > 6 && mcscore <= 7){
+		        grade = 'C'
+		    }
+		    else if (mcscore > 7 && mcscore <= 10)
+		        grade = 'D'
+		    else if (mcscore > 10 ){
+		        grade = 'F'
+		    }
+	    return grade;
     }
     getMomentConsistencyColors(mcscore,rank){
         let background= '';
 		let color='';
-		if(isNaN(mcscore) || mcscore == null){
+		
+		if( isNaN(mcscore) || mcscore == null){
 			background = '';
 			color = '';   
 		}
 		else {
 			let grade = this.getMomentConsistencyGrades(mcscore); 	
+			mcscore = parseFloat(mcscore).toFixed(2);
 			if(grade == 'A'){
 				background='green';
 				color='white';
@@ -375,7 +332,7 @@ class OverallLeaderboardTable extends Component{
 			}
 			else if(grade == 'C'){
 				background='yellow';
-				color='balck';
+				color='black';
 			}
 			else if(grade == 'D'){
 				background='#FF8C00';
@@ -386,8 +343,9 @@ class OverallLeaderboardTable extends Component{
 				color='black';
 			}
 		}
+		
 		return (
-			<td className ="overall_rank_value MC" 
+			<td className ="overall_rank_value" 
 			style = {{backgroundColor:background,color:color}}>
 			<span>{mcscore}<br/>{'('+rank+')'}</span>
 			</td>
@@ -395,24 +353,24 @@ class OverallLeaderboardTable extends Component{
     }
     getRestingHeartRateGrades(rhrscore){
        let grade = '';
-       if (rhrscore >= 30 && rhrscore <= 60){
-        grade = 'A';
-    }
-    else if (rhrscore >= 61 && rhrscore <= 68){
-        grade = 'B'
-    }
-    else if (rhrscore >= 69 && rhrscore <= 74){
-        grade = 'C'
-    }
-    else if (rhrscore >= 75 && rhrscore <= 79){
-        grade = 'D'
-    }
-    else if( rhrscore >= 80 || rhrscore < 30){
-        grade = 'F'
-    }
-    else{
-        grade = 'F'
-    }
+		    if (rhrscore >= 30 && rhrscore <= 60){
+		        grade = 'A';
+		    }
+		    else if (rhrscore >= 61 && rhrscore <= 68){
+		        grade = 'B'
+		    }
+		    else if (rhrscore >= 69 && rhrscore <= 74){
+		        grade = 'C'
+		    }
+		    else if (rhrscore >= 75 && rhrscore <= 79){
+		        grade = 'D'
+		    }
+		    else if( rhrscore >= 80 || rhrscore < 30){
+		        grade = 'F'
+		    }
+		    else{
+		        grade = 'F'
+		    }
     return grade;
       
     }
@@ -435,7 +393,7 @@ class OverallLeaderboardTable extends Component{
 			}
 			else if(grade == 'C'){
 				background='yellow';
-				color='balck';
+				color='black';
 			}
 			else if(grade == 'D'){
 				background='#FF8C00';
@@ -447,7 +405,7 @@ class OverallLeaderboardTable extends Component{
 			}
 		}
 		return (
-			<td className ="overall_rank_value rhr" 
+			<td className ="overall_rank_value" 
 			style = {{backgroundColor:background,color:color}}>
 			<span>{rhrscore}<br/>{'('+rank+')'}</span>
 			</td>
@@ -456,32 +414,34 @@ class OverallLeaderboardTable extends Component{
    
     getOverallGpaGrades(ogpascore){
       let grade = '';
-      if (ogpascore >= 3.4){
-        grade = 'A';
-    }
-    else if (ogpascore >= 3 && ogpascore < 3.4)
-        grade = 'B';
-    else if (ogpascore >= 2 && ogpascore < 3){
-        grade = 'C';
-    }
-    else if (ogpascore >= 1 && ogpascore < 2){
-        grade = 'D';
-    }
-    else if (ogpascore < 1){
-        grade = 'F';
-     }
+		if (ogpascore >= 3.4){
+		    grade = 'A';
+		}
+		else if (ogpascore >= 3 && ogpascore < 3.4)
+		    grade = 'B';
+		else if (ogpascore >= 2 && ogpascore < 3){
+		    grade = 'C';
+		}
+		else if (ogpascore >= 1 && ogpascore < 2){
+		    grade = 'D';
+		}
+		else if (ogpascore < 1){
+		    grade = 'F';
+		 }
      return grade;
     }
     getOverallGpaColors(ogpascore,rank){
      let background= '';
 		let color='';
-		if(isNaN(ogpascore) || ogpascore == null){
+		let grade = this.getOverallGpaGrades(ogpascore); 	
+		if( isNaN(ogpascore) ||ogpascore == null || grade ==  ' ' ){
 			background = '';
-			color = '';   
+			color = ''; 
+			grade = 'NA';
 		}
 		else {
-			let grade = this.getOverallGpaGrades(ogpascore); 	
-			if(grade == 'A'){
+		     ogpascore = parseFloat(ogpascore).toFixed(2);	
+			 if(grade == 'A'){
 				background='green';
 				color='white';
 			}
@@ -491,7 +451,7 @@ class OverallLeaderboardTable extends Component{
 			}
 			else if(grade == 'C'){
 				background='yellow';
-				color='balck';
+				color='black';
 			}
 			else if(grade == 'D'){
 				background='#FF8C00';
@@ -501,11 +461,12 @@ class OverallLeaderboardTable extends Component{
 				background='red';
 				color='black';
 			}
+		
 		}
 		return (
-			<td className ="overall_rank_value ogpa" 
+			<td className ="overall_rank_value" 
 			style = {{backgroundColor:background,color:color}}>
-			<span>{ogpascore}<br/>{'('+rank+')'}</span>
+			<span>{grade}{' '}{'/'}<br/>{ogpascore}{' '}{'('+rank+')'}</span>
 			</td>
 		);
     }
@@ -586,7 +547,7 @@ class OverallLeaderboardTable extends Component{
 	    }
 	    return (
 	    	<td 
-	    		className ="overall_rank_value Nes"
+	    		className ="overall_rank_value"
 	    		style = {{backgroundColor:background,color:color}}>
 	    		<span>{this.renderCommaSteps(steps)}<br/>{'('+rank+')'}</span>
 	    	</td>
@@ -604,94 +565,48 @@ class OverallLeaderboardTable extends Component{
         }
         return x1 + x2;
 	}
-     getSleepGrades(sleepduration){
-        let grade = '';
-          if (sleepduration < 4.5){
-        grade = 'F';
-    }
-    else if (sleepduration >= 4.5 && sleepduration < 6){
-        grade = 'D';
-    }
-    else if (sleepduration >= 6 && sleepduration < 7){
-        grade = 'C';
-    }
-    else if (sleepduration >= 7 && sleepduration < 10){
-         grade = 'B'
-    }
-    else if (hours_inactive > 10){
-    }
-    else{
-         grade = 'A';
-     }
-     return grade;
-    }
-    getSleepColors(sleepduration,rank){
-       let background= '';
-		let color='';
-		if(isNaN(sleepduration) || sleepduration == null){
-			background = '';
-			color = '';   
-		}
-		else {
-			let grade = this.getSleepGrades(sleepduration); 	
-			if(grade == 'A'){
-				background='green';
-				color='white';
-			}
-			else if(grade == 'B'){
-				background='#32CD32';
-				color='white';
-			}
-			else if(grade == 'C'){
-				background='yellow';
-				color='balck';
-			}
-			else if(grade == 'D'){
-				background='#FF8C00';
-				color='white';
-			}
-			else if(grade == 'F'){
-				background='red';
-				color='black';
-			}
-		}
+    getSleepColors(sleepduration,rank,avgsleepgpa){
+		let background = "";
+		let color = "";
+		if(sleepduration && sleepduration != 'NA' && sleepduration != 'NR'){
+			let sleepDurationInSeconds = strToSecond(sleepduration);
+			if(sleepDurationInSeconds < strToSecond("6:00") || sleepDurationInSeconds > strToSecond("12:00")){
+				 	background = '#FF0101';
+	                color = 'black';
+	             
+	        }
+			else if(strToSecond("7:30") <= sleepDurationInSeconds && sleepDurationInSeconds <= strToSecond("10:00")){
+					background = 'green';
+		            color = 'white';
+		       
+		    }
+	    	else if((strToSecond("7:00")<=sleepDurationInSeconds && sleepDurationInSeconds<= strToSecond("7:29"))
+	    	 || (strToSecond("10:01")<=sleepDurationInSeconds && sleepDurationInSeconds<= strToSecond("10:30"))){
+	    		 	background = '#32CD32';
+	                color = 'white';
+	            
+	    	}	
+	    	else if((strToSecond("6:30")<=sleepDurationInSeconds && sleepDurationInSeconds<=strToSecond("6:59"))
+	    	 || (strToSecond("10:31")<= sleepDurationInSeconds && sleepDurationInSeconds<=strToSecond("11:00"))){
+	    		 	background = '#FFFF01';
+	                color = 'black';
+	               
+	        }
+	    	else if((strToSecond("06:00")<=sleepDurationInSeconds && sleepDurationInSeconds<= strToSecond("6:29"))
+	    	 || (strToSecond("11:00")<=sleepDurationInSeconds && sleepDurationInSeconds<= strToSecond("12:00"))){
+	    		 	background = '#E26B0A';
+	                color = 'black';
+	             
+	    	}
+    	}
+
 		return (
-			<td className ="overall_rank_value slp" 
+			<td className ="overall_rank_value" 
 			style = {{backgroundColor:background,color:color}}>
 			<span>{sleepduration}<br/>{'('+rank+')'}</span>
 			</td>
 		);
-    }
-	renderGetColors(hours_inactive,rank){
-		let background = "";
-		let color = "";
-	    if (hours_inactive <= 4.5){
-	        background = "green";
-	        color = "white";
-	    }
-	    else if (hours_inactive > 4.5 && hours_inactive <= 6){
-	       background = "#32CD32";
-	        color = "white";
-	    }
-	    else if (hours_inactive > 6 && hours_inactive <= 7){
-	       background = "yellow";
-	        color = "black";
-	    }
-	    else if (hours_inactive > 7 && hours_inactive <= 10){
-	       background = "#FF8C00";
-	        color = "white";
-	    }
-	    else if (hours_inactive > 10){
-	        background = "red";
-	        color = "white";
-	    }
-	    return (
-	    	<td 
-	    		className ="overall_rank_value"
-	    		style = {{backgroundColor:background,color:color}}>
-	    		<span>{hours_inactive} {'('+rank+')'}</span>
-	    	</td>
-	    );
+      
     }
 
     getStylesForExerciseduration(value1,rank,avgHR,selectedRange){
@@ -738,9 +653,9 @@ class OverallLeaderboardTable extends Component{
 			        color = "white";
 			    }
 			    return (
-			    	<td className ="overall_rank_value ed" 
+			    	<td className ="overall_rank_value" 
 			    		style = {{backgroundColor:background,color:color}}>
-			    		<span>{value1}{'('+rank+')'}<br/>{' / '}{avgHR}</span>
+			    		<span>{value1}{' '}{'('+rank+')'}<br/>{' / '}{avgHR}</span>
 			    	</td>
 			    );
 			}
@@ -756,40 +671,6 @@ class OverallLeaderboardTable extends Component{
 				return td;
 			} 	
 		}   
-	}
-
-	mcsData(status){
-  		/* adding background color to card depends upon their steps ranges*/
-	  	  let background = "";
-		  let color = "";
-	      if(status == "sleeping"){
-	        background= 'rgb(0,176,240)';
-	      }
-	      else if(status == "inactive"){
-	        background = 'red';
-	      }
-	      else if(status == "strength"){
-	      	background = "rgb(255,0,255)";
-	      }
-	      else if(status == "exercise"){
-	        background = "#FD9A44";
-	      }
-	      else if(status == "no data yet"){
-	        background = "#A5A7A5";
-	      }
-	      else if(status == "time zone change"){
-	      	background = "#fdeab7";
-	      }
-	       else if(status == "nap"){
-	      	background = " #107dac";
-	      }
-	      else if (status == "active"){
-	        background = 'green';
-	      }
-	    return (
-	    	<td style = {{background:background}}>
-	    	</td> 
-	    )
 	}
 
 	exerciseDurColrsSingleDayOr2to6Days(value,background,color,value1,rank,avgHR){
@@ -815,9 +696,9 @@ class OverallLeaderboardTable extends Component{
 		    }
 		    return (
 		    	<td 
-		    		className ="overall_rank_value ed" 
+		    		className ="overall_rank_value" 
 		    		style = {{backgroundColor:background,color:color}}>
-		    		<span>{value1}{'('+rank+')'}<br/> {' / '}{avgHR}</span>
+		    		<span>{value1}{' '}{'('+rank+')'}<br/> {' / '}{avgHR}</span>
 		    	</td>
 		    )
 	}
@@ -827,267 +708,316 @@ class OverallLeaderboardTable extends Component{
 		let td_rows = [];
 		let keys = [ "rank","username","oh_gpa","avg_sleep","resting_hr","nes",
 		             "mc","ec","exercise_duration","aerobic_duration","vo2_max",
-		             "prcnt_uf","alcohol" ];
-{/*"user_daily_inputs"*/}
+		             "prcnt_uf","alcohol"];
+		         {/*,"user_daily_inputs"*/}
 		objectLength = Object.keys(overall_data).length;
 		for(let[key,value] of Object.entries(overall_data)){
 			let td_values = [];
-			 let currentUser = '';
-			 let currentUserId = value['nes'].user_id;
+			let currentUser = '';
+			let currentUserId = value['nes'].user_id;
 			for(let key1 of keys){
-				if( key1 == "rank" ){
+					if( key1 == "rank" ){
 					td_values.push(<td className="rnk">{value[key1]}</td>);
-				}
-				else if( key1 == "username" ){
-					let user = value[key1];
-					if(user == Movement_username){
-						td_values.push(<td className="usr">{user}</td>);
-						currentUser = user;
 					}
-					else{
-						td_values.push(<td  className="usr">{user}</td>);
-						currentUser = '';
+					else if( key1 == "username" ){
+						let user = value[key1];
+						if(user == Movement_username){
+							td_values.push(<td className="usr">{user}</td>);
+							currentUser = user;
+						}
+						else{
+							td_values.push(<td  className="usr">{user}</td>);
+							currentUser = '';
+						}
 					}
-				}
-				else if( key1 == "oh_gpa" ){
-					let  overallGpaScore = value[key1].score.value;
-                    if(overallGpaScore = 'N/A'){
-                    	overallGpaScore = 'NA'
-                    }
+					else if( key1 == "oh_gpa" ){
+					  let  overallGpaScore = value[key1].score.value;
+						if( overallGpaScore == 'N/A' || overallGpaScore == null ){
+							overallGpaScore = 'NA';
+						}
+						if( overallGpaScore == 'Not Reported' ){
+							overallGpaScore = 'NR';
+						}
 					td_values.push(this.getOverallGpaColors(overallGpaScore,value[key1].rank));
-				}
-				else if( key1 == "avg_sleep" ){
-					let  avgSleepScore = value[key1].other_scores.sleep_duration.value;
-                    if(avgSleepScore = 'N/A'){
-                    	avgSleepScore = 'NA'
-                    }
-				    td_values.push(this.getSleepColors(avgSleepScore,value[key1].rank)); 	
-				}
-                else if( key1 == "resting_hr" ){
-                	let  restingHeartRateScore = value[key1].score.value;
-                    if(restingHeartRateScore = 'N/A'){
-                    	restingHeartRateScore = 'NA'
-                    } 
-                    td_values.push(this.getRestingHeartRateColors(restingHeartRateScore,value[key1].rank));   
-                }
-                else if( key1 == "nes" ){
-                	let  nonExerciseStepsScore = value[key1].score.value;
-                    if(nonExerciseStepsScore = 'N/A'){
-                    	nonExerciseStepsScore = 'NA'
-                    } 
-                     td_values.push(this.renderStepsColor(nonExerciseStepsScore,value[key1].rank));
-                }
-                else if( key1 == "mc" ){
-                	let  momentConsistencyScore = value[key1].score.value;
-                    if(momentConsistencyScore = 'N/A'){
-                    	momentConsistencyScore = 'NA'
-                    } 
-                	td_values.push(this.getMomentConsistencyColors(momentConsistencyScore,value[key1].rank));
-                }
-                else if( key1 == "ec" ){
-                    let  exerciseConsistencyScore = value[key1].score.value;
-                    if(exerciseConsistencyScore = 'N/A'){
-                    	exerciseConsistencyScore = 'NA'
-                    } 
-                	
-                     td_values.push(this.getExerciseConsistencyColors(exerciseConsistencyScore,value[key1].rank));
-                }
-                else if( key1 == "exercise_duration" ){
-                	let avg_exercise_heart_rate = value[key1].other_scores.avg_exercise_heart_rate.value; 
-                     if( avg_exercise_heart_rate == null ){
-                     	 avg_exercise_heart_rate = 'NA'; 
-                     	}
-                     td_values.push(this.getStylesForExerciseduration(value[key1].score.value,value[key1].rank,avg_exercise_heart_rate,selectedRange));	
-                }
-                else if( key1 == "aerobic_duration" ){
-                  let aerobic_prcnt = value[key1].other_scores.prcnt_aerobic_duration.value;
-                  let anaerobic_prcnt = value[key1].other_scores.prcnt_anaerobic_duration.value;
-                  let below_aerobic_prcnt =  value[key1].other_scores.prcnt_below_aerobic_duration.value;
-                  let heartrate_not_recorded_prcnt = value[key1].other_scores.prcnt_hr_not_recorded_duration.value; 
-                  if(aerobic_prcnt == null){
-                  	aerobic_prcnt = 0
-                  }
-                  if( anaerobic_prcnt == null ){
-                     anaerobic_prcnt = 0;
-                  }
-                  if( below_aerobic_prcnt == null ){
-                     below_aerobic_prcnt = 0;
-                  }
-                  if( heartrate_not_recorded_prcnt == null ){
-                         heartrate_not_recorded_prcnt = 0;
-                  }	
-                  if(value[key1].score.value != null && value[key1].other_scores.anaerobic_duration.value != null &&
-                      value[key1].other_scores.below_aerobic_duration.value != null && value[key1].other_scores.hr_not_recorded_duration.value != null){
-                      td_values.push(
-	                          <td className="ad">
-	                      	 <table style={{marginLeft:"auto",marginRight:"auto",backgroundColor:'#FFF'}}>
-	                     	<tr><td>
-	                        {value[key1].score.value}<br/>{"("+aerobic_prcnt+"%"+")"}
-	                        </td>
-	                         <td>
-	                        {value[key1].other_scores.anaerobic_duration.value}<br/>{"("+anaerobic_prcnt+"%"+")"}
-	                        </td></tr>
-	                        <tr><td>
-	                        {value[key1].other_scores.below_aerobic_duration.value}<br/>{"("+ below_aerobic_prcnt+"%"+")"}
-	                        </td>
-	                        <td>
-	                        {value[key1].other_scores.hr_not_recorded_duration.value}<br/>{"("+heartrate_not_recorded_prcnt+"%"+")"}
-	                        </td></tr>
-	                        </table>
-	                         </td>);
-                          }
-                     else{
-                             td_values.push(<td className="ad">{"-"}</td>);		                        
-                  	     
-                         }
-                }
-                else if( key1 == "vo2_max" ){
-                    td_values.push(<td className="vmax">{value[key1].score.value}</td>);	
-                }
-                else if( key1 == "prcnt_uf" ){
-                	
-                
-                	    td_values.push(this.getFoodColors(value[key1].score.value,value[key1].rank)); 	
-                	
-                        
-                }
-                else if( key1 == "alcohol" ){
-                	let alcohol_drink_per_day = value[key1].other_scores.alcohol_drink_per_day.value;
-                	//let alcohol_drink_per_week = value[key1].scores.value;
-                	if( alcohol_drink_per_day == null || alcohol_drink_per_day == 'N/A'  ){
-                		alcohol_drink_per_day = 'NA';
-                	}
-                	if( alcohol_drink_per_day == "Not Reported"){
-                		alcohol_drink_per_day = 'NR';
-                	}
-                	td_values.push(this.getAlcoholColors(alcohol_drink_per_day,value[key1].score.value,value[key1].rank));
-                }
-                //  else if( key1 == "user_daily_inputs" ){
-                //   let reported_inputs = value[key1].other_scores.prcnt_days_reported_inputs.value;
-                //   let sick = value[key1].other_scores.prcnt_days_sick.value;
-                //   let travel =  value[key1].other_scores.prcnt_days_travel.value;
-                //   let medium_high_stress = value[key1].other_scores.prcnt_days_medium_high_stress.value; 
-                //   if( travel == null ){
-                //   	travel = 0
-                //   }
-                //   if( sick == null ){
-                //      sick = 0;
-                //   }
-                //   if( medium_high_stress == null ){
-                //      medium_high_stress = 0;
-                //   }
-                //   if( reported_inputs == null ){
-                //          reported_inputs = 0;
-                //   }
-                //   if(value[key1].score.value != null && value[key1].other_scores.days_sick.value != null &&
-                //       value[key1].other_scores.days_medium_high_stress.value != null && value[key1].other_scores.days_travel.value != null){
-                //       td_values.push(
-	               //            <td className="udi">
-	               //        	 <table style={{marginLeft:"auto",marginRight:"auto",backgroundColor:'#FFF'}}>
-	               //       	<tr><td>
-	               //          {value[key1].other_scores.days_travel.value+('\n')+"("+travel+"%"+")"}
-	               //          </td>
-	               //           <td>
-	               //          {value[key1].other_scores.days_sick.value+('\n')+"("+sick+"%"+")"}
-	               //          </td></tr>
-	               //          <tr><td>
-	               //          {value[key1].other_scores.days_medium_high_stress.value+('\n')+"("+medium_high_stress+"%"+")"}
-	               //          </td>
-	               //          <td>
-	               //          {value[key1].score.value+('\n')+"("+reported_inputs+"%"+")"}
-	               //          </td></tr>
-	               //          </table>
-	               //           </td>);
-                //           }
-                //      else{
-                //              td_values.push(<td>{"-"}</td>);		                        
-                  	     
-                //          }
-                // }
-            
-		}	
+					}
+					else if( key1 == "avg_sleep" ){
+					  let  avgSleepScore = value[key1].other_scores.sleep_duration.value;
+						if( avgSleepScore == 'N/A' || avgSleepScore == null ){
+							avgSleepScore = 'NA';
+						}
+						if( avgSleepScore == 'Not Reported' ){
+							avgSleepScore = 'NR';
+						}
+					td_values.push(this.getSleepColors(avgSleepScore,value[key1].rank,value[key1].score.value)); 	
+					}
+					else if( key1 == "resting_hr" ){
+					  let  restingHeartRateScore = value[key1].score.value;
+						if( restingHeartRateScore == 'N/A' || restingHeartRateScore == null ){
+							restingHeartRateScore = 'NA';
+						} 
+						if( restingHeartRateScore == 'Not Reported' ){
+							restingHeartRateScore == 'NR';
+						}
+					td_values.push(this.getRestingHeartRateColors(restingHeartRateScore,value[key1].rank));   
+					}
+					else if( key1 == "nes" ){
+					  let  nonExerciseStepsScore = value[key1].score.value;
+						if( nonExerciseStepsScore == 'N/A' || nonExerciseStepsScore == null ){
+							nonExerciseStepsScore = 'NA';
+						} 
+						if( nonExerciseStepsScore == 'Not Reported' ){
+							nonExerciseStepsScore = 'NR';
+						}
+					 td_values.push(this.renderStepsColor(nonExerciseStepsScore,value[key1].rank));
+					}
+					else if( key1 == "mc" ){
+					  let  momentConsistencyScore = value[key1].score.value;
+						if( momentConsistencyScore == 'N/A' || momentConsistencyScore == null ){
+							momentConsistencyScore = 'NA';
+						} 
+						if( momentConsistencyScore == 'Not Reported' ){
+							momentConsistencyScore = 'NR';
+						}
+					td_values.push(this.getMomentConsistencyColors(momentConsistencyScore,value[key1].rank));
+					}
+					else if( key1 == "ec" ){
+					  let  exerciseConsistencyScore = value[key1].score.value;
+						if( exerciseConsistencyScore == 'N/A' || exerciseConsistencyScore == null ){
+							exerciseConsistencyScore = 'NA'
+						} 
+						if( exerciseConsistencyScore == 'Not Reported' ){
+							exerciseConsistencyScore = 'NR';
+						}
+					 td_values.push(this.getExerciseConsistencyColors(exerciseConsistencyScore,value[key1].rank));
+					}
+					else if( key1 == "exercise_duration" ){
+					  let avg_exercise_heart_rate = value[key1].other_scores.avg_exercise_heart_rate.value;
+					  let exerciseduartionScore = value[key1].score.value;
+						if( avg_exercise_heart_rate == null || avg_exercise_heart_rate == 'N/A' ){
+						    avg_exercise_heart_rate = 'NA'; 
+						}
+						if( avg_exercise_heart_rate == "Not Reported" ){
+						   avg_exercise_heart_rate = 'NR';
+						}
+						if( exerciseduartionScore == null || exerciseduartionScore == 'N/A' ){
+						    exerciseduartionScore = 'NA';
+						}	
+						if( exerciseduartionScore == "Not Reported" ){
+						    exerciseduartionScore = 'NR';
+						}
+					 td_values.push(this.getStylesForExerciseduration(exerciseduartionScore,value[key1].rank,avg_exercise_heart_rate,selectedRange));	
+					}
+					else if( key1 == "aerobic_duration" ){
+						let aerobic_prcnt = value[key1].other_scores.prcnt_aerobic_duration.value;
+						let anaerobic_prcnt = value[key1].other_scores.prcnt_anaerobic_duration.value;
+						let below_aerobic_prcnt =  value[key1].other_scores.prcnt_below_aerobic_duration.value;
+						let heartrate_not_recorded_prcnt = value[key1].other_scores.prcnt_hr_not_recorded_duration.value; 
+							if( aerobic_prcnt == null ){
+							    aerobic_prcnt = 0;
+							}
+							if( anaerobic_prcnt == null ){
+							    anaerobic_prcnt = 0;
+							}
+							if( below_aerobic_prcnt == null ){
+							    below_aerobic_prcnt = 0;
+							}
+							if( heartrate_not_recorded_prcnt == null ){
+							    heartrate_not_recorded_prcnt = 0;
+							}	
+							if(value[key1].score.value != null && value[key1].other_scores.anaerobic_duration.value != null &&
+							value[key1].other_scores.below_aerobic_duration.value != null && value[key1].other_scores.hr_not_recorded_duration.value != null){
+							td_values.push(
+							<td>
+							<table className="heartrate_zone_table" style={{marginLeft:"auto",marginRight:"auto",backgroundColor:'#FFF'}}>
+							<tr><td>
+							{value[key1].score.value}<br/>{"("+aerobic_prcnt+"%"+")"}
+							</td>
+							<td>
+							{value[key1].other_scores.anaerobic_duration.value}<br/>{"("+anaerobic_prcnt+"%"+")"}
+							</td></tr>
+							<tr><td>
+							{value[key1].other_scores.below_aerobic_duration.value}<br/>{"("+ below_aerobic_prcnt+"%"+")"}
+							</td>
+							<td>
+							{value[key1].other_scores.hr_not_recorded_duration.value}<br/>{"("+heartrate_not_recorded_prcnt+"%"+")"}
+							</td></tr>
+							</table>
+							</td>);
+							}
+							else{
+							td_values.push(<td>{"-"}</td>);		                        
+
+							}
+					}
+					else if( key1 == "vo2_max" ){
+                       let vmax = value[key1].score.value; 
+					   if( vmax == null || vmax == 'N/A' ){
+					   	   vmax = 'NA';
+					   }
+					   if( vmax == "Not Reported" ){
+					   	   vmax = 'NR';
+					   }
+					  td_values.push(<td>{vmax}</td>);	
+					}
+					else if( key1 == "prcnt_uf" ){
+						let foodUnproc = value[key1].score.value;
+						 if( foodUnproc == 'Not Reported' ){
+						 	  foodUnproc = 'NR';
+						 }
+					    td_values.push(this.getFoodColors(foodUnproc,value[key1].rank)); 	
+					}
+					else if( key1 == "alcohol" ){
+						let alcohol_drink_per_day = value[key1].other_scores.alcohol_drink_per_day.value;
+						let alcohol_drink_per_week = value[key1].score.value;
+							if( alcohol_drink_per_day == null || alcohol_drink_per_day == 'N/A'  ){
+								alcohol_drink_per_day = 'NA';
+							}
+							if( alcohol_drink_per_day == "Not Reported"){
+								alcohol_drink_per_day = 'NR';
+							}
+							if( alcohol_drink_per_week == null || alcohol_drink_per_week == 'N/A' ){
+								alcohol_drink_per_week = 'NA'
+							}
+							if( alcohol_drink_per_week == 'Not Reported'){
+								alcohol_drink_per_week = 'NR'
+							}
+						td_values.push(this.getAlcoholColors(alcohol_drink_per_day,
+															 alcohol_drink_per_week,
+															 value[key1].rank),
+															 this.props.gender);
+						}
+					//  else if( key1 == "user_daily_inputs" ){
+					//   let reported_inputs = value[key1].other_scores.prcnt_days_reported_inputs.value;
+					//   let sick = value[key1].other_scores.prcnt_days_sick.value;
+					//   let travel =  value[key1].other_scores.prcnt_days_travel.value;
+					//   let medium_high_stress = value[key1].other_scores.prcnt_days_medium_high_stress.value; 
+					//   if( travel == null ){
+					//   	travel = 0
+					//   }
+					//   if( sick == null ){
+					//      sick = 0;
+					//   }
+					//   if( medium_high_stress == null ){
+					//      medium_high_stress = 0;
+					//   }
+					//   if( reported_inputs == null ){
+					//          reported_inputs = 0;
+					//   }
+					//   if(value[key1].score.value != null && value[key1].other_scores.days_sick.value != null &&
+					//       value[key1].other_scores.days_medium_high_stress.value != null && value[key1].other_scores.days_travel.value != null){
+					//       td_values.push(
+					//            <td className="udi">
+					//        	 <table style={{marginLeft:"auto",marginRight:"auto",backgroundColor:'#FFF'}}>
+					//       	<tr><td>
+					//          {value[key1].other_scores.days_travel.value+('\n')+"("+travel+"%"+")"}
+					//          </td>
+					//           <td>
+					//          {value[key1].other_scores.days_sick.value+('\n')+"("+sick+"%"+")"}
+					//          </td></tr>
+					//          <tr><td>
+					//          {value[key1].other_scores.days_medium_high_stress.value+('\n')+"("+medium_high_stress+"%"+")"}
+					//          </td>
+					//          <td>
+					//          {value[key1].score.value+('\n')+"("+reported_inputs+"%"+")"}
+					//          </td></tr>
+					//          </table>
+					//           </td>);
+					//           }
+					//      else{
+					//              td_values.push(<td>{"-"}</td>);		                        
+						     
+					//          }
+					// }
+
+				}	
 			++operationCount;
-                this.scrollCallback(operationCount);
+			this.scrollCallback(operationCount);
 			td_rows.push(<tr id={(currentUser) ? 'my-row' : ''}>{td_values}</tr>);	
 		}
 		let table =    
-		                <div className="table table-responsive table-bordered">
-			          	    <table className = "table table-striped">
-								<tr  ref="table_header_overall">
-									<th>Rank</th>
-									<th>User</th>														    
-								    <th>Overall GPA</th>
-								   	 <th>Sleep</th>
-								   	 <th>RHR</th>
-								   	 <th>Non Exercise Steps</th>
-								   	 <th>MCS Score</th>
-								   	 <th>Exercise Consistency</th>
-								   	 <th>Exercise Duration / Avg HR</th>
-								   	 <th>
-								   	  <table className="aa">
-									    <tr><td>AE</td><td>AN</td></tr>
-									    <tr><td>BA</td><td>NR</td></tr> 
-									  </table>
-								   	 </th>
-								   	<th>VO2 Max</th>
-								    <th>% Unprocessed</th>
-								    <th>Drinks yesterday / Per Week</th>
-								    {/*<th>
-								   	   <table className="userip">
-									    <tr><td>Travel</td><td>Sick</td></tr>
-									    <tr><td>M/H stress</td><td>Report Inputs</td></tr> 
-									   </table>
-								   </th>*/}
-								</tr>
-								<tbody>
-								{td_rows}
-								</tbody>
+					<div className="table table-responsive table-bordered">
+						<table className = "table table-striped">
+							<tr  ref="table_header_overall">
+							<th>Rank</th>
+							<th>User</th>														    
+							<th>Overall Graade / GPA (Rank)</th>
+							<th>Sleep (Rank)</th>
+							<th>Resting HR (Rank)</th>
+							<th>Non Exercise Steps (Rank)</th>
+							<th>MCS Score (Rank)</th>
+							<th>Exercise L7 Days (Rank)</th>
+							<th>Exercise Duration (Rank) / Avg HR</th>
+							<th>
+							<table className="aa">
+							<tr><td>AE</td><td>AN</td></tr>
+							<tr><td>BA</td><td>NR</td></tr> 
 							</table>
-							</div>
-						
+							</th>
+							<th>VO2 Max</th>
+							<th>% Food Unproc (Rank)</th>
+							<th>Drinks Per Day / Per Week</th>
+							{/*<th>
+							<table className="userip">
+							<tr><td>Travel</td><td>Sick</td></tr>
+							<tr><td>M/H stress</td><td>Report Inputs</td></tr> 
+							</table>
+							</th>*/}
+							</tr>
+							<tbody>
+							{td_rows}
+							</tbody>
+						</table>
+					</div>
+
 		return table;
 	}
 
 	render(){
 		return(
-                <div>                  
-                  <div className="overall_Leaderboard" ref="overall_Leaderboard"> 
-						{
-							this.renderTable(
-								this.props.overall_data,
-								this.props.Movement_username,
-								this.props.mcs_data,
-								this.props.selectedRange
-							)
-						}	
+				<div>                  
+					<div className="overall_Leaderboard" ref="overall_Leaderboard"> 
+					{
+						this.renderTable(
+										  this.props.overall_data,
+										  this.props.Movement_username,
+										  this.props.mcs_data,
+										  this.props.selectedRange
+						)
+					}	
 					</div>   
-                    <div className = "row">
+					<div className = "row">
 						<div className = "col-sm-12">
-			          	  <p className="footer_content" style={{marginLeft:"15px"}}>	 
-						  MCS: Movement Consistency Score
-						  </p>
-                    	  <p className="footer_content" style={{marginLeft:"15px"}}>
-                          ECS: Exercise Consistency Score
-                          </p>
-                          <p className="footer_content" style={{marginLeft:"15px"}}>
-                          NR = Not Reported; NA = Not Available
-                          </p>
-                          <p className="footer_content" style={{marginLeft:"15px"}}>
-                          <span className="row">
-                           Grades:&nbsp;
-                           <span className="col-sm-1" style={{backgroundColor:"green","text-align":"center"}}>A</span>&nbsp;
-                           <span className="col-sm-1" style={{backgroundColor:"#32CD32","text-align":"center"}}>B</span>&nbsp;
-                           <span className="col-sm-1" style={{backgroundColor:"yellow","text-align":"center"}}>C</span>&nbsp;
-                           <span className="col-sm-1" style={{backgroundColor:"orange","text-align":"center"}}>D</span>&nbsp;
-                           <span className="col-sm-1" style={{backgroundColor:"red","text-align":"center"}}>E</span>
-                          </span>
-                          </p>
-                          <p className="footer_content" style={{marginLeft:"15px"}}>
-                          Numbers in (parenthesis) represent overall rank in category (where (1) is best)
-                          </p>
-                         </div>
-                     </div>      
-                 </div>
+							<p className="footer_content" style={{marginLeft:"15px"}}>	 
+							MCS: Movement Consistency Score
+							</p>
+							<p className="footer_content" style={{marginLeft:"15px"}}>
+							ECS: Exercise Consistency Score
+							</p>
+							<p className="footer_content" style={{marginLeft:"15px"}}>
+							NR = Not Reported; NA = Not Available
+							</p>
+							<p className="footer_content" style={{marginLeft:"15px"}}>
+							Grades:&nbsp;
+							<div className="rd_mch_color_legend color_legend_green"></div>
+							<span className="rd_mch_color_legend_label">A</span>
+							<div className="rd_mch_color_legend color_legend_parrot_green"></div>
+							<span className="rd_mch_color_legend_label">B</span>
+							<div className="rd_mch_color_legend color_legend_yelow"></div>
+							<span className="rd_mch_color_legend_label">C</span>
+							<div className="rd_mch_color_legend color_legend_orange"></div>
+							 <span className="rd_mch_color_legend_label">D</span>
+							<div className="rd_mch_color_legend color_legend_red"></div>
+							<span className="rd_mch_color_legend_label">F</span>
+							</p>      
+							<p className="footer_content" style={{marginLeft:"15px"}}>
+							Numbers in (parenthesis) represent overall rank in category (where (1) is best)
+							</p>
+							<p className="footer_content" style={{marginLeft:"15px"}}>
+							See the Movement Leaderboard for more details regarding Overall Movement Rank
+							</p>
+						</div>
+					</div>      
+				</div>
 	   );
 	}
 }
