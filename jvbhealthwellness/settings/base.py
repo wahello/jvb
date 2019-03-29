@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'hrr',
     'dashboards',
     'alerts',
+    'apple',
 ]
 
 MIDDLEWARE = [
