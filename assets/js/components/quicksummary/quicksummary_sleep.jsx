@@ -98,7 +98,9 @@ getGarminStressColors(stressValue){
 	if(stressValue != null 
 		&& stressValue != undefined 
 		&& stressValue != '-'){
-		if(stressValue >= 0 && stressValue <= 25)
+        if(stressValue =0)
+            return{background: ' ' , color: ' '}      
+		else if(stressValue > 0 && stressValue <= 25)
 			return {background: 'green', color: 'white'}
 		else if(stressValue >= 26 && stressValue <= 50)
 			return {background: '#32CD32', color: 'white'}
@@ -156,6 +158,12 @@ renderTableColumns(dateWiseData,category,classes=""){
 										style:this.getStylesGpaBeforePanalities(value)})
 					}
 					else if(key == 'heartrate_variability_stress'){
+						if( value == null ||
+							value == 'undefined' ||
+						     value == ''){
+						     	value = '-'
+						     }
+
 						all_data.push({
 							value:value,
 							style:this.getGarminStressColors(value)
