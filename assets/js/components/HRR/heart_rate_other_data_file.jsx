@@ -63,8 +63,7 @@ class Other_Hrr_Data extends Component{
 			diff_actity_hrr:"",
 			pure_time_99:"",
 			end_time_activity:"",
-			HRR_activity_start_time:""
-
+			HRR_activity_start_time:"",   
 		}
 		this.renderTime = this.renderTime.bind(this);
 		this.renderSecToMin = this.renderSecToMin.bind(this);
@@ -85,7 +84,7 @@ class Other_Hrr_Data extends Component{
 		this.getDTMomentObj = this.getDTMomentObj.bind(this);
 		this.successHeart = this.successHeart.bind(this);
 		this.errorHeart = this.errorHeart.bind(this);
-		this.renderHrrSelectedDateFetchOverlay = renderHrrSelectedDateFetchOverlay.bind(this);
+		this.renderHrrSelectedDateFetchOverlay = renderHrrSelectedDateFetchOverlay.bind(this);	
 	}
 	componentWillReceiveProps(nextProps) {
 		this.setState({ editable: nextProps.hrr.editable });  
@@ -110,6 +109,7 @@ class Other_Hrr_Data extends Component{
 			editable_pure_time_99:!this.state.editable_pure_time_99,
 		})
 	}
+
 	editEndHeartrateActivity(){
 		this.setState({
 			editable_end_heartrate_activity:!this.state.editable_end_heartrate_activity,
@@ -247,6 +247,8 @@ class Other_Hrr_Data extends Component{
 					heart_rate_down_up:data.data.heart_rate_down_up,
 					pure_1min_heart_beats:data.data.pure_1min_heart_beats,
 					pure_time_99:data.data.pure_time_99,
+					in_hrr:data.data.in_hrr,
+					ex_hrr:data.data.ex_hrr,
 
 					no_fitfile_hrr_time_reach_99:data.data.no_fitfile_hrr_time_reach_99,
 					no_fitfile_hrr_reach_99:data.data.no_fitfile_hrr_reach_99,
@@ -293,8 +295,10 @@ class Other_Hrr_Data extends Component{
 				"end_heartrate_activity":this.state.end_heartrate_activity,
 				"heart_rate_down_up":this.state.heart_rate_down_up,
 				"pure_1min_heart_beats":this.state.pure_1min_heart_beats,
-				"pure_time_99":pure_time_99
+				"pure_time_99":pure_time_99,
+                "use_updated_hrr":true
 			},() => {
+                this.props.updateText(this.state.use_updated_hrr);
 				let data = {
 	  				"end_time_activity":endTimeActivity.utc().valueOf(),
 					"diff_actity_hrr":diff_time,
@@ -302,15 +306,12 @@ class Other_Hrr_Data extends Component{
 					"end_heartrate_activity":parseInt(this.state.end_heartrate_activity),
 					"heart_rate_down_up":parseInt(this.state.heart_rate_down_up),
 					"pure_1min_heart_beats":parseInt(this.state.pure_1min_heart_beats),
-					"pure_time_99":pure_time_99
+					"pure_time_99":pure_time_99,
+			        "use_updated_hrr":this.state.use_updated_hrr,
+			        "include_hrr":this.props.shouldIncludeHRR
 				}
-
-	  			updateHeartData(data, this.props.selectedDate, this.successHeart, this.errorHeart);
-	  				  				  			
-	  			//this.props.renderHrrData(data);
-			});
-
-	  			
+	  			updateHeartData(data, this.props.selectedDate, this.successHeart, this.errorHeart);		
+			});		
   		}
 	render(){
 		return(
@@ -658,7 +659,7 @@ class Other_Hrr_Data extends Component{
 	          	    </div>
           	  </div>
           	  	<div className = "row justify-content-center">
-          	    	<Button onClick = {this.updateData}>Update</Button>
+					  <Button onClick ={this.updateData}>Update</Button>
           	    </div>
 			</div>
 			);
