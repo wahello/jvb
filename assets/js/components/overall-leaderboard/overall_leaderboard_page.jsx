@@ -6,7 +6,7 @@ import FontAwesome from "react-fontawesome";
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import OverallLeaderboardTable from './overall_leaderboard_table';
-import fetchLeaderBoard, {fetchMcsSnapshot} from '../../network/leaderBoard';
+import fetchLeaderBoard from '../../network/leaderBoard';
 import { Collapse,Button,Modal,ModalHeader,ModalBody,ModalFooter,Navbar,NavbarToggler, 
          NavbarBrand,Nav,NavItem,NavLink,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input,
          Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
@@ -91,8 +91,6 @@ class OverallLeaderboard extends Component{
 		this.renderOverallMovementTable = this.renderOverallMovementTable.bind(this);
 		this.successOverallMovementRank = this.successOverallMovementRank.bind(this);
 		this.errorOverallMovementRank = this.errorOverallMovementRank.bind(this);
-		this.successMcsSnapshot = this.successMcsSnapshot.bind(this);
-		this.errorMcsSnapshot = this.errorMcsSnapshot.bind(this);
 		this.processDate = this.processDate.bind(this);
 		this.toggle1 = this.toggle1.bind(this);
 		this.toggleDate1 = this.toggleDate1.bind(this);
@@ -165,19 +163,6 @@ class OverallLeaderboard extends Component{
 	        fetching_hrr3:false,
 	        fetching_hrr4:false,
 		})
-	}
-
-	successMcsSnapshot(data){
-		this.setState({
-			mcs_data:data.data,
-			selectedRangeMCSData:data.data[moment(this.state.selectedDate).format('YYYY-MM-DD')]
-		},()=>{
-			
-		})
-	}
-
-	errorMcsSnapshot(error){
-		console.log(error.message);
 	}
     
     successProfile(data){
@@ -397,7 +382,6 @@ class OverallLeaderboard extends Component{
 						 this.state.selectedDate,
 						 null,null,'overall');
 		getUserProfile(this.successProfile);
-		fetchMcsSnapshot(this.successMcsSnapshot,this.errorMcsSnapshot,this.state.selectedDate);
 	}
 
 	  	renderOverallMovementTable(value,mcs_data,value5){

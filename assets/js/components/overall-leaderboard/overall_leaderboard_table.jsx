@@ -25,10 +25,7 @@ class OverallLeaderboardTable extends Component{
 
 	constructor(props){
 		super(props);
-       
-        this.setState = {
-
-        }
+		
         this.renderTable = this.renderTable.bind(this);
         this.scrollCallback = this.scrollCallback.bind(this);
 		this.doOnOrientationChange = this.doOnOrientationChange.bind(this);
@@ -180,7 +177,7 @@ class OverallLeaderboardTable extends Component{
 			}
 			else if(grade == 'C'){
 				background='yellow';
-				color='balck';
+				color='black';
 			}
 			else if(grade == 'D'){
 				background='#FF8C00';
@@ -237,7 +234,7 @@ class OverallLeaderboardTable extends Component{
 			}
 			else if(grade == 'C'){
 				background='yellow';
-				color='balck';
+				color='black';
 			}
 			else if(grade == 'D'){
 				background='#FF8C00';
@@ -293,7 +290,7 @@ class OverallLeaderboardTable extends Component{
 			}
 			else if(grade == 'C'){
 				background='yellow';
-				color='balck';
+				color='black';
 			}
 			else if(grade == 'D'){
 				background='#FF8C00';
@@ -353,7 +350,7 @@ class OverallLeaderboardTable extends Component{
 			}
 			else if(grade == 'C'){
 				background='yellow';
-				color='balck';
+				color='black';
 			}
 			else if(grade == 'D'){
 				background='#FF8C00';
@@ -409,7 +406,7 @@ class OverallLeaderboardTable extends Component{
 			}
 			else if(grade == 'C'){
 				background='yellow';
-				color='balck';
+				color='black';
 			}
 			else if(grade == 'D'){
 				background='#FF8C00';
@@ -560,7 +557,7 @@ class OverallLeaderboardTable extends Component{
 				}
 				else if(grade == 'C'){
 					background='yellow';
-					color='balck';
+					color='black';
 				}
 				else if(grade == 'D'){
 					background='#FF8C00';
@@ -798,7 +795,7 @@ class OverallLeaderboardTable extends Component{
 							value[key1].other_scores.below_aerobic_duration.value != null && value[key1].other_scores.hr_not_recorded_duration.value != null){
 							td_values.push(
 							<td>
-							<table style={{marginLeft:"auto",marginRight:"auto",backgroundColor:'#FFF'}}>
+							<table className="heartrate_zone_table" style={{marginLeft:"auto",marginRight:"auto",backgroundColor:'#FFF'}}>
 							<tr><td>
 							{value[key1].score.value}<br/>{"("+aerobic_prcnt+"%"+")"}
 							</td>
@@ -831,9 +828,6 @@ class OverallLeaderboardTable extends Component{
 					}
 					else if( key1 == "prcnt_uf" ){
 						let foodUnproc = value[key1].score.value;
-						 if( foodUnproc == null || foodUnproc == 'N/A'){
-						 	  foodUnproc = 'NA';
-						 }
 						 if( foodUnproc == 'Not Reported' ){
 						 	  foodUnproc = 'NR';
 						 }
