@@ -108,8 +108,10 @@ class Dashboard extends Component {
 
 							 <Link to='/userinputs'>User Inputs Daily Form</Link><br/>
 							 <h3 id="link_style">Leaderboards</h3>
+
 							  <Link to='/movement_leaderboard'>Movement Leaderboard</Link><br/>
-							  <Link to='/overall_hrr_rank'>HRR Leaderboard</Link><br/>		  
+							  <Link to='/overall_hrr_rank'>HRR Leaderboard</Link><br/>
+							   <Link to='/overall_leaderboard'>Overall Leaderboard</Link><br/>		  
 							 <h3 id="link_style">Dashboards</h3>
 				  		 	  <Link to='/movement_dashboard'>Movement Dashboard</Link><br/>
 				  		 	  <Link to='/grades_dashboard'>Grades Dashboard</Link><br/>
@@ -127,7 +129,9 @@ class Dashboard extends Component {
 							  <h3 id="link_style">Heart Rate Recovery (HRR)</h3>
 							  <Link to='/hrr_summary_dashboard'>HRR Dashboard</Link><br/>
 							  <Link to='/hrr_recovery'>HRR Daily Summary Details</Link><br/>
-
+                                
+                                 
+                               
 							  <h3 id="link_style">Reporting</h3>
 							  <Link to='/progressanalyzer'>Progress Analyzer</Link><br/>
 							  <Link to='/leaderboard'>My Rankings</Link><br/>
