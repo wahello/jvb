@@ -250,17 +250,17 @@ def get_sleep_stats(sleep_data, ui_bedtime = None,
 	return sleep_stats
 
 
-def fitbit_steps_data(todays_steps_data):
+def apple_steps_data(todays_steps_data):
 
-	''' This function is refer for fitbit_steps_data using this function
- we have to displaying the fitbit_stepsdata in Raw data.
+	''' This function is refer for apple_steps_data using this function
+ we have to displaying the apple_steps_data in Raw data.
  '''
-	if todays_steps_data:
-		total_steps = todays_steps_data['activities-steps'][0]['value']
-	else:
-		total_steps = 0	
-	return total_steps
+	apple_total_steps = 0
+	for i,total_steps in enumerate(todays_steps_data):
+		apple_total_steps = apple_total_steps + int(total_steps.get("steps",0))
+	return apple_total_steps
 
+	
 def fitbit_heartrate_data(user,current_date):
 	todays_heartrate_data = get_fitbit_model_data(
 		UserFitbitDataHeartRate,user,current_date.date(),current_date.date())
@@ -344,12 +344,6 @@ def calculate_apple_steps(user,start_date):
 
 	return total_apple_steps
 
-def get_exercise_steps_apple(todays_activity_data):
-	total_steps = 0
-	for i,single_activity in enumerate(todays_activity_data):
-		total_steps = total_steps + int(single_activity.get("steps",0))
-	return total_steps
-
 def create_apple_quick_look(user,from_date=None,to_date=None):
 	'''
 		calculate and create quicklook instance for given date range
@@ -367,7 +361,7 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 	current_date = from_dt
 	SERIALIZED_DATA = []
 	user_age = user.profile.age()
-	
+
 	while current_date <= to_dt:
 		tomorrow_date = current_date + timedelta(days=1)
 		last_seven_days_date = current_date - timedelta(days=6)
@@ -464,17 +458,13 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 			todays_activity_data = list(map(apple_to_garmin_activities,
 				todays_activity_data))
 		
-		if todays_activity_data:
-			apple_exrcise_steps = get_exercise_steps_apple(todays_activity_data[0])
-		else:
-			return todays_activity_data
-
-		# combined_user_exercise_activities,combined_user_exec_non_exec_activities =\
-		# 	quicklook.calculations.garmin_calculation.\
-		# 		get_filtered_activity_stats(
-		# 			todays_activity_data,user_age,
-		# 			userinput_activities = userinput_activities,
-		# 			provide_all=True)
+		combined_user_exercise_activities,combined_user_exec_non_exec_activities =\
+			quicklook.calculations.garmin_calculation.\
+				get_filtered_activity_stats(
+					todays_activity_data[0],user_age,
+					userinput_activities = userinput_activities,
+					epoch_summaries = todays_epoch_data,
+					provide_all=True)
 
 		ui_bedtime = None
 		ui_awaketime = None
@@ -655,35 +645,34 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 		# 	sleep_grade_point[1] if sleep_grade_point[1] else 0
 
 		# Exercise/Activity Calculations
-		# activity_stats = quicklook.calculations.garmin_calculation.get_activity_stats(
-		# 	combined_user_exercise_activities,user_age)
-		# exercise_calculated_data['did_workout'] = activity_stats['have_activity']
-		# exercise_calculated_data['distance_run'] = activity_stats['distance_run_miles']
-		# exercise_calculated_data['distance_bike'] = activity_stats['distance_bike_miles']
-		# exercise_calculated_data['distance_swim'] = activity_stats['distance_swim_yards']
-		# exercise_calculated_data['distance_other'] = activity_stats['distance_other_miles']
-		# exercise_calculated_data['workout_duration'] = quicklook.calculations.garmin_calculation.\
-		# 	sec_to_hours_min_sec(
-		# 	activity_stats['total_duration'])
-		# exercise_calculated_data['pace'] = activity_stats['pace']
-		# exercise_calculated_data['avg_heartrate'] = activity_stats['avg_heartrate']
-		# exercise_calculated_data['activities_duration'] = activity_stats['activities_duration']
-		# exercise_calculated_data['did_workout'] = quicklook.calculations.garmin_calculation.\
-		# 	did_workout_today(have_activities=activity_stats['have_activity']
-		# 		,user_did_workout=ui_did_workout)
+		activity_stats = quicklook.calculations.garmin_calculation.get_activity_stats(
+			combined_user_exercise_activities,user_age)
+		exercise_calculated_data['did_workout'] = activity_stats['have_activity']
+		exercise_calculated_data['distance_run'] = activity_stats['distance_run_miles']
+		exercise_calculated_data['distance_bike'] = activity_stats['distance_bike_miles']
+		exercise_calculated_data['distance_swim'] = activity_stats['distance_swim_yards']
+		exercise_calculated_data['distance_other'] = activity_stats['distance_other_miles']
+		exercise_calculated_data['workout_duration'] = quicklook.calculations.garmin_calculation.\
+			sec_to_hours_min_sec(
+			activity_stats['total_duration'])
+		exercise_calculated_data['pace'] = activity_stats['pace']
+		exercise_calculated_data['avg_heartrate'] = activity_stats['avg_heartrate']
+		exercise_calculated_data['activities_duration'] = activity_stats['activities_duration']
+		exercise_calculated_data['did_workout'] = quicklook.calculations.garmin_calculation.\
+			did_workout_today(have_activities=activity_stats['have_activity']
+				,user_did_workout=ui_did_workout)
 		
 		# Steps calculation
-		# daily_total_steps = fitbit_steps_data(todays_steps_data)
-		# exercise_steps,non_exercise_steps,total_steps = quicklook.calculations.\
-		# 	garmin_calculation.cal_exercise_steps_total_steps(
-		# 		int(daily_total_steps),
-		# 		combined_user_exec_non_exec_activities,
-		# 		user_age
-		# 	)	
-		steps_calculated_data['non_exercise_steps'] = total_steps_apple - apple_exrcise_steps
-		steps_calculated_data['exercise_steps'] = apple_exrcise_steps
-		steps_calculated_data['total_steps'] = total_steps_apple
-		# print(steps_calculated_data['total_steps'],"KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK")
+		daily_total_steps = apple_steps_data(todays_steps_data)
+		exercise_steps,non_exercise_steps,total_steps = quicklook.calculations.\
+			garmin_calculation.cal_exercise_steps_total_steps(
+				int(daily_total_steps),
+				combined_user_exec_non_exec_activities,
+				user_age
+			)
+		steps_calculated_data['non_exercise_steps'] = non_exercise_steps
+		steps_calculated_data['exercise_steps'] = exercise_steps
+		steps_calculated_data['total_steps'] = total_steps
 
 
 		# # Non exercise steps grade and gpa calculation

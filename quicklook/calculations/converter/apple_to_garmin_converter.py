@@ -55,7 +55,10 @@ def get_epoch_offset_from_timestamp(timestamp, timezone):
 		timezone = 0
 
 	if timestamp and timezone:
-		continent,country = timezone.split("-")
+		try:
+			continent,country = timezone.split("-")
+		except:
+			continent,country = timezone.split("/")
 		timezone = continent+'/'+country
 		local = pytz.timezone(timezone)
 		naive = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
