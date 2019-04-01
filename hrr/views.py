@@ -1823,7 +1823,9 @@ def daily_aa_data(user, start_date):
 			summaryId = ui_data_single['summaryId']
 			ui_data_keys.remove(summaryId)
 			ui_data_hrr.append(summaryId)
-
+		if ui_data_single['steps_type'] == 'non_exercise':
+			summaryId = ui_data_single['summaryId']
+			ui_data_keys.remove(summaryId)
 	garmin_list,garmin_dic = get_garmin_activities(
 		user,start_date_timestamp,end_date_timestamp)
 	manually_edited_dic,manually_edited_list = get_garmin_manully_activities(
@@ -1844,8 +1846,12 @@ def daily_aa_data(user, start_date):
 	
 	filtered_activities_only = remove_hrr_file(filtered_activities_only)
 	garmin_activity_keys = []
+	filtered_act_keys = []
 	for i,single_activity in enumerate(filtered_activities_only):
 		garmin_activity_keys.append(single_activity.get("summaryId"))
+	for i,single_activity in enumerate(filtered_activities_files):
+		if single_activity.get("summaryId") != "HEART_RATE_RECOVERY":
+			filtered_act_keys.append(single_activity.get("summaryId"))
 	duplicate_file = list(set(ui_data_keys)-set(garmin_activity_keys))
 	count = 0
 	id_act = 0
@@ -1908,6 +1914,7 @@ def daily_aa_data(user, start_date):
 				if ui_duration == None or ui_duration == '':
 					ui_duration = 0
 				if (garmin_id == ui_id) and ((garmin_hr != ui_hr) or (garmin_duration != ui_duration)):
+					print("Step 3")
 					user_created_activity_list.append(k)
 					remove_in_workout.append(int(k["summaryId"]))
 		elif (single_actiivty.get("manual",0) != True 
@@ -1923,6 +1930,7 @@ def daily_aa_data(user, start_date):
 				if garmin_hr == None or garmin_hr == '':
 					garmin_hr = 0
 				if (garmin_id == ui_id) and ((not garmin_hr and ui_hr) or (garmin_hr != ui_hr)):
+					print("Step 4")
 					user_created_activity_list.append(k)
 					remove_in_workout.append(int(k["summaryId"]))
 	hrr_not_recorded_list = []
@@ -1942,7 +1950,6 @@ def daily_aa_data(user, start_date):
 			"duration_hrr_not_recorded":0.0,
 			"percent_hrr_not_recorded":0.0,
 			}
-
 	workout = []
 	hrr = []
 	activities_duration = []
@@ -1958,7 +1965,7 @@ def daily_aa_data(user, start_date):
 				data_id = int(meta['activityIds'][0])
 				if id_act == data_id:
 					hrr.append(tmp)
-				elif str(data_id) in garmin_workout_keys:
+				elif str(data_id) in filtered_act_keys:
 					workout.append(tmp)
 					data_summaryid.append(data_id)
 				if filtered_activities_files:
@@ -2035,7 +2042,7 @@ def daily_aa_data(user, start_date):
 				prcnt_hrr_not_recorded = int(Decimal(int(Decimal(prcnt_hrr_not_recorded).quantize(0,ROUND_HALF_UP))).quantize(0,ROUND_HALF_UP))
 				prcnt_hrr_not_recorded_list.append(prcnt_hrr_not_recorded)
 			except ZeroDivisionError:
-				prcnt_hrr_not_recorded = ""
+				prcnt_hrr_not_recorded = 0
 				prcnt_hrr_not_recorded_list.append(prcnt_hrr_not_recorded)
 	else:
 		prcnt_hrr_not_recorded_list.append(0)
@@ -2138,9 +2145,7 @@ def daily_aa_data(user, start_date):
 					"duration_hrr_not_recorded":hrr_not_recorded_list[i],
 					"percent_hrr_not_recorded":prcnt_hrr_not_recorded_list[i]
 					}
-			# print(single_data,"single_data")
 			daily_aa_data[str(data_summaryid[i])] = single_data
-			# print(daily_aa_data,"daily_aa_data")
 		try:
 			total_prcnt_anaerobic = (sum(anaerobic_duration)/sum(total_duration)*100)
 			total_prcnt_anaerobic = int(Decimal(total_prcnt_anaerobic).quantize(0,ROUND_HALF_UP))
@@ -2152,7 +2157,6 @@ def daily_aa_data(user, start_date):
 			total_prcnt_anaerobic = ''
 			total_prcnt_below_aerobic = ''
 			total_prcnt_aerobic = ''
-
 		total =  {"avg_heart_rate":avg_hrr,
 				  "max_heart_rate":max_hrr,
 				  "total_duration":sum(total_duration),
