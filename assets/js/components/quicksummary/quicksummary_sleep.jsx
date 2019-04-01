@@ -98,7 +98,7 @@ getGarminStressColors(stressValue){
 	if(stressValue != null 
 		&& stressValue != undefined 
 		&& stressValue != '-'){
-        if(stressValue =0)
+        if(stressValue == 0)
             return{background: ' ' , color: ' '}      
 		else if(stressValue > 0 && stressValue <= 25)
 			return {background: 'green', color: 'white'}
