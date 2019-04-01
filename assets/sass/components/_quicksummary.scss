@@ -576,9 +576,75 @@ background-color: #777777;
 }
 }
 
-
-
-
+@media screen and (max-width: 374px) and (min-width: 321px) and (orientation: portrait){
+	.calendar_date{
+		font-size: 9px !important;
+	}
+	html,body{
+		font-size: 11px !important;
+	}
+	.daterange-btn{
+		width: 65px !important;
+		font-size: 10px !important;
+		height: 27px !important;
+	}
+	#nav-btn{
+		font-size: 10px !important;
+		height: 27px !important;
+	}
+	.wearable_device{
+		font-size: 12px !important;
+	}
+	.fa-2x{
+		font-size:1em !important;
+	}
+}
+@media screen and (max-width: 320px) and (min-width: 310px) and (orientation: portrait){
+	.calendar_date{
+		font-size: 9px !important;
+	}
+	html,body{
+		font-size: 11px !important;
+	}
+	.daterange-btn{
+		width: 65px !important;
+		font-size: 10px !important;
+		height: 27px !important;
+	}
+	#nav-btn{
+		font-size: 10px !important;
+		height: 27px !important;
+	}
+	.wearable_device{
+		font-size: 11px !important;
+	}
+	.fa-2x{
+		font-size:1em !important;
+	}
+}
+@media screen and (max-width: 412px) and (min-width: 375px) and (orientation: portrait){
+	.calendar_date{
+		font-size: 9px !important;
+	}
+	.wearable_device{
+		font-size: 13px !important;
+	}
+	.fa-2x{
+		font-size:1em;
+	}
+	.daterange-btn{
+		height: 27px !important;
+	}
+	#nav-btn{
+		height: 27px !important;
+	}
+	
+}
+@media screen and (max-width: 414px) and (min-width: 413px) and (orientation: portrait){
+	.fa-2x{
+		font-size:1em !important;
+	}
+	}
  @media screen and (max-width: 667px) and (min-width: 375px) and (orientation: portrait){
 
 .dropbutton{

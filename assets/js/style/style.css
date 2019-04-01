@@ -2555,7 +2555,7 @@ output {
   font-size: 14px;
   line-height: 1.42857143;
   color: #555;
-  background-color: #fff;
+  
   background-image: none;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -2597,7 +2597,7 @@ fieldset[disabled] .form-control {
   cursor: not-allowed;
 }
 textarea.form-control {
-  height: auto;
+  height:auto;
 }
 input[type="search"] {
   -webkit-appearance: none;
@@ -6763,4 +6763,5 @@ width: 136% !important;
     display: none !important;
   }
 }
+
 /*# sourceMappingURL=bootstrap.css.map */

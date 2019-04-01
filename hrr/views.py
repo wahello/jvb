@@ -171,11 +171,11 @@ class UpdateHrr(generics.RetrieveUpdateDestroyAPIView):
 				None
 		except Hrr.DoesNotExist:
 			return None
-
+	
 	def put(self, request,format="json"):
 		latest_hrr = self.get_object()
 		if latest_hrr:
-			serializer = HrrSerializer(latest_hrr,data = request.data)
+			serializer = HrrSerializer(latest_hrr,data = request.data, partial=True)
 			if serializer.is_valid():
 				serializer.save()
 				return Response(serializer.data)
@@ -3225,10 +3225,11 @@ def store_garmin_hrr(user,from_date,to_date,type_data):
 			hrr_obj = Hrr.objects.get(user_hrr=user,created_at=current_date)
 		except:
 			hrr_obj = None
-		if type_data == 'dailies' or not hrr_obj or hrr_obj.Did_you_measure_HRR == 'no':	 
-			hrr_only_store(user,current_date)
-		elif not type_data:
-			hrr_only_store(user,current_date)
+		if not hrr_obj.use_updated_hrr:
+			if type_data == 'dailies' or not hrr_obj or hrr_obj.Did_you_measure_HRR == 'no':
+				hrr_only_store(user,current_date)
+			elif not type_data:
+				hrr_only_store(user,current_date)
 		current_date -= timedelta(days=1)
 	print("HRR calculations got finished")
 	return None
