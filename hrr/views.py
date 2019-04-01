@@ -1914,7 +1914,6 @@ def daily_aa_data(user, start_date):
 				if ui_duration == None or ui_duration == '':
 					ui_duration = 0
 				if (garmin_id == ui_id) and ((garmin_hr != ui_hr) or (garmin_duration != ui_duration)):
-					print("Step 3")
 					user_created_activity_list.append(k)
 					remove_in_workout.append(int(k["summaryId"]))
 		elif (single_actiivty.get("manual",0) != True 
@@ -1930,7 +1929,6 @@ def daily_aa_data(user, start_date):
 				if garmin_hr == None or garmin_hr == '':
 					garmin_hr = 0
 				if (garmin_id == ui_id) and ((not garmin_hr and ui_hr) or (garmin_hr != ui_hr)):
-					print("Step 4")
 					user_created_activity_list.append(k)
 					remove_in_workout.append(int(k["summaryId"]))
 	hrr_not_recorded_list = []
