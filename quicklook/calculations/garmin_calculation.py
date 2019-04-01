@@ -40,6 +40,8 @@ from quicklook.serializers import UserQuickLookSerializer
 import user_input.views.garmin_views
 from user_input.utils.daily_activity import get_daily_activities_in_base_format
 from hrr.fitbit_aa import belowaerobic_aerobic_anaerobic
+from weather.views import get_weather_response_as_required,\
+	has_weather_data
 
 def str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
@@ -404,60 +406,6 @@ def get_weekly_user_input_data(qobj_lst,to_date,from_date):
 		weekly_data[obj.user_input.created_at.strftime("%Y-%m-%d")] = obj
 
 	return weekly_data
-
-
-def extract_weather_data(data):
-	'''
-		Extract weather information like - Temperature, Dew point
-		Humidity, Apparent Temperature, Wind
-	'''
-	DATA = {
-		"temperature":None,
-		"dewPoint":None,
-		"humidity":None,
-		"apparentTemperature":None,
-		"windSpeed":None
-	}
-
-	if data and data.get('daily',None):
-		data = data['daily']['data'][0]
-		if data.get('temperatureMin',None) and data.get('temperatureMax',None):
-			DATA['temperature'] = round((data['temperatureMin'] + data['temperatureMax'])/2, 2)
-
-		DATA['dewPoint'] = data.get('dewPoint',None)
-
-		if data.get('humidity',None):
-			DATA['humidity'] = round(data['humidity'] * 100,2)
-
-		if data.get('apparentTemperatureMin',None) and data.get('apparentTemperatureMax',None):
-			DATA['apparentTemperature'] = round((data['apparentTemperatureMin']+
-										  data['apparentTemperatureMax'])/2, 2)
-			
-		DATA['windSpeed'] = data.get('windSpeed',None)
-
-	return DATA
-
-def fetch_weather_data(latitude,longitude,date):
-	'''
-		Fetch Weather daily data for certain date
-		from www.darksky.net api  
-
-		Expect date in UNIX timestamp format 
-
-		Latitude of NYC =  40.730610
-		Longitude of NYC = -73.935242 
-	'''
-	KEY = '52871e89c8acb84e7c8b8bc8ac5ba307'
-	EXCLUDE = ['currently','minutely','hourly','alerts','flags']
-	UNIT = 'si'
-	URL =  'https://api.darksky.net/forecast/{}/{},{},{}?exclude={}&units={}'.format(
-				KEY, latitude, longitude, date,",".join(EXCLUDE),UNIT)
-
-	try:
-		r = requests.get(URL)
-		return r.json()
-	except:
-		return {}
 
 def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 	today_sleep_data = None, user_input_bedtime = None, user_input_awake_time = None,
@@ -2636,14 +2584,63 @@ def get_overall_grade(grades):
 		   penalty) / 6,2)
 	return cal_overall_grade(gpa)
 
-def get_weather_data(todays_daily_strong,todays_date_epoch,
-	activity_stat):
+def get_avg_weather_data_from_activities(combined_activities):
+	default_data = {
+		"temperature":None,
+		"dewPoint":None,
+		"humidity":None,
+		"apparentTemperature":None,
+		"windSpeed":None
+	}
+
+	temperature = 0
+	dewpoint = 0
+	humidity = 0
+	apparent_temperature = 0
+	wind_speed = 0
+	act_with_weather = 0
+
+	if combined_activities:
+		for activity in combined_activities:
+			if has_weather_data(activity):
+				act_with_weather += 1
+				temperature += float(activity.get('temperature',0))
+				dewpoint += float(activity.get('dewPoint',0))
+				humidity += float(activity.get('humidity',0))
+				apparent_temperature += float(activity.get('temperature_feels_like',0))
+				wind_speed += float(activity.get('wind',0))
+			else:
+				# get weather data for individual activities from API
+				lat = activity.get('startingLatitudeInDegree')
+				lon = activity.get('startingLongitudeInDegree')
+				start_time = activity['startTimeInSeconds']
+				if lat and lon and start_time:
+					weather_data = get_weather_response_as_required(lat, lon, start_time)
+					weather_data.pop('weather_condition')
+					data_without_units = {key:weather_data[key]['value'] for key in weather_data}
+					if has_weather_data(data_without_units):
+						act_with_weather += 1
+						temperature += data_without_units.get('temperature',0)
+						dewpoint += data_without_units.get('dewPoint',0)
+						humidity += data_without_units.get('humidity',0)
+						apparent_temperature += data_without_units.get('temperature_feels_like',0)
+						wind_speed += data_without_units.get('wind',0)
+		if act_with_weather:
+			default_data["temperature"] = round(temperature/act_with_weather,2)
+			default_data["dewPoint"] = round(dewpoint/act_with_weather,2)
+			default_data["humidity"] = round(humidity/act_with_weather,2)
+			default_data["apparentTemperature"] = round(apparent_temperature/act_with_weather,2)
+			default_data["windSpeed"] = round(wind_speed/act_with_weather,2)
+
+	return default_data
+
+def get_weather_data(todays_daily_strong, combined_activities):
 	manual_weather = False
 	if(safe_get(todays_daily_strong,'indoor_temperature','') or
 	   safe_get(todays_daily_strong,'outdoor_temperature','') or
 	   safe_get(todays_daily_strong,'dewpoint','') or
 	   safe_get(todays_daily_strong,'humidity','') or
-	   safe_get(todays_daily_strong,'apparent_temperature','') or
+	   safe_get(todays_daily_strong,'temperature_feels_like','') or
 	   safe_get(todays_daily_strong,'wind_speed','')):
 		manual_weather = True
 
@@ -2663,20 +2660,8 @@ def get_weather_data(todays_daily_strong,todays_date_epoch,
 		}
 		return DATA
 	else:
-		latitude = activity_stat['latitude']
-		longitude = activity_stat['longitude']
-		if latitude and longitude:
-			DATA = extract_weather_data(fetch_weather_data(latitude,longitude,todays_date_epoch))
-			return DATA
-		else:
-			DATA = {
-				"temperature":None,
-				"dewPoint":None,
-				"humidity":None,
-				"apparentTemperature":None,
-				"windSpeed":None
-			}
-			return DATA
+		avg_weather_data = get_avg_weather_data_from_activities(combined_activities)
+		return avg_weather_data
 
 def did_workout_today(have_activities,user_did_workout):
 	if user_did_workout:
@@ -2911,7 +2896,7 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 				userinput_activities,user = user, calendar_date = current_date,
 				epoch_summaries = epochs_json,provide_all=True)
 		activity_stats = get_activity_stats(combined_user_exercise_activities,user_age)
-		weather_data = get_weather_data(todays_daily_strong,start_epoch,activity_stats)
+		weather_data = get_weather_data(todays_daily_strong,combined_user_exec_non_exec_activities)
 
 		# Exercise Calculation
 		exercise_calculated_data['did_workout'] = did_workout_today(
