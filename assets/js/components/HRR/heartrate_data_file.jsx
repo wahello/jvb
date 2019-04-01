@@ -422,7 +422,7 @@ class Heartrate_Data extends Component{
 	                                        value={this.state.No_beats_recovered}                                       
 	                                        onChange={this.handleChange}
 	                                        onBlur={this.editToggleNoBeats}>
-	                                        {this.createSleepDropdown(0,220)}
+	                                        {this.createSleepDropdown(70,220)}
 	                                    </Input> 
 				          	    	: this.state.No_beats_recovered}
 				          	    	{this.state.editable &&

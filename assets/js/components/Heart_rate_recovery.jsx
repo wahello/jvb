@@ -15,6 +15,8 @@ import { Collapse, Navbar, NavbarToggler,
 import NavbarMenu from './navbar';
 import { getGarminToken,logoutUser} from '../network/auth';
 import {renderAerobicSelectedDateFetchOverlay} from './dashboard_healpers'; 
+import { ToastContainer, toast } from 'react-toastify';
+import {updateHeartRateData} from '../network/heratrateOperations';
 import Workout from './workout_stats';
 import {fetchWorkoutData,fetchAaWorkoutData} from '../network/workout';
 import {renderTimeTohrrZoneSelectedDateFetchOverlay} from './dashboard_healpers';
@@ -51,8 +53,20 @@ class HeartRate extends Component{
 	 	this.errorHeartrateZone24Hour = this.errorHeartrateZone24Hour.bind(this);
 	 	this.renderAddDate = this.renderAddDate.bind(this);
 		this.renderRemoveDate = this.renderRemoveDate.bind(this);
+		this.toggleEditForm = this.toggleEditForm.bind(this);
+		this.editToggleAerobicRange = this.editToggleAerobicRange.bind(this);
+		this.editToggleAnaerobicRange = this.editToggleAnaerobicRange.bind(this);
+		this.editToggleBelowAerobicRange = this.editToggleBelowAerobicRange.bind(this);
+		this.handleChange =this.handleChange.bind(this);
+		this.createSleepDropdown = this.createSleepDropdown.bind(this);
+		this.updateData = this.updateData.bind(this);
+
+		
+
 	    this.state = {
 	    	mode:'workout',
+	    	
+
 	        selectedDate:new Date(),
 	    	calendarOpen:false,
 	    	isOpen:false,
@@ -64,15 +78,42 @@ class HeartRate extends Component{
 			hr_summary_24_hour:{}, // 24 hour chart 1
 			hr_zone_24_hour:{},//24 hour chart 3
 			updateButton:false,
+			editable_Aerobic_Range:false,
+			editable_Anaerobic_Range:false,
+			editable_Below_Aerobic_Range:false,
+			editable:false,
+			Aerobic_Range:"",
+			Anaerobic_Range:"",
+			Below_Aerobic_Range:"",
+			
+			
+
 	    };
 	}
 
 	successHeartRate(data){
+		toast.info("Your HRR stats have been updated successfully",{
+	          className:"dark"
+	    });
+	    let aerobic_range_start = data.data.aerobic_range.split('-')[0];
+	    let aerobic_range_end = data.data.aerobic_range.split('-')[1];
+	    let anaerobic_range = data.data.anaerobic_range.split(" ")[0];
+	    let below_aerobic_range = data.data.below_aerobic_range.split(" ")[1];
+
+	    console.log("aerobic_range_start is:",aerobic_range_start)
 		this.setState({
 			hr_summary:data.data,
-			fetching_aerobic:false
+			fetching_aerobic:false,
+			editable:false,
+			aerobic_range_start:aerobic_range_start,
+			aerobic_range_end:aerobic_range_end,
+			anaerobic_range:anaerobic_range,
+			below_aerobic_range:below_aerobic_range
 		})
 	}
+
+	
+
 	successHeartRate24Hour(data){
 		this.setState({
 	    	hr_summary_24_hour:data
@@ -84,6 +125,12 @@ class HeartRate extends Component{
 	    this.setState({
 	    	calendarOpen:!this.state.calendarOpen
 	    });
+    }
+
+    toggleEditForm(){
+       this.setState({
+         editable:!this.state.editable
+       });
     }
 
     successHeartrateZone(data){
@@ -124,7 +171,25 @@ class HeartRate extends Component{
 			fetching_aerobic:false,
 		});
 	}
+    
+    updateData(){
+  			this.setState({
+  				fetching_hrr:true
+  			}, () => {
+  				let data = {
 
+  					aerobic_range_start:this.state.aerobic_range_start,
+  					aerobic_range_end:this.state.aerobic_range_end,
+
+	  				anaerobic_range:this.state.anaerobic_range,
+			        below_aerobic_range:this.state.below_aerobic_range,
+			    };
+			    
+	  			updateHeartRateData(data,this.props.selectedDate, this.successHeartRate, this.errorHeartRate);
+	  		})
+	  			
+  			//this.props.renderHrrData(data);
+  		}
 
 	getEmptyActivityFieldsForAA(){
 	    let val = {
@@ -261,6 +326,16 @@ class HeartRate extends Component{
 	    	return "-";
 	    }
 	}
+	createSleepDropdown(start_num , end_num, mins=false, step=1){
+		    let elements = [];
+		    let i = start_num;
+		    while(i<=end_num){
+		      let j = (mins && i < 10) ? "0"+i : i;
+		      elements.push(<option key={j} value={j}>{j}</option>);
+		      i=i+step;
+		    }
+		    return elements;
+		}
 
 	
 	renderpercentage(value){
@@ -321,6 +396,54 @@ class HeartRate extends Component{
 
 		});
 	}
+
+	editToggleAerobicRange(){
+	  		this.setState({
+	  			editable_Aerobic_Range:!this.state.editable_Aerobic_Range
+	  		});
+  		}
+  	editToggleAnaerobicRange(){
+	  		this.setState({
+	  			editable_Anaerobic_Range:!this.state.editable_Anaerobic_Range
+	  		});
+  		}
+    editToggleBelowAerobicRange(){
+	  		this.setState({
+	  			editable_Below_Aerobic_Range:!this.state.editable_Below_Aerobic_Range
+	  		},() => console.log(this.state.editable_Below_Aerobic_Range,"Below_Aerobic_Range"));
+  		}
+
+    handleChange(event){
+    	console.log("entering or mnoy");
+		  	const target = event.target;
+		  	const value = target.value;	
+		  	const name = target.name;
+		  	console.log(value,"value");
+		  	
+		  	this.setState({
+				 [name]: value,
+			   },
+			// 	()=>{
+			// 		if(target.name=='Aerobic_Range'){
+			// 			this.setState({
+	  // 						Aerobic_Range:target.value,
+
+	  // 					},()=> console.log(Aerobic_Range,"Anaerobic_Range"));
+			// 		}
+			// 		else if(target.name=='Anaerobic_Range'){
+			// 			this.setState({
+	  // 						Anaerobic_Range:target.value,
+	  // 					});
+			// 		}
+			// 		else if(target.name=='Below_Aerobic_Range'){
+			// 			this.setState({
+	  // 						Below_Aerobic_Range:target.value,
+	  // 					});
+			// 		}
+			// }
+			);
+		}
+
 	processDate(selectedDate){
 		this.setState({
 			selectedDate:selectedDate,
@@ -534,6 +657,16 @@ class HeartRate extends Component{
 		                        size = "2x"
 			                />
 						</span> 
+						&nbsp;&nbsp;
+						<span>
+                    	<Button 
+                           id="nav-btn"
+                              size="sm"
+                              onClick={this.toggleEditForm}
+                              className="btn hidden-sm-up">
+                              {this.state.editable ? 'View Hrr Data' : 'Edit Hrr Data'}
+                        </Button>			      
+                	    </span>
 		            	<Popover
 				            placement="bottom"
 				            isOpen={this.state.calendarOpen}
@@ -576,21 +709,122 @@ class HeartRate extends Component{
 					          	    {!_.isEmpty(hrSummary) && <tbody>   
 						          	    <tr className = "hr_table_style_rows">   
 							          	    <td className = "hr_table_style_rows">Aerobic Range</td>    
-							          	    <td className = "hr_table_style_rows">{(hrSummary.aerobic_range)}</td>
+							          	    <td className = "hr_table_style_rows">
+
+							          	    {this.state.editable_Aerobic_Range ?
+							         <span>
+					          	    	<Input
+					          	    		style = {{maxWidth:"100px"}}
+	                                        type="select"
+	                                        className="custom-select form-control" 
+	                                        name="aerobic_range_start"
+	                                        value={this.state.aerobic_range_start}
+	                                        	/*hrSummary.aerobic_range.split("-")[0] */                                      
+	                                        onChange={this.handleChange}
+	                                        onBlur={this.editToggleAerobicRange}>
+	                                        {this.createSleepDropdown(0,220)}
+	                                    </Input>
+	                                       &nbsp;
+	                                        -
+	                                       &nbsp;
+	                                    <Input
+					          	    		style = {{maxWidth:"100px"}}
+	                                        type="select"
+	                                        className="custom-select form-control" 
+	                                        name="aerobic_range_end"
+	                                        value={this.state.aerobic_range_end}
+	                                        	// hrSummary.aerobic_range.split("-")[1]}                                       
+	                                        onChange={this.handleChange}
+	                                        onBlur={this.editToggleAerobicRange}>
+	                                        {this.createSleepDropdown(0,220)}
+	                                    </Input>
+	                                    </span>
+	                                    
+				          	    	: this.state.aerobic_range_start+'-'+this.state.aerobic_range_end}
+
+							          	   
+							          	    	
+							          	    	{this.state.editable &&
+				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggleAerobicRange}
+                            			className="fa fa-pencil fa-1x"
+                            			>
+                        			</span>
+                        			}
+							          	    </td>
 							          	    <td className = "hr_table_style_rows">{this.renderTime(hrSummary.aerobic_zone)}</td>
 							          	    <td className = "hr_table_style_rows">{this.renderpercentage(hrSummary.percent_aerobic)}</td>
+							          	    
+							          	    
 							          
 						          	    </tr>
 						          	    <tr className = "hr_table_style_rows">
 							          	    <td className = "hr_table_style_rows">Anaerobic Range</td>
-							          	    <td className = "hr_table_style_rows">{(hrSummary.anaerobic_range)}</td>
+							          	    <td className = "hr_table_style_rows">
+
+							          	    	{this.state.editable_Anaerobic_Range ? 
+							          	 <span>
+                    
+					          	    	<Input
+					          	    		style = {{maxWidth:"100px"}}
+	                                        type="select"
+	                                        className="custom-select form-control" 
+	                                        name="anaerobic_range"
+	                                        value={this.state.anaerobic_range}
+	                                         // hrSummary.anaerobic_range.split(" ")[0]
+	                                                                              
+	                                        onChange={this.handleChange}
+	                                        onBlur={this.editToggleAnaerobicRange}>
+	                                        {this.createSleepDropdown(0,220)}
+	                                    </Input>
+	                                    &nbsp;
+	                                     or above
+	                                    </span>
+	                                   
+				          	    	: this.state.anaerobic_range+" "+"or above"}
+
+							          	    	{this.state.editable &&
+				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggleAnaerobicRange}
+                            			className="fa fa-pencil fa-1x"
+                            			>
+                        			</span>
+                        			}
+
+
+							          	    </td>
 							          	    <td className = "hr_table_style_rows">{this.renderTime(hrSummary.anaerobic_zone)}</td>
 							          	    <td className = "hr_table_style_rows">{this.renderpercentage(hrSummary.percent_anaerobic)}</td>
 						          	    	
 						          	    </tr>
 						          	    <tr className = "hr_table_style_rows">
 							          	    <td className = "hr_table_style_rows">Below Aerobic Range</td>
-							          	    <td className = "hr_table_style_rows">{(hrSummary.below_aerobic_range)}</td>
+							          	    <td className = "hr_table_style_rows">
+
+							          	    	{this.state.editable_Below_Aerobic_Range ?
+							          	 <span>
+							          	 below
+							          	 &nbsp;
+					          	    	<Input
+					          	    		style = {{maxWidth:"100px"}}
+	                                        type="select"
+	                                        className="custom-select form-control" 
+	                                        name="below_aerobic_range"
+	                                        value={this.state.below_aerobic_range}
+	                                        // hrSummary.below_aerobic_range.split(" ")[1]                                       
+	                                        onChange={this.handleChange}
+	                                        onBlur={this.editToggleBelowAerobicRange}>
+	                                        {this.createSleepDropdown(0,220)}
+	                                    </Input> 
+	                                    </span>
+				          	    	: "below"+" "+this.state.below_aerobic_range}
+							          	    	{this.state.editable &&
+				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggleBelowAerobicRange}
+                            			className="fa fa-pencil fa-1x"
+                            			>
+                        			</span>
+                        			}
+
+
+							          	    </td>
 							          	    <td className = "hr_table_style_rows">{this.renderTime(hrSummary.below_aerobic_zone)}</td>
 							          	    <td className = "hr_table_style_rows">{this.renderpercentage(hrSummary.percent_below_aerobic)}</td>
 						          	    	
@@ -611,8 +845,15 @@ class HeartRate extends Component{
 						          	    </tr>
 					          	    </tbody>}
 				          	    </table>   
+
+
+				          	    <div className = "row justify-content-center">
+          	    	               <Button onClick = {this.updateData}>Update</Button>
+          	                    </div>
 			          	    </div>
+
 		          	    </div>
+
 		          	 
 						<h3><span style = {{fontSize:"22px",fontWeight:"bold"}}>Heart Rate Zone - Low End & High End</span></h3>
 						<div className = "row justify-content-center hr_table_padd">

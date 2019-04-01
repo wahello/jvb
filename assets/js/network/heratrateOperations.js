@@ -41,3 +41,25 @@ export function fetchHeartRateData_TwentyFourHour(successHeartRate_TwentyFourHou
   });
 
 }
+
+export function updateHeartRateData(data,successHeartRate,errorHeartRate,selectedDate){   
+  selectedDate = moment(selectedDate);
+   data['created_at'] = selectedDate.format('YYYY-MM-DD');
+  const URL=`/common/users/aa_custom_ranges`;
+  const config={
+   url:URL,
+   data:data,
+   method:"put",
+   params:{
+   start_date: selectedDate.format('YYYY-MM-DD')
+ },
+   withCredentials: true
+  };
+  axios(config).then((response)=>{
+   successHeartRate(response);
+  }).catch(function(error){
+     console.log("ERROR:: "+error);
+    errorHeartRate(error);
+  });
+
+}

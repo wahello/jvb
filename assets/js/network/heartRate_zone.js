@@ -82,3 +82,5 @@ export function fetchHrrWeeklyData(startDate,endDate,successHeartrateZone, error
        errorHrrWeeklyAaData(error);
     });
   }
+
+
