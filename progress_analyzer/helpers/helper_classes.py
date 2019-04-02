@@ -416,7 +416,13 @@ class ProgressReport():
 			mins = hours * 60
 			hours,mins = divmod(mins,60)
 			hours = round(hours)
-			mins = round(mins)
+			if mins < 59:
+				# if minute is less than 59 then round it
+				# otherwise don't because it'll be rounded to
+				# 60 and look like 5:60 which is incorrect
+				mins = round(mins)
+			else:
+				mins = int(mins)
 			if mins < 10:
 				mins = "{:02d}".format(mins) 
 			return "{}:{}".format(hours,mins)
