@@ -1814,7 +1814,9 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,
 			# ex 6:00 PM, not 6:32 PM
 			hour_start_zero_min = stretch_time(hour_start,"start")
 
-			if (yesterday_bedtime and
+			if(_is_epoch_falls_in_activity_duration(activities_start_end_time, hour_start)):
+				status = "exercise"
+			elif (yesterday_bedtime and
 				today_awake_time and
 				hour_start >= stretch_time(yesterday_bedtime,"start") and
 				hour_start_zero_min <= today_awake_time):
@@ -1828,8 +1830,6 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,
 				hour_start >= stretch_time(user_input_strength_start_time,"start") and
 				hour_start <= stretch_time(user_input_strength_end_time,"end")):
 				status = "strength"
-			elif(_is_epoch_falls_in_activity_duration(activities_start_end_time, hour_start)):
-				status = "exercise"
 			else:
 				status = "active" if data.get('steps') + steps_in_interval >= 300 else "inactive"
 
@@ -1911,7 +1911,10 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,
 						movement_consistency[interval]['status'] = 'inactive'
 						movement_consistency[interval]['steps'] = 0
 						
-				if today_bedtime and hour_start >= stretch_time(today_bedtime,"start"):
+				if(_is_epoch_falls_in_activity_duration(activities_start_end_time,hour_start)):
+					movement_consistency[interval]['status'] = 'exercise'
+
+				elif today_bedtime and hour_start >= stretch_time(today_bedtime,"start"):
 					# if interval is beyond the today's bedtime then it will be marked as "sleeping"
 					movement_consistency[interval]['status'] = 'sleeping'
 					
@@ -1923,8 +1926,6 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,
 					and hour_start >= stretch_time(nap_start_time,"start") 
 					and hour_start <= stretch_time(nap_end_time,"end")):
 						movement_consistency[interval]['status'] = 'nap'
-				elif(_is_epoch_falls_in_activity_duration(activities_start_end_time,hour_start)):
-					movement_consistency[interval]['status'] = 'exercise'
 
 			elif(not yesterday_bedtime and not today_awake_time):
 				# If there is no sleep information then try to guess
