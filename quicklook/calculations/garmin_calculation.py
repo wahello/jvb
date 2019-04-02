@@ -479,6 +479,17 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 		Returns:
 			dict: deep, light and rem sleep duration in seconds
+
+		NOTE: Now garmin provides "calendar_date" key which
+			represents the date to which summary belong. So
+			for newer summaries, we really don't need this
+			fuction since most of the code here is for
+			determining the date of sleep summary.We may
+			still need this for older summaries though.
+			It would be better to write a clean function
+			for newer summaries, which would be less line
+			of code and use this as an alternative for
+			summaries which do no have 'calendar_date'
 		'''
 		durations = {'deep':0,'light':0,'awake':0,"rem":0}
 		sleep_level_maps = data.get('sleepLevelsMap')
@@ -1867,6 +1878,8 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,
 		_update_status_to_timezone_change(
 			movement_consistency,timezone_change_interval,calendar_date)
 
+		# update the status of the inervals for which there was no
+		# epoch summaries
 		for interval,values in list(movement_consistency.items()):
 			am_or_pm = am_or_pm = interval.split('to')[0].strip().split(' ')[1]
 			hour = interval.split('to')[0].strip().split(' ')[0].split(':')[0]
@@ -1914,6 +1927,11 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,
 					movement_consistency[interval]['status'] = 'exercise'
 
 			elif(not yesterday_bedtime and not today_awake_time):
+				# If there is no sleep information then try to guess
+				# the hour when user wake up. The first hour (any time before
+				# 9 am) where difference in steps for previous and current
+				# hour is more then 150, that current hour will be the
+				# hour when user wake up.
 				nine_am = datetime.combine(calendar_date.date(),time(9))
 				if (movement_consistency[interval]['steps'] and hour_start < nine_am):
 					if not have_steps_before_9_am:
@@ -1994,7 +2012,7 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,
 
 def cal_exercise_steps_total_steps(total_daily_steps,combined_user_activities,age):
 	'''
-		Calculate exercise steps and total steps
+		Calculate exercise, non-exercise and total steps
 	'''	
 	IGNORE_ACTIVITY = ["HEART_RATE_RECOVERY"]
 
