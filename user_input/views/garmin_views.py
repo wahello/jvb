@@ -143,7 +143,7 @@ def _get_activities(user,target_date):
 	epoch_summaries = quicklook.calculations.garmin_calculation\
 		.get_garmin_model_data(UserGarminDataEpoch,user,
 			current_date_epoch,current_date_epoch+86400,
-			order_by = '-id')
+			order_by = '-id', filter_dup = True)
 	epoch_summaries = [ast.literal_eval(dic) for dic in epoch_summaries]
 	combined_activities = quicklook.calculations.garmin_calculation\
 	.get_filtered_activity_stats(
