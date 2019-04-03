@@ -706,8 +706,7 @@ class OverallLeaderboardTable extends Component{
 		let td_rows = [];
 		let keys = [ "rank","username","oh_gpa","avg_sleep","resting_hr","nes",
 		             "mc","ec","exercise_duration","aerobic_duration","vo2_max",
-		             "prcnt_uf","alcohol"];
-		         {/*,"user_daily_inputs"*/}
+		             "prcnt_uf","alcohol","user_daily_inputs"];		         
 		objectLength = Object.keys(overall_data).length;
 		for(let[key,value] of Object.entries(overall_data)){
 			let td_values = [];
@@ -884,48 +883,48 @@ class OverallLeaderboardTable extends Component{
 															 value[key1].rank),
 															 this.props.gender);
 						}
-					//  else if( key1 == "user_daily_inputs" ){
-					//   let reported_inputs = value[key1].other_scores.prcnt_days_reported_inputs.value;
-					//   let sick = value[key1].other_scores.prcnt_days_sick.value;
-					//   let travel =  value[key1].other_scores.prcnt_days_travel.value;
-					//   let medium_high_stress = value[key1].other_scores.prcnt_days_medium_high_stress.value; 
-					//   if( travel == null ){
-					//   	travel = 0
-					//   }
-					//   if( sick == null ){
-					//      sick = 0;
-					//   }
-					//   if( medium_high_stress == null ){
-					//      medium_high_stress = 0;
-					//   }
-					//   if( reported_inputs == null ){
-					//          reported_inputs = 0;
-					//   }
-					//   if(value[key1].score.value != null && value[key1].other_scores.days_sick.value != null &&
-					//       value[key1].other_scores.days_medium_high_stress.value != null && value[key1].other_scores.days_travel.value != null){
-					//       td_values.push(
-					//            <td className="udi">
-					//        	 <table style={{marginLeft:"auto",marginRight:"auto",backgroundColor:'#FFF'}}>
-					//       	<tr><td>
-					//          {value[key1].other_scores.days_travel.value+('\n')+"("+travel+"%"+")"}
-					//          </td>
-					//           <td>
-					//          {value[key1].other_scores.days_sick.value+('\n')+"("+sick+"%"+")"}
-					//          </td></tr>
-					//          <tr><td>
-					//          {value[key1].other_scores.days_medium_high_stress.value+('\n')+"("+medium_high_stress+"%"+")"}
-					//          </td>
-					//          <td>
-					//          {value[key1].score.value+('\n')+"("+reported_inputs+"%"+")"}
-					//          </td></tr>
-					//          </table>
-					//           </td>);
-					//           }
-					//      else{
-					//              td_values.push(<td>{"-"}</td>);		                        
+					 else if( key1 == "user_daily_inputs" ){
+					  let reported_inputs = value[key1].other_scores.prcnt_days_reported_inputs.value;
+					  let sick = value[key1].other_scores.prcnt_days_sick.value;
+					  let travel =  value[key1].other_scores.prcnt_days_travel.value;
+					  let medium_high_stress = value[key1].other_scores.prcnt_days_medium_high_stress.value; 
+					  if( travel == null ){
+					  	travel = 0
+					  }
+					  if( sick == null ){
+					     sick = 0;
+					  }
+					  if( medium_high_stress == null ){
+					     medium_high_stress = 0;
+					  }
+					  if( reported_inputs == null ){
+					         reported_inputs = 0;
+					  }
+					  if(value[key1].score.value != null && value[key1].other_scores.days_sick.value != null &&
+					      value[key1].other_scores.days_medium_high_stress.value != null && value[key1].other_scores.days_travel.value != null){
+					      td_values.push(
+					           <td className="udi">
+					       	 <table className="heartrate_zone_table" style={{marginLeft:"auto",marginRight:"auto",backgroundColor:'#FFF'}}>
+					      	<tr><td>
+					         {value[key1].other_scores.days_travel.value+('\n')+"("+travel+"%"+")"}
+					         </td>
+					          <td>
+					         {value[key1].other_scores.days_sick.value+('\n')+"("+sick+"%"+")"}
+					         </td></tr>
+					         <tr><td>
+					         {value[key1].other_scores.days_medium_high_stress.value+('\n')+"("+medium_high_stress+"%"+")"}
+					         </td>
+					         <td>
+					         {value[key1].score.value+('\n')+"("+reported_inputs+"%"+")"}
+					         </td></tr>
+					         </table>
+					          </td>);
+					          }
+					     else{
+					             td_values.push(<td>{"-"}</td>);		                        
 						     
-					//          }
-					// }
+					         }
+					}
 
 				}	
 			++operationCount;
@@ -946,20 +945,20 @@ class OverallLeaderboardTable extends Component{
 							<th>Exercise L7 Days (Rank)</th>
 							<th>Exercise Duration (Rank) / Avg HR</th>
 							<th>
-							<table className="aa">
+							<table>
 							<tr><td>AE</td><td>AN</td></tr>
 							<tr><td>BA</td><td>NR</td></tr> 
 							</table>
 							</th>
-							<th>VO2 Max</th>
+							<th>VO2<br/>Max</th>
 							<th>% Food Unproc (Rank)</th>
 							<th>Drinks Per Day / Per Week</th>
-							{/*<th>
-							<table className="userip">
-							<tr><td>Travel</td><td>Sick</td></tr>
-							<tr><td>M/H stress</td><td>Report Inputs</td></tr> 
+							<th>
+							<table>
+							<tr><td>TR</td><td>SK</td></tr>
+							<tr><td>STR</td><td>RI</td></tr> 
 							</table>
-							</th>*/}
+							</th>
 							</tr>
 							<tbody>
 							{td_rows}
@@ -969,6 +968,7 @@ class OverallLeaderboardTable extends Component{
 
 		return table;
 	}
+
 
 	render(){
 		return(
