@@ -1146,10 +1146,18 @@ def export_users_xls(request):
 	#Sleep
 
 	columns5 = ['sleep_per_wearable','sleep_comments','sleep_aid','resting_hr_last_night','sleep_per_wearable', 'sleep_bed_time', 
-	'sleep_awake_time','deep_sleep','light_sleep','awake_time','rem_sleep']
+	'sleep_awake_time','deep_sleep','light_sleep','awake_time','rem_sleep','heartrate_variability_stress']
 	columns5W = ['Sleep Per User Input (excluding awake time)','Sleep Comments', 'Sleep Aid taken?', 
 	'Resting Heart Rate (RHR)','Sleep per Wearable (excluding awake time)',
-	'Sleep Bed Time', 'Sleep Awake Time','Deep Sleep','Light Sleep','Awake Time','REM Sleep']
+	'Sleep Bed Time', 'Sleep Awake Time','Deep Sleep','Light Sleep','Awake Time','REM Sleep','Garmin Stress Level']
+
+	# exercise_qs = ExerciseAndReporting.objects.filter(
+	# 	user_ql__created_at__range=(from_date, to_date),
+	# 	user_ql__user = request.user).order_by('-user_ql__created_at')
+
+	# exercise_datewise = {q.user_ql.created_at.strftime("%Y-%m-%d"):q
+	# 	 for q in exercise_qs }
+
 	sheet9.write(31, 0, "Sleep",bold)
 	col_num2 = 31
 	num_4 = row_num
@@ -1166,21 +1174,7 @@ def export_users_xls(request):
 	format2.set_align('top')
 	format2.set_text_wrap()
 	format2.set_shrink()
-	# sleep_qs = Sleep.objects.filter(
-	# 	user_ql__created_at__range=(from_date, to_date),
-	# 	user_ql__user = request.user).order_by('-user_ql__created_at')
-
-	# sleep_datewise = {q.user_ql.created_at.strftime("%Y-%m-%d"):q
-	# 	 for q in sleep_qs }
-
-	# exercise_qs = ExerciseAndReporting.objects.filter(
-	# 	user_ql__created_at__range=(from_date, to_date),
-	# 	user_ql__user = request.user).order_by('-user_ql__created_at')
-
-	# exercise_datewise = {q.user_ql.created_at.strftime("%Y-%m-%d"):q
-	# 	 for q in exercise_qs }
-
-
+	
 	current_date = to_date
 		
 	while (current_date >= from_date):
@@ -1245,7 +1239,7 @@ def export_users_xls(request):
 						if exercise_data[key] <= 30:
 							sheet9.write(i + 2, row_num, exercise_data[key], format_red)
 				elif i == 1:
-					sheet9.write(i1 + i + 1, row_num - num_4,sleep_data[key], format2)
+					sheet9.write(i1 + i + 1, row_num - num_4, sleep_data[key], format2)
 				
 				elif i == 3:
 					if exercise_data[key] >= 76:
@@ -1256,9 +1250,17 @@ def export_users_xls(request):
 						sheet9.write(i1 + i + 1, row_num - num_4, exercise_data[key], format_green)
 					if exercise_data[key] <= 30:
 						sheet9.write(i1 + i + 1, row_num - num_4, exercise_data[key], format_red)
-			
-				if i != 0 and i != 3:
-					sheet9.write(i1 + i + 1, row_num - num_4, sleep_data[key], format)
+
+				elif i == 11 and key == 'heartrate_variability_stress':
+					if exercise_data.get(key) == -1:
+						sheet9.write(i1 + i + 1, row_num - num_4, exercise_data.get(key),format)
+					elif exercise_data.get(key) == 0:
+						sheet9.write(i1 + i + 1, row_num - num_4, '', format)
+				
+				if i != 0 and i != 3 and i != 11:
+					sheet9.write(i1 + i + 1, row_num - num_4, sleep_data.get(key), format)
+
+
 		else:
 			row_num += 1
 			sheet9.write(i1+i+1,row_num - num_4, '')
@@ -2036,7 +2038,8 @@ def export_users_xls(request):
 	sheet3.repeat_columns(0)
 	sheet3.set_row(0,30)
 	columns = ['sleep_per_user_input','sleep_comments',  'sleep_aid','sleep_per_wearable', 'sleep_bed_time', 'sleep_awake_time',
-			   'deep_sleep','light_sleep','awake_time','rem_sleep']
+			   'deep_sleep','light_sleep','awake_time','rem_sleep','heartrate_variability_stress']
+
 	current_date = to_date
 	r = 0
 	if to_date and from_date:
@@ -2115,9 +2118,15 @@ def export_users_xls(request):
 						sheet3.write(i + 2, row_num, exercise_data[key], format_green)
 					if exercise_data[key] <= 30:
 						sheet3.write(i + 2, row_num, exercise_data[key], format_red)
-			
-				if i != 0 and i != 3:
-					sheet3.write(i + 2, row_num, sleep_data[key], format)
+
+				elif i == 11 and key == 'heartrate_variability_stress':
+					if exercise_data.get(key) == -1:
+						sheet3.write(i + 2, row_num, exercise_data.get(key), format)
+					elif exercise_data.get(key) == 0:
+						sheet3.write(i + 2, row_num, '', format)
+				
+				if i != 0 and i != 3 and i != 11:
+					sheet3.write(i + 2, row_num, sleep_data.get(key), format)
 		else:
 			row_num += 1
 			sheet3.write(i + 2, row_num, '')
@@ -2150,8 +2159,6 @@ def export_users_xls(request):
 
 	format2 = book.add_format()
 	format2.set_align('fill')
-
-
 
 	current_date = to_date
 	while (current_date >= from_date):
@@ -2207,9 +2214,6 @@ def export_users_xls(request):
 	for col_num in range(len(columns7W)):
 		col_num1 = col_num1 + 1
 		sheet5.write(col_num1, row_num, columns7W[col_num])
-
-
-
 	current_date = to_date
 	while (current_date >= from_date):
 		alcohol_data = alcohol_datewise.get(current_date.strftime("%Y-%m-%d"),None)
@@ -2245,7 +2249,7 @@ def export_users_xls(request):
 			sheet5.write(i + 2, row_num, '')
 		current_date -= timedelta(days=1)
 
-	
+
 	#exercise reporting
 	sheet6.set_landscape()
 	sheet6.repeat_rows(0)
@@ -2263,7 +2267,6 @@ def export_users_xls(request):
 	columns8w = ['Workout Easy Hard','Workout Type', 'Workout Time','Workout Location','Workout Duration (hh:mm:ss)',
 	'Maximum Elevation Workout','Minutes Walked Before Workout','Distance (In Miles) - Run', 'Distance (in Miles) - Bike', 
 	'Distance (in yards) - Swim', 'Distance (in Miles) - Other','Pace (minutes:seconds) (Running)']
-
 
 	rem_columns = ['Overall Average Exercise Heart Rate','Elevation Gain(feet)','Elevation Loss(feet)','Effort Level','Dew Point (in °F)','Temperature (in °F)',
 	'Humidity (in %)',  'Temperature Feels Like (in °F)', 'Wind (in miles per hour)','HRR - Time to 99 (mm:ss)','HRR Start Point',"HRR (lowest heart rate point) in 1st min",
