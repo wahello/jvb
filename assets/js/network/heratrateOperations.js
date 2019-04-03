@@ -49,7 +49,7 @@ export function updateHeartRateData(data,successHeartRate,errorHeartRate,selecte
   const config={
    url:URL,
    data:data,
-   method:"put",
+   method:"post",
    params:{
    start_date: selectedDate.format('YYYY-MM-DD')
  },

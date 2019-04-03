@@ -16,6 +16,7 @@ import NavbarMenu from './navbar';
 import { getGarminToken,logoutUser} from '../network/auth';
 import {renderAerobicSelectedDateFetchOverlay} from './dashboard_healpers'; 
 import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
 import {updateHeartRateData} from '../network/heratrateOperations';
 import Workout from './workout_stats';
 import {fetchWorkoutData,fetchAaWorkoutData} from '../network/workout';
@@ -92,11 +93,9 @@ class HeartRate extends Component{
 	}
 
 	successHeartRate(data){
-		toast.info("Your HRR stats have been updated successfully",{
-	          className:"dark"
-	    });
-	    let aerobic_range_start = data.data.aerobic_range.split('-')[0];
-	    let aerobic_range_end = data.data.aerobic_range.split('-')[1];
+		
+	    let aerobic_range_start = data.data.aerobic_range.split("-")[0];;
+	    let aerobic_range_end = data.data.aerobic_range.split("-")[1];
 	    let anaerobic_range = data.data.anaerobic_range.split(" ")[0];
 	    let below_aerobic_range = data.data.below_aerobic_range.split(" ")[1];
 
@@ -176,16 +175,21 @@ class HeartRate extends Component{
   			this.setState({
   				fetching_hrr:true
   			}, () => {
+
+  						toast.info("your aa ranges have been updated successfully",{
+	          className:"dark"
+	    });
+
   				let data = {
 
-  					aerobic_range_start:this.state.aerobic_range_start,
-  					aerobic_range_end:this.state.aerobic_range_end,
-
+  					aerobic_range:this.state.aerobic_range_start+'-'+this.state.aerobic_range_end,
+  					// aerobic_range_end:this.state.aerobic_range_end,
 	  				anaerobic_range:this.state.anaerobic_range,
 			        below_aerobic_range:this.state.below_aerobic_range,
 			    };
 			    
 	  			updateHeartRateData(data,this.props.selectedDate, this.successHeartRate, this.errorHeartRate);
+
 	  		})
 	  			
   			//this.props.renderHrrData(data);
@@ -844,7 +848,16 @@ class HeartRate extends Component{
 						          	    	
 						          	    </tr>
 					          	    </tbody>}
-				          	    </table>   
+				          	    </table> 
+				          	    <ToastContainer 
+				                    position="top-center"
+				                    type="success"
+				                    autoClose={5000}
+				                    hideProgressBar={true}
+				                    newestOnTop={false}
+				                    closeOnClick
+				                    className="toast-popup"
+				                />  
 
 
 				          	    <div className = "row justify-content-center">
