@@ -12,7 +12,6 @@ import { Collapse, Navbar, NavbarToggler,
         Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 
 let objectLength = 0;
-
 function strToSecond(value){
     let time = value.split(':');
     let hours = parseInt(time[0])*3600;
@@ -149,7 +148,6 @@ class OverallLeaderboardTable extends Component{
 					<span>{score}{'%'}{' '}{'('+rank+')'}</span>
 					</td> 
 		);
-
     }
     getAlcoholGrades(drink_avg, gender){
 		let grade = '';
@@ -565,6 +563,7 @@ class OverallLeaderboardTable extends Component{
         }
         return x1 + x2;
 	}
+
     getSleepColors(sleepduration,rank,avgsleepgpa){
 		let background = "";
 		let color = "";
@@ -599,15 +598,6 @@ class OverallLeaderboardTable extends Component{
 	             
 	    	}
     	}
-
-		return (
-			<td className ="overall_rank_value" 
-			style = {{backgroundColor:background,color:color}}>
-			<span>{sleepduration}<br/>{'('+rank+')'}</span>
-			</td>
-		);
-      
-    }
 
     getStylesForExerciseduration(value1,rank,avgHR,selectedRange){
 		let value = strToSecond(value1);
