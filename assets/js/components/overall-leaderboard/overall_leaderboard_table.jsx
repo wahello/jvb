@@ -938,7 +938,7 @@ class OverallLeaderboardTable extends Component{
 							<tr  ref="table_header_overall">
 							<th>Rank</th>
 							<th>User</th>														    
-							<th>Overall Graade / GPA (Rank)</th>
+							<th>Overall Grade / GPA (Rank)</th>
 							<th>Sleep (Rank)</th>
 							<th>Resting HR (Rank)</th>
 							<th>Non Exercise Steps (Rank)</th>
