@@ -248,8 +248,16 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 	let isUndefindValueFound = false;
 
 	for(let dataKey of td_keys) {
-		
-		if((dataKey.indexOf("aerobic") >=0) || (dataKey == "duration_hrr_not_recorded") || (dataKey == "percent_hrr_not_recorded")) {
+		              // if((dataKey.indexOf("aerobic") >=0) || (dataKey == "duration_hrr_not_recorded") || (dataKey == "percent_hrr_not_recorded")) {
+
+		if((dataKey == "duration_in_aerobic_range")||
+			(dataKey == "percent_aerobic")||
+			(dataKey == "duration_below_aerobic_range")||
+			(dataKey == "percent_below_aerobic")||
+			(dataKey == "duration_in_anaerobic_range")||
+			(dataKey == "percent_anaerobic")||
+		    (dataKey == "duration_hrr_not_recorded")||
+		    (dataKey == "percent_hrr_not_recorded")) {
 
 			let tempDuration = null;
 			let tempPercentage = null;
