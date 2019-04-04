@@ -8,7 +8,8 @@ def which_device(user):
 	elif hasattr(user,"fitbit_refresh_token"):
 		return "fitbit"
 	else:
-		return None
+		hasattr(user,"apple_refresh_token")
+		return "apple"
 
 def create_quick_look(user,from_date,to_date):
 	device = which_device(user)
