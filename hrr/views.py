@@ -581,7 +581,7 @@ def calculate_garmin_twentyfour_hour_AA3(user,start_date,user_input_activities=N
 	response = fitbit_aa.calculate_AA_chart3(user,start_date,user_input_activities,\
 									AA_data,all_activities_heartrate_list,
 									all_activities_timestamp_list)
-	if response['total']['total_duration']:
+	if response['total']['total_duration']is not None:
 		total_time = 86400
 
 		for key,value in response.items():

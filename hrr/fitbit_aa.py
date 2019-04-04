@@ -1170,9 +1170,11 @@ def get_aa3_data(user,hr_list,timediff_list):
 
 	low_end_heart = [180-user_age+tmp for tmp in low_end_values]
 	low_end_heart = [ x for x in low_end_heart if x >= 0]
+	removed_hr_vales = len(low_end_heart_all) - len(low_end_heart)
 
 	high_end_heart = [180-user_age+tmp for tmp in high_end_values]
-	high_end_heart = [ x for x in high_end_heart if x >= 0]
+	#high_end_heart = [ x for x in high_end_heart if x >= 0]
+	high_end_heart = high_end_heart_all[removed_hr_vales:]
 
 	for a,b in zip(low_end_heart,high_end_heart):
 		if a and b > anaerobic_value:
