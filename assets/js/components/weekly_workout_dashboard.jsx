@@ -195,12 +195,12 @@ class WorkoutDashboard extends Component{
 		});
 		fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
 	}
-	componentDidMount(){
+	/*componentDidMount(){
 		this.setState({
 			fetching_weekly:true,
 		});
 		fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
-	}
+	}*/
 	gpascoreDecimal(gpa){
 		let value;
 		let x = gpa;
