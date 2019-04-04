@@ -131,4 +131,4 @@ def has_weather_data(activity):
     weather_keys = list(weather_report_dict().keys())
     weather_keys_values = dictfilt(activity, weather_keys)
     return False if all(
-        value == None for value in weather_keys_values.values()) else True
+        not value for value in weather_keys_values.values()) else True
