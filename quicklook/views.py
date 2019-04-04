@@ -1251,16 +1251,12 @@ def export_users_xls(request):
 					if exercise_data[key] <= 30:
 						sheet9.write(i1 + i + 1, row_num - num_4, exercise_data[key], format_red)
 
-				elif i == 11 and key == 'heartrate_variability_stress':
-					if exercise_data.get(key) == -1:
-						sheet9.write(i1 + i + 1, row_num - num_4, exercise_data.get(key),format)
-					elif exercise_data.get(key) == 0:
+				if i == 11 and key == 'heartrate_variability_stress':
+					if exercise_data.get(key) == 0:
 						sheet9.write(i1 + i + 1, row_num - num_4, '', format)
 					else:
 						sheet9.write(i1 + i + 1, row_num - num_4, exercise_data.get(key),format)
 					
-
-				
 				if i != 0 and i != 3 and i != 11:
 					sheet9.write(i1 + i + 1, row_num - num_4, sleep_data.get(key), format)
 
@@ -1273,8 +1269,8 @@ def export_users_xls(request):
 	num_5 = row_num
 	columns6 = ['prcnt_non_processed_food','processed_food','non_processed_food', 'diet_type']
 	columns6W = ['% of Unprocessed Food','Processed Food Consumed', 'Non Processed Food', 'Diet Type']
-	sheet9.write(43, 0, "Food",bold)
-	col_num2 = 43
+	sheet9.write(44, 0, "Food",bold)
+	col_num2 = 44
 	# a = len(rows_of_grades) + len(rows3) + len(rows4)
 	for col_num in range(len(columns6W)):
 		col_num2 = col_num2 + 1
@@ -1296,7 +1292,7 @@ def export_users_xls(request):
 			food_data = food_data.__dict__
 			grades_data = grades_data.__dict__
 			# logic
-			i1 = 43
+			i1 = 44
 			row_num += 1
 			for i, key in enumerate(columns6):
 				if grades_data['prcnt_unprocessed_food_consumed_grade'] == 'A' and i == 0:
@@ -2123,7 +2119,7 @@ def export_users_xls(request):
 					if exercise_data[key] <= 30:
 						sheet3.write(i + 2, row_num, exercise_data[key], format_red)
 
-				elif i == 11 and key == 'heartrate_variability_stress':
+				if i == 11 and key == 'heartrate_variability_stress':
 					if exercise_data.get(key) == -1:
 						sheet3.write(i + 2, row_num, exercise_data.get(key), format)
 					elif exercise_data.get(key) == 0:
