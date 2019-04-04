@@ -195,12 +195,6 @@ class WorkoutDashboard extends Component{
 		});
 		fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
 	}
-	/*componentDidMount(){
-		this.setState({
-			fetching_weekly:true,
-		});
-		fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
-	}*/
 	gpascoreDecimal(gpa){
 		let value;
 		let x = gpa;
@@ -285,7 +279,7 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 				}
 				if(dataKey == "percent_below_aerobic") {
 					percent_below_aerobic = tempPercentage;
-				} else if(dataKey == "percent_hrr_not_recorded") {
+				} else if(dataKey == "percent_hrr_not_recorded") { 
 					percent_hrr_not_recorded = tempPercentage;
 				} else if(dataKey == "percent_anaerobic") {
 					percent_anaerobic = tempPercentage;
