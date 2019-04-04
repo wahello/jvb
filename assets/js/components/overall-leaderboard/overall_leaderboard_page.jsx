@@ -185,7 +185,6 @@ class OverallLeaderboard extends Component{
 							 this.errorOverallMovementRank,
 							 this.state.selectedDate,
 							 null,null,'overall');
-			fetchMcsSnapshot(this.successMcsSnapshot,this.errorMcsSnapshot,this.state.selectedDate);
 
 		});
 	}
