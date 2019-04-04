@@ -2623,11 +2623,16 @@ def get_avg_weather_data_from_activities(combined_activities):
 		for activity in combined_activities:
 			if has_weather_data(activity):
 				act_with_weather += 1
-				temperature += float(activity.get('temperature',0))
-				dewpoint += float(activity.get('dewPoint',0))
-				humidity += float(activity.get('humidity',0))
-				apparent_temperature += float(activity.get('temperature_feels_like',0))
-				wind_speed += float(activity.get('wind',0))
+				if activity.get('temperature',0):
+					temperature += float(activity.get('temperature',0))
+				if activity.get('dewPoint',0):
+					dewpoint += float(activity.get('dewPoint',0))
+				if activity.get('humidity',0):
+					humidity += float(activity.get('humidity',0))
+				if activity.get('temperature_feels_like',0):
+					apparent_temperature += float(activity.get('temperature_feels_like',0))
+				if activity.get('wind',0):
+					wind_speed += float(activity.get('wind',0))
 			else:
 				# get weather data for individual activities from API
 				lat = activity.get('startingLatitudeInDegree')
