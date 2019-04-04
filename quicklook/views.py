@@ -1256,6 +1256,10 @@ def export_users_xls(request):
 						sheet9.write(i1 + i + 1, row_num - num_4, exercise_data.get(key),format)
 					elif exercise_data.get(key) == 0:
 						sheet9.write(i1 + i + 1, row_num - num_4, '', format)
+					else:
+						sheet9.write(i1 + i + 1, row_num - num_4, exercise_data.get(key),format)
+					
+
 				
 				if i != 0 and i != 3 and i != 11:
 					sheet9.write(i1 + i + 1, row_num - num_4, sleep_data.get(key), format)
@@ -2124,6 +2128,9 @@ def export_users_xls(request):
 						sheet3.write(i + 2, row_num, exercise_data.get(key), format)
 					elif exercise_data.get(key) == 0:
 						sheet3.write(i + 2, row_num, '', format)
+					else:
+						sheet3.write(i + 2, row_num, exercise_data.get(key), format)
+					
 				
 				if i != 0 and i != 3 and i != 11:
 					sheet3.write(i + 2, row_num, sleep_data.get(key), format)
