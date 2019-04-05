@@ -54,6 +54,7 @@ class HeartRate extends Component{
 	 	this.errorHeartrateZone24Hour = this.errorHeartrateZone24Hour.bind(this);
 	 	this.renderAddDate = this.renderAddDate.bind(this);
 		this.renderRemoveDate = this.renderRemoveDate.bind(this);
+		this.toggleInfo=this.toggleInfo.bind(this);
 		this.toggleEditForm = this.toggleEditForm.bind(this);
 		this.editToggleAerobicRange = this.editToggleAerobicRange.bind(this);
 		this.editToggleAnaerobicRange = this.editToggleAnaerobicRange.bind(this);
@@ -98,7 +99,6 @@ class HeartRate extends Component{
 	    let aerobic_range_end = data.data.aerobic_range.split("-")[1];
 	    let anaerobic_range = data.data.anaerobic_range.split(" ")[0];
 	    let below_aerobic_range = data.data.below_aerobic_range.split(" ")[1];
-
 	    console.log("aerobic_range_start is:",aerobic_range_start)
 		this.setState({
 			hr_summary:data.data,
@@ -123,6 +123,12 @@ class HeartRate extends Component{
 	toggleCalendar(){
 	    this.setState({
 	    	calendarOpen:!this.state.calendarOpen
+	    });
+    }
+
+    toggleInfo(){
+	    this.setState({
+	      infoButton:!this.state.infoButton
 	    });
     }
 
@@ -613,7 +619,7 @@ class HeartRate extends Component{
 	    ];
 	    td_rows.push(<tr>{td_values}</tr>);
 	    }
-	    return td_rows;
+	    return td_rows; 
 	}
 
 	componentDidMount(){
@@ -668,7 +674,7 @@ class HeartRate extends Component{
                               size="sm"
                               onClick={this.toggleEditForm}
                               className="btn hidden-sm-up">
-                              {this.state.editable ? 'View Hrr Data' : 'Edit Hrr Data'}
+                              {this.state.editable ? 'View AA Ranges' : 'Create AA Ranges'}
                         </Button>			      
                 	    </span>
 		            	<Popover
@@ -752,8 +758,24 @@ class HeartRate extends Component{
 				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggleAerobicRange}
                             			className="fa fa-pencil fa-1x"
                             			>
-                        			</span>
-                        			}
+                        			</span>}
+                        			&nbsp;&nbsp;
+                                  {this.state.editable &&
+                        			<span id="infobutton"
+						                onClick={this.toggleInfo}                   
+						                >
+						                  <a  className="infoBtn"> 
+						                     <FontAwesome 
+						                        name = "info-circle"
+						                        size = "1x"                                      
+						                      />
+						                  </a>
+						            </span> 
+
+						               
+						        }
+
+                        			
 							          	    </td>
 							          	    <td className = "hr_table_style_rows">{this.renderTime(hrSummary.aerobic_zone)}</td>
 							          	    <td className = "hr_table_style_rows">{this.renderpercentage(hrSummary.percent_aerobic)}</td>
@@ -786,12 +808,7 @@ class HeartRate extends Component{
 	                                   
 				          	    	: this.state.anaerobic_range+" "+"or above"}
 
-							          	    	{this.state.editable &&
-				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggleAnaerobicRange}
-                            			className="fa fa-pencil fa-1x"
-                            			>
-                        			</span>
-                        			}
+							          	    	
 
 
 							          	    </td>
@@ -820,12 +837,7 @@ class HeartRate extends Component{
 	                                    </Input> 
 	                                    </span>
 				          	    	: "below"+" "+this.state.below_aerobic_range}
-							          	    	{this.state.editable &&
-				          	    	<span  style = {{marginLeft:"30px"}}  onClick={this.editToggleBelowAerobicRange}
-                            			className="fa fa-pencil fa-1x"
-                            			>
-                        			</span>
-                        			}
+							          	    	
 
 
 							          	    </td>
