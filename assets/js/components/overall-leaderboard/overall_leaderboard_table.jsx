@@ -903,19 +903,19 @@ class OverallLeaderboardTable extends Component{
 					  if(value[key1].score.value != null && value[key1].other_scores.days_sick.value != null &&
 					      value[key1].other_scores.days_medium_high_stress.value != null && value[key1].other_scores.days_travel.value != null){
 					      td_values.push(
-					           <td className="udi">
+					           <td>
 					       	 <table className="heartrate_zone_table" style={{marginLeft:"auto",marginRight:"auto",backgroundColor:'#FFF'}}>
 					      	<tr><td>
-					         {value[key1].other_scores.days_travel.value+('\n')+"("+travel+"%"+")"}
+					         {value[key1].other_scores.days_travel.value}<br/>{"("+travel+"%"+")"}
 					         </td>
 					          <td>
-					         {value[key1].other_scores.days_sick.value+('\n')+"("+sick+"%"+")"}
+					         {value[key1].other_scores.days_sick.value}<br/>{"("+sick+"%"+")"}
 					         </td></tr>
 					         <tr><td>
-					         {value[key1].other_scores.days_medium_high_stress.value+('\n')+"("+medium_high_stress+"%"+")"}
+					         {value[key1].other_scores.days_medium_high_stress.value}<br/>{"("+medium_high_stress+"%"+")"}
 					         </td>
 					         <td>
-					         {value[key1].score.value+('\n')+"("+reported_inputs+"%"+")"}
+					         {value[key1].score.value}<br/>{"("+reported_inputs+"%"+")"}
 					         </td></tr>
 					         </table>
 					          </td>);
@@ -955,8 +955,8 @@ class OverallLeaderboardTable extends Component{
 							<th>Drinks Per Day / Per Week</th>
 							<th>
 							<table>
-							<tr><td>TR</td><td>SK</td></tr>
-							<tr><td>STR</td><td>RI</td></tr> 
+							<tr><td>TRL</td><td>ILL</td></tr>
+							<tr><td>STR</td><td>REP</td></tr> 
 							</table>
 							</th>
 							</tr>
@@ -990,6 +990,18 @@ class OverallLeaderboardTable extends Component{
 							</p>
 							<p className="footer_content" style={{marginLeft:"15px"}}>
 							ECS: Exercise Consistency Score
+							</p>
+							<p className="footer_content" style={{marginLeft:"15px"}}>
+							TRL: Total number of days in period traveled (% of total days reported in the duration)
+							</p>
+							<p className="footer_content" style={{marginLeft:"15px"}}>
+							ILL: Total number of days in period sick (% of total days reported in the duration)
+							</p>
+							<p className="footer_content" style={{marginLeft:"15px"}}>
+							STR: Total number of days in period having medium or high Stress (% of total days reported in the duration)
+							</p>
+							<p className="footer_content" style={{marginLeft:"15px"}}>
+							REP: Total number of days in period reported inputs (% of total days reported in the duration)
 							</p>
 							<p className="footer_content" style={{marginLeft:"15px"}}>
 							NR = Not Reported; NA = Not Available
