@@ -1169,12 +1169,20 @@ def get_aa3_data(user,hr_list,timediff_list):
 						38,43,48,53,58,63,68,78,88]
 
 	low_end_heart = [180-user_age+tmp for tmp in low_end_values]
-	low_end_heart = [ x for x in low_end_heart if x >= 0]
+	low_end_heart_all = [ x for x in low_end_heart if x >= 0]
+	#Storing differentiated values from length of low_end_heart and length of low_end_heart_all
+	removed_hr_vales = len(low_end_heart) - len(low_end_heart_all)
+	
 
 	high_end_heart = [180-user_age+tmp for tmp in high_end_values]
-	high_end_heart = [ x for x in high_end_heart if x >= 0]
+	
+	high_end_heart_all = [ x for x in high_end_heart if x >= 0]
+	#Adding removed hr vales to a high_end_heart_all list
+	high_end_heart = high_end_heart_all[removed_hr_vales:]
+	
 
 	for a,b in zip(low_end_heart,high_end_heart):
+		
 		if a and b > anaerobic_value:
 			classification_dic[a] = 'anaerobic_zone'
 		elif (a or a == 0) and b < below_aerobic_value:
