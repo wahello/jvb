@@ -114,12 +114,12 @@
 	}
 	.overall_Leaderboard th table td {
 	    padding: 0px !important;
-	    min-width: 41px !important;
+	    min-width: 26px !important;
 	    vertical-align: middle !important;
 	    font-size: 8.3px !important;
 	}
 	.overall_Leaderboard .mov_sticky th {
-    	    min-width: 45px !important;
+    	    min-width: 42px !important;
 		    font-size: 9px !important;
 		    padding: 0px !important;
 		    max-width: 42px !important;
@@ -147,7 +147,7 @@
 	    margin-left: 0px !important;
 	}
 	.overall_Leaderboard .mov_sticky + tbody td .heartrate_zone_table tr td{
-	    max-width: 23px !important;
+	    max-width: 19px !important;
 	}
 	.footer_content{
 		font-size: 12px !important;
@@ -162,7 +162,7 @@
 		    max-width: 42px !important;
 	}
 	.overall_Leaderboard .mov_sticky + tbody td .heartrate_zone_table tr td{
-	    max-width: 43px !important;
+	    max-width: 38px !important;
 	    margin-left: 0px !important;
 	    font-size: 8px !important;
 	}
@@ -217,12 +217,12 @@
 	}
 	.overall_Leaderboard th table td {
 	    padding: 0px !important;
-	    min-width: 41px !important;
+	    min-width: 24px !important;
 	    vertical-align: middle !important;
 	    font-size: 8.3px !important;
 	}
 	.overall_Leaderboard .mov_sticky th {
-		min-width:47px !important;
+		min-width:43px !important;
      	font-size: 9px !important;
     	padding: 0rem !important;
 	}
@@ -245,7 +245,7 @@
 	    max-width: 37px !important;    
 	}
 	.overall_Leaderboard .mov_sticky + tbody td .heartrate_zone_table td{
-	    max-width: 24px !important;
+	    max-width: 20px !important;
 	    margin-left: 0px !important;
 	    font-size: 8px !important;
 	}
@@ -285,7 +285,7 @@
 	    font-size: 10px !important;
 	}
 	.overall_Leaderboard .mov_sticky + tbody td .heartrate_zone_table tr td{
-	    max-width: 29px !important;
+	    max-width: 23px !important;
 	    margin-left: 0px !important;
 	    font-size: 8px !important;
 	}
@@ -310,7 +310,7 @@
 		height: 20px !important;
 	}
 	.overall_Leaderboard .mov_sticky th {
-		min-width:50px !important;
+		min-width:48px !important;
      	font-size: 9px !important;
     	padding: 0rem !important;
 	}
@@ -367,9 +367,9 @@
     padding: 0.1rem !important;
     vertical-align: top !important;
     text-align: center;
-    min-width: 55px !important;
+    min-width: 52px !important;
     width: 1918px !important;
-    max-width: 0px !important;
+    max-width: 53px !important;
     font-size: 12px !important;
 	}
 	.overall_Leaderboard .mov_sticky th table td {
@@ -378,6 +378,10 @@
 	.overall_Leaderboard .mov_sticky + tbody td {
 	   min-width: 52px !important;
 	}
+	.overall_Leaderboard .mov_sticky + tbody td .heartrate_zone_table tr td {
+    max-width: 26px !important;
+    font-size: 10px !important;
+   }
 }
 
 

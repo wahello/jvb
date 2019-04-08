@@ -543,34 +543,46 @@ class OverallLeaderboard extends Component{
                         <ModalBody className="modalcontent" id="modal1" >
 		                  <div className = "row">
 						    <div className = "col-sm-12">
-			          	      <p className="footer_content" style={{marginLeft:"15px"}}>	 
-							  MCS: Movement Consistency Score
-							  </p>
-	                    	  <p className="footer_content" style={{marginLeft:"15px"}}>
-	                          ECS: Exercise Consistency Score
-	                          </p>
-	                          <p className="footer_content" style={{marginLeft:"15px"}}>
-	                          NR = Not Reported; NA = Not Available
-	                          </p>
-		          			 <p className="footer_content" style={{marginLeft:"15px"}}>
-		          			 Grades:&nbsp;
-		          			  <div className="rd_mch_color_legend color_legend_green"></div>
-					           <span className="rd_mch_color_legend_label">A</span>
-					           <div className="rd_mch_color_legend color_legend_parrot_green"></div>
-					           <span className="rd_mch_color_legend_label">B</span>
-					           <div className="rd_mch_color_legend color_legend_yelow"></div>
-					           <span className="rd_mch_color_legend_label">C</span>
-					           <div className="rd_mch_color_legend color_legend_orange"></div>
-					           <span className="rd_mch_color_legend_label">D</span>
-					           <div className="rd_mch_color_legend color_legend_red"></div>
-					           <span className="rd_mch_color_legend_label">F</span>
-			          	     </p>      
-	                          <p className="footer_content" style={{marginLeft:"15px"}}>
-	                          Numbers in (parenthesis) represent overall rank in category (where (1) is best)
-	                          </p>
-	                           <p className="footer_content" style={{marginLeft:"15px"}}>
-		                        See the Movement Leaderboard for more details regarding Overall Movement Rank
-		                        </p>
+								<p className="footer_content" style={{marginLeft:"15px"}}>	 
+								MCS: Movement Consistency Score
+								</p>
+								<p className="footer_content" style={{marginLeft:"15px"}}>
+								ECS: Exercise Consistency Score
+								</p>
+								<p className="footer_content" style={{marginLeft:"15px"}}>
+								TRL: Total number of days in period traveled (% of total days reported in the duration)
+								</p>
+								<p className="footer_content" style={{marginLeft:"15px"}}>
+								ILL: Total number of days in period sick (% of total days reported in the duration)
+								</p>
+								<p className="footer_content" style={{marginLeft:"15px"}}>
+								STR: Total number of days in period having medium or high Stress (% of total days reported in the duration)
+								</p>
+								<p className="footer_content" style={{marginLeft:"15px"}}>
+								REP: Total number of days in period reported inputs (% of total days reported in the duration)
+								</p>
+								<p className="footer_content" style={{marginLeft:"15px"}}>
+								NR = Not Reported; NA = Not Available
+								</p>
+								<p className="footer_content" style={{marginLeft:"15px"}}>
+								Grades:&nbsp;
+								<div className="rd_mch_color_legend color_legend_green"></div>
+								<span className="rd_mch_color_legend_label">A</span>
+								<div className="rd_mch_color_legend color_legend_parrot_green"></div>
+								<span className="rd_mch_color_legend_label">B</span>
+								<div className="rd_mch_color_legend color_legend_yelow"></div>
+								<span className="rd_mch_color_legend_label">C</span>
+								<div className="rd_mch_color_legend color_legend_orange"></div>
+								<span className="rd_mch_color_legend_label">D</span>
+								<div className="rd_mch_color_legend color_legend_red"></div>
+								<span className="rd_mch_color_legend_label">F</span>
+								</p>      
+								<p className="footer_content" style={{marginLeft:"15px"}}>
+								Numbers in (parenthesis) represent overall rank in category (where (1) is best)
+								</p>
+								<p className="footer_content" style={{marginLeft:"15px"}}>
+								See the Movement Leaderboard for more details regarding Overall Movement Rank
+								</p>
                              </div>
                           </div>
                          </ModalBody> 
