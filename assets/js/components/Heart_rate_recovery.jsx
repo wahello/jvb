@@ -11,7 +11,7 @@ import _ from 'lodash';
 import FontAwesome from "react-fontawesome";
 import { Collapse, Navbar, NavbarToggler, 
          NavbarBrand, Nav, NavItem, NavLink,
-        Button,Popover,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
+        Button,Popover, Modal,ModalHeader, ModalBody, ModalFooter,PopoverBody,Form,FormGroup,FormText,Label,Input} from 'reactstrap';
 import NavbarMenu from './navbar';
 import { getGarminToken,logoutUser} from '../network/auth';
 import {renderAerobicSelectedDateFetchOverlay} from './dashboard_healpers'; 
@@ -62,6 +62,7 @@ class HeartRate extends Component{
 		this.handleChange =this.handleChange.bind(this);
 		this.createSleepDropdown = this.createSleepDropdown.bind(this);
 		this.updateData = this.updateData.bind(this);
+		this.infoPrint = this.infoPrint.bind(this);
 
 		
 
@@ -80,6 +81,7 @@ class HeartRate extends Component{
 			hr_summary_24_hour:{}, // 24 hour chart 1
 			hr_zone_24_hour:{},//24 hour chart 3
 			updateButton:false,
+			infoButton:false,
 			editable_Aerobic_Range:false,
 			editable_Anaerobic_Range:false,
 			editable_Below_Aerobic_Range:false,
@@ -109,6 +111,8 @@ class HeartRate extends Component{
 			anaerobic_range:anaerobic_range,
 			below_aerobic_range:below_aerobic_range
 		})
+
+		
 	}
 
 	
@@ -190,8 +194,8 @@ class HeartRate extends Component{
 
   					aerobic_range:this.state.aerobic_range_start+'-'+this.state.aerobic_range_end,
   					// aerobic_range_end:this.state.aerobic_range_end,
-	  				anaerobic_range:this.state.anaerobic_range,
-			        below_aerobic_range:this.state.below_aerobic_range,
+	  				anaerobic_range:this.state.aerobic_range_end,
+			        below_aerobic_range:this.state.aerobic_range_start,
 			    };
 			    
 	  			updateHeartRateData(data,this.props.selectedDate, this.successHeartRate, this.errorHeartRate);
@@ -284,6 +288,25 @@ class HeartRate extends Component{
   		});
   	}
 
+	infoPrint(){
+	    var mywindow = window.open('', 'PRINT');
+	    mywindow.document.write('<html><head><style>' +
+	        '.research-logo {margin-bottom: 20px;width: 100%; min-height: 55px; float: left;}' +
+	        '.print {visibility: hidden;}' +
+	        '.research-logo img {max-height: 100px;width: 60%;border-radius: 4px;}' +
+	        '</style><title>' + document.title  + '</title>');
+	    mywindow.document.write('</head><body >');
+	    mywindow.document.write('<h1>' + document.title  + '</h1>');
+	    mywindow.document.write(document.getElementById('modal1').innerHTML);
+	    mywindow.document.write('</body></html>');
+
+	    mywindow.document.close(); // necessary for IE >= 10
+	    mywindow.focus(); // necessary for IE >= 10*/
+
+	    mywindow.print();
+	    mywindow.close();
+	   }
+	   
   	renderNullValue(value){
   		// This function will add the (-) for when the values get null
   		let values;
@@ -362,6 +385,7 @@ class HeartRate extends Component{
 		}
 		return percentage;
 	}
+
 	
 	renderAddDate(){
 		var today = this.state.selectedDate;
@@ -771,8 +795,45 @@ class HeartRate extends Component{
 						                      />
 						                  </a>
 						            </span> 
+      
+						        }
+						        {this.state.infoButton &&
+						        	<Modal
+                            id="popover"                          
+                            placement="bottom" 
+                            isOpen={this.state.infoButton}
+                            target="infobutton" 
+                            toggle={this.toggleInfo}>
+                            <ModalHeader toggle={this.toggleInfo} style={{fontWeight:"bold"}}>
+                            <div >                      
+                            <a href="#" onClick={this.infoPrint} style={{fontSize:"15px",color:"black"}}><i className="fa fa-print">Print</i></a>
+                            </div>
+                            </ModalHeader>
+                              <ModalBody className="modalcontent" id="modal1" >
+                                <div>
+                                  <div>Completing your daily inputs EVERY DAY makes you ACCOUNTABLE
+                                  to your results and our hope is that you will make healthier
+                                  life choices as a result of having to report various topics
+                                  (and we see significantly improved results for those that report daily).
+                                  Reporting only takes a few minutes a day and is well worth
+                                  the time investment. You provide the inputs and we will provide
+                                  you the analyses! Create a new habit of reporting your inputs daily!</div>
 
-						               
+                                  <p style={{paddingTop:"15px"}}>Reporting your inputs to us has many benefits:</p>
+
+                                  <div style={{paddingTop:"15px"}}>(1) It enables us to report your data to you in a simple, understandable,
+                                   and customizable way. Our reporting and proprietary grading system will 
+                                   provide you with a powerful tool to identify positive and negative trends
+                                    in your health and life, so you can (1) work on improving areas you want
+                                     to improve and (2) maintain areas where you are performing well;</div>
+
+                                 
+
+                                  
+                                </div>
+                              </ModalBody>
+                           </Modal> 
+
 						        }
 
                         			
@@ -785,62 +846,19 @@ class HeartRate extends Component{
 						          	    </tr>
 						          	    <tr className = "hr_table_style_rows">
 							          	    <td className = "hr_table_style_rows">Anaerobic Range</td>
-							          	    <td className = "hr_table_style_rows">
 
-							          	    	{this.state.editable_Anaerobic_Range ? 
-							          	 <span>
-                    
-					          	    	<Input
-					          	    		style = {{maxWidth:"100px"}}
-	                                        type="select"
-	                                        className="custom-select form-control" 
-	                                        name="anaerobic_range"
-	                                        value={this.state.anaerobic_range}
-	                                         // hrSummary.anaerobic_range.split(" ")[0]
-	                                                                              
-	                                        onChange={this.handleChange}
-	                                        onBlur={this.editToggleAnaerobicRange}>
-	                                        {this.createSleepDropdown(0,220)}
-	                                    </Input>
-	                                    &nbsp;
-	                                     or above
-	                                    </span>
-	                                   
-				          	    	: this.state.anaerobic_range+" "+"or above"}
+							          	    <td className = "hr_table_style_rows">{this.state.aerobic_range_end 
+							          	  +" "+"or above"}</td>
 
-							          	    	
-
-
-							          	    </td>
 							          	    <td className = "hr_table_style_rows">{this.renderTime(hrSummary.anaerobic_zone)}</td>
 							          	    <td className = "hr_table_style_rows">{this.renderpercentage(hrSummary.percent_anaerobic)}</td>
 						          	    	
 						          	    </tr>
 						          	    <tr className = "hr_table_style_rows">
 							          	    <td className = "hr_table_style_rows">Below Aerobic Range</td>
-							          	    <td className = "hr_table_style_rows">
+							          	          
+							          	    <td className = "hr_table_style_rows">{"below"+" "+this.state.aerobic_range_start}</td>
 
-							          	    	{this.state.editable_Below_Aerobic_Range ?
-							          	 <span>
-							          	 below
-							          	 &nbsp;
-					          	    	<Input
-					          	    		style = {{maxWidth:"100px"}}
-	                                        type="select"
-	                                        className="custom-select form-control" 
-	                                        name="below_aerobic_range"
-	                                        value={this.state.below_aerobic_range}
-	                                        // hrSummary.below_aerobic_range.split(" ")[1]                                       
-	                                        onChange={this.handleChange}
-	                                        onBlur={this.editToggleBelowAerobicRange}>
-	                                        {this.createSleepDropdown(0,220)}
-	                                    </Input> 
-	                                    </span>
-				          	    	: "below"+" "+this.state.below_aerobic_range}
-							          	    	
-
-
-							          	    </td>
 							          	    <td className = "hr_table_style_rows">{this.renderTime(hrSummary.below_aerobic_zone)}</td>
 							          	    <td className = "hr_table_style_rows">{this.renderpercentage(hrSummary.percent_below_aerobic)}</td>
 						          	    	
