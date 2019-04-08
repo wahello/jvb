@@ -12,6 +12,8 @@ from hrr.views import hrr_calculations,\
 						store_aa_calculations,\
 						add_date_to_fitfile
 
+from common.common_calculations import update_aa_calculation
+
 logger = get_task_logger(__name__)
 
 @task(name="hrr.save_hrr_data")
@@ -57,6 +59,13 @@ def add_date_to_fitfile_celery():
 	print("Entered into the Fitfile celery perodic task")
 	try:
 		add_date_to_fitfile()
+	except Exception as e:
+		logger.error(e,exc_info=True)
+
+@task(name="hrr.aa_custom_ranges")
+def aa_custom_ranges(user_id,from_date):
+	try:
+		update_aa_calculation(user_id,from_date)
 	except Exception as e:
 		logger.error(e,exc_info=True)
 
