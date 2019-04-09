@@ -15,4 +15,3 @@ class UserBackfillRequestSerializer(serializers.ModelSerializer):
 			user = user,
 			**validated_data)
 		return instance
-

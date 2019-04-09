@@ -1,7 +1,8 @@
 from django.contrib import admin
 from apple.models import (UserAppleDataSteps,
 						   ApplePingNotification,
-						   UserAppleDataActivities)
+						   UserAppleDataActivities,
+						   AppleUser)
 # Register your models here.
 
 class UserAppleDataStepsAdmin(admin.ModelAdmin):
@@ -19,6 +20,12 @@ class ApplePingNotificationAdmin(admin.ModelAdmin):
 	search_fields = ('user__username','user__email','user__first_name',
 		'user__last_name')
 
+class AppleUserAdmin(admin.ModelAdmin):
+	list_display = ['user','status']
+
+
+
 admin.site.register(UserAppleDataSteps,UserAppleDataStepsAdmin)
 admin.site.register(UserAppleDataActivities,UserAppleDataActivitiesAdmin)
 admin.site.register(ApplePingNotification,ApplePingNotificationAdmin)
+admin.site.register(AppleUser,AppleUserAdmin)
