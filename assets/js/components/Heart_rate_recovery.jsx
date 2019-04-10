@@ -63,6 +63,8 @@ class HeartRate extends Component{
 		this.createSleepDropdown = this.createSleepDropdown.bind(this);
 		this.updateData = this.updateData.bind(this);
 		this.infoPrint = this.infoPrint.bind(this);
+		
+
 
 		
 
@@ -95,13 +97,16 @@ class HeartRate extends Component{
 	    };
 	}
 
+  
+
 	successHeartRate(data){
 		
-	    let aerobic_range_start = data.data.aerobic_range.split("-")[0];;
+	    let aerobic_range_start = data.data.aerobic_range.split("-")[0];
 	    let aerobic_range_end = data.data.aerobic_range.split("-")[1];
 	    let anaerobic_range = data.data.anaerobic_range.split(" ")[0];
 	    let below_aerobic_range = data.data.below_aerobic_range.split(" ")[1];
-	    console.log("aerobic_range_start is:",aerobic_range_start)
+	    //console.log("aerobic_range_start is:",aerobic_range_start)
+		
 		this.setState({
 			hr_summary:data.data,
 			fetching_aerobic:false,
@@ -112,7 +117,7 @@ class HeartRate extends Component{
 			below_aerobic_range:below_aerobic_range
 		})
 
-		
+
 	}
 
 	
@@ -194,7 +199,7 @@ class HeartRate extends Component{
 
   					aerobic_range:this.state.aerobic_range_start+'-'+this.state.aerobic_range_end,
   					// aerobic_range_end:this.state.aerobic_range_end,
-	  				anaerobic_range:this.state.aerobic_range_end,
+	  				anaerobic_range:parseInt(this.state.aerobic_range_end)+1,
 			        below_aerobic_range:this.state.aerobic_range_start,
 			    };
 			    
@@ -288,6 +293,9 @@ class HeartRate extends Component{
   		});
   	}
 
+  	 
+
+
 	infoPrint(){
 	    var mywindow = window.open('', 'PRINT');
 	    mywindow.document.write('<html><head><style>' +
@@ -313,11 +321,17 @@ class HeartRate extends Component{
   		if(value){
   			values = value;
   		}
-  		else if(value == null || value == undefined){
+  		else if(value == null || value == undefined || value == isNaN){
   			values = "-"
   		}
+  		// else if(isNaN(value)){
+  		// 	values = "-"
+  		// }
+
   		return values;
   	}
+
+  	
 	renderTime(value){
 		// This function will devide the seconds to hh:mm:ss format.
 		var time;
@@ -339,6 +353,7 @@ class HeartRate extends Component{
 		}
 		return time;
 	}
+	
 	stepsValue(value){
 		// This function will add the (,) for the steps values
 		if(value){
@@ -408,6 +423,7 @@ class HeartRate extends Component{
 			fetchHeartrateZoneData_TwentyFourHour(this.successHeartrateZone24Hour,this.errorHeartrateZone24Hour,this.state.selectedDate);
 		});
 	}
+	
 	renderRemoveDate(){
 		var today = this.state.selectedDate;
 		var tomorrow = moment(today).subtract(1, 'days');
@@ -774,7 +790,7 @@ class HeartRate extends Component{
 	                                    </Input>
 	                                    </span>
 	                                    
-				          	    	: this.state.aerobic_range_start+'-'+this.state.aerobic_range_end}
+				          	    	: this.state.aerobic_range_start+'-'+this.renderNullValue(this.state.aerobic_range_end)}
 
 							          	   
 							          	    	
@@ -847,7 +863,7 @@ class HeartRate extends Component{
 						          	    <tr className = "hr_table_style_rows">
 							          	    <td className = "hr_table_style_rows">Anaerobic Range</td>
 
-							          	    <td className = "hr_table_style_rows">{this.state.aerobic_range_end 
+							          	    <td className = "hr_table_style_rows">{parseInt(this.state.aerobic_range_end)+1
 							          	  +" "+"or above"}</td>
 
 							          	    <td className = "hr_table_style_rows">{this.renderTime(hrSummary.anaerobic_zone)}</td>
