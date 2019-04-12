@@ -27,19 +27,14 @@ def update_aa_calculation(user_id,from_date):
 	Return:
 		None
 	'''
-	print("Step5")
 	try:
 		user = User.objects.get(id=user_id)
 	except:
 		logging.exception("message")
 		pass
-	print(user,"userrrrrrrrrrrrrrrr")
 	model_type = _get_model_types()
 	for key,single_model in model_type.items():
-		print(single_model,"single model")
-		print("Step 6")
 		delete_aa_tables(user,single_model,key)
-		print("Step 7")
 		create_aa_tables(user,key,from_date)
 
 
@@ -51,7 +46,6 @@ def delete_aa_tables(user,model_name,key):
 	Return:
 		None
 	'''
-	print("Step 6-1")
 	if key == "aacalculations":
 		model_name.objects.filter(user_aa=user).delete()
 	else:
@@ -66,20 +60,16 @@ def create_aa_tables(user,model_name,from_date):
 	Return:
 		None
 	'''
-	print("Step 7-1")
 	to_date = convert_date_datetime_str(datetime.now())
 
 	if model_name == 'aa':
-		print("Step 7-2")
 		try:
 			store_aa_calculations(user,from_date,to_date)
 		except:
 			logging.exception("message")
 	elif model_name == 'aacalculations':
-		print("Entered into aa calculations")
 		store_daily_aa_calculations(user,from_date,to_date)
 	elif model_name == 'timeheartzones':
-		print("Entered into the time heart rate zones")
 		store_aa_low_high_end_calculations(user,from_date,to_date)
 
 

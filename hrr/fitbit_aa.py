@@ -9,6 +9,7 @@ from datetime import datetime, timedelta , date, time, timezone
 from decimal import Decimal, ROUND_HALF_UP
 from operator import itemgetter
 
+from django.contrib.auth.models import User
 from django.db.models import Q
 from django.shortcuts import render
 from django.core.mail import EmailMessage
@@ -33,7 +34,8 @@ from hrr.models import (AaCalculations,
 					TimeHeartZones,
 					AaWorkoutCalculations,
 					AA, TwentyfourHourAA, 
-					TwentyfourHourTimeHeartZones)
+					TwentyfourHourTimeHeartZones,
+					AACustomRanges)
 
 from hrr.calculation_helper import get_usernput_activities
 import quicklook.calculations.converter
@@ -282,9 +284,15 @@ def all_activities_hr_and_time_diff(hr_time_diff):
 			all_activities_heartrate_list.extend(single_activity[single_activity_id[0]]["hr_values"])
 	return all_activities_heartrate_list,all_activities_timestamp_list
 def belowaerobic_aerobic_anaerobic(user,user_age):
+	aa_ranges_list = []
 	try:
-		aa_ranges = AACustomRanges.objects.get(user=user)
+		print(user,"user")
+		aa_ranges = AACustomRanges.objects.filter(user=user).last()
+	except ValueError:
+		user = User.objects.filter(username=user)
+		aa_ranges = AACustomRanges.objects.filter(user=user).last()
 	except:
+		logging.exception("message")
 		aa_ranges = None
 	if not aa_ranges:
 		aerobic_anaerobic = [[110,110,166],[110,110,166],[110,110,166],[110,110,165],[110,110,164],[110,110,163],
@@ -307,6 +315,11 @@ def belowaerobic_aerobic_anaerobic(user,user_age):
 		elif user_age > 100:
 			index_value = -1
 		return aerobic_anaerobic[index_value]
+	else:
+		aa_ranges_list.append(int(aa_ranges.below_aerobic_range))
+		aa_ranges_list.append(int(aa_ranges.aerobic_range.split('-')[0]))
+		aa_ranges_list.append(int(aa_ranges.anaerobic_range))
+		return aa_ranges_list
 
 
 def  Update_AA_ranges_by_ages(user):

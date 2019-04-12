@@ -1350,6 +1350,7 @@ def store_aa_calculations(user,from_date,to_date):
 	Return:None
 	'''
 	device_type = quicklook.calculations.calculation_driver.which_device(user)
+	print(device_type,"device type")
 	if device_type == "garmin":
 		store_garmin_aa1(user,from_date,to_date)
 	elif device_type == "fitbit":
@@ -2798,7 +2799,7 @@ def hrr_data(user,start_date):
 													user_age=user_age,
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic,
-													include_non_exercise = True)
+													include_non_exercise = True,)
 	count = 0
 	id_act = []
 	activities = []
