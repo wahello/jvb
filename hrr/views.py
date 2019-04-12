@@ -1133,7 +1133,7 @@ def aa_data(user,start_date):
 			elif str(data_id) in ui_data_hrr:
 				hrr.append(tmp)		
 
-	aa_ranges =fitbit_aa.belowaerobic_aerobic_anaerobic(user_age)
+	aa_ranges =fitbit_aa.belowaerobic_aerobic_anaerobic(user,user_age)
 	update =fitbit_aa.Update_AA_ranges_by_ages(user)
 	below_aerobic_value = update[0]
 	anaerobic_value = update[1]
@@ -1321,18 +1321,22 @@ def store_garmin_aa1(user,from_date,to_date):
 	print("HRR calculations got finished")
 
 def store_fitbit_aa1(user,from_date,to_date):
-	activities_dict = get_usernput_activities(user,from_date)
-	# print(activities_dict,"activities_dict")
-	data = fitbit_aa.fitbit_aa_chart_one_new(user,from_date,user_input_activities=activities_dict)
-	if data.get('total_time'):
-		print("Fitbit AA1 calculations creating")
-		try:
-			user_aa = AA.objects.get(user=user, created_at=from_date)
-			aa_update_instance(user_aa, data)
-		except AA.DoesNotExist:
-			aa_create_instance(user, data, from_date)
-	else:
-		print("NO Fitbit AA1")
+	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
+	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
+	current_date = to_date_obj
+	while (current_date >= from_date_obj):
+		activities_dict = get_usernput_activities(user,current_date)
+		data = fitbit_aa.fitbit_aa_chart_one_new(user,current_date,user_input_activities=activities_dict)
+		if data.get('total_time'):
+			print("Fitbit AA1 calculations creating")
+			try:
+				user_aa = AA.objects.get(user=user, created_at=current_date)
+				aa_update_instance(user_aa, data)
+			except AA.DoesNotExist:
+				aa_create_instance(user, data, current_date)
+		else:
+			print("NO Fitbit AA1")
+		current_date -= timedelta(days=1)
 
 def store_aa_calculations(user,from_date,to_date):
 	'''
@@ -2055,7 +2059,7 @@ def daily_aa_data(user, start_date):
 	activies_timestamp = []
 	daily_aa_data={}
 
-	aa_ranges = fitbit_aa.belowaerobic_aerobic_anaerobic(user_age)
+	aa_ranges = fitbit_aa.belowaerobic_aerobic_anaerobic(user,user_age)
 	update = fitbit_aa.Update_AA_ranges_by_ages(user)
 	below_aerobic_value = update[0]
 	anaerobic_value = update[1]
@@ -2235,15 +2239,20 @@ def store_garmin_aa_daily(user,from_date,to_date):
 	print("A/A dailes finished")
 
 def store_fitbit_aa_daily(user,from_date,to_date):
-	activities_dict = get_usernput_activities(user,from_date)
-	data = fitbit_aa.calculate_AA2_daily(user,from_date,user_input_activities=activities_dict)
-	if data:
-			try:
-				user_aa = AaCalculations.objects.get(
-					user_aa=user, created_at=from_date)
-				update_aa_instance(user,from_date,data)
-			except AaCalculations.DoesNotExist:
-				create_aa_instance(user, data, from_date)
+	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
+	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
+	current_date = to_date_obj
+	while (current_date >= from_date_obj):
+		activities_dict = get_usernput_activities(user,current_date)
+		data = fitbit_aa.calculate_AA2_daily(user,current_date,user_input_activities=activities_dict)
+		if data:
+				try:
+					user_aa = AaCalculations.objects.get(
+						user_aa=user, created_at=current_date)
+					update_aa_instance(user,current_date,data)
+				except AaCalculations.DoesNotExist:
+					create_aa_instance(user, data, current_date)
+		current_date -= timedelta(days=1)
 
 def store_daily_aa_calculations(user,from_date,to_date):
 	'''
@@ -2529,7 +2538,7 @@ def aa_low_high_end_data(user,start_date):
 				"prcnt_total_duration_in_zone":"",
 				}
 
-	aa_ranges = fitbit_aa.belowaerobic_aerobic_anaerobic(user_age)
+	aa_ranges = fitbit_aa.belowaerobic_aerobic_anaerobic(user,user_age)
 	update = fitbit_aa.Update_AA_ranges_by_ages(user)
 	below_aerobic_value = update[0]
 	anaerobic_value = update[1]
@@ -2691,16 +2700,23 @@ def store_garmin_aa3(user,from_date,to_date):
 	return None
 
 def store_fitbit_aa3(user,from_date,to_date):
-	activities_dict = get_usernput_activities(user,from_date)
-	data = fitbit_aa.calculate_AA3(user,from_date,user_input_activities=activities_dict)
-	if data:
-		try:
-			time_hr_zone_obj = TimeHeartZones.objects.get(
-				user=user, created_at=from_date)
-			if time_hr_zone_obj:
-				update_heartzone_instance(user, from_date,data)
-		except TimeHeartZones.DoesNotExist:
-			create_heartzone_instance(user, data, from_date)
+	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
+	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
+	current_date = to_date_obj
+	print("Calculate starts")
+	while (current_date >= from_date_obj):
+		print(current_date,"current date")
+		activities_dict = get_usernput_activities(user,from_date)
+		data = fitbit_aa.calculate_AA3(user,from_date,user_input_activities=activities_dict)
+		if data:
+			try:
+				time_hr_zone_obj = TimeHeartZones.objects.get(
+					user=user, created_at=from_date)
+				if time_hr_zone_obj:
+					update_heartzone_instance(user, from_date,data)
+			except TimeHeartZones.DoesNotExist:
+				create_heartzone_instance(user, data, from_date)
+		current_date -= timedelta(days=1)
 			
 def store_aa_low_high_end_calculations(user,from_date,to_date):
 	'''

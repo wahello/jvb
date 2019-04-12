@@ -25,14 +25,8 @@ def set_pa_update_date(sender,instance,created,**kwargs):
 
 @receiver(post_save, sender=AACustomRanges)
 def aa_custom_ranges_signal(sender,instance,created,**kwargs):
-	if(not created):
-		user_id = instance.user.id
-		# from_date = instance.created_at
-		from_date_str = "2018-08-01"
-		# if from_date != datetime.now().date():
-			# if updated user input is not for today (some historical date) then
-			# we have to update all the PA report from that date. So we need to record
-			# this date in database and update PA later as a celery task
+	user_id = instance.user.id
+	from_date_str = "2018-08-01"
 
-		aa_custom_ranges.delay(user_id,from_date_str)
+	aa_custom_ranges.delay(user_id,from_date_str)
 

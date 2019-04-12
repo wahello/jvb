@@ -195,26 +195,25 @@ def fitbit_aa_chart_one(user_get,start_date,user_input_activities=None):
 		#duration_in_hr_min_sec = convertMillis(duration_in_milli_seconds)
 		for key,activity_list in activity_data.items():
 			for index,single_activity in enumerate(activity_list): 
-			# print(single_activity,"single_activity")
-			# print(index,"index")
-				act_duration = activity_data['activities'][index]['originalDuration']
-				act_start = activity_data['activities'][index]['originalStartTime']
-				act_id = activity_data['activities'][index]['logId']
+				if single_activity == 'activities':
+					act_duration = activity_data['activities'][index]['originalDuration']
+					act_start = activity_data['activities'][index]['originalStartTime']
+					act_id = activity_data['activities'][index]['logId']
 
-				if str(act_id) in exercise_act:
-					activity_start_data,offset = quicklook.calculations.converter.fitbit_to_garmin_converter.get_epoch_offset_from_timestamp(
-													act_start)
-					act_start_timestamp = activity_start_data + offset
-					act_end_timestamp = act_start_timestamp + (act_duration/1000)
+					if str(act_id) in exercise_act:
+						activity_start_data,offset = quicklook.calculations.converter.fitbit_to_garmin_converter.get_epoch_offset_from_timestamp(
+														act_start)
+						act_start_timestamp = activity_start_data + offset
+						act_end_timestamp = act_start_timestamp + (act_duration/1000)
 
-					act_start_srt = get_time_from_timestamp(act_start_timestamp)
-					act_end_srt = get_time_from_timestamp(act_end_timestamp)
-					act_start_end_dict = {}
-					act_start_end_dict[str(act_id)] = {}
-					act_start_end_dict[str(act_id)]["act_start"] = act_start_srt
-					act_start_end_dict[str(act_id)]["act_end"] = act_end_srt
-					act_start_end_dict[str(act_id)]["log_id"] = str(act_id)
-					activities_start_end_time.append(act_start_end_dict)
+						act_start_srt = get_time_from_timestamp(act_start_timestamp)
+						act_end_srt = get_time_from_timestamp(act_end_timestamp)
+						act_start_end_dict = {}
+						act_start_end_dict[str(act_id)] = {}
+						act_start_end_dict[str(act_id)]["act_start"] = act_start_srt
+						act_start_end_dict[str(act_id)]["act_end"] = act_end_srt
+						act_start_end_dict[str(act_id)]["log_id"] = str(act_id)
+						activities_start_end_time.append(act_start_end_dict)
 		
 	# print(activities_start_end_time,"activities_start_end_time")
 	return activities_start_end_time
@@ -231,7 +230,11 @@ def get_fitbit_hr_data(user_get,start_date):
 			qs = ast.literal_eval(qs.replace(
 				"'heartrate_fitbit': {...}","'heartrate_fitbit': {}"))
 			heartrate_data = qs
-		hr_dataset = heartrate_data.get('activities-heart-intraday').get('dataset')
+		if heartrate_data:
+			try:
+				hr_dataset = heartrate_data.get('activities-heart-intraday').get('dataset')
+			except:
+				pass
 	return hr_dataset
 
 def fitbit_hr_diff_calculation(user_get,start_date,user_input_activities=None):
@@ -278,32 +281,37 @@ def all_activities_hr_and_time_diff(hr_time_diff):
 			all_activities_timestamp_list.extend(single_activity[single_activity_id[0]]["time_diff"])
 			all_activities_heartrate_list.extend(single_activity[single_activity_id[0]]["hr_values"])
 	return all_activities_heartrate_list,all_activities_timestamp_list
-def belowaerobic_aerobic_anaerobic(user_age):
+def belowaerobic_aerobic_anaerobic(user,user_age):
+	try:
+		aa_ranges = AACustomRanges.objects.get(user=user)
+	except:
+		aa_ranges = None
+	if not aa_ranges:
+		aerobic_anaerobic = [[110,110,166],[110,110,166],[110,110,166],[110,110,165],[110,110,164],[110,110,163],
+					[110,110,162],[110,110,161],[110,110,160],[110,110,159],[110,110,158],[110,110,157],[110,110,156],
+					[110,110,155],[110,110,155],[110,110,155],[110,110,155],[110,110,155],[110,110,155],[110,110,154],
+					[110,110,153],[110,110,152],[110,110,151],[110,110,150],[110,110,149],[110,110,148],[110,110,147],
+					[110,110,146],[109,109,145],[108,108,144],[107,107,143],[106,106,142],[105,105,141],[104,104,140],
+					[103,103,139],[102,102,138],[102,102,137],[102,102,136],[102,102,135],[102,102,134],[102,102,133],
+					[102,102,132],[102,102,131],[102,102,130],[102,102,129],[102,102,128],[102,102,127],[102,102,127],
+					[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],
+					[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],
+					[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[101,101,126],[101,101,125],
+					[101,101,124],[101,101,123],[101,101,122],[101,101,121],[101,101,120],[101,101,119],[101,101,118],
+					[101,101,117],[101,101,116],[100,100,115],[99,99,114],[98,98,113],[97,97,112],[96,96,111],[95,95,110],
+					[94,94,109],[93,93,108],[92,92,107],[91,91,106],[91,90,105]]
+		
+		index_value = user_age-13
+		if user_age < 13:
+			index_value = 0
+		elif user_age > 100:
+			index_value = -1
+		return aerobic_anaerobic[index_value]
 
-	aerobic_anaerobic = [[110,110,166],[110,110,166],[110,110,166],[110,110,165],[110,110,164],[110,110,163],
-				[110,110,162],[110,110,161],[110,110,160],[110,110,159],[110,110,158],[110,110,157],[110,110,156],
-				[110,110,155],[110,110,155],[110,110,155],[110,110,155],[110,110,155],[110,110,155],[110,110,154],
-				[110,110,153],[110,110,152],[110,110,151],[110,110,150],[110,110,149],[110,110,148],[110,110,147],
-				[110,110,146],[109,109,145],[108,108,144],[107,107,143],[106,106,142],[105,105,141],[104,104,140],
-				[103,103,139],[102,102,138],[102,102,137],[102,102,136],[102,102,135],[102,102,134],[102,102,133],
-				[102,102,132],[102,102,131],[102,102,130],[102,102,129],[102,102,128],[102,102,127],[102,102,127],
-				[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],
-				[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],
-				[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[101,101,126],[101,101,125],
-				[101,101,124],[101,101,123],[101,101,122],[101,101,121],[101,101,120],[101,101,119],[101,101,118],
-				[101,101,117],[101,101,116],[100,100,115],[99,99,114],[98,98,113],[97,97,112],[96,96,111],[95,95,110],
-				[94,94,109],[93,93,108],[92,92,107],[91,91,106],[91,90,105]]
-	
-	index_value = user_age-13
-	if user_age < 13:
-		index_value = 0
-	elif user_age > 100:
-		index_value = -1
-	return aerobic_anaerobic[index_value]
 
 def  Update_AA_ranges_by_ages(user):
 	user_age = user.profile.age()
-	aa_ranges = belowaerobic_aerobic_anaerobic(user_age)
+	aa_ranges = belowaerobic_aerobic_anaerobic(user,user_age)
 	below_aerobic_value = aa_ranges[0]
 	anaerobic_value = aa_ranges[2]
 	if user_age > 100:
@@ -514,7 +522,7 @@ def fitbit_aa_chart_one_new(user_get,start_date,user_input_activities=None):
 			fibit_act = fitbit_aa_chart_one(user_get,start_date,user_input_activities)
 			activity_hr_time = get_user_created_activity(user_get,start_date,user_input_activities,fibit_act)
 			activity_hr_time,hr_not_recorded_ids = find_act_hrr(user_input_activities,activity_hr_time)
-			if activity_hr_time[0]:
+			if activity_hr_time and activity_hr_time[0]:
 				act_hr_list,act_time_list = all_activities_hr_and_time_diff(activity_hr_time)
 			else:
 				act_hr_list = []
@@ -784,22 +792,24 @@ def get_aa2_daily_data(user,hr_time_diff):
 	avg_hr = []
 	max_hr = []
 	user_age = user.profile.age()
+	#print(hr_time_diff,"hr_time_diff")
 	if hr_time_diff and hr_time_diff[0]:
 		for single_activity in hr_time_diff:
-			log_ids.extend(list(single_activity.keys()))
-			single_activity_id = list(single_activity.keys())
-			time_diff = single_activity[single_activity_id[0]]['time_diff']
-			hr_values = single_activity[single_activity_id[0]]['hr_values']
-			try:
-				avg_hr.append(sum(hr_values)/len(hr_values))
-			except:
-				pass
-			try:
-				max_hr.append(max(hr_values))
-			except:
-				pass
-			all_activities_hr.append(hr_values)
-			all_activities_time.append(time_diff)
+			if single_activity:
+				log_ids.extend(list(single_activity.keys()))
+				single_activity_id = list(single_activity.keys())
+				time_diff = single_activity[single_activity_id[0]]['time_diff']
+				hr_values = single_activity[single_activity_id[0]]['hr_values']
+				try:
+					avg_hr.append(sum(hr_values)/len(hr_values))
+				except:
+					pass
+				try:
+					max_hr.append(max(hr_values))
+				except:
+					pass
+				all_activities_hr.append(hr_values)
+				all_activities_time.append(time_diff)
 		# print(all_activities_heartrate_list,"activities_heartrate_list")
 		# print(all_activities_timestamp_list,"all_activities_timestamp_list")
 		all_activities_heartrate = [single_list for single_list in all_activities_hr if single_list]
@@ -942,7 +952,7 @@ def get_user_created_activity(user,start_date,user_input_activities,fibit_act):
 				hr_dataset,start_time_str,end_tine_str,summaryid)
 			activity_hr_time.append(single_activity_hr_time)
 		return activity_hr_time
-
+	return activity_hr_time
 def total_percent(modified_data_total):
 	'''
 		Add percent to all the fields in Totals
