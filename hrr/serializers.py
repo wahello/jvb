@@ -45,3 +45,8 @@ class HrrSerializer(serializers.ModelSerializer):
 	def update(self, instance, validated_data):
 		self._update_helper(instance,validated_data)
 		return instance
+
+	def create(self, validated_data):
+		user = self.context['request'].user
+		hrr_obj = Hrr.objects.create(user_hrr=user,**validated_data)
+		return hrr_obj
