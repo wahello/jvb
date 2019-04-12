@@ -5,27 +5,26 @@ import { connect } from 'react-redux';
 import {Field, reduxForm } from 'redux-form';
 import _ from 'lodash';
 import axios from 'axios';
+import { StyleSheet, css } from 'aphrodite';
 import axiosRetry from 'axios-retry';
 import moment from 'moment';
+import html2canvas from 'html2canvas';
+import Dimensions from 'react-dimensions';
 import FontAwesome from "react-fontawesome";
 import { Collapse, Navbar, NavbarToggler, 
         NavbarBrand, Nav, NavItem, NavLink,
-        Button,Popover,PopoverBody,Form,FormGroup,
+        Button,Popover,DropdownToggle,Dropdown,DropdownMenu,DropdownItem,PopoverBody,Form,FormGroup,
         FormText,Label,Input,Card, CardImg, CardText, 
         CardBody,CardTitle, CardSubtitle} from 'reactstrap';
 import NavbarMenu from './navbar';
-import fetchProgress,{fetchUserRank,progressAnalyzerUpdateTime} from '../network/progress';
-import AllRank_Data1 from "./leader_all_exp";
-import Dimensions from 'react-dimensions';
-import { StyleSheet, css } from 'aphrodite';
-import html2canvas from 'html2canvas';
-import {renderProgressFetchOverlay,renderProgress2FetchOverlay,renderProgress3FetchOverlay,renderProgressSelectedDateFetchOverlay} from './dashboard_healpers';
-import { getGarminToken,logoutUser} from '../network/auth';
+import fetchProgress from '../network/progress';
+import {getUserProfile} from '../network/auth';
+
+
 axiosRetry(axios, { retries: 3});
 
 
-//const category = ["oh_gpa","alcohol","avg_sleep","prcnt_uf","nes","mc","ec","resting_hr",
-//"beat_lowered","pure_beat_lowered","pure_time_99","time_99","active_min_exclude_sleep","active_min_exclude_sleep_exercise","active_min_total",];
+
 const duration = ["week","today","yesterday","year","month","custom_range"];
 const category=['oh_gpa','nes','mc','avg_sleep','ec','prcnt_uf',
                                  'alcohol','total_steps','floor_climbed','resting_hr',
@@ -69,9 +68,7 @@ class Aadashboard extends Component{
         	 cr3_end_date:'',
 			 calendarOpen:false,
 			 isOpen1:false,
-			 dateRange1:false,
-			 dateRange2:false,
-			 dateRange3:false,
+			
              fetching_ql1:false,
              fetching_ql2:false,
              fetching_ql3:false,
@@ -81,1389 +78,83 @@ class Aadashboard extends Component{
 			 active_view:true,
 			 btnView:false,
 			 rankData:rankInitialState,
+			 userage:'',
 			 summary:{
-            "overall_health":{
-               "overall_health_gpa":this.getInitialDur(),
-                 "overall_health_gpa_grade":this.getInitialDur(),
-                 "total_gpa_point":this.getInitialDur()
-                },
+            
 
-            "ec":{
-                 "avg_no_of_days_exercises_per_week":this.getInitialDur(),
-                  "exercise_consistency_grade":this.getInitialDur(),
-                   "exercise_consistency_gpa":this.getInitialDur()
-                 },
-                "nutrition":{
-                   "prcnt_unprocessed_food_gpa":this.getInitialDur(),
-                 "prcnt_unprocessed_food_grade":this.getInitialDur(),
-                  "prcnt_unprocessed_volume_of_food":this.getInitialDur()
+			"exercise":{     
+			"avg_exercise_heart_rate":'80',         
+			"hr_aerobic_duration_hour_min":this.getInitialDur(), 
+			"hr_anaerobic_duration_hour_min":this.getInitialDur(),
+			"hr_below_aerobic_duration_hour_min": this.getInitialDur(),                                      
+			"hr_not_recorded_duration_hour_min":this.getInitialDur(),
+			"prcnt_aerobic_duration":this.getInitialDur(),
+			"prcnt_anaerobic_duration":this.getInitialDur(), 
+			"prcnt_below_aerobic_duration" : this.getInitialDur(),
+			"prcnt_hr_not_recorded_duration" : this.getInitialDur(),
+			"total_workout_duration_over_range" : this.getInitialDur()             
+			 }
+			},
+			"duration_date": this.getInitialDur(),
+			selected_range:"today",
+			date:"",
+			capt:"",
+			active_category:"",
+			active_username:"",
+			active_category_name:"",
+			all_verbose_name:"",
+			dateRange4:false,
+			isStressInfoModelOpen:false
+			};
 
-                  },
-            "mc":{
-                    "movement_consistency_gpa":this.getInitialDur(),
-                    "movement_consistency_grade":this.getInitialDur(),
-                    "movement_consistency_score":this.getInitialDur(),
-                    "total_active_minutes":this.getInitialDur(),
-                    "total_active_minutes_prcnt":this.getInitialDur(),
-                    "active_minutes_without_sleep":this.getInitialDur(),
-                    "active_minutes_without_sleep_prcnt":this.getInitialDur(),
-                    "active_minutes_without_sleep_exercise":this.getInitialDur(),
-                    "active_minutes_without_sleep_exercise_prcnt":this.getInitialDur()
-                  },
-            "non_exercise":{
-                 "non_exericse_steps_gpa":this.getInitialDur(),
-                 "movement_non_exercise_step_grade":this.getInitialDur(),
-                 "non_exercise_steps":this.getInitialDur(),
-                 "total_steps":this.getInitialDur(),     
-            },
-        "exercise":{                
-            "workout_duration_hours_min":this.getInitialDur(), 
-                "avg_exercise_heart_rate":this.getInitialDur(),
-                "avg_non_strength_exercise_heart_rate": this.getInitialDur(),                                      
-                "workout_effort_level":this.getInitialDur(),
-                "vo2_max":this.getInitialDur()              
-                },
-         "sleep": {
-             "prcnt_days_sleep_aid_taken_in_period": this.getInitialDur(),
-            "average_sleep_grade": this.getInitialDur(),
-            "total_sleep_in_hours_min": this.getInitialDur(),
-            "overall_sleep_gpa": this.getInitialDur(),
-             "num_days_sleep_aid_taken_in_period": this.getInitialDur()
-        },
-         "alcohol": {
-            "alcoholic_drinks_per_week_grade": this.getInitialDur(),
-            "avg_drink_per_week": this.getInitialDur(),
-            "alcoholic_drinks_per_week_gpa": this.getInitialDur(),
-            "prcnt_alcohol_consumption_reported":this.getInitialDur()
-        },
-         "other": {
-            "hrr_beats_lowered_in_first_min":this.getInitialDur(),
-            "hrr_highest_hr_in_first_min":this.getInitialDur(),
-            "hrr_lowest_hr_point": this.getInitialDur(),
-            "floors_climbed": this.getInitialDur(),
-            "resting_hr": this.getInitialDur(),
-            "hrr_time_to_99":this.getInitialDur(),
-            "hrr_pure_1_minute_beat_lowered":this.getInitialDur(),
-             "hrr_pure_time_to_99": this.getInitialDur()
-        },
-        "sick":{
-          "days_sick_not_sick_reported":this.getInitialDur(),
-          "number_of_days_not_sick":this.getInitialDur(),
-          "number_of_days_sick":this.getInitialDur(),
-          "prcnt_of_days_not_sick":this.getInitialDur(),
-          "prcnt_of_days_sick":this.getInitialDur()
-      },
-        "stress":{
-          "days_stress_level_reported":this.getInitialDur(),
-          "number_of_days_high_stress_reported":this.getInitialDur(),
-          "number_of_days_low_stress_reported":this.getInitialDur(),
-          "number_of_days_medium_stress_reported":this.getInitialDur(),
-          "prcnt_of_days_high_stress":this.getInitialDur(),
-          "prcnt_of_days_low_stress":this.getInitialDur(),
-          "prcnt_of_days_medium_stress":this.getInitialDur(),
-          "garmin_stress_lvl":this.getInitialDur()
-        },
-        "standing":{
-          "number_days_reported_stood_not_stood_three_hours":this.getInitialDur(),
-          "number_days_stood_three_hours":this.getInitialDur(),
-          "prcnt_days_stood_three_hours":this.getInitialDur()
-        },
-        "travel":{
-          "number_days_travel_away_from_home":this.getInitialDur(),
-          "prcnt_days_travel_away_from_home":this.getInitialDur()
-        },
- 	 	},
-		"duration_date": this.getInitialDur(),
-	  selected_range:"today",
-	  date:"",
-		capt:"",
-		active_category:"",
-    active_username:"",
-    active_category_name:"",
-    all_verbose_name:"",
-    dateRange4:false,
-    isStressInfoModelOpen:false
-		};
-
-
+	
 		this.successProgress = this.successProgress.bind(this);
-		this.successRank = this.successRank.bind(this);
 		this.headerDates = this.headerDates.bind(this);
-  	this.errorProgress = this.errorProgress.bind(this);
-  	this.toggleCalendar=this.toggleCalendar.bind(this);
-  	this.toggleDate1 = this.toggleDate1.bind(this);
- 		this.toggleDate2 = this.toggleDate2.bind(this);
- 		this.toggleDate3 = this.toggleDate3.bind(this);
-    this.toggleDate4 = this.toggleDate4.bind(this);
+  	    this.errorProgress = this.errorProgress.bind(this);
+  	    this.toggleCalendar=this.toggleCalendar.bind(this);
  		this.handleChange = this.handleChange.bind(this);
  		this.createExcelPrintURL = this.createExcelPrintURL.bind(this);
  		this.toggleDropdown = this.toggleDropdown.bind(this);
- 		this.onSubmitDate1 = this.onSubmitDate1.bind(this);
- 		this.onSubmitDate2 = this.onSubmitDate2.bind(this);
- 		this.onSubmitDate3 = this.onSubmitDate3.bind(this);
  		this.processDate = this.processDate.bind(this);
- 		this.strToSecond = this.strToSecond.bind(this);
- 		this.handleScroll = this.handleScroll.bind(this);
- 		this.renderDateRangeDropdown = this.renderDateRangeDropdown.bind(this);
-    this.renderProgressFetchOverlay = renderProgressFetchOverlay.bind(this);
-    this.renderProgress2FetchOverlay = renderProgress2FetchOverlay.bind(this);
-    this.renderProgress3FetchOverlay = renderProgress3FetchOverlay.bind(this);
-    this.renderProgressSelectedDateFetchOverlay = renderProgressSelectedDateFetchOverlay.bind(this);
- 		this.toggle = this.toggle.bind(this);
- 		this.renderOverallHealth = this.renderOverallHealth.bind(this);
- 		this.renderMcs = this.renderMcs.bind(this);
- 		this.renderNonExerciseSteps = this.renderNonExerciseSteps.bind(this);
- 		this.renderNutrition = this.renderNutrition.bind(this);
- 		this.renderAlcohol = this.renderAlcohol.bind(this);
- 		this.renderEc = this.renderEc.bind(this);
- 		this.renderExerciseStats = this.renderExerciseStats.bind(this);
- 		this.renderOther = this.renderOther.bind(this);
- 		this.renderSleep = this.renderSleep.bind(this);
- 		this.renderSick = this.renderSick.bind(this);
- 		this.renderStress = this.renderStress.bind(this);
- 		this.renderStanding = this.renderStanding.bind(this);
- 		this.renderTravel = this.renderTravel.bind(this);
- 		this.gpascoreDecimal = this.gpascoreDecimal.bind(this);
- 		this.renderComma = this.renderComma.bind(this);
- 		this.exerciseStatsNoWorkOut = this.exerciseStatsNoWorkOut.bind(this);
- 		this.vo2MaxNotReported = this.vo2MaxNotReported.bind(this);
+ 		this.strToSecond = this.strToSecond.bind(this);	
  		this.renderPercent = this.renderPercent.bind(this);
- 		this.renderRank = this.renderRank.bind(this);
- 		this.handleBackButton = this.handleBackButton.bind(this);
- 		this.getStylesForGrades = this.getStylesForGrades.bind(this);
- 		this.getStylesForGpa = this.getStylesForGpa.bind(this);
- 		this.getStylesForsteps = this.getStylesForsteps.bind(this);
- 		this.getStylesForSleep = this.getStylesForSleep.bind(this);
- 		this.getStylesForBeats = this.getStylesForBeats.bind(this);
- 		this.getStylesForRhr = this.getStylesForRhr.bind(this);
- 		this.getStylesForFood = this.getStylesForFood.bind(this);
  		this.getInitialDur = this.getInitialDur.bind(this);
  		this.renderValue = this.renderValue.bind(this);
-    this.toggle1 = this.toggle1.bind(this);
-    this.renderMcsLink = this.renderMcsLink.bind(this);
-    this.reanderAllHrr = this.reanderAllHrr.bind(this);
-    this.onSubmitDate4 = this.onSubmitDate4.bind(this);
-    this.toggleStressInfo = this.toggleStressInfo.bind(this);
-    this.MinToHours = this.MinToHours.bind(this);
-    this.renderActiveMinsValue = this.renderActiveMinsValue.bind(this);
-       
+        this.renderDateRangeDropdown = this.renderDateRangeDropdown.bind(this);
+        this.reanderAllHrr = this.reanderAllHrr.bind(this);
+        this.toggle = this.toggle.bind(this);
+        this.toggleDate1 = this.toggleDate1.bind(this);
+        this.toggleDate2 = this.toggleDate2.bind(this);
+        this.toggleDate3 = this.toggleDate3.bind(this);
+        this.onSubmitDate1 = this.onSubmitDate1.bind(this);
+        this.onSubmitDate2 = this.onSubmitDate2.bind(this);
+        this.onSubmitDate3 = this.onSubmitDate3.bind(this);
+        this.onSubmitDate4 = this.onSubmitDate4.bind(this);
+        this.aerobicTimeZone = this.aerobicTimeZone.bind(this);
+        this.aaExercisestats = this.aaExercisestats.bind(this);
+        this.belowAerobicTimeZone = this.belowAerobicTimeZone.bind(this);
+        this.anerobicTimeZone = this.anerobicTimeZone.bind(this);
+        this.totalworkoutdurationTimeZone = this.totalworkoutdurationTimeZone.bind(this);
+        this.heartRateNotRecordedTimeZone = this.heartRateNotRecordedTimeZone.bind(this);
+        this.renderLastSync = this.renderLastSync.bind(this);    
+        this.succesCallback = this.succesCallback.bind(this);
+        this.aaColorRanges = this.aaColorRanges.bind(this);
+        this.toggleDate4 = this.toggleDate4.bind(this);
+        this.toggle1 = this.toggle1.bind(this);
 	}
 
-	vo2MaxNotReported(value){
-      	if(value == undefined || value == 0 || value == "" || value == "00:00"){
-        	value = "Not Provided"
-      	}
-      	else{
-        	value = value
-      	}
-    	return value;
-	}
-
-renderExerciseStats(value,dur){
-  		let card = <Card className = "card_style" 
-						id = "my-card-mcs"
-						style = {{fontSize:"14px"}}
-						 >
-			        	<CardBody>
-			          		<CardTitle className = "header_style" style = {{fontWeight:"bold"}}>Exercise Stats</CardTitle>
-			          		<hr  
-			          			
-			          			/>
-			          		<CardText>
-				          		<div className = "row justify-content-center">
-					          		<div className = "col-md-7 col-sm-7 col-lg-7 text_center1">
-						          		Workout Duration (hours:minutes)
-		          					</div>
-		          					<div className = "col-md-5 col-sm-5 col-lg-5 text_center">
-						          		{ this.exerciseStatsNoWorkOut(this.renderValue(value.workout_duration_hours_min,dur)) }
-		          					</div>
-		          				</div>
-		          				<hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-7 col-sm-7 col-lg-7 text_center1">
-						         		Workout Effort Level
-						         	</div>
-						         	<div className = "col-md-5 col-sm-5 col-lg-5 text_center">
-						         		{ this.exerciseStatsNoWorkOut(this.renderValue(value.workout_effort_level,dur)) }
-						         	</div>
-						        </div>
-				          		<hr  
-	          						
-          						/>
-          						<div className = "row justify-content-center">
-					          		<div className = "col-md-7 col-sm-7 col-lg-7 text_center1">
-					          			Average Exercise Heart Rate
-					          		</div>
-					          		<div className = "col-md-5 col-sm-5 col-lg-5 text_center">
-					          			{ this.exerciseStatsNoWorkOut(this.renderValue(value.avg_exercise_heart_rate,dur)) }
-					          		</div>
-					          	</div>
-					          	<hr  
-	          						
-          						/>
-                      <div className = "row justify-content-center">
-                        <div className = "col-md-7 col-sm-7 col-lg-7 text_center1">
-                          AVG Non Strength Activities Heart Rate
-                        </div>
-                        <div className = "col-md-5 col-sm-5 col-lg-5 text_center">
-                          { this.exerciseStatsNoWorkOut(this.renderValue(value.avg_non_strength_exercise_heart_rate,dur)) }
-                        </div>
-                      </div>
-                      <hr  
-                        
-                      />
-					          	<div className = "row justify-content-center">
-					          		<div className = "col-md-7 col-sm-7 col-lg-7 text_center1">
-					          			VO2 Max
-					          		</div>
-					          		<div className = "col-md-5 col-sm-5 col-lg-5 text_center">
-					          			{ this.vo2MaxNotReported(this.renderValue(value.vo2_max,dur)) }
-					          		</div>
-					          	</div>
-			          		</CardText>
-			        	</CardBody>
-		      		</Card>
-  		return card;
+  	reanderAllHrr(period,date,capt){
+  		this.setState({
+  			selected_range:period,
+  			date:date,
+  			capt:capt,
+  		});
   	}
-
-  		renderOther(value,dur,rank){
-  		let card = <Card className = "card_style" 
-						id = "my-card-mcs"
-						style = {{fontSize:"14px"}}
-						 >
-			        	<CardBody>
-			          		<CardTitle className = "header_style" style = {{fontWeight:"bold"}}>Other Stats</CardTitle>
-			          		<hr  
-			          			
-			          			/>
-			          		<CardText>
-				          		<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						          		Resting Heart Rate (RHR)
-		          					</div>
-		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{this.getStylesForRhr(this.renderValue(value.resting_hr,dur)) }
-		          					</div>
-		          				</div>
-		          				<hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		Rank against other users
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{this.renderRank(this.state.rankData.resting_hr,this.state.selected_range)}
-						         	</div>
-						        </div>
-		          				<hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		HRR (time to 99)
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ this.renderValue(value.hrr_time_to_99,dur)}
-						         	</div>
-						        </div>
-						        <hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		Rank against other users
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{this.renderRank(this.state.rankData.time_99,this.state.selected_range)}
-						         	</div>
-						        </div>
-				          		<hr  
-	          						
-          						/>
-          						<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			HRR (heart beats lowered in 1st minute)
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{this.getStylesForBeats(this.renderValue(value.hrr_beats_lowered_in_first_min,dur)) }
-					          		</div>
-					          	</div>
-					          	<hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		Rank against other users
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{this.renderRank(this.state.rankData.beat_lowered,this.state.selected_range)}
-						         	</div>
-						        </div>
-					          	<hr  
-	          						
-          						/>
-					          	<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			HRR (highest heart rate in 1st minute)
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{this.renderValue(value.hrr_highest_hr_in_first_min,dur) }
-					          		</div>
-					          	</div>
-					          	<hr  
-	          						
-          						/>
-					          	<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			HRR (lowest heart rate point in 1st Minute)
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{this.renderValue(value.hrr_lowest_hr_point,dur) }
-					          		</div>
-					          	</div>
-					          	<hr  
-	          						
-          						/>
-					          	<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			Pure 1 Minute HRR Beats Lowered
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.getStylesForBeats(this.renderValue(value.hrr_pure_1_minute_beat_lowered,dur)) }
-					          		</div>
-					          	</div>
-					          	<hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		Rank against other users
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{this.renderRank(this.state.rankData.pure_beat_lowered,this.state.selected_range)}
-						         	</div>
-						        </div>
-					          	<hr  
-	          						
-          						/>
-					          	<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			Pure time to 99 (mm:ss)
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.renderValue(value.hrr_pure_time_to_99,dur) }
-					          		</div>
-					          	</div>
-					          	<hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		Rank against other users
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{this.renderRank(this.state.rankData.pure_time_99,this.state.selected_range)}
-						         	</div>
-						        </div>
-					          	<hr  
-	          						
-          						/>
-					          	<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			Floors Climbed
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.renderValue(value.floors_climbed,dur) }
-					          		</div>
-					          	</div>
-			          		</CardText>
-			        	</CardBody>
-		      		</Card>
-  		return card;
-  	}
-  	renderSleep(value,dur,rank){
-  		let card = <Card className = "card_style" 
-						id = "my-card-mcs"
-						style = {{fontSize:"14px"}}
-						 >
-			        	<CardBody>
-			          		<CardTitle className = "header_style" style = {{fontWeight:"bold"}}>Sleep Per Night (excluding awake time)</CardTitle>
-			          		<hr  
-			          			
-			          			/>
-			          		<CardText>
-				          		<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						          		Total Sleep in hours:minutes
-		          					</div>
-		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ this.getStylesForSleep(this.renderValue(value.total_sleep_in_hours_min,dur)) }
-		          					</div>
-		          				</div>
-		          				<hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		Rank against other users 
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{this.renderRank(this.state.rankData.avg_sleep,this.state.selected_range)}
-						         	</div>
-						        </div>
-		          				<hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		Average Sleep Grade
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ this.getStylesForGrades(this.renderValue(value.average_sleep_grade,dur)) }
-						         	</div>
-						        </div>
-				          		<hr  
-	          						
-          						/>
-          						<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			# of Days Sleep Aid Taken in Period
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{this.renderValue(value.num_days_sleep_aid_taken_in_period,dur) }
-					          		</div>
-					          	</div>
-					          	<hr  
-	          						
-          						/>
-					          	<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			% of Days Sleep Aid Taken in Period
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.renderPercent(this.renderValue(value.prcnt_days_sleep_aid_taken_in_period,dur)) }
-					          		</div>
-					          	</div>
-			          		</CardText>
-			        	</CardBody>
-		      		</Card>
-  		return card;
-  	}
-  	renderSick(value,dur){
-  		let card = <Card className = "card_style" 
-						id = "my-card-mcs"
-						style = {{fontSize:"14px"}}
-						 >
-			        	<CardBody>
-			          		<CardTitle className = "header_style" style = {{fontWeight:"bold"}}>Sick</CardTitle>
-			          		<hr  
-			          			
-			          			/>
-			          		<CardText>
-				          		<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						          		Number of Days Not Sick
-		          					</div>
-		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ this.renderValue(value.number_of_days_not_sick,dur) }
-		          					</div>
-		          				</div>
-		          				<hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		% of Days Not Sick
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ this.renderPercent(this.renderValue(value.prcnt_of_days_not_sick,dur)) }
-						         	</div>
-						        </div>
-				          		<hr  
-	          						
-          						/>
-          						<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			Number of Days Sick
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.renderValue(value.number_of_days_sick,dur) }
-					          		</div>
-					          	</div>
-					          	<hr  
-	          						
-          						/>
-					          	<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			% of Days Sick
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.renderPercent(this.renderValue(value.prcnt_of_days_sick,dur)) }
-					          		</div>
-					          	</div>
-					          	<hr  
-	          						
-          						/>
-					          	<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			Days Sick/Not Sick Reported
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.renderValue(value.days_sick_not_sick_reported,dur) }
-					          		</div>
-					          	</div>
-			          		</CardText>
-			        	</CardBody>
-		      		</Card>
-  		return card;
-  	}
-  	renderStress(value,dur){
-  		let card = <Card className = "card_style" 
-						id = "my-card-mcs"
-						style = {{fontSize:"14px"}}
-						 >
-			        	<CardBody>
-			          		<CardTitle className = "header_style" style = {{fontWeight:"bold"}}>Stress</CardTitle>
-			          		<hr  
-			          			
-			          			/>
-			          		<CardText>
-                      <div className = "row justify-content-center">
-                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                          Garmin Stress Level
-                          <span id="garmin-stress-info"
-                             onClick={this.toggleStressInfo} 
-                             style={{paddingLeft:"15px",color:"gray"}}>
-                             <FontAwesome 
-                                style={{color:"#5E5E5E"}}
-                                  name = "info-circle"
-                                  size = "1.5x"                                                                              
-                              />
-                          </span>
-                        </div>
-                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-                          {this.getGarminStressColors(this.renderValue(value.garmin_stress_lvl,dur))}
-                        </div>
-                      </div>
-                      <hr  
-                        
-                      />
-				          		<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						          		Number of Days Low Stress Reported
-		          					</div>
-		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ this.renderValue(value.number_of_days_low_stress_reported,dur) }
-		          					</div>
-		          				</div>
-		          				<hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		% of Days Low Stress
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ this.renderPercent(this.renderValue(value.prcnt_of_days_low_stress,dur)) }
-						         	</div>
-						        </div>
-				          		<hr  
-	          						
-          						/>
-          						<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			Number of Days Medium Stress Reported
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.renderValue(value.number_of_days_medium_stress_reported,dur) }
-					          		</div>
-					          	</div>
-					          	<hr  
-	          						
-          						/>
-					          	<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			% of Days Medium Stress
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.renderPercent(this.renderValue(value.prcnt_of_days_medium_stress,dur)) }
-					          		</div>
-					          	</div>
-					          	<hr  
-	          						
-          						/>
-					          	<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			Number of Days High Stress Reported
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.renderValue(value.number_of_days_high_stress_reported,dur) }
-					          		</div>
-					          	</div>
-					          	<hr  
-	          						
-          						/>
-					          	<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			% of Days High Stress
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.renderPercent(this.renderValue(value.prcnt_of_days_high_stress,dur)) }
-					          		</div>
-					          	</div>
-					          	<hr  
-	          						
-          						/>
-					          	<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			Number of Days Stress Level Reported
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.renderValue(value.days_stress_level_reported,dur) }
-					          		</div>
-					          	</div>
-			          		</CardText>
-			        	</CardBody>
-		      		</Card>
-  		return card;
-  	}
-  	renderStanding(value,dur){
-  		let card = <Card className = "card_style" 
-						id = "my-card-mcs"
-						style = {{fontSize:"14px"}}
-						 >
-			        	<CardBody>
-			          		<CardTitle className = "header_style" style = {{fontWeight:"bold"}}>Standing</CardTitle>
-			          		<hr  
-			          			
-			          			/>
-			          		<CardText>
-				          		<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						          		Number of Days Stood more than 3 hours
-		          					</div>
-		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ this.renderValue(value.number_days_stood_three_hours,dur) }
-		          					</div>
-		          				</div>
-		          				<hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		% of Days Stood More Than 3 Hours
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ this.renderPercent(this.renderValue(value.prcnt_days_stood_three_hours,dur)) }
-						         	</div>
-						        </div>
-				          		<hr  
-	          						
-          						/>
-          						<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			Number of Days Reported Standing/Not Standing more than 3 hours
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.renderValue(value.number_days_reported_stood_not_stood_three_hours,dur) }
-					          		</div>
-					          	</div>					       
-			          		</CardText>
-			        	</CardBody>
-		      		</Card>
-  		return card;
-  	}
-  	renderTravel(value,dur){
-  		let card = <Card className = "card_style" 
-						id = "my-card-mcs"
-						style = {{fontSize:"14px"}}
-						 >
-			        	<CardBody>
-			          		<CardTitle className = "header_style" style = {{fontWeight:"bold"}}>Travel</CardTitle>
-			          		<hr  
-			          			
-			          			/>
-			          		<CardText>
-				          		<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						          		Number of Days you Traveled/Stayed Away From Home?
-		          					</div>
-		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ this.renderValue(value.number_days_travel_away_from_home,dur) }
-		          					</div>
-		          				</div>
-		          				<hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		% of Days you Traveled/Stayed Away From Home?
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ this.renderPercent(this.renderValue(value.prcnt_days_travel_away_from_home,dur)) }
-						         	</div>
-						        </div>				       
-			          		</CardText>
-			        	</CardBody>
-		      		</Card>
-  		return card;
-  	}
-
-	exerciseStatsNoWorkOut(value){
-      	if(value == undefined || value == 0 || value == "" || value == "00:00"){
-        	value = "No Workout"
-      	}
-      	else{
-        	value = value
-      	}
-    	return value;
-	}
-  	renderComma(value){
-		let steps = '';
-		if(value){
-			value += '';
-	     	var x = value.split('.');
-	    	var x1 = x[0];
-	        var x2 = x.length > 1 ? '.' + x[1] : '';
-	        var rgx = /(\d+)(\d{3})/;
-	        while (rgx.test(x1)) {
-	        	x1 = x1.replace(rgx, '$1' + ',' + '$2');
-	        }
-	        steps = x1 + x2;
-    	}
-        return steps;
-	}
-
-  	gpascoreDecimal(gpa){
-		let value;
-		let x = gpa;
-		if( x !=  null && x != undefined && x != "Not Reported"){
-		    value =parseFloat(x).toFixed(2);
-		 }
-		 else if(x == "Not Reported"){
-		  value = x;
-		 }
-		 else{
-		  value = "";
-		 }
-		return value;
-	}
-  	getStylesForBeats(value){
-  		let background = "";
-		let color = "";
-		let hr_background = "";
-		if(value || value == 0){
-	            if(value >= 20){
-	           		background = 'green';
-	               	color = 'white';
-	               	hr_background = 'white';
-	            }
-	            else if(value >= 12 && value < 20){
-	                background = '#FFFF01';
-	                color = 'black';
-	                hr_background = 'black';
-	            }	      
-	            else if(value > 0 && value < 12){
-	                background = '#FF0101';
-	                color = 'black';
-	                hr_background = 'black';
-	            }
-        }
-       else{
-	        	value = "No Data Yet"
-	            background = 'white';
-	            color = '#5e5e5e';
-	            hr_background = '#e5e5e5';
-        }
-		var model = <div  style = {{background:background, color:color}}>
-						{value}
-					</div>
-		return model;
-  	}
-	  	renderNonExerciseSteps(value,dur,rank){
-  		let card = <Card className = "card_style" 
-						id = "my-card-mcs"
-						style = {{fontSize:"14px"}}
-						 >
-			        	<CardBody>
-			          		<CardTitle className = "header_style" style = {{fontWeight:"bold"}}>Non Exercise Steps</CardTitle>
-			          		<hr  
-			          			
-			          			/>
-			          		<CardText>
-				          		<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						          		Non Exercise Steps
-		          					</div>
-		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ this.getStylesForsteps(this.renderValue(value.non_exercise_steps,dur)) }
-		          					</div>
-		          				</div>
-		          				 <hr  
-	          						
-          						/>
-          						 <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		Rank against other users
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{this.renderRank(this.state.rankData.nes,this.state.selected_range)}
-						         	</div>
-						        </div>
-		          				<hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-9 col-sm-9 col-lg-9 text_center1">
-						         		Movement-Non Exercise Steps Grade
-						         	</div>
-						         	<div className = "col-md-3 col-sm-3 col-lg-3 text_center">
-						         		{this.getStylesForGrades(this.renderValue(value.movement_non_exercise_step_grade,dur)) }
-						         	</div>
-						        </div>
-				          		<hr  
-	          						
-          						/>
-          						<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			Non Exercise Steps GPA
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{this.getStylesForGpa(this.renderValue(value.non_exericse_steps_gpa,dur)) }
-					          		</div>
-					          	</div>
-					          	<hr  
-	          						
-          						/>
-					          	<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			Total Steps
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{this.renderComma(this.renderValue(value.total_steps,dur))}
-					          		</div>
-					          	</div>
-			          		</CardText>
-			        	</CardBody>
-		      		</Card>
-  		return card;
-  	}
-
-  		renderNutrition(value,dur,rank){
-  		let card = <Card className = "card_style" 
-						id = "my-card-mcs"
-						style = {{fontSize:"14px"}}
-						 >
-			        	<CardBody>
-			          		<CardTitle className = "header_style" style = {{fontWeight:"bold"}}>Nutrition</CardTitle>
-			          		<hr  
-			          			
-			          			/>
-			          		<CardText>
-				          		<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						          		% of Unprocessed Food Consumed
-		          					</div>
-		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ this.getStylesForFood(this.renderValue(value.prcnt_unprocessed_volume_of_food,dur)) }
-		          					</div>
-		          				</div>
-		          				<hr  
-	          						
-          						/>
-          						 <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		Rank against other users
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{this.renderRank(this.state.rankData.prcnt_uf,this.state.selected_range)}
-						         	</div>
-						        </div>
-		          				<hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		% Non Processed Food Consumed Grade
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{this.getStylesForGrades(this.renderValue(value.prcnt_unprocessed_food_grade,dur)) }
-						         	</div>
-						        </div>
-				          		<hr  
-	          						
-          						/>
-          						<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			% Non Processed Food Consumed GPA
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{this.getStylesForGpa(this.renderValue(value.prcnt_unprocessed_food_gpa,dur)) }
-					          		</div>
-					          	</div>
-			          		</CardText>
-			        	</CardBody>
-		      		</Card>
-  		return card;
-  	}
-
-  	renderAlcohol(value,dur,rank){
-  		let card = <Card className = "card_style" 
-						id = "my-card-mcs"
-						style = {{fontSize:"14px"}}
-						 >
-			        	<CardBody>
-			          		<CardTitle className = "header_style" style = {{fontWeight:"bold"}}>Alcohol</CardTitle>
-			          		<hr  
-			          			
-			          			/>
-			          		<CardText>
-				          		<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						          		Average Drinks Per Week (7 Days)
-		          					</div>
-		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ this.renderValue(value.avg_drink_per_week,dur) }
-		          					</div>
-		          				</div>
-		          				<hr  
-	          						
-          						/>
-          						 <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		Rank against other users
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{this.renderRank(this.state.rankData.alcohol,this.state.selected_range)}
-						         	</div>
-						        </div>
-		          				<hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		Alcoholic drinks per week Grade
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ this.getStylesForGrades(this.renderValue(value.alcoholic_drinks_per_week_grade,dur)) }
-						         	</div>
-						        </div>
-				          		<hr  
-	          						
-          						/>
-          						<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			Alcoholic drinks per week GPA
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.getStylesForGpa(this.renderValue(value.alcoholic_drinks_per_week_gpa,dur)) }
-					          		</div>
-					          	</div>
-					          	<hr  
-	          						
-          						/>
-					          	<div className = "row justify-content-center">
-					          		<div className = "col-md-9 col-sm-9 col-lg-9 text_center1">
-					          			% of Days Alcohol Consumption Reported
-					          		</div>
-					          		<div className = "col-md-3 col-sm-3 col-lg-3 text_center">
-					          			{this.renderPercent(this.renderValue(value.prcnt_alcohol_consumption_reported,dur)) }
-					          		</div>
-					          	</div>
-			          		</CardText>
-			        	</CardBody>
-		      		</Card>
-  		return card;
-  	}
-
-
-  	renderRank(value,dur){
-  		let rank = '';
-  		let all_rank_data = '';
-  		let userName = '';
-  		let category = '';
-  		let verbose_name = '';
-      let other_Scores = {};
-
-  		if(dur && dur != "today" && dur != "month" &&
-  			dur != "yesterday" && dur != "week" && dur != "year"){
-            if(value && value['custom_range'] != undefined){
-                if(value['custom_range'][dur] != undefined){
-          			rank = value['custom_range'][dur].user_rank.rank;
-          			all_rank_data = value['custom_range'][dur].all_rank;
-          			userName = value['custom_range'][dur].user_rank.username;
-          			category = value['custom_range'][dur].user_rank.category;
-
-          			/*if(category == "Percent Unprocessed Food"){
-                  verbose_name = value['custom_range'][dur].user_rank.other_scores.percent_unprocessed_food.verbose_name;
-                }
-                else if(category == "Average Sleep"){
-                  verbose_name = value['custom_range'][dur].user_rank.other_scores.sleep_duration.verbose_name;
-                }*/
-                let otherScoreObject = value['custom_range'][dur].user_rank.other_scores;
-                if(category != "Pure Time To 99" 
-                    && category != "Time To 99"
-                    && category != "Active Minute Per Day (24 hours)"
-                    && category != "Alcohol"
-                    && (otherScoreObject != null 
-                    && otherScoreObject != undefined 
-                    && otherScoreObject != "")){
-                  for (let [key3,o_score] of Object.entries(otherScoreObject)){
-                    if(o_score != null && o_score != undefined && o_score != "") {
-                      if(!other_Scores[key3]){
-                        other_Scores[key3] = {
-                          verbose_name:o_score.verbose_name,
-                          scores:[]
-                        }
-                      }
-                      if(o_score.value != null && o_score.value != undefined && o_score.value != "") {
-                        other_Scores[key3]["scores"].push(o_score.value);
-                      }
-                    }
-                  }
-                }
-
-  		        }
-            }
-        }
-  		else{
-  			rank = value[dur].user_rank.rank;
-  			all_rank_data = value[dur].all_rank;
-  			userName = value[dur].user_rank.username;
-  			category = value[dur].user_rank.category;
-  			/*if(category == "Percent Unprocessed Food"){
-          verbose_name = value[dur].user_rank.other_scores.percent_unprocessed_food.verbose_name;
-        }
-        else if(category == "Average Sleep"){
-          verbose_name = value[dur].user_rank.other_scores.sleep_duration.verbose_name;
-        }*/
-        let otherScoreObject = value[dur].user_rank.other_scores;
-        if(category != "Pure Time To 99" 
-            && category != "Time To 99"
-            && category != "Active Minute Per Day (24 hours)"
-            && category != "Alcohol"
-            && (otherScoreObject != null 
-            && otherScoreObject != undefined 
-            && otherScoreObject != "")){
-          for (let [key3,o_score] of Object.entries(otherScoreObject)){
-            if(o_score != null && o_score != undefined && o_score != "") {
-              if(!other_Scores[key3]){
-                other_Scores[key3] = {
-                  verbose_name:o_score.verbose_name,
-                  scores:[]
-                }
-              }
-              if(o_score.value != null && o_score.value != undefined && o_score.value != "") {
-                other_Scores[key3]["scores"].push(o_score.value);
-              }
-            }
-          }
-          }
-
-  		}
-  		let code = <a onClick = {this.renderAllRank.bind(this,all_rank_data,userName,category,other_Scores)}>
-						         		<span style={{textDecoration:"underline"}}>{rank}</span>
-					         			 	<span id="lbfontawesome">
-					                          	<FontAwesome
-					                            className = "fantawesome_style"
-					                              name = "external-link"
-					                              size = "1x"
-					                          	/>
-				                       		</span> 
-						         		</a>
- 		return code;
-  	}
-
-  	handleBackButton(){
+  	toggle1() {
       this.setState({
-        active_view:!this.state.active_view,
-        btnView:false
-      })
+        isOpen1: !this.state.isOpen1,
+      });
     }
-
-
-    	getStylesForGrades(score){
-		let background = "";
-		let color = "";
-		let hr_background = "";
-		if(score){
-			if (score == "A"){
-	        	background = 'green';
-	           	color = 'white';
-	           	hr_background = 'white';
-	      	}
-	      	 else if(score == "B"){
-                background = '#32CD32';
-                color = 'white';
-                hr_background = 'white';
-            }
-	      	else if (score == "C"){
-	    	 	background = '#FFFF01';
-	            color = 'black';
-	            hr_background = 'black';
-	  		}
-	  		else if(score == "D"){
-                background = '#E26B0A';
-                color = 'black';
-                hr_background = 'black';
-            }
-	      	else if (score == "F"){
-	        	background = '#FF0101';
-	            color = 'black';
-	            hr_background = 'black';
-	      	}  	
-	    }
-	   	else{
-	        	score = "Not Reported"
-	            background = 'white';
-	            color = '#5e5e5e';
-	            hr_background = '#e5e5e5';
-        }
-		var model = <div  style = {{background:background, color:color}}>
-						{score}
-					</div>
-		return model;
-      
-    }
-
-    getStylesForGpa(score){
-		let background = "";
-		let color = "";
-		let hr_background = "";
-		if(score || score == 0){
-		var score = parseFloat(score); 
-	            if(score >= "3.4"){
-	               	background = 'green';
-	               	color = 'white';
-	               	hr_background = 'white';
-	            }
-	            else if(score >= "3" && score < "3.4"){
-	                background = '#32CD32';
-	                color = 'white';
-	                hr_background = 'white';
-	            }
-	            else if(score >= "2" && score < "3"){
-	                background = '#FFFF01';
-	                color = 'black';
-	                hr_background = 'black';
-	            }
-	            else if(score >= "1" && score < "2"){
-	                background = '#E26B0A';
-	                color = 'black';
-	                hr_background = 'black';
-	            }
-	            else if(score < "1"){
-	                background = '#FF0101';
-	                color = 'black';
-	                hr_background = 'black';
-	            }
-        	
-        	
-		}
-		else{
-				score = "Not Reported"
-	            background = 'white';
-	            color = '#5e5e5e';
-	            hr_background = '#E5E5E5';
-        }
-		var model = <div  style = {{background:background, color:color}}>
-						{this.gpascoreDecimal(score)}
-					</div>
-		return model;
-      
-    }
-
-
-     getStylesForsteps(score){
-		let background = "";
-		let color = "";
-		let hr_background = "";
-		if(score || score == 0){
-	            if(score >= 10000){
-	           		background = 'green';
-	               	color = 'white';
-	               	hr_background = 'white';
-	            }
-	            else if(score >= 7500 && score < 10000){
-	                background = '#32CD32';
-	                color = 'white';
-	                hr_background = 'white';
-	            }
-	            else if(score >= 5000 && score < 7500){
-	                background = '#FFFF01';
-	                color = 'black';
-	                hr_background = 'black';
-	            }
-	            else if(score >= 3500 && score < 5000){
-	                background = '#E26B0A';
-	                color = 'black';
-	                hr_background = 'black';
-	            }
-	            else if(score >= 0 && score < 3500){
-	                background = '#FF0101';
-	                color = 'black';
-	                hr_background = 'black';
-	            }
-        }
-       else{
-	        	score = "No Data Yet"
-	            background = 'white';
-	            color = '#5e5e5e';
-	            hr_background = '#e5e5e5';
-0        }
-		var model = <div  style = {{background:background, color:color}}>
-						{this.renderComma(score)}
-					</div>
-		return model;
-      
-    }
-     getStylesForSleep(value){
-		let background = "";
-		let color = "";
-		let hr_background = "";
-		let score;
-		if(value){
-		 score = value;
-		}
-		else{
-			score = "No Data Yet";
-            background = 'white';
-            color = '#5e5e5e';
-            hr_background = '#E5E5E5';
-        }
-			if(value){
-				value = this.strToSecond(value);
-				if(value < this.strToSecond("6:00") || value > this.strToSecond("12:00")){
-					 	background = '#FF0101';
-		                color = 'black';
-		                hr_background = 'black';
-		        }
-				else if(this.strToSecond("7:30") <= value && value <= this.strToSecond("10:00")){
-					background = 'green';
-			            color = 'white';
-			            hr_background = 'white';
-			    }
-		    	else if((this.strToSecond("7:00")<=value && value<= this.strToSecond("7:29"))
-		    	 || (this.strToSecond("10:01")<=value && value<=this.strToSecond("10:30"))){
-		    		 	background = '#32CD32';
-		                color = 'white';
-		                hr_background = 'white';
-		    	}	
-		    	else if((this.strToSecond("6:30")<=value && value<=this.strToSecond("6:59"))
-		    	 || (this.strToSecond("10:31")<= value && value<=this.strToSecond("11:00"))){
-		    		 	background = '#FFFF01';
-		                color = 'black';
-		                hr_background = 'black';
-		        }
-		    	else if((this.strToSecond("06:00")<=value && value<= this.strToSecond("6:29"))
-		    	 || (this.strToSecond("11:00")<=value && value<= this.strToSecond("12:00"))){
-		    		 	background = '#E26B0A';
-		                color = 'black';
-		                hr_background = 'black';
-		    	}
-	    	}
- 
-       else{
-	        	score = "No Data Yet"
-	            background = 'white';
-	            color = '#5e5e5e';
-	            hr_background = '#e5e5e5';
-        }
-		var model = <div  style = {{background:background, color:color}}>
-						{score}
-					</div>
-		return model;
-      
-    }
-
-
-      getStylesForRhr(score){
-    console.log("score:..."+score);
-  	let background = "";
-		let color = "";
-		let hr_background = "";
-		if(score || score == 0){
-      if(score>=80){
-     		background = 'red';
-         	color = 'black';
-         	hr_background = 'black';
-      }
-      /*
-      return {background:'#ff8c00',color:'black'};//Orange
-    else if (score >=69 && score <= 74)
-        return {background:'#ffff00',color:'black'};//Yellow
-    else if (score >=61 && score <= 68)
-        return {background:'#32cd32',color:'white'};//Light Green
-    else if (score >=30 && score <= 60)
-        return {background:'#008000',color:'white'};//Green*/
-      else if(score>=75 && score<=79){
-          background = '#ff8c00'; //Orange
-          color = 'black';
-          hr_background = 'black';
-      }
-      else if(score>=69 && score<=74){
-          background = '#ffff00' ; //Yellow
-          color = 'black';
-          hr_background = 'black';
-      }
-      else if(score >=61 && score <= 68){
-          background = '#32cd32'; //Light getGarminToken
-          color = 'white';
-          hr_background = 'white';
-      }
-      else if(score >=30 && score <= 60){
-          background = '#008000'; 
-          color = 'white';
-          hr_background = 'white';
-      }
-      else if(score<30){
-          background = 'red';
-          color = 'black';
-          hr_background = 'black';
-      }
-    }
-    else{
-    	score = "No Data Yet"
-      background = 'white';
-      color = '#5e5e5e';
-      hr_background = '#e5e5e5';
-    }
-		var model = <div  style = {{background:background, color:color}}>
-						{this.renderComma(score)}
-					</div>
-		return model;
-  	}
-
-getStylesForFood(score){
-  		let background = "";
-		let color = "";
-		let hr_background = "";
-		if(score || score == 0){
-	            if(score<50){
-	           		 background = '#FF0101';
-	                color = 'black';
-	                hr_background = 'black';
-	            }
-	            else if(score>=50 && score<70){
-	                background = '#FFFF01';
-	                color = 'black';
-	                hr_background = 'black';
-	            }	      
-	            else if(score >= 70){	       
-	                background = 'green';
-	               	color = 'white';
-	               	hr_background = 'white';
-	            }
-        }
-       
-		var model = <div  style = {{background:background, color:color}}>
-						{this.renderPercent(score)}
-					</div>
-		return model;
-  	}
 	renderPercent(value){
 		let percent ='';
 		if(value != null || value != undefined){
@@ -1474,293 +165,8 @@ getStylesForFood(score){
 		}
 		return percent;
 	}
-  	renderEc(value,dur,rank){
-  		let card = <Card className = "card_style" 
-						id = "my-card-mcs"
-						style = {{fontSize:"14px"}}
-						 >
-			        	<CardBody>
-			          		<CardTitle className = "header_style" style = {{fontWeight:"bold"}}>Exercise Consistency</CardTitle>
-			          		<hr  
-			          			
-			          			/>
-			          		<CardText>
-				          		<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						          		Avg # of Days Exercised/Week
-		          					</div>
-		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{this.renderValue(value.avg_no_of_days_exercises_per_week,dur) }
-		          					</div>
-		          				</div>
-		          				<hr  
-	          						
-          						/>
-          						 <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		Rank against other users
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{this.renderRank(this.state.rankData.ec,this.state.selected_range)}
-						         	</div>
-						        </div>
-		          				<hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		Exercise Consistency Grade
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ this.getStylesForGrades(this.renderValue(value.exercise_consistency_grade,dur)) }
-						         	</div>
-						        </div>
-				          		<hr  
-	          						
-          						/>
-          						<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			Exercise Consistency GPA
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{ this.getStylesForGpa(this.renderValue(value.exercise_consistency_gpa,dur)) }
-					          		</div>
-					          	</div>
-			          		</CardText>
-			        	</CardBody>
-		      		</Card>
-  		return card;
-  	}
-
-	renderMcs(value,dur,rank,dure_date){
-  		let card = <Card className = "card_style" 
-						id = "my-card-mcs"
-						style = {{fontSize:"14px"}}
-						 >
-			        	<CardBody>
-			          		<CardTitle className = "header_style"
-			          		 style = {{fontWeight:"bold"}}>
-			          		 	Movement Consistency
-			          		 </CardTitle> 
-			          		<hr  
-			          			
-			          			/>
-			          		<CardText>
-				          		<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						          		Movement Consistency Score
-		          					</div>
-		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{ this.renderValue(value.movement_consistency_score,dur)}
-                                        {this.renderMcsLink(this.state.rankData.mc,this.state.selected_range,this.state.duration_date)} 
-		          					</div>
-		          				</div>
-		          				<hr  
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		Movement Consistency Grade
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{this.getStylesForGrades(this.renderValue(value.movement_consistency_grade,dur)) }
-						         	</div>
-						        </div>
-						        <hr  
-	          						
-          						/>
-          						 <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		Rank against other users
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">						         		
-						         		{this.renderRank(this.state.rankData.mc,this.state.selected_range)}
-						         	</div>
-						        </div>
-				          		<hr  
-	          						
-          						/>
-          						<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			Movement Consistency GPA
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{this.getStylesForGpa(this.renderValue(value.movement_consistency_gpa,dur)) }
-					          		</div>
-					          	</div>
-                      <hr  
-                        
-                      />
-                      <div className = "row justify-content-center">
-                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                          Time Moving / Active (hh:mm) (24 hours)
-                        </div>
-                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-                          {this.renderActiveMinsValue(value.total_active_minutes,dur) == null?"Not Reported":this.renderActiveMinsValue(value.total_active_minutes,dur)}
-                        </div>
-                      </div>
-                      <hr  
-                        
-                      />
-                      <div className = "row justify-content-center">
-                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                          % of Time Moving / Active (hh:mm) (24 hours)
-                        </div>
-                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-                          {this.renderValue(value.total_active_minutes_prcnt,dur) == null?"Not Reported":this.renderValue(value.total_active_minutes_prcnt,dur) +"%"}
-                        </div>
-                      </div>
-                      <hr  
-                        
-                      />
-                      <div className = "row justify-content-center">
-                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                           Rank against other users
-                        </div>
-                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-                          {this.renderRank(this.state.rankData.active_min_total,this.state.selected_range) == null?"Not Reported":this.renderRank(this.state.rankData.active_min_total,this.state.selected_range)}
-                        </div>
-                      </div>
-                      <hr  
-                        
-                      />
-                      <div className = "row justify-content-center">
-                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                           Time Moving / Active (when not sleeping) (hh:mm)
-
-                        </div>
-                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-                          {this.renderActiveMinsValue(value.active_minutes_without_sleep,dur) == null?"Not Reported":this.renderActiveMinsValue(value.active_minutes_without_sleep,dur)}
-                        </div>
-                      </div>
-                      <hr  
-                        
-                      />
-                      <div className = "row justify-content-center">
-                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                           % of Time Moving / Active (when not sleeping) (hh:mm)
-                        </div>
-                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-                          {this.renderValue(value.active_minutes_without_sleep_prcnt,dur) == null?"Not Reported":this.renderValue(value.active_minutes_without_sleep_prcnt,dur) + "%"}
-                        </div>
-                      </div>
-                      <hr  
-                        
-                      />
-                      <div className = "row justify-content-center">
-                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                         Rank against other users
-                        </div>
-                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-                          {this.renderRank(this.state.rankData.active_min_exclude_sleep,this.state.selected_range) == null?"Not Reported":this.renderRank(this.state.rankData.active_min_exclude_sleep,this.state.selected_range)}
-                        </div>
-                      </div>
-                      <hr  
-                        
-                      />
-                      <div className = "row justify-content-center">
-                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                          Time Moving / Active (when not sleeping and exercising) (hh:mm)
-
-                        </div>
-                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-                          {this.renderActiveMinsValue(value.active_minutes_without_sleep_exercise,dur) == null?"Not Reported":this.renderActiveMinsValue(value.active_minutes_without_sleep_exercise,dur)}
-                        </div>
-                      </div>
-                      <hr  
-                        
-                      />
-                      <div className = "row justify-content-center">
-                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                          % of Time Moving / Active (when not sleeping and exercising) (hh:mm)
-                        </div>
-                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-                          {this.renderValue(value.active_minutes_without_sleep_exercise_prcnt,dur) == null?"Not Reported":this.renderValue(value.active_minutes_without_sleep_exercise_prcnt,dur) + "%"}
-                        </div>
-                      </div>
-                      <hr  
-                        
-                      />
-                      <div className = "row justify-content-center">
-                        <div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-                          Rank against other users
-                        </div>
-                        <div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-                          {this.renderRank(this.state.rankData.active_min_exclude_sleep_exercise,this.state.selected_range) == null?"Not Reported":this.renderRank(this.state.rankData.active_min_exclude_sleep_exercise,this.state.selected_range)}
-                        </div>
-                      </div>
-
-			          		</CardText>
-			        	</CardBody>
-		      		</Card>
-  		return card;
-  	}
-
-  	   renderMcsLink(value,dur,dure_date){
-      let rank = '';
-      let all_rank_data = '';
-      let userName = '';
-      let category = '';
-      let verbose_name = '';
-      if(dur && dur != "today" && dur != "month" &&
-        dur != "yesterday" && dur != "week" && dur != "year"){
-        if(value && value['custom_range'] != undefined){
-            if(value['custom_range'][dur] != undefined){
-                rank = value['custom_range'][dur].user_rank.rank;
-                all_rank_data = value['custom_range'][dur].all_rank;
-                userName = value['custom_range'][dur].user_rank.username;
-                category = value['custom_range'][dur].user_rank.category;
-                if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
-                  verbose_name = value['custom_range'][dur].user_rank.score.verbose_name;
-                }
-              }
-            }
-        }
-      else{
-        rank = value[dur].user_rank.rank;
-        all_rank_data = value[dur].all_rank;
-        userName = value[dur].user_rank.username;
-        category = value[dur].user_rank.category;
-        if(category == "Percent Unprocessed Food" || category == "Average Sleep"){
-          verbose_name = value[dur].user_rank.score.verbose_name;
-        }
-      }
-      let code;
-      if(dur == "today" || dur == "yesterday"){
-            code = <Link to={`/mcs_dashboard?date=${moment(dure_date[dur]).format('YYYY-MM-DD')}`}>
-                                        <span id="lbfontawesome">
-                                       <FontAwesome
-                                       className = "fantawesome_style"
-                                         name = "external-link"
-                                          size = "1x"
-                                      />
-                                  </span> 
-                              </Link> 
-      }
-      else{
-        code = <a onClick = {this.renderAllRank.bind(this,all_rank_data,userName,category,verbose_name)}>
-                            <span id="lbfontawesome">
-                                      <FontAwesome
-                                      className = "fantawesome_style"
-                                        name = "external-link"
-                                        size = "1x"
-                                      />
-                            </span> 
-        </a>
-      }
-    return code;
-    }
-
-    	reanderAllHrr(period,date,capt){
-  		this.setState({
-  			selected_range:period,
-  			date:date,
-  			capt:capt,
-  		});
-  	}
-
-  	    renderValue(value,dur){
-
+  	
+  	 renderValue(value,dur){
     	let score = "";
     	if(dur && dur != "today" && dur != "month" &&
   			dur != "yesterday" && dur != "week" && dur != "year"){
@@ -1776,6 +182,145 @@ getStylesForFood(score){
     	return score;
     }
 
+	toggleCalendar(){
+	   this.setState({
+      	calendarOpen:!this.state.calendarOpen
+	    });
+  	}
+     strToSecond(value){
+    	let time = value.split(':');
+    	let hours = parseInt(time[0])*3600;
+    	let min = parseInt(time[1])*60;
+    	let s_time = hours + min;
+    	return s_time;
+	}
+	toggle(){
+		this.setState({
+			dropdownOpen1:!this.state.dropdownOpen1
+		})
+	}
+	toggleDate1(){
+	    this.setState({
+	      dateRange1:!this.state.dateRange1
+	    });
+   	}
+   	toggleDate2(){
+	    this.setState({
+	      dateRange2:!this.state.dateRange2
+	    });
+   	}
+toggleDate3(){
+	    this.setState({
+	      dateRange3:!this.state.dateRange3
+	    });
+   	}
+   	toggleDate4(){
+        this.setState({
+          dateRange4:!this.state.dateRange4
+        });
+    }
+	toggleDropdown() {
+	    this.setState({
+      		dropdownOpen: !this.state.dropdownOpen
+	    });
+	}
+	onSubmitDate1(event){
+    event.preventDefault();
+    this.setState({
+      dateRange1:!this.state.dateRange1,
+      fetching_ql1:true,
+
+    },()=>{
+        let custom_ranges = [];
+        if(this.state.cr2_start_date && this.state.cr2_end_date){
+            custom_ranges.push(this.state.cr2_start_date);
+            custom_ranges.push(this.state.cr2_end_date);
+        }
+         if(this.state.cr3_start_date && this.state.cr3_end_date){
+            custom_ranges.push(this.state.cr3_start_date);
+            custom_ranges.push(this.state.cr3_end_date);
+        }
+        custom_ranges.push(this.state.cr1_start_date);
+        custom_ranges.push(this.state.cr1_end_date);
+
+      let crange1 = this.state.cr1_start_date + " " + "to" + " " + this.state.cr1_end_date 
+      let selected_range = {
+            range:crange1,
+            duration:this.headerDates(crange1),
+            caption:""
+       }
+      fetchProgress(this.successProgress,
+                    this.errorProgress,
+                    this.state.selectedDate,custom_ranges,
+                    selected_range);
+       
+    });
+  }
+
+
+ onSubmitDate2(event){
+    event.preventDefault();
+    this.setState({
+      dateRange2:!this.state.dateRange2,
+      fetching_ql2:true,
+
+    },()=>{
+         let custom_ranges = [];
+        if(this.state.cr1_start_date && this.state.cr1_end_date){
+            custom_ranges.push(this.state.cr1_start_date);
+            custom_ranges.push(this.state.cr1_end_date);
+        }
+         if(this.state.cr3_start_date && this.state.cr3_end_date){
+            custom_ranges.push(this.state.cr3_start_date);
+            custom_ranges.push(this.state.cr3_end_date);
+        }
+
+        custom_ranges.push(this.state.cr2_start_date);
+        custom_ranges.push(this.state.cr2_end_date);
+      let crange1 = this.state.cr2_start_date + " " + "to" + " " + this.state.cr2_end_date 
+      let selected_range = {
+            range:crange1,
+            duration:this.headerDates(crange1),
+            caption:""
+       }
+
+      fetchProgress(this.successProgress,
+                    this.errorProgress,
+                    this.state.selectedDate,custom_ranges,
+                    selected_range);
+       
+    });
+  }
+ onSubmitDate3(event){
+    event.preventDefault();
+    this.setState({
+      dateRange3:!this.state.dateRange3,
+      fetching_ql3:true,
+    },()=>{
+         let custom_ranges = [];
+         if(this.state.cr1_start_date && this.state.cr1_end_date){
+            custom_ranges.push(this.state.cr1_start_date);
+            custom_ranges.push(this.state.cr1_end_date);
+        }
+        if(this.state.cr2_start_date && this.state.cr2_end_date){
+            custom_ranges.push(this.state.cr2_start_date);
+            custom_ranges.push(this.state.cr2_end_date);
+        }
+        custom_ranges.push(this.state.cr3_start_date);
+        custom_ranges.push(this.state.cr3_end_date);
+      let crange1 = this.state.cr3_start_date + " " + "to" + " " + this.state.cr3_end_date 
+      let selected_range = {
+            range:crange1,
+            duration:this.headerDates(crange1),
+            caption:""
+       }
+
+     fetchProgress(this.successProgress,
+                    this.errorProgress,
+                    this.state.selectedDate,custom_ranges,
+                    selected_range);
+    });
+  }
 
   onSubmitDate4(event){
     event.preventDefault();
@@ -1806,167 +351,156 @@ getStylesForFood(score){
                     this.errorProgress,
                     this.state.selectedDate,custom_ranges,
                     selected_range);
-      fetchUserRank(
-            this.successRank,
-            this.errorProgress,
-            this.state.selectedDate,custom_ranges,
-            selected_range
-        );
     });
-  }
+  } 
+	createExcelPrintURL(){
+    	// code
+	    let custom_ranges = [];
+	    let selected_date = moment(this.state.selectedDate).format("YYYY-MM-DD");
+	    if(this.state.cr1_start_date && this.state.cr1_end_date){
+	        custom_ranges.push(this.state.cr1_start_date);
+	        custom_ranges.push(this.state.cr1_end_date);
+	    }
 
-  MinToHours(score){
-  let time;// undefined
-      if(score != null && score != undefined && score != "" && score != "N/A"){
-        if (score == -1){
-          time = "Never"
-        }
-        else{
-          let hours = parseInt(score/60);//3
-          let minutes = (score % 60);//9
-          if(hours < 10){// 3<10 
-            hours = "0" + hours;  //time = 03
-          }
-          else{
-            hours = hours; // time = 03 
-          }
-          if(minutes < 10){// 9<10 
-            time = hours + ":0" + minutes; // time = 03:09
-          }
-          else{
-            time = hours + ":" + minutes;// time = 3:9
-          }
-        }
-      }
-      else{
-        time = "N/A"
-      }
-      if (score == null || score == 0){
-        time = "N/A"
-      }
-      return time;
-    }// time = 03:09
-
-
-   renderActiveMinsValue(value,dur) {
-      let score = "";
-      if(dur && dur != "today" && dur != "month" &&
-        dur != "yesterday" && dur != "week" && dur != "year"){
-            if(value && value['custom_range'] != undefined){
-                if(value['custom_range'][dur] != undefined){
-          score = this.MinToHours(value['custom_range'][dur].data);
-             }
-            }
-        }
-      else{
-          score = this.MinToHours(value[dur]);
-      }
-      return score;
+	    if(this.state.cr2_start_date && this.state.cr2_end_date){
+	        custom_ranges.push(this.state.cr2_start_date);
+	        custom_ranges.push(this.state.cr2_end_date);
+	    }
+	     if(this.state.cr3_start_date && this.state.cr3_end_date){
+	        custom_ranges.push(this.state.cr3_start_date);
+	        custom_ranges.push(this.state.cr3_end_date);
+	    }
+	    custom_ranges = (custom_ranges && custom_ranges.length) ? custom_ranges.toString():'';
+	    let excelURL = `progress/print/progress/excel?date=${selected_date}&&custom_ranges=${custom_ranges}`;
+	    return excelURL;
+	}
+	handleChange(event){
+      	const target = event.target;
+      	const value = target.value;
+      	const name = target.name;
+      	this.setState({
+        	[name]: value
+      	});
     }
 
-   toggleStressInfo(){
-    this.setState({
-      isStressInfoModelOpen: !this.state.isStressInfoModelOpen
-    });
-  }
-		renderOverallHealth(value,dur,rank){ 		
-  		let card = <Card className = "card_style" 
-						id = "my-card-mcs"
-						style = {{fontSize:"14px"}}
-						 >
-			        	<CardBody>
-			          		<CardTitle className = "header_style" style = {{fontWeight:"bold"}}>Overall Health Grade</CardTitle>
-			          		<hr 
-			          			
-			          			/>
-			          		<CardText>
-				          		<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						          		Total GPA Points
-		          					</div>
-		          					<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						          		{this.renderValue(value.total_gpa_point,dur)}
-		          					</div>
-		          				</div>
-		          				<hr 
-			          				
-		          				/>
-						        <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		Overall Health GPA
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{ this.getStylesForGpa(this.renderValue(value.overall_health_gpa,dur)) }
-						         	</div>
-						        </div>
-				          		<hr 
-	          						
-          						/>
-          						 <div className = "row justify-content-center">
-						         	<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-						         		Rank against other users
-						         	</div>
-						         	<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-						         		{this.renderRank(this.state.rankData.oh_gpa,this.state.selected_range)}
-						         	</div>
-						        </div>
-				          		<hr/>
-          						<div className = "row justify-content-center">
-					          		<div className = "col-md-8 col-sm-8 col-lg-8 text_center1">
-					          			Overall Health GPA Grade
-					          		</div>
-					          		<div className = "col-md-4 col-sm-4 col-lg-4 text_center">
-					          			{this.getStylesForGrades(this.renderValue(value.overall_health_gpa_grade,dur)) }
-					          		</div>
-					          	</div>
-			          		</CardText>
-			        	</CardBody>
-		      		</Card>
-  		return card;
-  	}
-
-	 toggle(){
-		this.setState({
-			dropdownOpen1:!this.state.dropdownOpen1
-		})
+	headerDates(value){
+   	   let str = value;
+       let d = str.split(" ");
+       let d1 = d[0];
+       let date1 =moment(d1).format('MMM DD, YYYY');
+       let d2 = d[2];
+       let date2 =moment(d2).format('MMM DD, YYYY');
+       let date = date1 + ' to ' + date2;
+       return date;  
 	}
-	toggleCalendar(){
+	getInitialDur(){
+		 let paDurationInitialState = {
+ 			"week":"-",
+            "yesterday":"-",
+            "month":"-",
+           "custom_range":"-",
+            "today":"-", 
+            "year":"-"
+       };
+       return paDurationInitialState;
+	}
+	
+    successLastSync(data){
+    	/* Getting Wearable Device Last Sync date and time*/
+    	let last_synced;
+    	if(_.isEmpty(data.data))
+    		last_synced = null
+    	else
+    		 last_synced = data.data.last_synced;
+    	this.setState({
+    		last_synced:last_synced,
+    	})
+    }
+    errorquick(error){
+		console.log(error.message);
+	}
+	 renderLastSync(value){
+	    let time;
+	    var sync = "";
+	    if(value){
+	      	time = moment(value).format("MMM DD, YYYY @ hh:mm a");
+	      	sync = <div style={{fontSize:"15px",fontWeight:"bold",fontFamily:'Proxima-Nova',color:"black"}}>Wearable Device Last Synced on{time}</div>;
+	    }
+	    return sync;
+	}
+	 
+
+ processDate(selectedDate){ 
 	    this.setState({
-      		calendarOpen:!this.state.calendarOpen
+	      fetching_ql4:true,
+	      selectedDate: selectedDate,
+	      calendarOpen:!this.state.calendarOpen,
+	      selected_range:"today",                              
+	    },()=>{
+	      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
 	    });
   	}
-  	toggle1() {
+
+
+	
+	toggleCalendar(){
+	  this.setState({
+	 calendarOpen:!this.state.calendarOpen
+	  });
+    }
+
+    succesCallback(data){
       this.setState({
-        isOpen1: !this.state.isOpen1,
+        userage:data.data.user_age
       });
     }
-  	toggleDate1(){
-	    this.setState({
-	      dateRange1:!this.state.dateRange1
-	    });
-   	}
- 	toggleDate2(){
-	    this.setState({
-	      dateRange2:!this.state.dateRange2
-	    });
-   	}
-    toggleDate3(){
-	    this.setState({
-	      dateRange3:!this.state.dateRange3
-	    });
-   	}
-    toggleDate4(){
-        this.setState({
-          dateRange4:!this.state.dateRange4
-        });
-    }
-   	toggleDropdown() {
-	    this.setState({
-      		dropdownOpen: !this.state.dropdownOpen
-	    });
+    
+	componentDidMount(){
+		this.setState({
+			fetching_ql4:true,     
+			});
+			
+				 fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
+				  getUserProfile(this.succesCallback);
 	}
 
-	renderDateRangeDropdown(value,value5){
+
+	successProgress(data,renderAfterSuccess=undefined){
+		let date =moment(data.data.duration_date["today"]).format("MMM DD, YYYY @ hh:mm:a"); 
+	    this.setState({
+	    	fetching_ql1:false,
+            fetching_ql2:false,
+            fetching_ql3:false,
+            fetching_ql4:false,
+	        report_date:data.data.report_date,
+	        summary:data.data.summary,
+	        avg_exercise_heart_rate:data.data.avg_exercise_heart_rate,
+	        duration_date:data.data.duration_date,
+	        capt:"Wearable Device Last Synced on",
+	        date:date,
+
+	    },()=>{
+            if(renderAfterSuccess){
+                this.reanderAllHrr(
+                    renderAfterSuccess.range,
+                    renderAfterSuccess.duration,
+                    renderAfterSuccess.caption
+                );
+            }
+        });
+  	}
+
+	errorProgress(error){
+       console.log(error.message);
+       this.setState({
+       		fetching_ql1:false,
+            fetching_ql2:false,
+            fetching_ql3:false,
+            fetching_ql4:false,
+       })
+    }
+	
+renderDateRangeDropdown(value,value5){
   		let duration_type = ["today","yesterday","week","month","year","custom_range"];
   		let duration_type1 = ["today","yesterday","week","month","year",];
   		let durations = [];
@@ -2027,646 +561,3278 @@ getStylesForFood(score){
 	  	}
 	  return tableHeaders;	
   	}
-	handleScroll() {
-      if (window.scrollY >= 150 && !this.state.scrollingLock) {
-        this.setState({
-          scrollingLock: true
-        });
-      } else if(window.scrollY < 100 && this.state.scrollingLock) {                                               
-        this.setState({
-          scrollingLock: false
-        });
-      }
+
+  	aaColorRanges(heartrate){
+  		let background = '';
+  	    let userage = this.state.userage;
+     if( heartrate == null || heartrate == undefined || heartrate == 0){
+  	  	background = '';
+  	 }
+  	 else{
+  	  	    if(userage >=13 && userage <=16){
+                   if( heartrate >= 153 && heartrate < 166){
+                     background="#32CD32";	
+                    }
+                   else if(heartrate >= 166 && heartrate < 170){
+                      background="Yellow";	
+                    }
+                   else if(heartrate >= 170 && heartrate < 175){
+                      background="Orange";	
+                    }
+                   else if(heartrate >= 175 && heartrate < 179){
+                      background="#32CD32";	
+                    }
+                   else if(heartrate >= 179 && heartrate < 182){
+                      background="green";	
+                    }
+                    else if(heartrate >= 182 && heartrate < 187){
+                      background="#32CD32";	
+                    }
+                    else if(heartrate >= 187 && heartrate < 190){
+                      background="Yellow";	
+                    }
+                    else if(heartrate >= 190 && heartrate < 192){
+                      background="Orange";	
+                    }
+                    else if(heartrate >= 192 && heartrate < 200){
+                      background="Red";	
+                    }		
+  	  	        }
+
+  	  	        if( userage >=13 && userage <=25){
+  	  	        	if(heartrate >= 110 && heartrate < 121){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        }
+
+  	  	        if( userage >=13 && userage < 14){
+  	  	        	if(heartrate >= 121 && heartrate < 141){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 141 && heartrate <= 153){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        }
+
+  	  	        if( userage >=14 && userage < 15){
+  	  	        	if(heartrate >= 121 && heartrate < 140){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 140 && heartrate < 153){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        }
+
+  	  	        if( userage >=15 && userage < 16){
+  	  	        	if(heartrate >= 121 && heartrate < 139){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 139 && heartrate < 153){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        }
+
+  	  	         if( userage >=18 && userage < 55){
+  	  	        	if(heartrate >= 179 && heartrate < 184){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 184 && heartrate < 187){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 187 && heartrate < 189){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 189 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        }
+
+  	  	         if( userage >=26 && userage < 31){
+  	  	        	if(heartrate >= 155 && heartrate < 159){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 159 && heartrate < 164){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 164 && heartrate < 167){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 167 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        }
+  	  	        
+  	  	         if( userage >=48 && userage < 80){
+  	  	        	if(heartrate >= 102 && heartrate < 106){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 101 && heartrate < 102){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        }
+                
+  	  	         if( userage >=63 && userage < 80){
+  	  	        	if(heartrate >= 127 && heartrate < 128){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        }
+
+  	  	         if( userage >=70 && userage < 80){
+  	  	        	if(heartrate >= 128 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        }
+
+  	  	         if( userage >=80 && userage < 91){
+  	  	        	if(heartrate >= 101 && heartrate < 105){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 100 && heartrate < 101){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        }
+
+  	  	         if( userage >=59 && userage < 80){
+  	  	        	if(heartrate >= 126 && heartrate < 127){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        }
+
+  	  	         if( userage >=55 && userage < 80){
+  	  	        	if(heartrate >= 106 && heartrate < 110){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 110 && heartrate < 125){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        }
+
+  	  	         if( userage >=16 && userage < 17){
+  	  	        	if(heartrate >= 121 && heartrate < 138){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 138 && heartrate < 153){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 153 && heartrate < 165){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 165 && heartrate < 169){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 169 && heartrate < 174){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 174 && heartrate < 178){
+  	  	        		background = "#32CD32" ;
+  	  	        	}
+  	  	        	else if(heartrate >= 178 && heartrate < 181){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 181 && heartrate < 186){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 186 && heartrate < 189){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 189 && heartrate < 191){
+  	  	        		background = "Orange" ;
+  	  	        	}
+  	  	        	else if(heartrate >= 191 && heartrate < 200){
+  	  	        		background = "Red" ;
+  	  	        	} 	
+  	  	        }
+
+  	  	        if( userage >=17 && userage < 18){
+  	  	        	if(heartrate >= 121 && heartrate < 137){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 137 && heartrate < 153){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 153 && heartrate < 164){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 164 && heartrate < 168){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 168 && heartrate < 173){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 173 && heartrate < 177){
+  	  	        		background = "#32CD32" ;
+  	  	        	}
+  	  	        	else if(heartrate >= 177 && heartrate < 180){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 180 && heartrate < 185){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 185 && heartrate < 188){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 188 && heartrate < 190){
+  	  	        		background = "Orange" ;
+  	  	        	}
+  	  	        	else if(heartrate >= 190 && heartrate < 200){
+  	  	        		background = "Red" ;
+  	  	        	} 	
+  	  	        }
+
+
+  	  	         if( userage >=18 && userage < 19){
+  	  	        	if(heartrate >= 121 && heartrate < 136){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 136 && heartrate < 153){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 153 && heartrate < 163){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 163 && heartrate < 167){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 167 && heartrate < 172){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 172 && heartrate < 176){
+  	  	        		background = "#32CD32" ;
+  	  	        	}
+  	  	        	else if(heartrate >= 176 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	          }	
+
+  	  	          if( userage >=19 && userage < 20){
+  	  	        	if(heartrate >= 121 && heartrate < 135){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 135 && heartrate < 153){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 153 && heartrate < 162){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 162 && heartrate < 166){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 166 && heartrate < 171){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 171 && heartrate < 174){
+  	  	        		background = "#32CD32" ;
+  	  	        	}
+  	  	        	else if(heartrate >= 174 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	          }
+
+  	  	          if( userage >=20 && userage < 21){
+  	  	        	if(heartrate >= 121 && heartrate < 134){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 134 && heartrate < 153){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 153 && heartrate < 161){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 161 && heartrate < 165){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 165 && heartrate < 170){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 170 && heartrate < 173){
+  	  	        		background = "#32CD32" ;
+  	  	        	}
+  	  	        	else if(heartrate >= 173 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	          }
+
+  	  	           if( userage >=21 && userage < 22){
+  	  	        	if(heartrate >= 121 && heartrate < 133){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 133 && heartrate < 153){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 153 && heartrate < 160){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 160 && heartrate < 164){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 164 && heartrate < 169){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 169 && heartrate < 172){
+  	  	        		background = "#32CD32" ;
+  	  	        	}
+  	  	        	else if(heartrate >= 172 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	          }
+
+  	  	           if( userage >=22 && userage < 23){
+  	  	        	if(heartrate >= 121 && heartrate < 132){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 132 && heartrate < 153){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 153 && heartrate < 159){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 159 && heartrate < 163){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 163 && heartrate < 168){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 168 && heartrate < 171){
+  	  	        		background = "#32CD32" ;
+  	  	        	}
+  	  	        	else if(heartrate >= 171 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+    	  	      }
+
+               
+  	  	           if( userage >=23 && userage < 24){
+  	  	        	if(heartrate >= 121 && heartrate < 131){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 131 && heartrate < 153){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 153 && heartrate < 158){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 158 && heartrate < 162){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 162 && heartrate < 167){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 167 && heartrate < 170){
+  	  	        		background = "#32CD32" ;
+  	  	        	}
+  	  	        	else if(heartrate >= 170 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        }
+
+  	  	     
+  	  	      if( userage >=24 && userage < 25){
+  	  	        	if(heartrate >= 121 && heartrate < 130){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 130 && heartrate < 152){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 152 && heartrate < 157){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 157 && heartrate < 161){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 161 && heartrate < 166){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 166 && heartrate < 169){
+  	  	        		background = "#32CD32" ;
+  	  	        	}
+  	  	        	else if(heartrate >= 169 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        }
+
+
+                    if( userage >=25 && userage < 26){
+  	  	        	if(heartrate >= 110 && heartrate < 120){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 120 && heartrate < 129){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 129 && heartrate < 151){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 156 && heartrate < 160){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 160 && heartrate < 165){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 165 && heartrate < 168){
+  	  	        		background = "#32CD32" ;
+  	  	        	}
+  	  	        	else if(heartrate >= 168 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        }
+
+
+  	  	        		if( userage >=26 && userage < 27){
+  	  	        	if(heartrate >= 110 && heartrate < 119){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 119 && heartrate < 128){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 128 && heartrate < 150){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 150 && heartrate < 155){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	
+  	  	        }
+
+
+
+  	  	        		if( userage >=27 && userage < 28){
+  	  	        	if(heartrate >= 110 && heartrate < 118){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 118 && heartrate < 127){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 127 && heartrate < 149){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 149 && heartrate < 155){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	
+  	  	        }
+
+
+  	  	        		if( userage >=28 && userage < 29){
+  	  	        	if(heartrate >= 110 && heartrate < 117){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 117 && heartrate < 126){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 126 && heartrate < 148){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 148 && heartrate < 155){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	
+  	  	        }
+
+
+
+  	  	        		if( userage >=29 && userage < 30){
+  	  	        	if(heartrate >= 110 && heartrate < 116){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 116 && heartrate < 125){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 125 && heartrate < 147){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 147 && heartrate < 155){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	
+  	  	        }
+
+
+
+  	  	        		if( userage >=30 && userage < 31){
+  	  	        	if(heartrate >= 110 && heartrate < 116){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 116 && heartrate < 124){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 124 && heartrate < 146){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 146 && heartrate < 155){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	
+  	  	        }
+  	  	        
+				if( userage >=31 && userage < 37){
+  	  	        	if(heartrate >= 110 && heartrate < 115){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        }
+				
+
+				if( userage >=31 && userage < 32){
+  	  	        	if(heartrate >= 115 && heartrate < 134){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 134 && heartrate < 146){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 146 && heartrate < 155){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 155 && heartrate < 160){
+  	  	        		background = "Yellow";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 160 && heartrate < 168){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 168 && heartrate < 171){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 171 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	
+  	  	        }
+
+
+                    if( userage >=32 && userage < 33){
+  	  	        	if(heartrate >= 115 && heartrate < 133){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 133 && heartrate < 146){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 146 && heartrate < 154){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 154 && heartrate < 159){
+  	  	        		background = "Yellow";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 159 && heartrate < 167){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 167 && heartrate < 170){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 170 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	
+  	  	        }
+
+
+  	  	        if( userage >=33 && userage < 34){
+  	  	        	if(heartrate >= 115 && heartrate < 132){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 132 && heartrate < 146){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 146 && heartrate < 153){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 153 && heartrate < 158){
+  	  	        		background = "Yellow";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 158 && heartrate < 166){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 166 && heartrate < 169){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 169 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	
+  	  	        }
+				
+				if( userage >=34 && userage < 35){
+  	  	        	if(heartrate >= 115 && heartrate < 131){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 131 && heartrate < 146){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 146 && heartrate < 152){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 152 && heartrate < 157){
+  	  	        		background = "Yellow";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 157 && heartrate < 165){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 165 && heartrate < 166){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 168 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	
+  	  	        }
+				
+				
+				if( userage >=35 && userage < 36){
+  	  	        	if(heartrate >= 115 && heartrate < 130){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 130 && heartrate < 146){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 146 && heartrate < 151){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 151 && heartrate < 156){
+  	  	        		background = "Yellow";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 156 && heartrate < 164){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 164 && heartrate < 167){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 167 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	
+  	  	        }
+				
+				if( userage >=36 && userage < 37){
+  	  	        	if(heartrate >= 115 && heartrate < 129){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 129 && heartrate < 145){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 145 && heartrate < 150){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 150 && heartrate < 155){
+  	  	        		background = "Yellow";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 155 && heartrate < 163){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 163 && heartrate < 166){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 166 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	
+  	  	        }
+				
+
+				if( userage >=37 && userage < 38){
+  	  	        	if(heartrate >= 110 && heartrate < 114){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 114 && heartrate < 128){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 128 && heartrate < 144){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 144 && heartrate < 149){
+  	  	        		background = "#32CD32";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 149 && heartrate < 154){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 154 && heartrate < 162){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 162 && heartrate < 165){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 165 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	
+  	  	        }
+				
+
+				if( userage >=38 && userage < 39){
+  	  	        	if(heartrate >= 110 && heartrate < 113){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 113 && heartrate < 127){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 127 && heartrate < 143){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 143 && heartrate < 148){
+  	  	        		background = "#32CD32";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 148 && heartrate < 153){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 153 && heartrate < 161){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 161 && heartrate < 164){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 164 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	
+  	  	        }
+				
+
+				if( userage >=39 && userage < 40){
+  	  	        	if(heartrate >= 110 && heartrate < 112){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 112 && heartrate < 126){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 126 && heartrate < 142){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 142 && heartrate < 147){
+  	  	        		background = "#32CD32";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 147 && heartrate < 152){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 152 && heartrate < 160){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 160 && heartrate < 163){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 163 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	
+  	  	        }
+
+
+  	  	        if( userage >=40 && userage < 41){
+  	  	        	if(heartrate >= 110 && heartrate < 112){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 112 && heartrate < 125){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 125 && heartrate < 141){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 141 && heartrate < 146){
+  	  	        		background = "#32CD32";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 146 && heartrate < 151){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 151 && heartrate < 159){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 159 && heartrate < 162){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 162 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	
+  	  	        }
+
+
+  	  	        if( userage >=41 && userage < 42){
+  	  	        	if(heartrate >= 0 && heartrate < 109){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 109 && heartrate < 110){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 110 && heartrate < 124){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 124 && heartrate < 140){
+  	  	        		background = "green";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 140 && heartrate < 145){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 145 && heartrate < 150){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 150 && heartrate < 158){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 158 && heartrate < 161){
+  	  	        		background = "#32CD32";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 161 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	
+  	  	        	
+  	  	        }
+
+  	  	        	if( userage >=42 && userage < 43){
+  	  	        	if(heartrate >= 0 && heartrate < 108){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 108 && heartrate < 109){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 109 && heartrate < 123){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 123 && heartrate < 139){
+  	  	        		background = "green";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 139 && heartrate < 144){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 144 && heartrate < 149){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 149 && heartrate < 157){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 157 && heartrate < 160){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 160 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}	  	        	
+  	  	        	
+  	  	        }
+
+  	  	        if( userage >=43 && userage < 44){
+  	  	        	if(heartrate >= 0 && heartrate < 107){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 107 && heartrate < 108){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 108 && heartrate < 122){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 122 && heartrate < 138){
+  	  	        		background = "green";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 138 && heartrate < 143){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 143 && heartrate < 148){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 148 && heartrate < 156){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 156 && heartrate < 159){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 159 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}	  	        	
+  	  	        	
+  	  	        }
+				
+				if( userage >=44 && userage < 45){
+  	  	        	if(heartrate >= 0 && heartrate < 106){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 106 && heartrate < 107){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 107 && heartrate < 121){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 121 && heartrate < 137){
+  	  	        		background = "green";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 137 && heartrate < 142){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 142 && heartrate < 147){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 147 && heartrate < 155){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 155 && heartrate < 158){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 158 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}	  	        	
+  	  	        	
+  	  	        }
+
+  	  	        if( userage >=45 && userage < 46){
+  	  	        	if(heartrate >= 0 && heartrate < 105){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 105 && heartrate < 106){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 106 && heartrate < 120){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 120 && heartrate < 136){
+  	  	        		background = "green";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 136 && heartrate < 141){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 141 && heartrate < 146){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 146 && heartrate < 154){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 154 && heartrate < 157){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 157 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}	  	        	
+  	  	        	
+  	  	        }
+				
+
+				if( userage >=46 && userage < 47){
+  	  	        	if(heartrate >= 0 && heartrate < 104){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 104 && heartrate < 106){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 106 && heartrate < 119){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 119 && heartrate < 135){
+  	  	        		background = "green";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 135 && heartrate < 140){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 140 && heartrate < 145){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 145 && heartrate < 153){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 153 && heartrate < 156){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 156 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}	  	        	
+  	  	        	
+  	  	        }		
+
+  	  	        if( userage >=47 && userage < 48){
+  	  	        	if(heartrate >= 0 && heartrate < 103){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 103 && heartrate < 105){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 106 && heartrate < 118){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 118 && heartrate < 134){
+  	  	        		background = "green";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 134 && heartrate < 139){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 140 && heartrate < 144){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 144 && heartrate < 152){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 152 && heartrate < 155){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 155 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	}	  	        	
+  	  	        	
+  	  	        }	
+
+  	  	        if( userage >=48 && userage < 49){
+  	  	        	if(heartrate >= 106 && heartrate < 117){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 117 && heartrate < 133){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 133 && heartrate < 138){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 138 && heartrate < 143){
+  	  	        		background = "Yellow";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 143 && heartrate < 151){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 151 && heartrate < 154){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 154 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	} 	  	    	
+  	  	        	
+  	  	        }		
+
+
+  	  	         if( userage >=49 && userage < 50){
+  	  	        	if(heartrate >= 106 && heartrate < 116){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 116 && heartrate < 132){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 132 && heartrate < 137){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 137 && heartrate < 142){
+  	  	        		background = "Yellow";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 142 && heartrate < 150){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 150 && heartrate < 153){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 153 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	} 	  	    	
+  	  	        	
+  	  	        }	
+
+  	  	        if( userage >=50 && userage < 51){
+  	  	        	if(heartrate >= 106 && heartrate < 115){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 115 && heartrate < 131){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 131 && heartrate < 136){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 136 && heartrate < 141){
+  	  	        		background = "Yellow";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 141 && heartrate < 149){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 149 && heartrate < 152){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 152 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	} 	  	    	
+  	  	        	
+  	  	        }										
+							if( userage >=51 && userage < 52){
+  	  	        	if(heartrate >= 106 && heartrate < 114){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 114 && heartrate < 130){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 130 && heartrate < 135){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 135 && heartrate < 140){
+  	  	        		background = "Yellow";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 140 && heartrate < 148){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 148 && heartrate < 151){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 151 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	} 	  	    	
+  	  	        	
+  	  	        }		
+						if( userage >=52 && userage < 53){
+  	  	        	if(heartrate >= 106 && heartrate < 113){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 113 && heartrate < 129){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 129 && heartrate < 134){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 134 && heartrate < 139){
+  	  	        		background = "Yellow";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 139 && heartrate < 147){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 147 && heartrate < 150){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 150 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	} 	  	    	
+  	  	        	
+  	  	        }					
+				
+				if( userage >=53 && userage < 54){
+  	  	        	if(heartrate >= 106 && heartrate < 112){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 112 && heartrate < 128){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 128 && heartrate < 133){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 133 && heartrate < 138){
+  	  	        		background = "Yellow";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 138 && heartrate < 146){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 146 && heartrate < 149){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 149 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	} 	  	    	
+  	  	        	
+  	  	        }					
+				
+
+				if( userage >=54 && userage < 55){
+  	  	        	if(heartrate >= 106 && heartrate < 111){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 111 && heartrate < 127){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 127 && heartrate < 132){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 132 && heartrate < 137){
+  	  	        		background = "Yellow";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 137 && heartrate < 145){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 145 && heartrate < 148){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 148 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	} 	  	    	
+  	  	        	
+  	  	        }				
+				
+				if( userage >=55 && userage < 56){
+  	  	        	if(heartrate >= 126 && heartrate < 131){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 131 && heartrate < 136){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 136 && heartrate < 144){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 144 && heartrate < 149){
+  	  	        		background = "#32CD32";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 149 && heartrate < 174){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 174 && heartrate < 179){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 179 && heartrate < 184){
+  	  	        		background = "Yellow";
+  	  	        	} 
+  	  	        	else if(heartrate >= 184 && heartrate < 189){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 189 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	} 		  	    	
+  	  	        	
+  	  	        }	
+
+  	  	        if( userage >=56 && userage < 57){
+  	  	        	if(heartrate >= 126 && heartrate < 130){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 130 && heartrate < 135){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 135 && heartrate < 143){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 143 && heartrate < 148){
+  	  	        		background = "#32CD32";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 148 && heartrate < 173){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 173 && heartrate < 178){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 178 && heartrate < 183){
+  	  	        		background = "Yellow";
+  	  	        	} 
+  	  	        	else if(heartrate >= 183 && heartrate < 188){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 188 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	} 		  	    	
+  	  	        	
+  	  	        }				
+				
+
+					if( userage >=57 && userage < 58){
+  	  	        	if(heartrate >= 126 && heartrate < 129){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 129 && heartrate < 134){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 134 && heartrate < 142){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 142 && heartrate < 147){
+  	  	        		background = "#32CD32";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 147 && heartrate < 172){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 172 && heartrate < 177){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 177 && heartrate < 182){
+  	  	        		background = "Yellow";
+  	  	        	} 
+  	  	        	else if(heartrate >= 182 && heartrate < 187){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 187 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	} 		  	    	
+  	  	        	
+  	  	        }	
+
+  	  	        if( userage >=58 && userage < 59){
+  	  	        	if(heartrate >= 126 && heartrate < 128){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 128 && heartrate < 133){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 133 && heartrate < 141){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 141 && heartrate < 146){
+  	  	        		background = "#32CD32";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 146 && heartrate < 171){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 171 && heartrate < 176){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 176 && heartrate < 181){
+  	  	        		background = "Yellow";
+  	  	        	} 
+  	  	        	else if(heartrate >= 181 && heartrate < 186){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 186 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	} 		  	    	
+  	  	        	
+  	  	        }	
+
+  	  	        if( userage >=59 && userage < 60){
+  	  	        	if(heartrate >= 127 && heartrate < 132){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 132 && heartrate < 140){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 140 && heartrate < 145){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 145 && heartrate < 170){
+  	  	        		background = "green";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 170 && heartrate < 175){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 175 && heartrate < 180){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 180 && heartrate < 185){
+  	  	        		background = "Orange";
+  	  	        	} 
+  	  	        	else if(heartrate >= 185 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}  	  	        	   	
+  	  	        	
+  	  	        }					
+				
+
+					if( userage >=60 && userage < 61){
+  	  	        	if(heartrate >= 127 && heartrate < 131){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 131 && heartrate < 139){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 139 && heartrate < 144){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 144 && heartrate < 169){
+  	  	        		background = "green";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 169 && heartrate < 174){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 174&& heartrate < 179){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 179 && heartrate < 184){
+  	  	        		background = "Orange";
+  	  	        	} 
+  	  	        	else if(heartrate >= 184 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}  	  	        	   	
+  	  	        	
+  	  	        }			
+				
+				if( userage >=61 && userage < 62){
+  	  	        	if(heartrate >= 127 && heartrate < 130){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 130 && heartrate < 138){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 138 && heartrate < 143){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 143&& heartrate < 168){
+  	  	        		background = "green";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 168&& heartrate < 173){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 173&& heartrate < 178){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 178 && heartrate < 183){
+  	  	        		background = "Orange";
+  	  	        	} 
+  	  	        	else if(heartrate >= 183 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}  	  	        	   	
+  	  	        	
+  	  	        }	
+
+  	  	        if( userage >=63 && userage < 64){
+  	  	        	if(heartrate >= 128 && heartrate < 136){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 136 && heartrate < 141){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 141 && heartrate < 166){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 166 && heartrate < 171){
+  	  	        		background = "#32CD32";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 171 && heartrate < 176){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 176&& heartrate < 181){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 181 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	} 
+  	  	        	
+  	  	        }	
+				
+  	  	        if( userage >=64 && userage < 65){
+  	  	        	if(heartrate >= 128 && heartrate < 135){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 135 && heartrate < 140){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 140 && heartrate < 165){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 165 && heartrate < 170){
+  	  	        		background = "#32CD32";
+  	  	        	}
+
+  	  	        	else if(heartrate >= 170 && heartrate < 175){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 175&& heartrate < 180){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 180 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}  	
+  	  	        }	
+				
+  	  	        if( userage >=65 && userage < 66){
+  	  	        	if(heartrate >= 128 && heartrate < 134){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 134 && heartrate < 139){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 139 && heartrate < 164){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 164 && heartrate < 169){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 169 && heartrate < 174){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 174 && heartrate < 179){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 179 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	} 
+  	  	        }
+
+
+  	  	        if( userage >=66 && userage < 67){
+  	  	        	if(heartrate >= 128 && heartrate < 133){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 133 && heartrate < 138){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 138 && heartrate < 163){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 163 && heartrate < 168){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 168 && heartrate < 173){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 173 && heartrate < 178){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 178 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	} 
+  	  	        }
+
+  	  	        if( userage >=67 && userage < 68){
+  	  	        	if(heartrate >= 128 && heartrate < 132){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 132 && heartrate < 137){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 137 && heartrate < 162){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 162 && heartrate < 167){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 167 && heartrate < 172){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 172 && heartrate < 177){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 177 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	} 
+  	  	        }
+				
+				if( userage >=68 && userage < 69){
+  	  	        	if(heartrate >= 128 && heartrate < 131){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 131 && heartrate < 136){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 136 && heartrate < 161){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 161 && heartrate < 166){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 166 && heartrate < 171){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 171 && heartrate < 176){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 176 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	} 
+  	  	        }
+
+  	  	        if( userage >=69 && userage < 70){
+  	  	        	if(heartrate >= 128 && heartrate < 130){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 130 && heartrate < 135){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 135 && heartrate < 160){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 160 && heartrate < 165){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 165 && heartrate < 170){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 170 && heartrate < 175){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 175 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	} 
+  	  	        }
+				
+				if( userage >=70 && userage < 71){
+  	  	        	if(heartrate >= 129 && heartrate < 134){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 134 && heartrate < 159){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 159 && heartrate < 164){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 164 && heartrate < 169){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 169 && heartrate < 174){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 174 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	
+  	  	        }
+
+  	  	        if( userage >=71 && userage < 72){
+  	  	        	if(heartrate >= 129 && heartrate < 133){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 133 && heartrate < 158){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 158 && heartrate < 163){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 163 && heartrate < 168){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 168 && heartrate < 173){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 173 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	
+  	  	        }
+				
+				if( userage >=72 && userage < 73){
+  	  	        	if(heartrate >= 129 && heartrate < 132){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 132 && heartrate < 157){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 157 && heartrate < 162){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 162 && heartrate < 167){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 167 && heartrate < 172){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 172 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	
+  	  	        }
+
+  	  	        if( userage >=73 && userage < 74){
+  	  	        	if(heartrate >= 129 && heartrate < 131){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 131 && heartrate < 156){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 156 && heartrate < 161){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 161 && heartrate < 166){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 168 && heartrate < 171){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 171 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	
+  	  	        }
+  	  	        if( userage >=75 && userage < 76){
+  	  	        	if(heartrate >= 130 && heartrate < 154){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 154 && heartrate < 159){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 159 && heartrate < 164){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 164 && heartrate < 169){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 169 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}  	  	        	    	
+  	  	        }
+  	  	        if( userage >=76 && userage < 77){
+  	  	        	if(heartrate >= 130 && heartrate < 153){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 153 && heartrate < 158){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 158 && heartrate < 163){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 163 && heartrate < 168){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 168 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}  	  	        	    	
+  	  	        }
+  	  	        if( userage >=77 && userage < 78){
+  	  	        	if(heartrate >= 130 && heartrate < 152){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 152 && heartrate < 157){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 157 && heartrate < 162){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 162 && heartrate < 167){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 167 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}  	  	        	    	
+  	  	        }
+				
+				if( userage >=78 && userage < 79){
+  	  	        	if(heartrate >= 130 && heartrate < 151){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 151 && heartrate < 156){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 156 && heartrate < 161){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 161 && heartrate < 166){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 166 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}  	  	        	    	
+  	  	        }
+				
+				if( userage >=79 && userage < 80){
+  	  	        	if(heartrate >= 130 && heartrate < 150){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 150 && heartrate < 155){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 155 && heartrate < 160){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 160 && heartrate < 165){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 165 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}  	  	        	    	
+  	  	        }
+				if( userage >=80 && userage < 81){
+  	  	        	if(heartrate >= 105 && heartrate < 109){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 109 && heartrate < 125){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 125 && heartrate < 126){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 127 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 130 && heartrate < 149){
+  	  	        		background = "green";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 149 && heartrate < 154){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 154 && heartrate < 159){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 159 && heartrate < 164){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 164 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}      	        	    	
+  	  	        }
+
+  	  	        if( userage >=81 && userage < 82){
+  	  	        	if(heartrate >= 105 && heartrate < 109){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 109 && heartrate < 124){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 124 && heartrate < 125){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 125 && heartrate < 126){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 126 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 130 && heartrate < 148){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 148 && heartrate < 153){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 153 && heartrate < 158){
+  	  	        		background = "Yellow";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 158 && heartrate < 163){
+  	  	        		background = "Orange";
+  	  	        	} 
+  	  	        	else if(heartrate >= 163 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}     	        	    	
+  	  	        }
+
+  	  	        if( userage >=82 && userage < 83){
+  	  	        	if(heartrate >= 105 && heartrate < 109){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 109 && heartrate < 123){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 123 && heartrate < 124){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 124 && heartrate < 125){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 125 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 130 && heartrate < 147){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 147 && heartrate < 152){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 152 && heartrate < 157){
+  	  	        		background = "Yellow";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 157 && heartrate < 162){
+  	  	        		background = "Orange";
+  	  	        	} 
+  	  	        	else if(heartrate >= 162 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}     	        	    	
+  	  	        }
+				
+				if( userage >=83 && userage < 84){
+  	  	        	if(heartrate >= 105 && heartrate < 108){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 108 && heartrate < 122){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 122 && heartrate < 123){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 123 && heartrate < 124){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 124 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 130 && heartrate < 146){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 146 && heartrate < 151){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 151 && heartrate < 156){
+  	  	        		background = "Yellow";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 156 && heartrate < 161){
+  	  	        		background = "Orange";
+  	  	        	} 
+  	  	        	else if(heartrate >= 161 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}     	        	    	
+  	  	        }
+
+  	  	        if( userage >=84 && userage < 85){
+  	  	        	if(heartrate >= 105 && heartrate < 108){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 108 && heartrate < 121){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 121 && heartrate < 122){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 122 && heartrate < 123){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 123 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 130 && heartrate < 145){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 145 && heartrate < 150){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 150 && heartrate < 155){
+  	  	        		background = "Yellow";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 155 && heartrate < 160){
+  	  	        		background = "Orange";
+  	  	        	} 
+  	  	        	else if(heartrate >= 160 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}     	        	    	
+  	  	        }
+				
+				 if( userage >=85 && userage < 86){
+  	  	        	if(heartrate >= 105 && heartrate < 108){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 108 && heartrate < 120){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 120 && heartrate < 121){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 121 && heartrate < 122){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 122 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 130 && heartrate < 144){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 144 && heartrate < 149){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 149 && heartrate < 154){
+  	  	        		background = "Yellow";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 154 && heartrate < 159){
+  	  	        		background = "Orange";
+  	  	        	} 
+  	  	        	else if(heartrate >= 159 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}     	        	    	
+  	  	        }
+				
+				if( userage >=86 && userage < 87){
+  	  	        	if(heartrate >= 105 && heartrate < 107){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 107 && heartrate < 119){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 119 && heartrate < 120){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 120 && heartrate < 121){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 121 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 130 && heartrate < 143){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 143 && heartrate < 148){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 148 && heartrate < 153){
+  	  	        		background = "Yellow";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 153 && heartrate < 158){
+  	  	        		background = "Orange";
+  	  	        	} 
+  	  	        	else if(heartrate >= 158 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}     	        	    	
+  	  	        }
+				
+				if( userage >=87 && userage < 88){
+  	  	        	if(heartrate >= 105 && heartrate < 107){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 107 && heartrate < 118){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 118 && heartrate < 119){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 119 && heartrate < 120){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 120 && heartrate < 128){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 130 && heartrate < 142){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 142 && heartrate < 147){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 147 && heartrate < 152){
+  	  	        		background = "Yellow";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 152 && heartrate < 157){
+  	  	        		background = "Orange";
+  	  	        	} 
+  	  	        	else if(heartrate >= 157 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}     	        	    	
+  	  	        }
+
+  	  	        if( userage >=88 && userage < 89){
+  	  	        	if(heartrate >= 105 && heartrate < 107){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 107 && heartrate < 117){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 117 && heartrate < 118){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 118 && heartrate < 119){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 119 && heartrate < 127){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 130 && heartrate < 141){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 141 && heartrate < 146){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 146 && heartrate < 151){
+  	  	        		background = "Yellow";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 151 && heartrate < 156){
+  	  	        		background = "Orange";
+  	  	        	} 
+  	  	        	else if(heartrate >= 156 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}     	        	    	
+  	  	        }
+
+  	  	        if( userage >=89 && userage < 90){
+  	  	        	if(heartrate >= 105 && heartrate < 106){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 106 && heartrate < 116){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 116 && heartrate < 117){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 117 && heartrate < 118){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 118 && heartrate < 126){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 130 && heartrate < 140){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 140 && heartrate < 145){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 145 && heartrate < 150){
+  	  	        		background = "Yellow";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 150 && heartrate < 155){
+  	  	        		background = "Orange";
+  	  	        	} 
+  	  	        	else if(heartrate >= 155 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}     	        	    	
+  	  	        }		
+  	  	         if( userage >=90 && userage < 91){
+  	  	        	if(heartrate >= 105 && heartrate < 106){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 106 && heartrate < 115){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 115 && heartrate < 116){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 116 && heartrate < 117){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 117 && heartrate < 125){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 130 && heartrate < 139){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 139 && heartrate < 144){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 144 && heartrate < 149){
+  	  	        		background = "Yellow";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 149 && heartrate < 154){
+  	  	        		background = "Orange";
+  	  	        	} 
+  	  	        	else if(heartrate >= 154 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}     	        	    	
+  	  	        }	
+						
+						if( userage >=41 && userage < 42){
+  	  	        	if(heartrate >= 0 && heartrate < 109){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 109 && heartrate < 110){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 110 && heartrate < 124){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 124 && heartrate < 140){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 140 && heartrate < 144){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 145 && heartrate < 150){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 150 && heartrate < 158){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 158 && heartrate < 161){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 161 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	} 
+  	  	        	    	        	    	
+  	  	        }				
+				
+
+						if( userage >=42 && userage < 43){
+  	  	        	if(heartrate >= 0 && heartrate < 108){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 108 && heartrate < 109){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 109 && heartrate < 123){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 123 && heartrate < 139){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 139 && heartrate < 143){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 143 && heartrate < 149){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 149 && heartrate < 157){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 157 && heartrate < 160){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 160 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	} 
+  	  	        	    	        	    	
+  	  	        }	
+
+  	  	        if( userage >=43 && userage < 44){
+  	  	        	if(heartrate >= 0 && heartrate < 107){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 107 && heartrate < 108){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 108 && heartrate < 122){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 122 && heartrate < 138){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 138 && heartrate < 143){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 143 && heartrate < 148){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 148 && heartrate < 156){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 156 && heartrate < 159){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 159 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	} 
+  	  	        	    	        	    	
+  	  	        }				
+				
+				 if( userage >=44 && userage < 45){
+  	  	        	if(heartrate >= 0 && heartrate < 106){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 106 && heartrate < 107){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 107 && heartrate < 121){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 121 && heartrate < 137){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 137 && heartrate < 142){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 142 && heartrate < 147){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 147 && heartrate < 155){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 155 && heartrate < 158){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 158 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	} 
+  	  	        	    	        	    	
+  	  	        }	
+  	  	        if( userage >=45 && userage < 46){
+  	  	        	if(heartrate >= 0 && heartrate < 105){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 105 && heartrate < 106){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 106 && heartrate < 120){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 120 && heartrate < 136){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 136 && heartrate < 141){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 141 && heartrate < 146){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 146 && heartrate < 154){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 154 && heartrate < 157){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 157 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	} 
+  	  	        	    	        	    	
+  	  	        }		
+				
+				if( userage >=46 && userage < 47){
+  	  	        	if(heartrate >= 0 && heartrate < 104){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 104 && heartrate < 105){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 105 && heartrate < 119){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 119 && heartrate < 135){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 135 && heartrate < 140){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 140 && heartrate < 145){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 145 && heartrate < 153){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 153 && heartrate < 156){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 156 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	} 
+  	  	        	    	        	    	
+  	  	        }	
+  	  	        if( userage >=47 && userage < 48){
+  	  	        	if(heartrate >= 0 && heartrate < 103){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 103 && heartrate < 104){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 104 && heartrate < 118){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 118 && heartrate < 134){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 134 && heartrate < 139){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 139 && heartrate < 144){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 144 && heartrate < 152){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 152 && heartrate < 155){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 155 && heartrate < 179){
+  	  	        		background = "green";
+  	  	        	} 
+  	  	        	    	        	    	
+  	  	        }	
+  	  	        if( userage >=91 && userage < 92){
+  	  	        	if(heartrate >= 0 && heartrate < 100){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 100 && heartrate < 104){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 104 && heartrate < 106){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 106 && heartrate < 114){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 114 && heartrate < 115){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 115 && heartrate < 116){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 116 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 130 && heartrate < 138){
+  	  	        		background = "green";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 138 && heartrate < 143){
+  	  	        		background = "#32CD32";
+  	  	        	} 
+  	  	        	else if(heartrate >= 143 && heartrate < 148){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 148 && heartrate < 153){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 153 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	} 
+  	  	        	    	        	    	
+  	  	        }	
+  	  	        if( userage >=92 && userage < 93){
+  	  	        	if(heartrate >= 0 && heartrate < 99){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 99 && heartrate < 103){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 103 && heartrate < 105){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 105 && heartrate < 113){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 113 && heartrate < 114){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 114 && heartrate < 115){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 115 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 130 && heartrate < 137){
+  	  	        		background = "green";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 137 && heartrate < 142){
+  	  	        		background = "#32CD32";
+  	  	        	} 
+  	  	        	else if(heartrate >= 142 && heartrate < 147){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 147 && heartrate < 152){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 152 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	} 
+  	  	        	    	        	    	
+  	  	        }	
+				
+				if( userage >=93 && userage < 94){
+  	  	        	if(heartrate >= 0 && heartrate < 98){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 98 && heartrate < 102){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 102 && heartrate < 104){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 104 && heartrate < 112){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 112 && heartrate < 113){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 113 && heartrate < 114){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 114 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 130 && heartrate < 136){
+  	  	        		background = "green";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 136 && heartrate < 141){
+  	  	        		background = "#32CD32";
+  	  	        	} 
+  	  	        	else if(heartrate >= 141 && heartrate < 146){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 146 && heartrate < 151){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 151 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	} 
+  	  	        	    	        	    	
+  	  	        }	
+
+			
+				if( userage >=94 && userage < 95){
+  	  	        	if(heartrate >= 0 && heartrate < 97){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 97 && heartrate < 101){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 101 && heartrate < 103){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 103 && heartrate < 111){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 111 && heartrate < 112){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 112 && heartrate < 113){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 113 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 130 && heartrate < 135){
+  	  	        		background = "green";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 135 && heartrate < 140){
+  	  	        		background = "#32CD32";
+  	  	        	} 
+  	  	        	else if(heartrate >= 140 && heartrate < 145){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 145 && heartrate < 150){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 150 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	} 
+  	  	        	    	        	    	
+  	  	        }	
+
+  	  	        if( userage >=95 && userage < 96){
+  	  	        	if(heartrate >= 0 && heartrate < 96){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 96 && heartrate < 100){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 100 && heartrate < 102){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 102 && heartrate < 110){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 110 && heartrate < 111){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 111 && heartrate < 112){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 112 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 130 && heartrate < 134){
+  	  	        		background = "green";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 134 && heartrate < 139){
+  	  	        		background = "#32CD32";
+  	  	        	} 
+  	  	        	else if(heartrate >= 139 && heartrate < 144){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 144 && heartrate < 149){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 149 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	} 
+  	  	        	    	        	    	
+  	  	        }	
+				
+				if( userage >=96 && userage < 97){
+  	  	        	if(heartrate >= 0 && heartrate < 95){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 95 && heartrate < 99){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 99 && heartrate < 101){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 101 && heartrate < 109){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 109 && heartrate < 110){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 110 && heartrate < 111){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 111 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 130 && heartrate < 133){
+  	  	        		background = "green";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 133 && heartrate < 138){
+  	  	        		background = "#32CD32";
+  	  	        	} 
+  	  	        	else if(heartrate >= 138 && heartrate < 143){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 143 && heartrate < 148){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 148 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	} 
+  	  	        	    	        	    	
+  	  	        }	
+				
+				if( userage >=97 && userage < 98){
+  	  	        	if(heartrate >= 0 && heartrate < 94){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 94 && heartrate < 98){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 98 && heartrate < 100){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 100 && heartrate < 108){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 108 && heartrate < 109){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 109 && heartrate < 110){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 110 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 130 && heartrate < 132){
+  	  	        		background = "green";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 132 && heartrate < 137){
+  	  	        		background = "#32CD32";
+  	  	        	} 
+  	  	        	else if(heartrate >= 137 && heartrate < 142){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 142 && heartrate < 147){
+  	  	        		background = "Orange";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 147 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	} 
+  	  	        	    	        	    	
+  	  	        }	
+
+  	  	        if( userage >=98 && userage < 99){
+  	  	        	if(heartrate >= 0 && heartrate < 93){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 93 && heartrate < 97){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 97 && heartrate < 99){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 99 && heartrate < 107){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 107 && heartrate < 108){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 108 && heartrate < 109){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 109 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 131 && heartrate < 136){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 136 && heartrate < 141){
+  	  	        		background = "Yellow";
+  	  	        	} 
+  	  	        	else if(heartrate >= 141 && heartrate < 146){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 146 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}  	
+  	  	        	
+  	  	        	    	        	    	
+  	  	        }	
+				
+				if( userage >=99 && userage < 100){
+  	  	        	if(heartrate >= 0 && heartrate < 92){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 92 && heartrate < 96){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 96 && heartrate < 98){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 98 && heartrate < 106){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 106 && heartrate < 107){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 107 && heartrate < 108){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 108 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 131 && heartrate < 135){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 135 && heartrate < 140){
+  	  	        		background = "Yellow";
+  	  	        	} 
+  	  	        	else if(heartrate >= 140 && heartrate < 145){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 145 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}  	
+  	  	        	
+  	  	        	    	        	    	
+  	  	        }	
+  	  	        if( userage >=100 && userage < 101){
+  	  	        	if(heartrate >= 0 && heartrate < 91){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 91 && heartrate < 95){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 95 && heartrate < 97){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 97 && heartrate < 105){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 105 && heartrate < 106){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 106 && heartrate < 107){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 107 && heartrate < 129){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 131 && heartrate < 134){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 134 && heartrate < 139){
+  	  	        		background = "Yellow";
+  	  	        	} 
+  	  	        	else if(heartrate >= 139 && heartrate < 144){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 144 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}  	
+  	  	        	
+  	  	        	    	        	    	
+  	  	        }	
+				
+				 if( userage >=100 && userage < 101){
+  	  	        	if(heartrate >= 0 && heartrate < 90){
+  	  	        		background = "Red";
+  	  	        	}
+  	  	        	else if(heartrate >= 90 && heartrate < 94){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 94 && heartrate < 97){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 97 && heartrate < 104){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        	else if(heartrate >= 104 && heartrate < 105){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 105 && heartrate < 106){
+  	  	        		background = "Yellow";
+  	  	        	}
+  	  	        	else if(heartrate >= 106 && heartrate < 128){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 128 && heartrate < 129){
+  	  	        		background = "#32CD32";
+  	  	        	}  	
+  	  	        	else if(heartrate >= 129 && heartrate < 130){
+  	  	        		background = "green";
+  	  	        	} 
+  	  	        	else if(heartrate >= 130 && heartrate < 133){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        	else if(heartrate >= 133 && heartrate < 138){
+  	  	        		background = "Yellow";
+  	  	        	} 
+  	  	        	else if(heartrate >= 138 && heartrate < 143){
+  	  	        		background = "Orange";
+  	  	        	}
+  	  	        	else if(heartrate >= 143 && heartrate < 200){
+  	  	        		background = "Red";
+  	  	        	}   	  	        	
+  	  	        	    	        	    	
+  	  	        }	
+				
+				if( userage >=74 && userage < 101){
+  	  	        	if(heartrate >= 129 && heartrate < 130){
+  	  	        		background = "#32CD32";
+  	  	        	}
+  	  	        }
+				
+				if( userage >=98 && userage < 101){
+  	  	        	if(heartrate >= 130 && heartrate < 131){
+  	  	        		background = "green";
+  	  	        	}
+  	  	        }				
+  	  	 }
+  	  
+       return background;
   	}
 
-	onSubmitDate2(event){
-    event.preventDefault();
-    this.setState({
-      dateRange2:!this.state.dateRange2,
-      fetching_ql2:true,
-
-    },()=>{
-         let custom_ranges = [];
-        if(this.state.cr1_start_date && this.state.cr1_end_date){
-            custom_ranges.push(this.state.cr1_start_date);
-            custom_ranges.push(this.state.cr1_end_date);
-        }
-         if(this.state.cr3_start_date && this.state.cr3_end_date){
-            custom_ranges.push(this.state.cr3_start_date);
-            custom_ranges.push(this.state.cr3_end_date);
-        }
-
-        custom_ranges.push(this.state.cr2_start_date);
-        custom_ranges.push(this.state.cr2_end_date);
-      let crange1 = this.state.cr2_start_date + " " + "to" + " " + this.state.cr2_end_date 
-      let selected_range = {
-            range:crange1,
-            duration:this.headerDates(crange1),
-            caption:""
-       }
-
-      fetchProgress(this.successProgress,
-                    this.errorProgress,
-                    this.state.selectedDate,custom_ranges,
-                    selected_range);
-      fetchUserRank(
-            this.successRank,
-            this.errorProgress,
-            this.state.selectedDate,custom_ranges,
-            selected_range
-        );
-      // let date = this.state.cr2_start_date + " " + "to" + " " + this.state.cr2_end_date;
-      // let c_date = this.headerDates(date);
-      
-      // this.reanderAllHrr(date,c_date,'');
-    
-
-    });
-  }
-
-   strToSecond(value){
-    	let time = value.split(':');
-    	let hours = parseInt(time[0])*3600;
-    	let min = parseInt(time[1])*60;
-    	let s_time = hours + min;
-    	return s_time;
-	}
- onSubmitDate3(event){
-    event.preventDefault();
-    this.setState({
-      dateRange3:!this.state.dateRange3,
-      fetching_ql3:true,
-    },()=>{
-         let custom_ranges = [];
-         if(this.state.cr1_start_date && this.state.cr1_end_date){
-            custom_ranges.push(this.state.cr1_start_date);
-            custom_ranges.push(this.state.cr1_end_date);
-        }
-        if(this.state.cr2_start_date && this.state.cr2_end_date){
-            custom_ranges.push(this.state.cr2_start_date);
-            custom_ranges.push(this.state.cr2_end_date);
-        }
-        custom_ranges.push(this.state.cr3_start_date);
-        custom_ranges.push(this.state.cr3_end_date);
-      let crange1 = this.state.cr3_start_date + " " + "to" + " " + this.state.cr3_end_date 
-      let selected_range = {
-            range:crange1,
-            duration:this.headerDates(crange1),
-            caption:""
-       }
-
-     fetchProgress(this.successProgress,
-                    this.errorProgress,
-                    this.state.selectedDate,custom_ranges,
-                    selected_range);
-      fetchUserRank(
-            this.successRank,
-            this.errorProgress,
-            this.state.selectedDate,custom_ranges,
-            selected_range
-        );
-  
-    });
-  }
-
-	onSubmitDate1(event){
-    event.preventDefault();
-    this.setState({
-      dateRange1:!this.state.dateRange1,
-      fetching_ql1:true,
-
-    },()=>{
-        let custom_ranges = [];
-        if(this.state.cr2_start_date && this.state.cr2_end_date){
-            custom_ranges.push(this.state.cr2_start_date);
-            custom_ranges.push(this.state.cr2_end_date);
-        }
-         if(this.state.cr3_start_date && this.state.cr3_end_date){
-            custom_ranges.push(this.state.cr3_start_date);
-            custom_ranges.push(this.state.cr3_end_date);
-        }
-        custom_ranges.push(this.state.cr1_start_date);
-        custom_ranges.push(this.state.cr1_end_date);
-
-      let crange1 = this.state.cr1_start_date + " " + "to" + " " + this.state.cr1_end_date 
-      let selected_range = {
-            range:crange1,
-            duration:this.headerDates(crange1),
-            caption:""
-       }
-      fetchProgress(this.successProgress,
-                    this.errorProgress,
-                    this.state.selectedDate,custom_ranges,
-                    selected_range);
-      fetchUserRank(
-            this.successRank,
-            this.errorProgress,
-            this.state.selectedDate,custom_ranges,
-            selected_range
-        );
-      // 
-      // let c_date = this.headerDates(date);
-      
-      // this.reanderAllHrr(date,c_date,'');
-   
-    });
-  }
-	toggleDropdown() {
-	    this.setState({
-      		dropdownOpen: !this.state.dropdownOpen
-	    });
+	aerobicTimeZone(value,durationdate){
+     let aerobicPrcnt = this.aaExercisestats(this.renderValue(value.prcnt_aerobic_duration,durationdate));
+     let score = this.aaExercisestats(this.renderValue(value.hr_aerobic_duration_hour_min,durationdate));
+     let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_exercise_heart_rate,durationdate));
+     if( score == "No workout" && aerobicPrcnt == "No workout" )
+     return(
+     		
+			<Card  className = "card_style_a" style={{backgroundColor:''}}>
+			<CardBody>
+			<CardTitle className = "header_style">Time in Aerobic Zone (102-137)  
+			</CardTitle> 
+			<CardText className = "value_style">{score}{' '}{'('+aerobicPrcnt+')'}</CardText>
+			</CardBody>
+			</Card>  
+			    
+         );
+      else{
+      	return(
+      		
+      		<Card  className = "card_style_a" >
+			<CardBody style={{backgroundColor:avgheartratecolor}}>
+			<CardTitle className = "header_style">Time in Aerobic Zone (102-137)  
+			</CardTitle> 
+			<CardText className = "value_style">{score}{' '}{'('+aerobicPrcnt+'%'+')'}</CardText>
+			</CardBody>
+			</Card>
+	
+      	);
+      }        	
 	}
 
-	createExcelPrintURL(){
-    	// code
-	    let custom_ranges = [];
-	    let selected_date = moment(this.state.selectedDate).format("YYYY-MM-DD");
-	    if(this.state.cr1_start_date && this.state.cr1_end_date){
-	        custom_ranges.push(this.state.cr1_start_date);
-	        custom_ranges.push(this.state.cr1_end_date);
-	    }
-
-	    if(this.state.cr2_start_date && this.state.cr2_end_date){
-	        custom_ranges.push(this.state.cr2_start_date);
-	        custom_ranges.push(this.state.cr2_end_date);
-	    }
-	     if(this.state.cr3_start_date && this.state.cr3_end_date){
-	        custom_ranges.push(this.state.cr3_start_date);
-	        custom_ranges.push(this.state.cr3_end_date);
-	    }
-	    custom_ranges = (custom_ranges && custom_ranges.length) ? custom_ranges.toString():'';
-	    let excelURL = `progress/print/progress/excel?date=${selected_date}&&custom_ranges=${custom_ranges}`;
-	    return excelURL;
-	}
-	handleChange(event){
-      	const target = event.target;
-      	const value = target.value;
-      	const name = target.name;
-      	this.setState({
-        	[name]: value
-      	});
-    }
-
-	toggleDate1(){
-	    this.setState({
-	      dateRange1:!this.state.dateRange1
-	    });
-   	}
- 	toggleDate2(){
-	    this.setState({
-	      dateRange2:!this.state.dateRange2
-	    });
-   	}
-    toggleDate3(){
-	    this.setState({
-	      dateRange3:!this.state.dateRange3
-	    });
-   	}
-    toggleDate4(){
-        this.setState({
-          dateRange4:!this.state.dateRange4
-        });
-    }
-	headerDates(value){
-   	   let str = value;
-       let d = str.split(" ");
-       let d1 = d[0];
-       let date1 =moment(d1).format('MMM DD, YYYY');
-       let d2 = d[2];
-       let date2 =moment(d2).format('MMM DD, YYYY');
-       let date = date1 + ' to ' + date2;
-       return date;  
-	}
-	getInitialDur(){
-		 let paDurationInitialState = {
- 			"week":"-",
-            "yesterday":"-",
-            "month":"-",
-           "custom_range":"-",
-            "today":"-", 
-            "year":"-"
-       };
-       return paDurationInitialState;
-	}
-	successMovementData(data){
-		if(!_.isEmpty(data.data)){
-			this.setState({
-		  		exercise_steps:data.data.exercise_steps,
-				mcs_score:data.data.mcs_score,
-				non_exercise_steps:data.data.non_exercise_steps,
-				steps_this_hour:data.data.steps_this_hour,
-				total_steps:data.data.total_steps,
-			});
-		}else{
-			this.setState({
-		  		exercise_steps:null,
-				mcs_score:null,
-				non_exercise_steps:null,
-				steps_this_hour:null,
-				total_steps:null,
-			});
-		}
-  	}
-
-  	errorMovementData(error){
-		console.log(error.message);
-    }
-    successLastSync(data){
-    	/* Getting Wearable Device Last Sync date and time*/
-    	let last_synced;
-    	if(_.isEmpty(data.data))
-    		last_synced = null
-    	else
-    		 last_synced = data.data.last_synced;
-    	this.setState({
-    		last_synced:last_synced,
-    	})
-    }
-    errorquick(error){
-		console.log(error.message);
-	}
-	 renderLastSync(value){
-	    let time;
-	    var sync = "";
-	    if(value){
-	      	time = moment(value).format("MMM DD, YYYY @ hh:mm a");
-	      	sync = <div style={{fontSize:"15px",fontWeight:"bold",fontFamily:'Proxima-Nova',color:"black"}}>Wearable Device Last Synced on{time}</div>;
-	    }
-	    return sync;
-	}
-	renderAddDate(){
-		/*It is forward arrow button for the calender getting the next day date*/
-		var today = this.state.selectedDate;
-		var tomorrow = moment(today).add(1, 'days');
-		this.setState({
-			selectedDate:tomorrow.toDate()
-		},()=>{
-			fetchMovementData(this.successMovementData,this.errorMovementData,this.state.selectedDate);
-		});
-	}
-	renderRemoveDate(){
-		/*It is backward arrow button for the calender getting the last day date*/
-		var today = this.state.selectedDate;
-		var tomorrow = moment(today).subtract(1, 'days');
-		this.setState({
-			selectedDate:tomorrow.toDate()
-		},()=>{
-			fetchMovementData(this.successMovementData,this.errorMovementData,this.state.selectedDate);
-		});
-	}
-   processDate(selectedDate){ 
-	    this.setState({
-	      fetching_ql4:true,
-	      selectedDate: selectedDate,
-	      calendarOpen:!this.state.calendarOpen,
-	      selected_range:"today",                              
-	    },()=>{
-	      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
-	      fetchUserRank(this.successRank,this.errorProgress,this.state.selectedDate);
-	    });
-  	}
-	renderCommaInSteps(value){
-		/* Adding comma (,) to steps when we get steps greater then 999
-		 this function will work and will add (,)*/
-		if(value){
-			value += '';
-	     	var x = value.split('.');
-	    	var x1 = x[0];
-	        var x2 = x.length > 1 ? '.' + x[1] : '';
-	        var rgx = /(\d+)(\d{3})/;
-	        while (rgx.test(x1)) {
-	        	x1 = x1.replace(rgx, '$1' + ',' + '$2');
-	        }
-	        value = x1+x2;
-    	}
-    	else if(value == 0){
-        	//value = "0";
-        }
-        else{
-        	//value = "No Data Yet"
-        }
-        return value;
-	}
-	renderHourStepsColor(score){
-		/* adding background color to card depends upon their steps ranges*/
-		let background = "";
-		let color = "";
-		let hr_background = "";
-		if(score){
-	            if(score >= 300){
-                	 background = "green";
-                	 color = "white";
-                	 hr_background = "white" 
-	            }
-	            else if(score >= 0 && score < 300){
-	            	 background = "#FF0101";
-	            	 color = "black";
-	            	 hr_background = "#e5e5e5" 
-	            }
-		}
-        else{
-        	//score = "";
-        	background = "white";
-        	color = "#5e5e5e";
-        	hr_background = "#e5e5e5" 
-        }
-
-		let score1 = this.renderCommaInSteps(score);
-		var model = <Card className = "card_style"
-						 id = "my-card"
-						 style = {{background:background, color:color}}>
-					        <CardBody>
-					          	<CardTitle className = "header_style">{/*Steps This Hour*/}</CardTitle>
-					          	<hr className = "hr_style"
-					          		id = "hr-style" 
-					          		style = {{background:hr_background}}/>
-					          	<CardText className = "value_style">{score1}</CardText>
-					        </CardBody>
-					    </Card>
-		return model;
-	}
-	renderHourNonExerciseStepsColor(score){
-		/* adding background color to card depends upon their Non-Exercise steps ranges*/
-		let background = "";
-		let color = "";
-		let hr_background = "";
-		if(score){
-	            if(score >= 10000){
-	           		background = 'green';
-	               	color = 'white';
-	               	hr_background = 'white';
-	            }
-	            else if(score >= 7500 && score < 10000){
-	                background = '#32CD32';
-	                color = 'white';
-	                hr_background = 'white';
-	            }
-	            else if(score >= 5000 && score < 7500){
-	                background = '#FFFF01';
-	                color = 'black';
-	                hr_background = 'black';
-	            }
-	            else if(score >= 3500 && score < 5000){
-	                background = '#E26B0A';
-	                color = 'black';
-	                hr_background = 'black';
-	            }
-	            else if(score >= 0 && score < 3500){
-	                background = '#FF0101';
-	                color = 'black';
-	                hr_background = 'black';
-	            }
-        }
-       else{
-	        	//score = "";
-	            background = 'white';
-	            color = '#5e5e5e';
-	            hr_background = '#e5e5e5';
-        }
-		let score1 = this.renderCommaInSteps(score);
-		var model = <Card className = "card_style"
-						 id = "my-card"
-						 style = {{background:background, color:color}}>
-					        <CardBody>
-					          	<CardTitle className = "header_style">{/*Today's Non Exercise Steps*/}</CardTitle>
-					          	<hr className = "hr_style"
-					          		id = "hr-style" 
-					          		style = {{background:hr_background}}/>
-					          	<CardText className = "value_style">{score1}</CardText>
-					        </CardBody>
-					    </Card>
-		return model;
-	}
-	renderMcsColors(score){
-		/* adding background color to card depends upon their Movement Consistency Score ranges*/
-		let background = "";
-		let color = "";
-		let hr_background = "";
-		if(score || score == 0){
-		var score = parseFloat(score); 
-	            if(score <= "4.5"){
-	               	background = 'green';
-	               	color = 'white';
-	               	hr_background = 'white';
-	            }
-	            else if(score > "4.5" && score <= "6"){
-	                background = '#32CD32';
-	                color = 'white';
-	                hr_background = 'white';
-	            }
-	            else if(score > "6" && score <= "7"){
-	                background = '#FFFF01';
-	                color = 'black';
-	                hr_background = 'black';
-	            }
-	            else if(score > "7" && score <= "10"){
-	                background = '#E26B0A';
-	                color = 'black';
-	                hr_background = 'black';
-	            }
-	            else if(score > "10"){
-	                background = '#FF0101';
-	                color = 'black';
-	                hr_background = 'black';
-	            }
-        	
+	anerobicTimeZone(value,durationdate){
+		let score = this.aaExercisestats(this.renderValue(value.hr_anaerobic_duration_hour_min,durationdate));
+		let anerobicPrcnt = this.aaExercisestats(this.renderValue(value.prcnt_anaerobic_duration,durationdate));
+        let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_exercise_heart_rate,durationdate));
+        if( score == "No workout" && anerobicPrcnt == "No workout"){
+			return (
+				
+			<Card className = "card_style_b">
+			<CardBody>
+			<CardTitle className = "header_style">Time in Anaerobic Zone (138 or above)</CardTitle>
+			<CardText className = "value_style">{score}{' '}{'('+anerobicPrcnt+')'}</CardText>
+			</CardBody>
+			</Card>
+		
+		   );
 		}
 		else{
-				//score = " "
-	            background = 'white';
-	            color = '#5e5e5e';
-	            hr_background = '#E5E5E5';
-        }
-		var model = <Card className = "card_style" 
-							id = "my-card-mcs"
-							 style = {{background:background, color:color}}>
-				        	<CardBody>
-				          		<CardTitle className = "header_style">{/*Today’s Movement Consistency Score (MCS)*/}</CardTitle>
-				          		<hr className = "hr_style" 
-				          			id = "hr-style-mcs"
-				          			style = {{background:hr_background}}/>
-				          		<CardText className = "value_style">{score}
-				          	    <Link to={`/mcs_dashboard?date=${moment(this.state.selectedDate).format('YYYY-MM-DD')}`}>
-                                   <span id="lbfontawesome">
-			                           <FontAwesome
-			                    	     className = "fantawesome_style"
-			                             name = "external-link"
-			                             size = "1x"
-			                           />
-			                        </span> 
-			                    </Link> 
-				          		</CardText>
-				        	</CardBody>
-			      		</Card>
-		return model;
-	}
-	toggleCalendar(){
-		//Toggle of calander icon.
-	    this.setState({
-	      calendarOpen:!this.state.calendarOpen
-	    });
-    }
-
-    
-
-    componentDidMount(){
-    	this.setState({
-         fetching_ql4:true,     
-       },()=>{
-       	fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
-       	fetchUserRank(this.successRank,this.errorProgress,this.state.selectedDate,true);
-       });
+		   return (
+		   	
+			<Card className = "card_style_b">
+			<CardBody style={{backgroundColor:avgheartratecolor}}>
+			<CardTitle className = "header_style">Time in Anaerobic Zone (138 or above)</CardTitle>
+			<CardText className = "value_style">{score}{' '}{'('+anerobicPrcnt+'%'+')'}</CardText>
+			</CardBody>
+			</Card>
+			
+		   );	
+		}     
 	}
 
-	successRank(data,renderAfterSuccess=undefined){
-	    this.setState({
-	        fetching_ql1:false,
-            fetching_ql2:false,
-            fetching_ql3:false,
-            fetching_ql4:false,
-	        rankData:data.data,
-	      //  duration_date:data.data.duration_date,
-	    },()=>{
-            if(renderAfterSuccess){
-                this.reanderAllHrr(
-                    renderAfterSuccess.range,
-                    renderAfterSuccess.duration,
-                    renderAfterSuccess.caption
-                );
-            }
-        });
-  	}
+	belowAerobicTimeZone(value,durationdate){
+		let score = this.aaExercisestats(this.renderValue(value.hr_below_aerobic_duration_hour_min,durationdate));
+		let belowAerobicPrcnt = this.aaExercisestats(this.renderValue(value.prcnt_below_aerobic_duration,durationdate));
+        let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_exercise_heart_rate,durationdate));
+        if( score == "No workout" && belowAerobicPrcnt == "No workout"){
+			return(
+				
+				<Card className = "card_style_c">
+				<CardBody>
+				<CardTitle className = "header_style">Time in below Aerobic Zone (below 102)</CardTitle>
+				<CardText className = "value_style">{score}{' '}{'('+belowAerobicPrcnt+')'}</CardText>
+				</CardBody>
+				</Card>
+				
+			  ); 
+			}
+			else{
+			  return(
+			  	
+				<Card className = "card_style_c">
+				<CardBody style={{backgroundColor:avgheartratecolor}}>
+				<CardTitle className = "header_style">Time in below Aerobic Zone (below 102)</CardTitle>
+				<CardText className = "value_style">{score}{' '}{'('+belowAerobicPrcnt+'%'+')'}</CardText>
+				</CardBody>
+				</Card>
+				
+			  );
+			}		                         
+	}
 
+	heartRateNotRecordedTimeZone(value,durationdate){
+		let score = this.aaExercisestats(this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate));
+		let hrr_not_recorded_prcnt = this.aaExercisestats(this.renderValue(value.prcnt_hr_not_recorded_duration,durationdate));
+        let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_exercise_heart_rate,durationdate));
+        if( score == "No workout" && hrr_not_recorded_prcnt == "No workout"){
+			return (
+				
+				<Card className = "card_style_d">
+				<CardBody>
+				<CardTitle className = "header_style">Heart Rate Not Reorded</CardTitle>
+				<CardText className = "value_style">{score}{' '}{'('+hrr_not_recorded_prcnt+')'}</CardText>
+				</CardBody>
+				</Card>
+				
+           );
+         } 
+         else{
+         	return (
+         		
+				<Card className = "card_style_d">
+				<CardBody>
+				<CardTitle className = "header_style">Heart Rate Not Reorded</CardTitle>
+				<CardText className = "value_style">{score}{' '}{'('+hrr_not_recorded_prcnt+'%'+')'}</CardText>
+				</CardBody>
+				</Card>
+				);
+         }
+	}
 
-	successProgress(data,renderAfterSuccess=undefined){
-		let date =moment(data.data.duration_date["today"]).format("MMM DD, YYYY"); 
-	    this.setState({
-	    	fetching_ql1:false,
-            fetching_ql2:false,
-            fetching_ql3:false,
-            fetching_ql4:false,
-	        report_date:data.data.report_date,
-	        summary:data.data.summary,
-	        duration_date:data.data.duration_date,
-	        capt:"Today",
-	        date:date,
+    totalworkoutdurationTimeZone(value,durationdate){
+		let score = this.aaExercisestats(this.renderValue(value.total_workout_duration_over_range,durationdate)); 
+        if(isNaN(score)){
+		return (
+			
+			<Card className = "card_style_e">
+			<CardBody>
+			<CardTitle className = "header_style_e">Total Work Duration </CardTitle>
+			<CardText className = "value_style_e">{score}</CardText>
+			</CardBody>
+			</Card>   
+			           
+         ); 
+       }
+	}
 
-	    },()=>{
-            if(renderAfterSuccess){
-                this.reanderAllHrr(
-                    renderAfterSuccess.range,
-                    renderAfterSuccess.duration,
-                    renderAfterSuccess.caption
-                );
-            }
-        });
-  	}
+	 aaExercisestats(value){
+	 	if(value == undefined || value == 0 || value == "" || value == "00:00"){
+        	value = "No workout"
+      	}
+      	else{
+        	value = value
+      	}
+    	return value;
+	 }
 
-	errorProgress(error){
-       console.log(error.message);
-       this.setState({
-       		fetching_ql1:false,
-            fetching_ql2:false,
-            fetching_ql3:false,
-            fetching_ql4:false,
-       })
-    }
-	
 	render(){
 		return(
 			<div>
 				<NavbarMenu title={"AA Dashboard"} />
+				
+				{this.state.active_view &&
+				<div className="nav3" id='bottom-nav'>
+                           <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
+                           <Navbar light toggleable className="navbar nav1 user_nav">
+                              <NavbarToggler className="navbar-toggler hidden-sm-up user_clndr" onClick={this.toggle1}>
+                                    <div className="toggler">
+                                    <FontAwesome 
+                                          name = "bars"
+                                          size = "1x"
+                                    />
+                                    </div>
+                               </NavbarToggler>
+                    <span id="navlink" onClick={this.toggleCalendar} id="gd_progress">
+                                    <FontAwesome
+                                        style = {{color:"white",marginLeft:"20px"}}
+                                        name = "calendar"
+                                        size = "1x"
+
+                                    />
+
+                                <span style={{marginLeft:"20px",color:"white",paddingTop:"7px"}}>
+                                            {moment(this.state.selectedDate).format('MMM D, YYYY ')}
+                                    </span> 
+
+                                </span> 
+                                 <span  onClick={this.toggleDate4} id="daterange4" className= "date_range1" style={{color:"white"}}>
+                                        <span className="date_range_btn">
+                                            <Button
+                                                className="daterange-btn btn"                            
+                                                id="daterange"
+                                    onClick={this.toggleDate4} >Custom Date Range1
+                                            </Button>
+                                        </span>
+                                </span>
+
+                               <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen1} navbar>
+                                  <Nav className="nav navbar-nav float-xs-right ml-auto" navbar>
+                                     <span className="pdf_button" id="pdf_button">
+                                    <a href={this.createExcelPrintURL()}>
+                                    <Button className="btn createbutton mb5">Export Report</Button>
+                                    </a>
+                                </span>
+                                <span  onClick={this.toggleDate1} id="daterange1" className= "date_rangee1"style={{color:"white"}}>
+                                        <span className="date_range_btn">
+                                            <Button
+                                                className="daterange-btn btn"                            
+                                                id="daterange"
+                                                onClick={this.toggleDate1} >Custom Date Range1
+                                            </Button>
+                                        </span>
+                                </span>
+                           <span  onClick={this.toggleDate2} id="daterange2" style={{color:"white"}}>
+                                  <span className="date_range_btn date_range_btn2">
+                                      <Button
+                                          className="daterange-btn btn"                            
+                                          id="daterange"
+                                          onClick={this.toggleDate2} >Custom Date Range2
+                                      </Button>
+                                  </span>
+                              </span>
+                           <span  onClick={this.toggleDate3} id="daterange3" style={{color:"white"}}>
+                                  <span className="date_range_btn date_range_btn3">
+                                      <Button
+                                          className="daterange-btn btn"                            
+                                          id="daterange"
+                                          onClick={this.toggleDate3} >Custom Date Range3
+                                      </Button>
+                                  </span>
+                              </span>
+                              <span className="pa_dropbutton">
+                                    <span id="spa">
+
+                                    <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown}>
+                                        <DropdownToggle caret style={{backgroundColor:"#40E0D0",borderColor:"#40E0D0",paddingTop:"10px"}}>
+                                            More
+                                        </DropdownToggle>
+                                        <DropdownMenu>
+                                            <DropdownItem>
+                                                <span  onClick={this.toggleDate2} id="daterange2" style={{color:"white"}}>
+                                                    <span className="date_range_btn drop_date_range_btn2">
+                                                        <Button
+                                                            className="daterange-btn btn"                            
+                                                            id="daterange"
+                                                            onClick={this.toggleDate2} >Custom Date Range2
+                                                        </Button>
+                                                    </span>
+                                                </span>
+                                            </DropdownItem>
+                                            <DropdownItem>
+                                                <span  onClick={this.toggleDate3} id="daterange3" style={{color:"white"}}>
+                                                    <span className="date_range_btn drop_date_range_btn3">
+                                                        <Button
+                                                          className="daterange-btn btn"                            
+                                                        onClick={this.toggleDate3} >Custom Date Range3
+                                                        </Button>
+                                                    </span>
+                                                </span>
+                                            </DropdownItem>
+                                            
+                                        </DropdownMenu>
+                                    </Dropdown>
+                                    </span>
+                                </span>                                                                        
+                                  </Nav>
+                                </Collapse>    
+                           </Navbar> 
+                           </div>
+                           </div>
+                       }
+
+
 				<div className = "cla_center">
-					<span>
-						<span onClick = {this.renderRemoveDate} style = {{marginLeft:"30px",marginRight:"14px"}}>
-							<FontAwesome
-		                        name = "angle-left"
-		                        size = "2x"
-			                />
-						</span> 
-
-		            	<span id="navlink" onClick={this.toggleCalendar} id="gd_progress">
-		                    <FontAwesome
-		                        name = "calendar"
-		                        size = "2x"
-		                    />
-		                    <span style = {{marginLeft:"20px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY')}</span>  
-	                	</span>
-
-
-	                	<span onClick = {this.renderAddDate} style = {{marginLeft:"14px"}}>
-							<FontAwesome
-		                        name = "angle-right"
-		                        size = "2x"
-			                />
-						</span> 
-
-
-					<span style = {{textAlign:"center"}}>{this.renderLastSync(this.state.last_synced)}</span>
+				<span style = {{textAlign:"center"}}>{this.renderLastSync(this.state.last_synced)}</span>
 		            	<Popover
 				            placement="bottom"
 				            isOpen={this.state.calendarOpen}
 				            target="gd_progress"
 				            toggle={this.toggleCalendar}>
-
 			                <PopoverBody className="calendar2">
 			                <CalendarWidget  onDaySelect={this.processDate}/>
-
 			                </PopoverBody>
-			               </Popover>
-
-                	</span>
-                	</div>
-                		
-                 <p style={{textAlign:"center", fontSize:"15px",fontWeight:"bold",fontFamily:'Proxima-Nova',color:"black"}}>Wearable Device Last Synced on
-                       <span style={{marginLeft:"6px",fontWeight:"bold",paddingTop:"7px"}}>{moment(this.state.selectedDate).format('MMM DD, YYYY @ hh:mm a')}</span>  
-							
-						</p> 
-
-
-
-                		
+		                </Popover>
+                	
+		        </div>
 		        
+		          <Popover
+                    placement="bottom"
+                    isOpen={this.state.dateRange1}
+                    target="daterange1"
+                    toggle={this.toggleDate1}>
+                          <PopoverBody>
+                            <div >
 
-				<div className = "row justify-content-center md_padding">
-					<div className = "col-md-6 table_margin ">
-						{this.renderHourStepsColor(this.state.steps_this_hour)}
-				    </div>
+                               <Form>
+                                <div style={{paddingBottom:"12px"}} className="justify-content-center">
+                                  <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+                                  <Input type="date"
+                                   name="cr1_start_date"
+                                   value={this.state.cr1_start_date}
+                                   onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
 
-				    
-				    	            
-				   
-					<div className = "col-md-6  table_margin ">
-			      		{this.renderHourNonExerciseStepsColor(this.state.non_exercise_steps)}
-			      	</div>
-				</div>
-				<div className = "row justify-content-center md_padding">
-					<div className = "col-md-6 table_margin ">
-						{this.renderMcsColors(this.state.mcs_score)}
-				    </div>
-					<div className = "col-md-6  table_margin ">
-						<Card className = "card_style">
-					        <CardBody>
-					          	<CardTitle className = "header_style">{/*Today's Exercise/Activity Steps*/}</CardTitle>
-					          	<hr className = "hr_style"/>
-					          	<CardText className = "value_style">{this.renderCommaInSteps(this.state.exercise_steps)}</CardText>
-					        </CardBody>
-					    </Card>
-				    </div>
-				</div>
-				<div className = "row justify-content-center md_padding">
-					<div className = "col-md-6  table_margin ">
-						<Card className = "card_style">
-				        	<CardBody>
-				          		<CardTitle className = "header_style">{/*Total Steps Today*/}</CardTitle>
-				          		<hr className = "hr_style"/>
-				          		<CardText className = "value_style">{this.renderCommaInSteps(this.state.total_steps)}</CardText>
-				        	</CardBody>
-				      	</Card>
-				    </div>
-				</div>
-			</div>
+                                </div>
+                                <div id="date" className="justify-content-center">
+
+                                  <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+                                  <Input type="date"
+                                   name="cr1_end_date"
+                                   value={this.state.cr1_end_date}
+                                   onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+
+                                </div>
+                                <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
+
+                                <button
+                                id="nav-btn"
+                                 style={{backgroundColor:"#ed9507"}}
+                                 type="submit"
+                                 className="btn btn-block-lg"
+                                 onClick={this.onSubmitDate1} style={{width:"175px"}}>SUBMIT</button>
+                                 </div>
+
+                               </Form>
+                            </div>
+                       </PopoverBody>
+                    </Popover>
+
+                 <Popover
+                    placement="bottom"
+                    isOpen={this.state.dateRange2}
+                    target="daterange2"
+                    toggle={this.toggleDate2}>
+                          <PopoverBody>
+                            <div >
+
+                               <Form>
+                                <div style={{paddingBottom:"12px"}} className="justify-content-center">
+                                  <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+                                  <Input type="date"
+                                   name="cr2_start_date"
+                                   value={this.state.cr2_start_date}
+                                   onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+
+                                </div>
+                                <div id="date" className="justify-content-center">
+
+                                  <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+                                  <Input type="date"
+                                   name="cr2_end_date"
+                                   value={this.state.cr2_end_date}
+                                   onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+
+                                </div>
+                                <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
+
+                                <button
+                                 id="nav-btn"
+                                 style={{backgroundColor:"#ed9507"}}
+                                 type="submit"
+                                 className="btn btn-block-lg"
+                                 onClick={this.onSubmitDate2} style={{width:"175px"}}>SUBMIT</button>
+                                 </div>
+
+                               </Form>
+                            </div>
+                       </PopoverBody>
+                    </Popover>
+                 <Popover
+                    placement="bottom"
+                    isOpen={this.state.dateRange3}
+                    target="daterange3"
+                    toggle={this.toggleDate3}>
+                          <PopoverBody>
+                            <div >
+
+                               <Form>
+                                <div style={{paddingBottom:"12px"}} className="justify-content-center">
+                                  <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+                                  <Input type="date"
+                                   name="cr3_start_date"
+                                   value={this.state.cr3_start_date}
+                                   onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+
+                                </div>
+                                <div id="date" className="justify-content-center">
+
+                                  <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+                                  <Input type="date"
+                                   name="cr3_end_date"
+                                   value={this.state.cr3_end_date}
+                                   onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+
+                                </div>
+                                <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
+
+                                <button
+                                id="nav-btn"
+                                 style={{backgroundColor:"#ed9507"}}
+                                 type="submit"
+                                 className="btn btn-block-lg"
+                                 onClick={this.onSubmitDate3} style={{width:"175px"}}>SUBMIT</button>
+                                 </div>
+
+                               </Form>
+                            </div>
+                       </PopoverBody>
+                    </Popover>
+
+                    <Popover
+                    placement="bottom"
+                    isOpen={this.state.dateRange4}
+                    target="daterange4"
+                    toggle={this.toggleDate4}>
+                          <PopoverBody>
+                            <div >
+
+                               <Form>
+                                <div style={{paddingBottom:"12px"}} className="justify-content-center">
+                                  <Label>Start Date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+                                  <Input type="date"
+                                   name="cr1_start_date"
+                                   value={this.state.cr1_start_date}
+                                   onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+
+                                </div>
+                                <div id="date" className="justify-content-center">
+
+                                  <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
+                                  <Input type="date"
+                                   name="cr1_end_date"
+                                   value={this.state.cr1_end_date}
+                                   onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
+
+                                </div>
+                                <div id="date" style={{marginTop:"12px"}} className="justify-content-center">
+
+                                <button
+                                id="nav-btn"
+                                 style={{backgroundColor:"#ed9507"}}
+                                 type="submit"
+                                 className="btn btn-block-lg"
+                                 onClick={this.onSubmitDate4} style={{width:"175px"}}>SUBMIT</button>
+                                 </div>
+
+                               </Form>
+                            </div>
+                       </PopoverBody>
+                    </Popover>
+
+
+
+		     {this.state.active_view && 
+	                    <div className = "row gd_padding">
+						    <div className = "row padropStyles">
+						        <Dropdown isOpen={this.state.dropdownOpen1} toggle={this.toggle}>
+							        <DropdownToggle caret>
+							          Select Range
+							        </DropdownToggle>
+							        <DropdownMenu>
+							       
+							         {this.renderDateRangeDropdown(this.state.summary,this.state.duration_date)}
+							    
+							        </DropdownMenu>
+						      	</Dropdown>
+						      	<span className = "paweekdate"><span>{this.state.capt}</span><span>{" " + this.state.date + ""}</span></span>
+				        	</div>
+						</div>
+					}
+<br />
+<br />
+
+<div className="card_mar">
+<span>{this.aerobicTimeZone(this.state.summary.exercise,this.state.selected_range)}</span>
+<span>{this.anerobicTimeZone(this.state.summary.exercise,this.state.selected_range)}</span>
+</div>
+
+
+
+
+
+<div>
+<span>{this.belowAerobicTimeZone(this.state.summary.exercise,this.state.selected_range)}</span>
+<span>{this.heartRateNotRecordedTimeZone(this.state.summary.exercise,this.state.selected_range)}</span>
+</div>
+
+
+
+<div  className="card_mar_e">
+<span>{this.totalworkoutdurationTimeZone(this.state.summary.exercise,this.state.selected_range)}</span>
+</div>
+</div>
+
 		);
 	}
 }
 export default Aadashboard;
+
+

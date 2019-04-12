@@ -119,7 +119,7 @@ class Dashboard extends Component {
 							  <Link to='/movement_leaderboard'>Movement Leaderboard</Link><br/>
 							  <Link to='/overall_hrr_rank'>HRR Leaderboard</Link><br/>		  
 							 <h3 id="link_style">Dashboards</h3>
-						      <Link to='/aadashboard'>AA dashboard</Link><br /> 
+						      <Link to='/aadashboard'>Aerobic and Anarobic(AA) dashboard</Link><br /> 
 				  		 	  <Link to='/movement_dashboard'>Movement Dashboard</Link><br/>
 				  		 	  <Link to='/grades_dashboard'>Grades Dashboard</Link><br/>
 				  		 	  <Link to = '/progressanalyzer_dashboard'>Progress Analyzer Dashboard</Link><br/>
