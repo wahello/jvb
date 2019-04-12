@@ -195,12 +195,6 @@ class WorkoutDashboard extends Component{
 		});
 		fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
 	}
-	componentDidMount(){
-		this.setState({
-			fetching_weekly:true,
-		});
-		fetchWeeklyWorkoutData(this.successWeeklyWorkoutData,this.errorWeeklyWorkoutData,this.state.selectedDate);
-	}
 	gpascoreDecimal(gpa){
 		let value;
 		let x = gpa;
@@ -248,8 +242,16 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 	let isUndefindValueFound = false;
 
 	for(let dataKey of td_keys) {
-		
-		if((dataKey.indexOf("aerobic") >=0) || (dataKey == "duration_hrr_not_recorded") || (dataKey == "percent_hrr_not_recorded")) {
+		              // if((dataKey.indexOf("aerobic") >=0) || (dataKey == "duration_hrr_not_recorded") || (dataKey == "percent_hrr_not_recorded")) {
+
+		if((dataKey == "duration_in_aerobic_range")||
+			(dataKey == "percent_aerobic")||
+			(dataKey == "duration_below_aerobic_range")||
+			(dataKey == "percent_below_aerobic")||
+			(dataKey == "duration_in_anaerobic_range")||
+			(dataKey == "percent_anaerobic")||
+		    (dataKey == "duration_hrr_not_recorded")||
+		    (dataKey == "percent_hrr_not_recorded")) {
 
 			let tempDuration = null;
 			let tempPercentage = null;
@@ -277,7 +279,7 @@ aeroAnaerobicMatrix(value, td_keys, td_values){
 				}
 				if(dataKey == "percent_below_aerobic") {
 					percent_below_aerobic = tempPercentage;
-				} else if(dataKey == "percent_hrr_not_recorded") {
+				} else if(dataKey == "percent_hrr_not_recorded") { 
 					percent_hrr_not_recorded = tempPercentage;
 				} else if(dataKey == "percent_anaerobic") {
 					percent_anaerobic = tempPercentage;

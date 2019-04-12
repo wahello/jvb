@@ -1379,7 +1379,9 @@ class LeaderboardOverview(object):
 					'alcohol': self.lb['alcohol'][dtype],
 					'user_daily_inputs': self.lb['user_daily_inputs'][dtype]
 				}
-				excluded_catg = ['aerobic_duration','vo2_max','user_daily_inputs']
+				excluded_catg = ["avg_sleep", "resting_hr", "nes", "mc", "ec",
+								 "exercise_duration","aerobic_duration", "vo2_max",
+								 "prcnt_uf", "alcohol", "user_daily_inputs"]
 				duration_lb[dtype] = CompositeLeaderboard(
 					self.user, overall_lb_data, excluded_catg
 				).get_leaderboard(format=format)
@@ -1453,7 +1455,9 @@ class LeaderboardOverview(object):
 						'alcohol': self.lb['alcohol']['custom_range'][str_range],
 						'user_daily_inputs': self.lb['user_daily_inputs']['custom_range'][str_range]
 					}
-					excluded_catg = ['aerobic_duration','vo2_max','user_daily_inputs']
+					excluded_catg = ["avg_sleep", "resting_hr", "nes", "mc", "ec",
+									 "exercise_duration","aerobic_duration", "vo2_max",
+									 "prcnt_uf", "alcohol", "user_daily_inputs"]
 					custom_range_lb[str_range] = CompositeLeaderboard(
 						self.user, overall_lb_data, excluded_catg
 					).get_leaderboard(format=format)
