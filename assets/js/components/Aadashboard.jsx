@@ -97,14 +97,21 @@ class Aadashboard extends Component{
 			},
 			"duration_date": this.getInitialDur(),
 			selected_range:"today",
+      selectedRange:{
+          dateRange:null,
+          rangeType:'today'
+        },
 			date:"",
+      dateRange:null,
+      //date:new Date(),
 			capt:"",
 			active_category:"",
 			active_username:"",
 			active_category_name:"",
 			all_verbose_name:"",
 			dateRange4:false,
-			isStressInfoModelOpen:false
+			isStressInfoModelOpen:false,
+      numberOfDays:null
 			};
 
 	
@@ -141,20 +148,43 @@ class Aadashboard extends Component{
         this.aaColorRanges = this.aaColorRanges.bind(this);
         this.toggleDate4 = this.toggleDate4.bind(this);
         this.toggle1 = this.toggle1.bind(this);
+        
 	}
+reanderAllHrr(period,date,capt,selectedrange){
+      this.setState({
+        selected_range:period,
+        date:date,
+        capt:capt,
 
-  	reanderAllHrr(period,date,capt){
-  		this.setState({
-  			selected_range:period,
-  			date:date,
-  			capt:capt,
-  		});
-  	}
+      });
+
+
+      let numberOfDays;
+      let dateRange;
+      if(selectedrange !== 'today' && selectedrange !== 'yesterday'){
+        let startDate = selectedrange.dateRange.split("to")[0].trim();
+        let endDate = selectedrange.dateRange.split("to")[1].trim();
+        let numberOfDays = Math.abs(moment(endDate).diff(moment(startDate), 'days'))+1;
+
+      this.setState({
+       numberOfDays:numberOfDays,
+       })
+      }
+      else{
+      this.setState({
+       numberOfDays:null,
+       })
+      }
+      
+    }
+
   	toggle1() {
       this.setState({
         isOpen1: !this.state.isOpen1,
       });
     }
+
+
 	renderPercent(value){
 		let percent ='';
 		if(value != null || value != undefined){
@@ -374,6 +404,7 @@ toggleDate3(){
 	    let excelURL = `progress/print/progress/excel?date=${selected_date}&&custom_ranges=${custom_ranges}`;
 	    return excelURL;
 	}
+
 	handleChange(event){
       	const target = event.target;
       	const value = target.value;
@@ -435,7 +466,13 @@ toggleDate3(){
 	      fetching_ql4:true,
 	      selectedDate: selectedDate,
 	      calendarOpen:!this.state.calendarOpen,
-	      selected_range:"today",                              
+        numberOfDays:null,
+	      selected_range:"today",
+        // selectedRange:{
+        //   dateRange:null,
+        //   rangeType:'today'
+        // },
+                                     
 	    },()=>{
 	      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
 	    });
@@ -467,6 +504,7 @@ toggleDate3(){
 
 	successProgress(data,renderAfterSuccess=undefined){
 		let date =moment(data.data.duration_date["today"]).format("MMM DD, YYYY @ hh:mm:a"); 
+    console.log("data.data.summary.exercise.avg_exercise_heart_rate",data.data.summary.exercise.avg_exercise_heart_rate)
 	    this.setState({
 	    	fetching_ql1:false,
             fetching_ql2:false,
@@ -525,36 +563,50 @@ renderDateRangeDropdown(value,value5){
 	  	let tableHeaders = [];
 	  	for(let dur of duration_type1){
 	  		let rank;
+        let selectedRange = {
+          dateRange:null,
+          rangeType:null
+        };
 	  		let capt = dur[0].toUpperCase() + dur.slice(1)
 	  		if(dur == "today"){
 	  			date = moment(value5[dur]).format('MMM DD, YYYY');
+          selectedRange['dateRange'] = value5[dur];
+          selectedRange['rangeType'] = dur;
 	  			
 	  		}
 	  		else if(dur == "yesterday"){
 	  			date = moment(value5[dur]).format('MMM DD, YYYY');
+          selectedRange['dateRange'] = value5[dur];
+          selectedRange['rangeType'] = dur;
 	  			
 	  		}
 	  		else if(dur == "week"){
 		  		date = this.headerDates(value5[dur]);
-		  		
+		  		selectedRange['dateRange'] = value5[dur];
+          selectedRange['rangeType'] = dur;
 	  		}
 	  		else if(dur == "month"){
 		  		date = this.headerDates(value5[dur]);
-		  		
+          selectedRange['dateRange'] = value5[dur];
+          selectedRange['rangeType'] = dur;	
 	  		}
 	  		else if(dur == "year"){
 		  		date = this.headerDates(value5[dur]);
+          selectedRange['dateRange'] = value5[dur];
+          selectedRange['rangeType'] = dur;
 		  		
 	  		}
 	  		else{
 	  			date = this.headerDates(dur);
 	  			capt = "";
+          selectedRange['dateRange'] = dur;
+          selectedRange['rangeType'] = 'custom_range';
 	  		}
 
   			tableHeaders.push(
   			 <DropdownItem>
   			 <a className="dropdown-item" 
-	  			onClick = {this.reanderAllHrr.bind(this,dur,date,capt)}
+	  			onClick = {this.reanderAllHrr.bind(this,dur,date,capt,selectedRange)}
 	  			style = {{fontSize:"13px"}}>
 	  			{capt}<br/>{date}
   			</a></DropdownItem>);
@@ -563,12 +615,16 @@ renderDateRangeDropdown(value,value5){
   	}
 
   	aaColorRanges(heartrate){
+      console.log("In aaColorRanges")
   		let background = '';
   	    let userage = this.state.userage;
      if( heartrate == null || heartrate == undefined || heartrate == 0){
+      console.log("heartrate",heartrate)
+      console.log("null values")
   	  	background = '';
   	 }
   	 else{
+      console.log("not null values")
   	  	    if(userage >=13 && userage <=16){
                    if( heartrate >= 153 && heartrate < 166){
                      background="#32CD32";	
@@ -3349,6 +3405,7 @@ renderDateRangeDropdown(value,value5){
   	}
 
 	aerobicTimeZone(value,durationdate){
+     //console.log("value.avg_exercise_heart_rate",value.avg_exercise_heart_rate)
      let aerobicPrcnt = this.aaExercisestats(this.renderValue(value.prcnt_aerobic_duration,durationdate));
      let score = this.aaExercisestats(this.renderValue(value.hr_aerobic_duration_hour_min,durationdate));
      let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_exercise_heart_rate,durationdate));
@@ -3413,7 +3470,8 @@ renderDateRangeDropdown(value,value5){
 		let score = this.aaExercisestats(this.renderValue(value.hr_below_aerobic_duration_hour_min,durationdate));
 		let belowAerobicPrcnt = this.aaExercisestats(this.renderValue(value.prcnt_below_aerobic_duration,durationdate));
         let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_exercise_heart_rate,durationdate));
-        if( score == "No workout" && belowAerobicPrcnt == "No workout"){
+        if( score == "No workout" && belowAerobicPrcnt == "No workout")
+        {
 			return(
 				
 				<Card className = "card_style_c">
@@ -3431,7 +3489,7 @@ renderDateRangeDropdown(value,value5){
 				<Card className = "card_style_c">
 				<CardBody style={{backgroundColor:avgheartratecolor}}>
 				<CardTitle className = "header_style">Time in below Aerobic Zone (below 102)</CardTitle>
-				<CardText className = "value_style">{score}{' '}{'('+belowAerobicPrcnt+'%'+')'}</CardText>
+				<CardText className = "value_style">{score}{' '}{'('+ 0 +'%'+')'}</CardText>
 				</CardBody>
 				</Card>
 				
@@ -3445,9 +3503,12 @@ renderDateRangeDropdown(value,value5){
         let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_exercise_heart_rate,durationdate));
         if( score == "No workout" && hrr_not_recorded_prcnt == "No workout"){
 			return (
+        
+        
 				
 				<Card className = "card_style_d">
 				<CardBody>
+
 				<CardTitle className = "header_style">Heart Rate Not Reorded</CardTitle>
 				<CardText className = "value_style">{score}{' '}{'('+hrr_not_recorded_prcnt+')'}</CardText>
 				</CardBody>
@@ -3466,6 +3527,7 @@ renderDateRangeDropdown(value,value5){
 				</Card>
 				);
          }
+
 	}
 
     totalworkoutdurationTimeZone(value,durationdate){
@@ -3475,7 +3537,7 @@ renderDateRangeDropdown(value,value5){
 			
 			<Card className = "card_style_e">
 			<CardBody>
-			<CardTitle className = "header_style_e">Total Work Duration </CardTitle>
+			<CardTitle className = "header_style_e">Total Workout Duration </CardTitle>
 			<CardText className = "value_style_e">{score}</CardText>
 			</CardBody>
 			</Card>   
@@ -3485,7 +3547,7 @@ renderDateRangeDropdown(value,value5){
 	}
 
 	 aaExercisestats(value){
-	 	if(value == undefined || value == 0 || value == "" || value == "00:00"){
+	 	if(value == undefined || value == 0 || value == "" || value == "00:00" ){
         	value = "No workout"
       	}
       	else{
@@ -3802,7 +3864,8 @@ renderDateRangeDropdown(value,value5){
 							    
 							        </DropdownMenu>
 						      	</Dropdown>
-						      	<span className = "paweekdate"><span>{this.state.capt}</span><span>{" " + this.state.date + ""}</span></span>
+						      	{/*<span className = "paweekdate"><span>{this.state.capt}</span><span>{" " + this.state.date + ""}</span></span>*/}
+                    <span className = "weekdate" style={{marginLeft:"300px",marginRight:"auto"}}><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}{this.state.numberOfDays && <span>{" - " + "Total Days: " +this.state.numberOfDays}</span>}</span></span>
 				        	</div>
 						</div>
 					}
