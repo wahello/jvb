@@ -714,7 +714,7 @@ class HeartRate extends Component{
                               size="sm"
                               onClick={this.toggleEditForm}
                               className="btn hidden-sm-up">
-                              {this.state.editable ? 'View AA Ranges' : 'Create AA Ranges'}
+                              {this.state.editable ? 'View AA Custom Ranges' : 'Create AA Custom Ranges'}
                         </Button>			      
                 	    </span>
 		            	<Popover
@@ -750,6 +750,7 @@ class HeartRate extends Component{
 			          	    <div className = "table table-responsive">
 				          	    <table className = "table table-striped table-bordered ">
 					          	    <thead className = "hr_table_style_rows">
+				
 						          	    <th className = "hr_table_style_rows">Ranges</th>
 						          	    <th className = "hr_table_style_rows">Heart Rate Range</th>
 						          	    <th className = "hr_table_style_rows">Time in Zone (hh:mm:ss)</th>
@@ -759,6 +760,7 @@ class HeartRate extends Component{
 					          	    {!_.isEmpty(hrSummary) && <tbody>   
 						          	    <tr className = "hr_table_style_rows">   
 							          	    <td className = "hr_table_style_rows">Aerobic Range</td>    
+					
 							          	    <td className = "hr_table_style_rows">
 
 							          	    {this.state.editable_Aerobic_Range ?
@@ -827,22 +829,9 @@ class HeartRate extends Component{
                             </ModalHeader>
                               <ModalBody className="modalcontent" id="modal1" >
                                 <div>
-                                  <div>Completing your daily inputs EVERY DAY makes you ACCOUNTABLE
-                                  to your results and our hope is that you will make healthier
-                                  life choices as a result of having to report various topics
-                                  (and we see significantly improved results for those that report daily).
-                                  Reporting only takes a few minutes a day and is well worth
-                                  the time investment. You provide the inputs and we will provide
-                                  you the analyses! Create a new habit of reporting your inputs daily!</div>
+                                  <div>By changing your AA ranges and updating it then your previous and future calculations will automatically be calculated with new ranges in all the AA charts.</div>
 
-                                  <p style={{paddingTop:"15px"}}>Reporting your inputs to us has many benefits:</p>
-
-                                  <div style={{paddingTop:"15px"}}>(1) It enables us to report your data to you in a simple, understandable,
-                                   and customizable way. Our reporting and proprietary grading system will 
-                                   provide you with a powerful tool to identify positive and negative trends
-                                    in your health and life, so you can (1) work on improving areas you want
-                                     to improve and (2) maintain areas where you are performing well;</div>
-
+                                 
                                  
 
                                   
