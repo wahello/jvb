@@ -5,7 +5,7 @@ import thunk from "redux-thunk"
 import { createStore, applyMiddleware } from "redux";
 import reducers from "../reducers";
 import promise from 'redux-promise';
-
+import Aadashboard from '../components/Aadashboard';
 import RequireAuth from '../components/require_auth';
 import HomePageContainer from '../containers/HomePageContainer';
 import Register from '../components/registration/Register';
@@ -33,10 +33,10 @@ import AllRank_Data1 from '../components/leader_all_exp';
 import HeartRateCal from '../components/HRR/heart_rate_calculation';
 import Workout from '../components/workout_stats';
 import HeartrateZone from '../components/heart_rate_zone';
-import Movement_Dashboard from '../components/Movement_dashboard'
+import Movement_Dashboard from '../components/Movement_dashboard';
 import Grades_Dashboard from '../components/grades_dashboard';
 import Hrr_Dashboard from '../components/Hrr_summary_dashboard';
-import MCS_Dashboard from '../components/mcs_dashboard'
+import MCS_Dashboard from '../components/mcs_dashboard';
 import WorkoutDashboard from '../components/weekly_workout_dashboard';
 import OverallRank from '../components/overall_hrr_rank';
 import ProgressDashboard from '../components/progressanalyzer_dashboard';
@@ -47,6 +47,7 @@ import OverallLeaderboard from '../components/overall-leaderboard/overall_leader
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
 import {isLoggedIn} from '../network/auth';
+//import Aadashboard from '../components/aa_dashboard';
 
 const createStoreWithMiddleware = applyMiddleware(promise,thunk)(createStore);
 
@@ -63,6 +64,7 @@ function initializeLocalState(){
 			<Provider store={createStoreWithMiddleware(reducers)}> 
 			  <BrowserRouter>
 			    <Switch>
+
 			        <Route exact path='/' component={HomePageContainer}/>
 			        <Route path='/users/dashboard' component={RequireAuth(Dashboard)} />
 			        <Route path='/raw/garmin' component={RequireAuth(GarminDataPage)} />
@@ -83,6 +85,8 @@ function initializeLocalState(){
 					<Route path='/WeeklySummary' component={RequireAuth(Weeklysummary)} /> 
 					{/*<Route path='/sleep' component={RequireAuth(Sleepgraph)} />*/}
 
+
+
 					<Route path='/rawdata' component={RequireAuth(Quicklook)} />
 					<Route path='/rawdata#movementconsistency' component={RequireAuth(Quicklook)} />
 					<Route path='/rawdata#grades' component={RequireAuth(Quicklook)} />
@@ -92,9 +96,13 @@ function initializeLocalState(){
 					<Route path='/leaderboard' component={RequireAuth(LeaderBoard1)} />
 					<Route path='/heartrate' component={RequireAuth(HeartRate)} />				
 					<Route path='/terms_and_conditions' component={RequireAuth(TermsConditions)} />
+
+					
+
 					<Route path='/movement_dashboard' component={RequireAuth(Movement_Dashboard)} />
 					<Route path='/weekly_workout_summary' component={RequireAuth(WorkoutDashboard)} />
 					<Route path='/grades_dashboard' component={RequireAuth(Grades_Dashboard)} />
+					<Route path='/aadashboard' component={RequireAuth(Aadashboard)} /> 
 					<Route path='/hrr_summary_dashboard' component={RequireAuth(Hrr_Dashboard)} />
 					<Route path='/mcs_dashboard' component={MCS_Dashboard}/>
 					<Route path='/overall_hrr_rank' component={OverallRank}/>
@@ -110,7 +118,7 @@ function initializeLocalState(){
 	};
 
 	const onFailure = (error) => {
-		console.log(error);
+		//console.log(error);
 		console.log(error.message);
 	};
 

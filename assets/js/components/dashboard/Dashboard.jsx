@@ -5,6 +5,9 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import NavbarMenu from '../navbar';
 import {haveDeviceToken} from "../../network/dashboard";
 
+//import Aadashboard from '../components/Aadashboard';
+
+
 class Dashboard extends Component {
 	constructor(props){
 		super(props);
@@ -98,13 +101,18 @@ class Dashboard extends Component {
 
 	render(){
 		return (
-			<div className = "container">
-				<NavbarMenu fix={true}/>
+			
+			       
+  
+			   	<div className = "container">
+      			<NavbarMenu fix={true}/>
 				<div>
 					  <div className="row">
 						<div className="col-sm-6 col-sm-offset-3 social-login" style={{marginTop:"80px"}}>
 						    <h3 id="link_style">User Inputs</h3>
 						    <div className="social-login-buttons">
+
+
 
 							 <Link to='/userinputs'>User Inputs Daily Form</Link><br/>
 							 <h3 id="link_style">Leaderboards</h3>
@@ -113,6 +121,7 @@ class Dashboard extends Component {
 							  <Link to='/overall_hrr_rank'>HRR Leaderboard</Link><br/>
 							   <Link to='/overall_leaderboard'>Overall Leaderboard</Link><br/>		  
 							 <h3 id="link_style">Dashboards</h3>
+						      <Link to='/aadashboard'>Aerobic and Anarobic(AA) dashboard</Link><br /> 
 				  		 	  <Link to='/movement_dashboard'>Movement Dashboard</Link><br/>
 				  		 	  <Link to='/grades_dashboard'>Grades Dashboard</Link><br/>
 				  		 	  <Link to = '/progressanalyzer_dashboard'>Progress Analyzer Dashboard</Link><br/>
@@ -180,13 +189,20 @@ class Dashboard extends Component {
 
 							<h3 id="link_style">Data Backfill Request</h3>
 							<Link to='/backfill'>Historical Data Backfill Request</Link><br/>
+                          
+
 
 						  </div>
 						</div>
 					</div>
 				</div>
 				{this.noDeviceLinkedModel()}
+
+				
 			</div>
+ 			
+
+ 			
 		);
 	}
 }
