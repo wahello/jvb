@@ -12,7 +12,7 @@ from fitbit.models import UserFitbitLastSynced,FitbitConnectToken
 from users.models import GarminToken
 from quicklook.calculations.calculation_driver import which_device
 from .models import UserDataBackfillRequest
-from .serializers import UserBackfillRequestSerializer
+from .serializers import UserBackfillRequestSerializer,AACustomRangesSerializer
 
 
 class UserLastSyncedItemview(generics.RetrieveUpdateDestroyAPIView):
@@ -91,6 +91,19 @@ class UserBackfillRequestView(generics.ListCreateAPIView):
 
 	def post(self,request,*args,**kwargs):
 		serializer = UserBackfillRequestSerializer(data=request.data,
+			context={'user_id':request.user.id})
+		if serializer.is_valid():
+			serializer.save()
+			return Response(serializer.data,status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AACustomRangesView(generics.ListCreateAPIView):
+
+	permission_classes = (IsAuthenticated,)
+	serializer_class = AACustomRangesSerializer
+
+	def post(self,request,*args,**kwargs):
+		serializer = AACustomRangesSerializer(data=request.data,
 			context={'user_id':request.user.id})
 		if serializer.is_valid():
 			serializer.save()

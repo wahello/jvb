@@ -153,7 +153,7 @@ def _get_activities(user,target_date):
 	.get_filtered_activity_stats(
 		activity_data,user_age,manually_updated_act_data,
 		include_duplicate=True,include_deleted=True,
-		include_non_exercise = True,epoch_summaries = epoch_summaries
+		include_non_exercise = True,epoch_summaries = epoch_summaries,user=user
 	)
 
 	for single_activity in combined_activities:
@@ -210,7 +210,7 @@ def _get_fitbit_activities_data(user,target_date):
 				get_filtered_activity_stats(
 					activity_data,user.profile.age(),
 					include_duplicate = True,include_deleted=True,
-					include_non_exercise = True)
+					include_non_exercise = True,user=user)
 		activity_data = [
 			_create_activity_stat(user,act,current_date)[act['summaryId']]
 			for act in combined_user_activities

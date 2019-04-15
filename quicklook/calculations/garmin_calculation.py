@@ -841,13 +841,13 @@ def activity_step_from_epoch(act_start, act_end, epochs):
 			steps += epoch_steps
 	return steps
 
-def get_zones_cutoff(age):
+def get_zones_cutoff(user,age):
 	'''
 	calculate the aerobic and anaerobic zone
 	start heartbeat
 	'''
 	if age:
-		aa_ranges = belowaerobic_aerobic_anaerobic(age)
+		aa_ranges = belowaerobic_aerobic_anaerobic(user,age)
 		return {
 			"aerobic_zone":aa_ranges[1],
 			"anaerobic_zone":aa_ranges[2]
@@ -855,7 +855,7 @@ def get_zones_cutoff(age):
 	return None
 
 def get_activity_exercise_non_exercise_category(activity_type,
-		avg_hr,user_age,steps_type=None):
+		avg_hr,user_age,steps_type=None,user=None):
 	'''
 	Determine the category of provided activity summary. Possible
 	categories are "exercise" and "non-exercise"
@@ -863,7 +863,7 @@ def get_activity_exercise_non_exercise_category(activity_type,
 	EXERCISE = 'exercise'
 	NON_EXERCISE = 'non_exercise'
 	HEART_RATE_RECOVERY = 'heart_rate_recovery'
-	zones = get_zones_cutoff(user_age)
+	zones = get_zones_cutoff(user,user_age)
 	if steps_type:
 		return steps_type
 
@@ -1022,7 +1022,7 @@ def get_filtered_activity_stats(activities_json,user_age,
 		act_avg_hr = act.get("averageHeartRateInBeatsPerMinute",0)
 		act_step_type = act.get('steps_type')
 		act_category = get_activity_exercise_non_exercise_category(act_type,
-			act_avg_hr,user_age,act_step_type)
+			act_avg_hr,user_age,act_step_type,kwargs.get('user'))
 		act['steps_type'] = act_category
 
 	deleted_activities = []

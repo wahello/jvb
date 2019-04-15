@@ -53,7 +53,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 	def get_user_aa_ranges(self, obj):
 		age = self.get_user_age(obj)
-		aa_ranges = belowaerobic_aerobic_anaerobic(age)
+		aa_ranges = belowaerobic_aerobic_anaerobic(obj.user.username,age)
 		return {
 			"aerobic_range_start":aa_ranges[1],
 			"anaerobic_range_start":aa_ranges[2]
