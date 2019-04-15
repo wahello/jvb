@@ -63,6 +63,8 @@ class HeartRate extends Component{
 		this.createSleepDropdown = this.createSleepDropdown.bind(this);
 		this.updateData = this.updateData.bind(this);
 		this.infoPrint = this.infoPrint.bind(this);
+		
+
 
 		
 
@@ -95,13 +97,16 @@ class HeartRate extends Component{
 	    };
 	}
 
+  
+
 	successHeartRate(data){
 		
-	    let aerobic_range_start = data.data.aerobic_range.split("-")[0];;
+	    let aerobic_range_start = data.data.aerobic_range.split("-")[0];
 	    let aerobic_range_end = data.data.aerobic_range.split("-")[1];
 	    let anaerobic_range = data.data.anaerobic_range.split(" ")[0];
 	    let below_aerobic_range = data.data.below_aerobic_range.split(" ")[1];
-	    console.log("aerobic_range_start is:",aerobic_range_start)
+	    //console.log("aerobic_range_start is:",aerobic_range_start)
+		
 		this.setState({
 			hr_summary:data.data,
 			fetching_aerobic:false,
@@ -112,7 +117,7 @@ class HeartRate extends Component{
 			below_aerobic_range:below_aerobic_range
 		})
 
-		
+
 	}
 
 	
@@ -194,7 +199,7 @@ class HeartRate extends Component{
 
   					aerobic_range:this.state.aerobic_range_start+'-'+this.state.aerobic_range_end,
   					// aerobic_range_end:this.state.aerobic_range_end,
-	  				anaerobic_range:this.state.aerobic_range_end,
+	  				anaerobic_range:parseInt(this.state.aerobic_range_end)+1,
 			        below_aerobic_range:this.state.aerobic_range_start,
 			    };
 			    
@@ -288,6 +293,9 @@ class HeartRate extends Component{
   		});
   	}
 
+  	 
+
+
 	infoPrint(){
 	    var mywindow = window.open('', 'PRINT');
 	    mywindow.document.write('<html><head><style>' +
@@ -313,11 +321,17 @@ class HeartRate extends Component{
   		if(value){
   			values = value;
   		}
-  		else if(value == null || value == undefined){
+  		else if(value == null || value == undefined || value == isNaN){
   			values = "-"
   		}
+  		// else if(isNaN(value)){
+  		// 	values = "-"
+  		// }
+
   		return values;
   	}
+
+  	
 	renderTime(value){
 		// This function will devide the seconds to hh:mm:ss format.
 		var time;
@@ -339,6 +353,7 @@ class HeartRate extends Component{
 		}
 		return time;
 	}
+	
 	stepsValue(value){
 		// This function will add the (,) for the steps values
 		if(value){
@@ -408,6 +423,7 @@ class HeartRate extends Component{
 			fetchHeartrateZoneData_TwentyFourHour(this.successHeartrateZone24Hour,this.errorHeartrateZone24Hour,this.state.selectedDate);
 		});
 	}
+	
 	renderRemoveDate(){
 		var today = this.state.selectedDate;
 		var tomorrow = moment(today).subtract(1, 'days');
@@ -698,7 +714,7 @@ class HeartRate extends Component{
                               size="sm"
                               onClick={this.toggleEditForm}
                               className="btn hidden-sm-up">
-                              {this.state.editable ? 'View AA Ranges' : 'Create AA Ranges'}
+                              {this.state.editable ? 'View AA Custom Ranges' : 'Create AA Custom Ranges'}
                         </Button>			      
                 	    </span>
 		            	<Popover
@@ -734,6 +750,7 @@ class HeartRate extends Component{
 			          	    <div className = "table table-responsive">
 				          	    <table className = "table table-striped table-bordered ">
 					          	    <thead className = "hr_table_style_rows">
+				
 						          	    <th className = "hr_table_style_rows">Ranges</th>
 						          	    <th className = "hr_table_style_rows">Heart Rate Range</th>
 						          	    <th className = "hr_table_style_rows">Time in Zone (hh:mm:ss)</th>
@@ -743,6 +760,7 @@ class HeartRate extends Component{
 					          	    {!_.isEmpty(hrSummary) && <tbody>   
 						          	    <tr className = "hr_table_style_rows">   
 							          	    <td className = "hr_table_style_rows">Aerobic Range</td>    
+					
 							          	    <td className = "hr_table_style_rows">
 
 							          	    {this.state.editable_Aerobic_Range ?
@@ -774,7 +792,7 @@ class HeartRate extends Component{
 	                                    </Input>
 	                                    </span>
 	                                    
-				          	    	: this.state.aerobic_range_start+'-'+this.state.aerobic_range_end}
+				          	    	: this.state.aerobic_range_start+'-'+this.renderNullValue(this.state.aerobic_range_end)}
 
 							          	   
 							          	    	
@@ -811,22 +829,9 @@ class HeartRate extends Component{
                             </ModalHeader>
                               <ModalBody className="modalcontent" id="modal1" >
                                 <div>
-                                  <div>Completing your daily inputs EVERY DAY makes you ACCOUNTABLE
-                                  to your results and our hope is that you will make healthier
-                                  life choices as a result of having to report various topics
-                                  (and we see significantly improved results for those that report daily).
-                                  Reporting only takes a few minutes a day and is well worth
-                                  the time investment. You provide the inputs and we will provide
-                                  you the analyses! Create a new habit of reporting your inputs daily!</div>
+                                  <div>By changing your AA ranges and updating it then your previous and future calculations will automatically be calculated with new ranges in all the AA charts.</div>
 
-                                  <p style={{paddingTop:"15px"}}>Reporting your inputs to us has many benefits:</p>
-
-                                  <div style={{paddingTop:"15px"}}>(1) It enables us to report your data to you in a simple, understandable,
-                                   and customizable way. Our reporting and proprietary grading system will 
-                                   provide you with a powerful tool to identify positive and negative trends
-                                    in your health and life, so you can (1) work on improving areas you want
-                                     to improve and (2) maintain areas where you are performing well;</div>
-
+                                 
                                  
 
                                   
@@ -847,7 +852,7 @@ class HeartRate extends Component{
 						          	    <tr className = "hr_table_style_rows">
 							          	    <td className = "hr_table_style_rows">Anaerobic Range</td>
 
-							          	    <td className = "hr_table_style_rows">{this.state.aerobic_range_end 
+							          	    <td className = "hr_table_style_rows">{parseInt(this.state.aerobic_range_end)+1
 							          	  +" "+"or above"}</td>
 
 							          	    <td className = "hr_table_style_rows">{this.renderTime(hrSummary.anaerobic_zone)}</td>
