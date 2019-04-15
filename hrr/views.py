@@ -1830,7 +1830,8 @@ def daily_aa_data(user, start_date):
 			ui_data_hrr.append(summaryId)
 		if ui_data_single['steps_type'] == 'non_exercise':
 			summaryId = ui_data_single['summaryId']
-			ui_data_keys.remove(summaryId)
+			if summaryId in ui_data_keys:
+				ui_data_keys.remove(summaryId)
 	garmin_list,garmin_dic = get_garmin_activities(
 		user,start_date_timestamp,end_date_timestamp)
 	manually_edited_dic,manually_edited_list = get_garmin_manully_activities(
@@ -2706,9 +2707,7 @@ def store_fitbit_aa3(user,from_date,to_date):
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
-	print("Calculate starts")
 	while (current_date >= from_date_obj):
-		print(current_date,"current date")
 		activities_dict = get_usernput_activities(user,from_date)
 		data = fitbit_aa.calculate_AA3(user,from_date,user_input_activities=activities_dict)
 		if data:
@@ -2799,7 +2798,7 @@ def hrr_data(user,start_date):
 													user_age=user_age,
 													manually_updated_json=manually_edited_dic,
 													userinput_activities=activities_dic,
-													include_non_exercise = True,)
+													include_non_exercise = True,user=user)
 	count = 0
 	id_act = []
 	activities = []

@@ -153,7 +153,7 @@ def _get_activities(user,target_date):
 	.get_filtered_activity_stats(
 		activity_data,user_age,manually_updated_act_data,
 		include_duplicate=True,include_deleted=True,
-		include_non_exercise = True,epoch_summaries = epoch_summaries
+		include_non_exercise = True,epoch_summaries = epoch_summaries,user=user
 	)
 
 	for single_activity in combined_activities:

@@ -286,7 +286,6 @@ def all_activities_hr_and_time_diff(hr_time_diff):
 def belowaerobic_aerobic_anaerobic(user,user_age):
 	aa_ranges_list = []
 	try:
-		print(user,"user")
 		aa_ranges = AACustomRanges.objects.filter(user=user).last()
 	except ValueError:
 		user = User.objects.filter(username=user)
