@@ -191,7 +191,7 @@ class HeartRate extends Component{
   				fetching_hrr:true
   			}, () => {
 
-  						toast.info("your aa ranges have been updated successfully",{
+  						toast.info("your aa custom ranges have been updated successfully",{
 	          className:"dark"
 	    });
 
@@ -473,24 +473,24 @@ class HeartRate extends Component{
 		  	this.setState({
 				 [name]: value,
 			   },
-			// 	()=>{
-			// 		if(target.name=='Aerobic_Range'){
-			// 			this.setState({
-	  // 						Aerobic_Range:target.value,
+				()=>{
+					if(target.name=='aerobic_range_start' ||target.name=='aerobic_range_end' ){
+						this.setState({
+	  						editable_Aerobic_Range:!this.state.editable_Aerobic_Range,
 
-	  // 					},()=> console.log(Aerobic_Range,"Anaerobic_Range"));
-			// 		}
-			// 		else if(target.name=='Anaerobic_Range'){
-			// 			this.setState({
-	  // 						Anaerobic_Range:target.value,
-	  // 					});
-			// 		}
-			// 		else if(target.name=='Below_Aerobic_Range'){
-			// 			this.setState({
-	  // 						Below_Aerobic_Range:target.value,
-	  // 					});
-			// 		}
-			// }
+	  					},()=> console.log(Aerobic_Range,"Anaerobic_Range"));
+					}
+					else if(target.name=='Anaerobic_Range'){
+						this.setState({
+	  						Anaerobic_Range:target.value,
+	  					});
+					}
+					else if(target.name=='Below_Aerobic_Range'){
+						this.setState({
+	  						Below_Aerobic_Range:target.value,
+	  					});
+					}
+			}
 			);
 		}
 
@@ -830,11 +830,6 @@ class HeartRate extends Component{
                               <ModalBody className="modalcontent" id="modal1" >
                                 <div>
                                   <div>By changing your AA ranges and updating it then your previous and future calculations will automatically be calculated with new ranges in all the AA charts.</div>
-
-                                 
-                                 
-
-                                  
                                 </div>
                               </ModalBody>
                            </Modal> 
