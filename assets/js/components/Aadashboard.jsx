@@ -4058,7 +4058,7 @@ renderDateRangeDropdown(value,value5){
 							         {this.renderDateRangeDropdown(this.state.summary,this.state.duration_date)}
 							        </DropdownMenu>
 						      	</Dropdown>
-                    <span className = "weekdate" style={{marginLeft:"350px",marginRight:"auto"}}><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}{this.state.numberOfDays&&<span>{" - "+"Total Days: "+this.state.numberOfDays}</span>}</span></span>
+                    <span className = "weekdate" style={{marginLeft:"350px",marginRight:"auto"}}><span className='weekdate'>{this.state.capt}</span><span>{" (" + this.state.date + ")"}{this.state.numberOfDays&&<span>{" - "+"Total Days: "+this.state.numberOfDays}</span>}</span></span>
 
                   </div>
                  </div>

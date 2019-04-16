@@ -45,6 +45,11 @@
     margin-top: 15px;
   }
 
+  .weekdate{
+   margin-left: 40px;
+  
+  }
+
 
 @media (max-width: 1023px){
   .table_margin{
@@ -63,7 +68,22 @@
     text-align: center;
     margin-top: 15px;
   }
+ .weekdate{
+   text-align: center;
+   margin-left:350px;
+   margin-right:auto;
+  }
 
+}
+@media (max-width: 1023px) and (orientation: portrait){
+  .weekdate{
+  margin-left:-380px
+  }
+}
+@media (max-width: 1023px) and (orientation: landscape){
+  .weekdate{
+  margin-left:-250px
+  }
 }
 #my-card-mcs {
   height: 100%;
