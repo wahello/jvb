@@ -570,6 +570,12 @@ class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
 			queryset = TwentyfourHourTimeHeartZones.objects.all()
 		return queryset
 
+def aa_ranges_api(request):
+	user = request.user
+	user_age = user.profile.age()
+	aa_ranges =fitbit_aa.belowaerobic_aerobic_anaerobic(user,user_age)
+	return aa_ranges
+
 def calculate_garmin_twentyfour_hour_AA3(user,start_date,user_input_activities=None):
 	hr_dataset = get_garmin_hr_data(user,start_date)
 	start_dt = 0
