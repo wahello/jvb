@@ -17,7 +17,7 @@ import { Collapse, Navbar, NavbarToggler,
         FormText,Label,Input,Card, CardImg, CardText, 
         CardBody,CardTitle, CardSubtitle} from 'reactstrap';
 import NavbarMenu from './navbar';
-import fetchProgress from '../network/progress';
+import fetchProgress, {fetchAaRanges} from '../network/progress';
 import {getUserProfile} from '../network/auth';
 import {fetchLastSync} from '../network/quick';
 
@@ -107,7 +107,8 @@ class Aadashboard extends Component{
 			all_verbose_name:"",
 			dateRange4:false,
 			isStressInfoModelOpen:false,
-      numberOfDays:null
+      numberOfDays:null,
+      aa_ranges:{},
 			};
 
 	
@@ -146,6 +147,8 @@ class Aadashboard extends Component{
         this.toggle1 = this.toggle1.bind(this);
         this.successLastSync = this.successLastSync.bind(this);
         this.aaExercisestatsPrct = this.aaExercisestatsPrct.bind(this);
+        this.successAaRanges = this.successAaRanges.bind(this);
+        this.errorAaRanges = this.errorAaRanges.bind(this);
         
 	}
 reanderAllHrr(period,date,capt,selectedRange){
@@ -466,6 +469,7 @@ toggleDate3(){
                                      
 	    },()=>{
 	      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
+        fetchAaRanges(this.successAaRanges,this.errorAaRanges,this.state.selectedDate);
 	    });
   	}
 
@@ -490,11 +494,22 @@ toggleDate3(){
 				 fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
 				 getUserProfile(this.succesCallback);
          fetchLastSync(this.successLastSync,this.errorquick);
+         fetchAaRanges(this.successAaRanges,this.errorAaRanges,this.state.selectedDate);
 	}
+  successAaRanges(data)
+  {
+    this.setState({
+      aa_ranges:data.data,
+    })
+  }
+  errorAaRanges(error)
+  {
+    console.log(error.message)
+  }
 
 
 	successProgress(data,renderAfterSuccess=undefined){
-    console.log("data.data.summary.exercise.hr_not_recorded_duration_hour_min",data.data.summary.exercise.hr_not_recorded_duration_hour_min)
+    
 		let date =moment(data.data.duration_date["today"]).format("MMM DD, YYYY");
 	    this.setState({
 	    	fetching_ql1:false,
@@ -3557,6 +3572,13 @@ renderDateRangeDropdown(value,value5){
   	}
 
 	aerobicTimeZone(value,durationdate){
+    let lower_aerobic_zone;
+    let higher_aerobic_zone;
+    for(let [key,ranges] of Object.entries(this.state.aa_ranges)){
+      lower_aerobic_zone = ranges[1];
+      higher_aerobic_zone = ranges[2];
+    }
+    let aa_ranges = this.state.aa_ranges['0'];
     let total_workout_duration_over_range_score = this.renderValue(value.total_workout_duration_over_range,durationdate);
      let aerobicPrcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_aerobic_duration,durationdate));
      let score = this.aaExercisestats(this.renderValue(value.hr_aerobic_duration_hour_min,durationdate),total_workout_duration_over_range_score);
@@ -3567,7 +3589,7 @@ renderDateRangeDropdown(value,value5){
      		
 			<Card  className = "card_style" style={{backgroundColor:'',color:''}}>
 			<CardBody>
-			<CardTitle className = "header_style">Time in Aerobic Zone (102-137)  
+			<CardTitle className = "header_style">{'Time in Aerobic Zone ('+lower_aerobic_zone+' - '+higher_aerobic_zone+')'}
 			</CardTitle> 
 			<CardText className = "value_style">{score}</CardText>
 			</CardBody>
@@ -3590,6 +3612,10 @@ renderDateRangeDropdown(value,value5){
 	}
 
 	anerobicTimeZone(value,durationdate){
+    let anerobic_zone;
+    for(let [key,ranges] of Object.entries(this.state.aa_ranges)){
+      anerobic_zone = ranges[2]+1;
+    }
     let total_workout_duration_over_range_score = this.renderValue(value.total_workout_duration_over_range,durationdate);
 		let score = this.aaExercisestats(this.renderValue(value.hr_anaerobic_duration_hour_min,durationdate),total_workout_duration_over_range_score);
 		let anerobicPrcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_anaerobic_duration,durationdate));
@@ -3599,7 +3625,7 @@ renderDateRangeDropdown(value,value5){
 				
 			<Card className = "card_style">
       <CardBody>
-			<CardTitle className = "header_style">Time in Anaerobic Zone (138 or above)</CardTitle>
+			<CardTitle className = "header_style">{'Time in Anaerobic Zone ('+anerobic_zone+' or above)'}</CardTitle>
 			<CardText className = "value_style">{score}</CardText>
 			</CardBody>
 			</Card>
@@ -3621,6 +3647,10 @@ renderDateRangeDropdown(value,value5){
 	}
 
 	belowAerobicTimeZone(value,durationdate){
+    let below_aerobic_zone;
+    for(let [key,ranges] of Object.entries(this.state.aa_ranges)){
+      below_aerobic_zone = ranges[0];
+    }
     let total_workout_duration_over_range_score = this.renderValue(value.total_workout_duration_over_range,durationdate);
 		let score = this.aaExercisestats(this.renderValue(value.hr_below_aerobic_duration_hour_min,durationdate),total_workout_duration_over_range_score);
 		let belowAerobicPrcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_below_aerobic_duration,durationdate))
@@ -3631,7 +3661,7 @@ renderDateRangeDropdown(value,value5){
 				
 				<Card className = "card_style" id = "my-card">
 				<CardBody>
-				<CardTitle className = "header_style">Time in below Aerobic Zone (below 102)</CardTitle>
+				<CardTitle className = "header_style">{'Time in below Aerobic Zone (below '+below_aerobic_zone+')'}</CardTitle>
 				<CardText className = "value_style">{score}</CardText>
 				</CardBody>
 				</Card>
@@ -3654,7 +3684,6 @@ renderDateRangeDropdown(value,value5){
 
 	heartRateNotRecordedTimeZone(value,durationdate){
     let total_workout_duration_over_range_score = this.renderValue(value.total_workout_duration_over_range,durationdate);
-    console.log("value.hr_not_recorded_duration_hour_min",value.hr_not_recorded_duration_hour_min)
 		let score = this.aaExercisestats(this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate),total_workout_duration_over_range_score);
     
 		let hrr_not_recorded_prcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_hr_not_recorded_duration,durationdate));
@@ -3705,13 +3734,10 @@ renderDateRangeDropdown(value,value5){
 	}
 
 	 aaExercisestats(value,total_workout_duration_over_range_score){
-    console.log("total_workout_duration_over_range_score",total_workout_duration_over_range_score)
 	 	if((value == undefined || value == 0 || value == "" || value == "00:00" || value==null) && (total_workout_duration_over_range_score == undefined || total_workout_duration_over_range_score == 0 || total_workout_duration_over_range_score == "" || total_workout_duration_over_range_score == "00:00"||total_workout_duration_over_range_score == null) ){
-          console.log("in no workout condition")
         	value = "No workout"
       	}
       	else if(total_workout_duration_over_range_score&&total_workout_duration_over_range_score!=""){
-          console.log("workout condition")
         	value = value
       	}
     	return value;
