@@ -120,7 +120,7 @@ class OverallLeaderboard extends Component{
 			duration_date:data.data.duration_date,
 			all_movement_rank_data:data.data.overall.today.all_rank,
 			date:moment(date).format("MMM D, YYYY"),
-			capt:"Today",
+			// capt:"Today",
 			fetching_hrr1:false,
 	        fetching_hrr2:false,
 	        fetching_hrr3:false,
