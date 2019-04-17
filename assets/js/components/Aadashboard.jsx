@@ -159,7 +159,6 @@ reanderAllHrr(period,date,capt,selectedRange){
 
       }); 
 
-
       let numberOfDays;
     if(selectedRange.rangeType !== 'today' && selectedRange.rangeType !== 'yesterday'){
       let startDate = selectedRange.dateRange.split("to")[0].trim();
