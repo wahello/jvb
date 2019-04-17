@@ -3602,7 +3602,7 @@ renderDateRangeDropdown(value,value5){
       		
       <Card  className = "card_style" >
 			<CardBody style={{backgroundColor:avgheartratecolor[0],color:avgheartratecolor[1]}}>
-			<CardTitle className = "header_style">Time in Aerobic Zone (102-137)  </CardTitle> 
+			<CardTitle className = "header_style">{'Time in Aerobic Zone ('+lower_aerobic_zone+' - '+higher_aerobic_zone+')'}</CardTitle> 
 			<CardText className = "value_style">{score}{' '}{'('+aerobicPrcnt+'%'+')'}</CardText>
 			</CardBody>
 			</Card>
@@ -3637,7 +3637,7 @@ renderDateRangeDropdown(value,value5){
 		   	
 			<Card className = "card_style">
       <CardBody style={{backgroundColor:avgheartratecolor[0],color:avgheartratecolor[1]}}>
-			<CardTitle className = "header_style">Time in Anaerobic Zone (138 or above)</CardTitle>
+			<CardTitle className = "header_style">{'Time in Anaerobic Zone ('+anerobic_zone+' or above)'}</CardTitle>
 			<CardText className = "value_style">{score}{' '}{'('+anerobicPrcnt+'%'+')'}</CardText>
 			</CardBody>
 			</Card>
@@ -3673,7 +3673,7 @@ renderDateRangeDropdown(value,value5){
 			  	
 				<Card className = "card_style" id = "my-card">
          <CardBody style={{backgroundColor:avgheartratecolor[0],color:avgheartratecolor[1]}}>
-				<CardTitle className = "header_style">Time in below Aerobic Zone (below 102)</CardTitle>
+				<CardTitle className = "header_style">{'Time in below Aerobic Zone (below '+below_aerobic_zone+')'}</CardTitle>
 				<CardText className = "value_style">{score}{' '}{'('+ belowAerobicPrcnt +'%'+')'}</CardText>
 				</CardBody>
 				</Card>
