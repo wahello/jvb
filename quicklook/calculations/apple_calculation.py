@@ -457,11 +457,10 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 		if todays_activity_data:
 			todays_activity_data = list(map(apple_to_garmin_activities,
 				todays_activity_data))
-		
 		combined_user_exercise_activities,combined_user_exec_non_exec_activities =\
 			quicklook.calculations.garmin_calculation.\
 				get_filtered_activity_stats(
-					todays_activity_data,user_age,
+					todays_activity_data[0],user_age,
 					userinput_activities = userinput_activities,
 					epoch_summaries = todays_epoch_data,
 					provide_all=True)
