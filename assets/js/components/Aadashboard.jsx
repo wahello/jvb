@@ -3592,7 +3592,7 @@ renderDateRangeDropdown(value,value5){
 
     for(let [key,ranges] of Object.entries(this.state.aa_ranges)){
       lower_aerobic_zone = ranges[1];
-      higher_aerobic_zone = ranges[2];
+      higher_aerobic_zone = ranges[2]-1;
     }
     let aa_ranges = this.state.aa_ranges['0'];
     let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min,durationdate);
@@ -3626,7 +3626,7 @@ renderDateRangeDropdown(value,value5){
 	anerobicTimeZone(value,durationdate){
     let anerobic_zone;
     for(let [key,ranges] of Object.entries(this.state.aa_ranges)){
-      anerobic_zone = ranges[2]+1;
+      anerobic_zone = ranges[2];
     }
     let heartRateNotRecorded = this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate)
     let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min,durationdate);
