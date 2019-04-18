@@ -80,7 +80,7 @@ class Aadashboard extends Component{
             
 
 			"exercise":{   
-			"avg_exercise_heart_rate":'80',         
+			"avg_non_strength_exercise_heart_rate":this.getInitialDur(),         
 			"hr_aerobic_duration_hour_min":this.getInitialDur(), 
 			"hr_anaerobic_duration_hour_min":this.getInitialDur(),
 			"hr_below_aerobic_duration_hour_min": this.getInitialDur(),                                      
@@ -89,7 +89,7 @@ class Aadashboard extends Component{
 			"prcnt_anaerobic_duration":this.getInitialDur(), 
 			"prcnt_below_aerobic_duration" : this.getInitialDur(),
 			"prcnt_hr_not_recorded_duration" : this.getInitialDur(),
-			"total_workout_duration_over_range" : this.getInitialDur()             
+			"workout_duration_hours_min" : this.getInitialDur()             
 			 }
 			},
 			"duration_date": this.getInitialDur(),
@@ -628,13 +628,30 @@ renderDateRangeDropdown(value,value5){
 	  return tableHeaders;	
   	}
 
-  	aaColorRanges(heartrate){
+  	aaColorRanges(heartrate,heartRateNotRecorded,workout_duration_hours_min_score){
   		let background = '';
       let color = '';
-  	    let userage = this.state.userage;
-     if( heartrate == null || heartrate == undefined || heartrate == 0){
+  	  let userage = this.state.userage;
+     if( heartrate == null || heartrate == undefined ){
   	  	background = '';
+        color = '';
+        return[background,color]
   	 }
+     else if ( heartrate == 0){
+        if( heartRateNotRecorded == 0 && (workout_duration_hours_min_score != ' ' || 
+           !workout_duration_hours_min_score)){
+           color = "white"
+           background="green";
+           return [background,color]
+          
+       }
+       else if( (heartRateNotRecorded != ' '||!heartRateNotRecorded) && (workout_duration_hours_min_score != ' ' || 
+                  !workout_duration_hours_min_score) ){
+          background = '';
+          color = '';
+          return [background,color]
+     }
+   }
   	 else{
   	  	    if(userage >=13 && userage <=16){
                    if( heartrate >= 153 && heartrate < 166){
@@ -650,7 +667,8 @@ renderDateRangeDropdown(value,value5){
                       background="#32CD32";	
                     }
                    else if(heartrate >= 179 && heartrate < 182){
-                      background="green";	
+                      background="green";
+                      color = "white";	
                     }
                     else if(heartrate >= 182 && heartrate < 187){
                       background="#32CD32";	
@@ -3560,54 +3578,49 @@ renderDateRangeDropdown(value,value5){
 				
 				if( userage >=98 && userage < 101){
   	  	        	if(heartrate >= 130 && heartrate < 131){
-                    
                     color="white";
   	  	        		background = "green";
   	  	        	}
   	  	        }				
   	  	 }
-  	  
        return [background,color];
   	}
 
 	aerobicTimeZone(value,durationdate){
     let lower_aerobic_zone;
     let higher_aerobic_zone;
+
     for(let [key,ranges] of Object.entries(this.state.aa_ranges)){
       lower_aerobic_zone = ranges[1];
       higher_aerobic_zone = ranges[2];
     }
     let aa_ranges = this.state.aa_ranges['0'];
-    let total_workout_duration_over_range_score = this.renderValue(value.total_workout_duration_over_range,durationdate);
+    let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min,durationdate);
      let aerobicPrcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_aerobic_duration,durationdate));
-     let score = this.aaExercisestats(this.renderValue(value.hr_aerobic_duration_hour_min,durationdate),total_workout_duration_over_range_score);
-     let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_exercise_heart_rate,durationdate));
-      
-     if( score == "No workout" ){
-     return(
-     		
-			<Card  className = "card_style" style={{backgroundColor:'',color:''}}>
-			<CardBody>
-			<CardTitle className = "header_style">{'Time in Aerobic Zone ('+lower_aerobic_zone+' - '+higher_aerobic_zone+')'}
-			</CardTitle> 
-			<CardText className = "value_style">{score}</CardText>
-			</CardBody>
-			</Card>  
-			    
+     let score = this.aaExercisestats(this.renderValue(value.hr_aerobic_duration_hour_min,durationdate),workout_duration_hours_min_score);
+     let heartRateNotRecorded = this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate)
+    let  avgheartratecolor  = this.aaColorRanges(this.renderValue(value.avg_non_strength_exercise_heart_rate,durationdate),heartRateNotRecorded,workout_duration_hours_min_score); 
+      if( score == "No workout" ){
+     return(  
+      <Card  className = "card_style" style={{backgroundColor:'',color:''}}>
+      <CardBody>
+      <CardTitle className = "header_style">{'Time in Aerobic Zone ('+lower_aerobic_zone+' - '+higher_aerobic_zone+')'}
+      </CardTitle> 
+      <CardText className = "value_style">{score}</CardText>
+      </CardBody>
+      </Card>  
          );
-      }
-      else{
-      	return(
-      		
+     }  
+     else{ 
+      return(   
       <Card  className = "card_style" >
-			<CardBody style={{backgroundColor:avgheartratecolor[0],color:avgheartratecolor[1]}}>
-			<CardTitle className = "header_style">{'Time in Aerobic Zone ('+lower_aerobic_zone+' - '+higher_aerobic_zone+')'}</CardTitle> 
-			<CardText className = "value_style">{score}{' '}{'('+aerobicPrcnt+'%'+')'}</CardText>
-			</CardBody>
-			</Card>
-	
-      	);
-      }        	
+      <CardBody style={{backgroundColor:avgheartratecolor[0],color:avgheartratecolor[1]}}>
+      <CardTitle className = "header_style">{'Time in Aerobic Zone ('+lower_aerobic_zone+' - '+higher_aerobic_zone+')'}</CardTitle> 
+      <CardText className = "value_style">{score}{' '}{'('+aerobicPrcnt+'%'+')'}</CardText>
+      </CardBody>
+      </Card>
+        );
+       }       	
 	}
 
 	anerobicTimeZone(value,durationdate){
@@ -3615,32 +3628,29 @@ renderDateRangeDropdown(value,value5){
     for(let [key,ranges] of Object.entries(this.state.aa_ranges)){
       anerobic_zone = ranges[2]+1;
     }
-    let total_workout_duration_over_range_score = this.renderValue(value.total_workout_duration_over_range,durationdate);
-		let score = this.aaExercisestats(this.renderValue(value.hr_anaerobic_duration_hour_min,durationdate),total_workout_duration_over_range_score);
+    let heartRateNotRecorded = this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate)
+    let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min,durationdate);
+		let score = this.aaExercisestats(this.renderValue(value.hr_anaerobic_duration_hour_min,durationdate),workout_duration_hours_min_score);
 		let anerobicPrcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_anaerobic_duration,durationdate));
-        let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_exercise_heart_rate,durationdate));
+    let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_non_strength_exercise_heart_rate,durationdate),heartRateNotRecorded,workout_duration_hours_min_score);    
         if( score == "No workout"){
 			return (
-				
 			<Card className = "card_style">
       <CardBody>
 			<CardTitle className = "header_style">{'Time in Anaerobic Zone ('+anerobic_zone+' or above)'}</CardTitle>
 			<CardText className = "value_style">{score}</CardText>
 			</CardBody>
 			</Card>
-		
 		   );
 		}
 		else{
-		   return (
-		   	
+		   return (	
 			<Card className = "card_style">
       <CardBody style={{backgroundColor:avgheartratecolor[0],color:avgheartratecolor[1]}}>
 			<CardTitle className = "header_style">{'Time in Anaerobic Zone ('+anerobic_zone+' or above)'}</CardTitle>
 			<CardText className = "value_style">{score}{' '}{'('+anerobicPrcnt+'%'+')'}</CardText>
 			</CardBody>
 			</Card>
-			
 		   );	
 		}     
 	}
@@ -3650,10 +3660,11 @@ renderDateRangeDropdown(value,value5){
     for(let [key,ranges] of Object.entries(this.state.aa_ranges)){
       below_aerobic_zone = ranges[0];
     }
-    let total_workout_duration_over_range_score = this.renderValue(value.total_workout_duration_over_range,durationdate);
-		let score = this.aaExercisestats(this.renderValue(value.hr_below_aerobic_duration_hour_min,durationdate),total_workout_duration_over_range_score);
+    let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min,durationdate);
+    let heartRateNotRecorded = this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate)
+		let score = this.aaExercisestats(this.renderValue(value.hr_below_aerobic_duration_hour_min,durationdate),workout_duration_hours_min_score);
 		let belowAerobicPrcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_below_aerobic_duration,durationdate))
-        let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_exercise_heart_rate,durationdate));
+        let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_non_strength_exercise_heart_rate,durationdate),heartRateNotRecorded,workout_duration_hours_min_score);
         if( score == "No workout")
         {
 			return(
@@ -3669,24 +3680,21 @@ renderDateRangeDropdown(value,value5){
 			}
 			else{
 			  return(
-			  	
 				<Card className = "card_style" id = "my-card">
          <CardBody style={{backgroundColor:avgheartratecolor[0],color:avgheartratecolor[1]}}>
 				<CardTitle className = "header_style">{'Time in below Aerobic Zone (below '+below_aerobic_zone+')'}</CardTitle>
 				<CardText className = "value_style">{score}{' '}{'('+ belowAerobicPrcnt +'%'+')'}</CardText>
 				</CardBody>
 				</Card>
-				
 			  );
 			}		                         
 	}
 
 	heartRateNotRecordedTimeZone(value,durationdate){
-    let total_workout_duration_over_range_score = this.renderValue(value.total_workout_duration_over_range,durationdate);
-		let score = this.aaExercisestats(this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate),total_workout_duration_over_range_score);
+    let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min,durationdate);
+		let score = this.aaExercisestats(this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate),workout_duration_hours_min_score);
     
 		let hrr_not_recorded_prcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_hr_not_recorded_duration,durationdate));
-        let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_exercise_heart_rate,durationdate));
         if( score == "No workout"){
 			return (
 				<Card className = "card_style">
@@ -3706,12 +3714,11 @@ renderDateRangeDropdown(value,value5){
 				</CardBody>
 				</Card>
 				);
-         }
-
-	}
+      }
+	 }
 
     totalworkoutdurationTimeZone(value,durationdate){
-		let score = this.renderValue(value.total_workout_duration_over_range,durationdate);
+		let score = this.renderValue(value.workout_duration_hours_min,durationdate);
     if(score == undefined || score == 0 || score == "" || score == "00:00" || score==null){
       score="No workout";
     }
@@ -3720,23 +3727,21 @@ renderDateRangeDropdown(value,value5){
     } 
         if(isNaN(score)){
 		return (
-			
 			<Card className = "card_style">
 			<CardBody>
 			<CardTitle className = "header_style">Total Workout Duration </CardTitle>
 			<CardText className = "value_style">{score}</CardText>
 			</CardBody>
-			</Card>   
-			           
+			</Card>            
          ); 
        }
 	}
 
-	 aaExercisestats(value,total_workout_duration_over_range_score){
-	 	if((value == undefined || value == 0 || value == "" || value == "00:00" || value==null) && (total_workout_duration_over_range_score == undefined || total_workout_duration_over_range_score == 0 || total_workout_duration_over_range_score == "" || total_workout_duration_over_range_score == "00:00"||total_workout_duration_over_range_score == null) ){
+	 aaExercisestats(value,workout_duration_hours_min_score){
+	 	if((value == undefined || value == 0 || value == "" || value == "00:00" || value==null) && (workout_duration_hours_min_score == undefined || workout_duration_hours_min_score == 0 || workout_duration_hours_min_score == "" || workout_duration_hours_min_score == "00:00"||workout_duration_hours_min_score == null) ){
         	value = "No workout"
       	}
-      	else if(total_workout_duration_over_range_score&&total_workout_duration_over_range_score!=""){
+      	else if(workout_duration_hours_min_score && workout_duration_hours_min_score!=""){
         	value = value
       	}
     	return value;
