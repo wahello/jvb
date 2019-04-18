@@ -43,7 +43,7 @@ def create_or_update_activities(sender,instance,created,**kwargs):
 		request = kwargs.get('request')
 		user_id = instance.user.id
 		from_date = instance.belong_to
-		from_date_str = from_date.strftime("%Y-%m-%d")
+		from_date_str = from_date[0:10]
 		'''generate_quicklook function goto quicklook/task.py'''
 		generate_quicklook.delay(user_id,from_date_str,from_date_str)
 	else:
@@ -51,7 +51,7 @@ def create_or_update_activities(sender,instance,created,**kwargs):
 		request = kwargs.get('request')
 		user_id = instance.user.id
 		from_date = instance.belong_to
-		from_date_str = from_date.strftime("%Y-%m-%d")
+		from_date_str = from_date[0:10]
 		generate_quicklook.delay(user_id,from_date_str,from_date_str)
 
 
@@ -64,7 +64,7 @@ def create_or_update_steps(sender,instance,created, **kwargs):
 		request = kwargs.get('request')
 		user_id = instance.user.id
 		from_date = instance.belong_to
-		from_date_str = from_date.strftime("%Y-%m-%d")
+		from_date_str = from_date[0:10]
 		'''generate_quicklook function goto quicklook/task.py'''
 		generate_quicklook.delay(user_id,from_date_str,from_date_str)
 	else:
@@ -72,5 +72,5 @@ def create_or_update_steps(sender,instance,created, **kwargs):
 		request = kwargs.get('request')
 		user_id = instance.user.id
 		from_date = instance.belong_to
-		from_date_str = from_date.strftime("%Y-%m-%d")
+		from_date_str = from_date[0:10]
 		generate_quicklook.delay(user_id,from_date_str,from_date_str)
