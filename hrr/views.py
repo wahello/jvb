@@ -2692,6 +2692,7 @@ def aa_low_high_end_calculations(request):
 	return JsonResponse(data)
 
 def store_garmin_aa3(user,from_date,to_date):
+	activities_dict = get_usernput_activities(user,from_date)
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
@@ -2746,7 +2747,6 @@ def store_aa_low_high_end_calculations(user,from_date,to_date):
 		print("Fitbit AA chat3 data calculation got started")
 		store_fitbit_aa3(user,from_date,to_date)
 		print("Fitbit AA chat3 data calculation finished")
-
 def hrr_data(user,start_date):
 	Did_heartrate_reach_99 = ''
 	time_99 = 0.0
@@ -2825,7 +2825,6 @@ def hrr_data(user,start_date):
 		daily_starttime = garmin_data_daily['startTimeInSeconds']
 	else:
 		daily_starttime = None
-
 	start = start_date
 	end = start_date + timedelta(days=3)
 	fitfiles_obj = get_fitfiles(user,start_date,start,end,start_date_timestamp,end_date_timestamp)
@@ -2836,7 +2835,7 @@ def hrr_data(user,start_date):
 		hrr file if it fails then else block will do assumtion calculation for idetifying
 		the HRR fit file
 	'''
-	try:
+	try:		
 		if activities_dic:
 			for tmp in fitfiles_obj:
 				meta = tmp.meta_data_fitfile
@@ -2846,7 +2845,7 @@ def hrr_data(user,start_date):
 					hrr.append(tmp)
 				elif data_id in workout_id:
 					workout.append(tmp)
-		else:
+		else:		
 			for tmp in fitfiles_obj:
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
@@ -2857,6 +2856,7 @@ def hrr_data(user,start_date):
 					hrr.append(tmp)
 	except:
 		logging.exception("message")
+
 	all_activities_heartrate = []
 	all_activities_timestamp = []
 	all_activities_timestamp_raw = []
@@ -2872,7 +2872,7 @@ def hrr_data(user,start_date):
 		workout_final_timestamp = ''
 		workout_timestamp = ''
 	Did_you_measure_HRR = ""
-	if hrr and workout and all_activities_heartrate:
+	if hrr and workout and all_activities_heartrate:	
 		hrr_data = fitfile_parse(hrr,offset,start_date_str)
 		hrr_final_heartrate,hrr_final_timestamp,hrr_timestamp = hrr_data
 		Did_you_measure_HRR = 'yes'
@@ -3022,7 +3022,7 @@ def hrr_data(user,start_date):
 
 	else:
 		Did_you_measure_HRR = 'no'
-
+		
 	if (not hrr) and workout and workout_final_heartrate:
 		end_time_activity = workout_timestamp[-1]-(offset)
 		end_heartrate_activity  = workout_final_heartrate[-1]
@@ -3250,7 +3250,8 @@ def store_garmin_hrr(user,from_date,to_date,type_data):
 			hrr_obj = Hrr.objects.get(user_hrr=user,created_at=current_date)
 		except:
 			hrr_obj = None
-		if not hrr_obj.use_updated_hrr:
+			logging.exception("message")
+		if not hrr_obj or not hrr_obj.use_updated_hrr:
 			if type_data == 'dailies' or not hrr_obj or hrr_obj.Did_you_measure_HRR == 'no':
 				hrr_only_store(user,current_date)
 			elif not type_data:
