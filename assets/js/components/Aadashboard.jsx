@@ -3699,7 +3699,7 @@ renderDateRangeDropdown(value,value5){
 			return (
 				<Card className = "card_style">
 				<CardBody>
-				<CardTitle className = "header_style">Heart Rate Not Reorded</CardTitle>
+				<CardTitle className = "header_style">Heart Rate Not Recorded</CardTitle>
 				<CardText className = "value_style">{score}</CardText>
 				</CardBody>
 				</Card>
@@ -3709,7 +3709,7 @@ renderDateRangeDropdown(value,value5){
          	return (		
 				<Card className = "card_style">
 				<CardBody>
-				<CardTitle className = "header_style">Heart Rate Not Reorded</CardTitle>
+				<CardTitle className = "header_style">Heart Rate Not Recorded</CardTitle>
 				<CardText className = "value_style">{score}{' '}{'('+hrr_not_recorded_prcnt+'%'+')'}</CardText>
 				</CardBody>
 				</Card>
