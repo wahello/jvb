@@ -2910,7 +2910,7 @@ handleScroll() {
                               </ModalBody>
                            </Modal> 
 
-                        { ((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
+                       {/*  { ((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                             <FormGroup>  
                               {this.state.editable &&
                                 <div className="input1">
@@ -3150,7 +3150,7 @@ handleScroll() {
                             }
                           </FormGroup>   
                        }
-                       </Collapse>
+                       </Collapse>*/}  
                            
                             
                       
