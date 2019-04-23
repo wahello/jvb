@@ -1,5 +1,3 @@
-
-
 import React, {Component} from 'react'
 import _ from 'lodash';
 import {Button,FormGroup, Label, Input, FormText, className, Modal,
