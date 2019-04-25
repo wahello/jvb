@@ -638,18 +638,18 @@ renderDateRangeDropdown(value,value5){
         return[background,color];                                    
          }
      else if ( heartrate == 0){
-        if( heartRateNotRecorded == 0 && (workout_duration_hours_min_score != ' ' && 
+        if( heartRateNotRecorded == "00:00" && (workout_duration_hours_min_score != ' ' && workout_duration_hours_min_score != '00:00' &&
            workout_duration_hours_min_score)){
-           color = ""
-           background="";
+           background = 'green';
+           color = 'white';
            return [background,color]
           
        }
-       else if( (heartRateNotRecorded != ' '||heartRateNotRecorded) && (workout_duration_hours_min_score != ' ' && 
-                  workout_duration_hours_min_score) ){
-          background = 'green';
-          color = 'white';
-          return [background,color]
+       else if( (heartRateNotRecorded != "00:00" && heartRateNotRecorded) && (workout_duration_hours_min_score != ' ' && 
+                  workout_duration_hours_min_score && workout_duration_hours_min_score != '00:00') ){
+         color = ""
+         background="";  
+         return [background,color]
      }
    }
   	 else{
