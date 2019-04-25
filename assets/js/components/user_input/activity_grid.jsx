@@ -1,4 +1,3 @@
-
 import React, {Component} from 'react'
 import _ from 'lodash';
 import {Button,FormGroup, Label, Input, FormText, className, Modal,
@@ -91,6 +90,7 @@ const activites = { "":"Select",
 "TRANSITION":"TRANSITION",
 "TREADMILL_RUNNING":"TREADMILL RUNNING",
 "UNCATEGORIZED":"UNCATEGORIZED",
+"VOLLEYBALL":"VOLLEYBALL",
 "WALKING":"WALKING",
 "WHITEWATER_RAFTING_KAYAKING":"WHITE WATER RAFTING KAYAKING",
 "WIND_KITE_SURFING":"WIND KITE SURFING",
