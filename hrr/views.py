@@ -996,6 +996,7 @@ def aa_data(user,start_date):
 	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
 	ui_data_hrr = []
 	ui_data_keys_test = []
+
 	for ui_data_single in ui_data.values():
 		if ui_data_single.get('activityType') == 'HEART_RATE_RECOVERY':
 			summaryId = ui_data_single['summaryId']
@@ -1246,7 +1247,6 @@ def aa_data(user,start_date):
 					"percent_below_aerobic":None,
 					"percent_anaerobic":None,
 					"total_percent":None}
-	
 	if user_created_activity_list:
 		added_data = add_created_activity1(
 			user_created_activity_list,data,below_aerobic_value,anaerobic_value,aerobic_range,anaerobic_range,below_aerobic_range)
@@ -2578,7 +2578,6 @@ def aa_low_high_end_data(user,start_date):
 			  "time_in_zone":0,
 			  "prcnt_total_duration_in_zone":0,
 			 }
-
 		data2[str(a)]=data
 	total = {"total_duration":0,
 				"total_percent":0}
@@ -2656,7 +2655,6 @@ def aa_low_high_end_data(user,start_date):
 				data2['total']['total_duration']+data2['heartrate_not_recorded'].get('time_in_zone',0)+sum(
 					duration_activites))
 		data2 = percent_added_activity(data2,data2['total']['total_duration'])
-
 	if data2["total"]["total_duration"]:
 		return data2
 	else:
