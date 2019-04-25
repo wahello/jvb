@@ -1184,7 +1184,7 @@ def add_to_final_data(user,final_data,user_input_activities,hr_not_recorded_ids)
 					duration_in_anaerobic_range = None
 					duration_below_aerobic_range = None
 					duration_in_aerobic_range = None
-					if hr >= 155:
+					if hr >= anarobic:
 						duration_in_anaerobic_range = activity.get("durationInSeconds")
 					elif hr <= below_aerobic:
 						duration_below_aerobic_range = activity.get("durationInSeconds")
@@ -1208,7 +1208,6 @@ def add_to_final_data(user,final_data,user_input_activities,hr_not_recorded_ids)
 		final_data.pop("Totals")	
 	except KeyError:
 		pass
-	print(final_data,"final data")
 	return add_totals(final_data)
 
 
