@@ -628,34 +628,35 @@ renderDateRangeDropdown(value,value5){
 	  return tableHeaders;	
   	}
 
-  	aaColorRanges(heartrate,heartRateNotRecorded,workout_duration_hours_min_score){
+  	aaColorRanges(heartrate,heartRateNotRecorded,workout_duration_hours_min_score){ 
   		let background = '';
       let color = '';
   	  let userage = this.state.userage;
-     if( heartrate == null || heartrate == undefined ){
+     if( heartrate == null || heartrate == undefined ){ 
   	  	background = '';
         color = '';
-        return[background,color]
-  	 }
+        return[background,color];                                    
+         }
      else if ( heartrate == 0){
-        if( heartRateNotRecorded == 0 && (workout_duration_hours_min_score != ' ' || 
-           !workout_duration_hours_min_score)){
-           color = "white"
-           background="green";
+        if( heartRateNotRecorded == "00:00" && (workout_duration_hours_min_score != ' ' && workout_duration_hours_min_score != '00:00' &&
+           workout_duration_hours_min_score)){
+           background = 'green';
+           color = 'white';
            return [background,color]
           
        }
-       else if( (heartRateNotRecorded != ' '||!heartRateNotRecorded) && (workout_duration_hours_min_score != ' ' || 
-                  !workout_duration_hours_min_score) ){
-          background = '';
-          color = '';
-          return [background,color]
+       else if( (heartRateNotRecorded != "00:00" && heartRateNotRecorded) && (workout_duration_hours_min_score != ' ' && 
+                  workout_duration_hours_min_score && workout_duration_hours_min_score != '00:00') ){
+         color = ""
+         background="";  
+         return [background,color]
      }
    }
   	 else{
   	  	    if(userage >=13 && userage <=16){
                    if( heartrate >= 153 && heartrate < 166){
                      background="#32CD32";	
+                     color = "white";
                     }
                    else if(heartrate >= 166 && heartrate < 170){
                       background="Yellow";	
@@ -665,13 +666,15 @@ renderDateRangeDropdown(value,value5){
                     }
                    else if(heartrate >= 175 && heartrate < 179){
                       background="#32CD32";	
+                      color = "white";
                     }
                    else if(heartrate >= 179 && heartrate < 182){
                       background="green";
                       color = "white";	
                     }
                     else if(heartrate >= 182 && heartrate < 187){
-                      background="#32CD32";	
+                      background="#32CD32";
+                        color = "white";
                     }
                     else if(heartrate >= 187 && heartrate < 190){
                       background="Yellow";	
@@ -693,6 +696,7 @@ renderDateRangeDropdown(value,value5){
   	  	        if( userage >=13 && userage < 14){
   	  	        	if(heartrate >= 121 && heartrate < 141){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 141 && heartrate <= 153){
                     color = "white";
@@ -703,6 +707,7 @@ renderDateRangeDropdown(value,value5){
   	  	        if( userage >=14 && userage < 15){
   	  	        	if(heartrate >= 121 && heartrate < 140){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 140 && heartrate < 153){
                     color = "white";
@@ -713,6 +718,7 @@ renderDateRangeDropdown(value,value5){
   	  	        if( userage >=15 && userage < 16){
   	  	        	if(heartrate >= 121 && heartrate < 139){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 139 && heartrate < 153){
                     color = "white";
@@ -723,6 +729,7 @@ renderDateRangeDropdown(value,value5){
   	  	         if( userage >=18 && userage < 55){
   	  	        	if(heartrate >= 179 && heartrate < 184){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 184 && heartrate < 187){
   	  	        		background = "Yellow";
@@ -744,6 +751,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 164 && heartrate < 167){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 167 && heartrate < 179){
                     color = "white";
@@ -784,12 +792,14 @@ renderDateRangeDropdown(value,value5){
   	  	         if( userage >=59 && userage < 80){
   	  	        	if(heartrate >= 126 && heartrate < 127){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        }
 
   	  	         if( userage >=55 && userage < 80){
   	  	        	if(heartrate >= 106 && heartrate < 110){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 110 && heartrate < 125){
                     color = "white";
@@ -800,6 +810,7 @@ renderDateRangeDropdown(value,value5){
   	  	         if( userage >=16 && userage < 17){
   	  	        	if(heartrate >= 121 && heartrate < 138){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 138 && heartrate < 153){
                     color = "white";
@@ -807,6 +818,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 165){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 165 && heartrate < 169){
   	  	        		background = "Yellow";
@@ -816,6 +828,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 174 && heartrate < 178){
   	  	        		background = "#32CD32" ;
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 178 && heartrate < 181){
                     color = "white";
@@ -823,6 +836,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 181 && heartrate < 186){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 186 && heartrate < 189){
   	  	        		background = "Yellow";
@@ -838,6 +852,7 @@ renderDateRangeDropdown(value,value5){
   	  	        if( userage >=17 && userage < 18){
   	  	        	if(heartrate >= 121 && heartrate < 137){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 137 && heartrate < 153){
                     color = "white";
@@ -845,6 +860,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 164){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 164 && heartrate < 168){
   	  	        		background = "Yellow";
@@ -853,7 +869,8 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 173 && heartrate < 177){
-  	  	        		background = "#32CD32" ;
+  	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 177 && heartrate < 180){
                     color = "white";
@@ -861,6 +878,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 180 && heartrate < 185){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 185 && heartrate < 188){
   	  	        		background = "Yellow";
@@ -877,6 +895,7 @@ renderDateRangeDropdown(value,value5){
   	  	         if( userage >=18 && userage < 19){
   	  	        	if(heartrate >= 121 && heartrate < 136){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 136 && heartrate < 153){
                     color = "white";
@@ -884,6 +903,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 163){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 163 && heartrate < 167){
   	  	        		background = "Yellow";
@@ -892,7 +912,8 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 172 && heartrate < 176){
-  	  	        		background = "#32CD32" ;
+  	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 176 && heartrate < 179){
                     color = "white";
@@ -910,6 +931,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 162){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 162 && heartrate < 166){
   	  	        		background = "Yellow";
@@ -919,7 +941,8 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 171 && heartrate < 174){
-  	  	        		background = "#32CD32" ;
+  	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 174 && heartrate < 179){
                          color = "white";
@@ -930,6 +953,7 @@ renderDateRangeDropdown(value,value5){
   	  	          if( userage >=20 && userage < 21){
   	  	        	if(heartrate >= 121 && heartrate < 134){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 134 && heartrate < 153){
                          color = "white";
@@ -937,6 +961,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 161){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 161 && heartrate < 165){
   	  	        		background = "Yellow";
@@ -945,7 +970,8 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 170 && heartrate < 173){
-  	  	        		background = "#32CD32" ;
+  	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 173 && heartrate < 179){
                          color = "white";
@@ -956,6 +982,7 @@ renderDateRangeDropdown(value,value5){
   	  	           if( userage >=21 && userage < 22){
   	  	        	if(heartrate >= 121 && heartrate < 133){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 133 && heartrate < 153){
                          color = "white";
@@ -963,6 +990,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 160){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 160 && heartrate < 164){
   	  	        		background = "Yellow";
@@ -971,7 +999,8 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 169 && heartrate < 172){
-  	  	        		background = "#32CD32" ;
+  	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 172 && heartrate < 179){
                          color = "white";
@@ -982,6 +1011,7 @@ renderDateRangeDropdown(value,value5){
   	  	           if( userage >=22 && userage < 23){
   	  	        	if(heartrate >= 121 && heartrate < 132){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 132 && heartrate < 153){
                          color = "white";
@@ -989,6 +1019,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 159){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 159 && heartrate < 163){
   	  	        		background = "Yellow";
@@ -997,7 +1028,8 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 168 && heartrate < 171){
-  	  	        		background = "#32CD32" ;
+  	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 171 && heartrate < 179){
                          color = "white";
@@ -1009,6 +1041,7 @@ renderDateRangeDropdown(value,value5){
   	  	           if( userage >=23 && userage < 24){
   	  	        	if(heartrate >= 121 && heartrate < 131){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 131 && heartrate < 153){
                          color = "white";
@@ -1016,6 +1049,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 158){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 158 && heartrate < 162){
   	  	        		background = "Yellow";
@@ -1024,7 +1058,8 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 167 && heartrate < 170){
-  	  	        		background = "#32CD32" ;
+  	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 170 && heartrate < 179){
                          color = "white";
@@ -1036,6 +1071,7 @@ renderDateRangeDropdown(value,value5){
   	  	      if( userage >=24 && userage < 25){
   	  	        	if(heartrate >= 121 && heartrate < 130){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 130 && heartrate < 152){
                          color = "white";
@@ -1043,6 +1079,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 152 && heartrate < 157){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 157 && heartrate < 161){
   	  	        		background = "Yellow";
@@ -1051,7 +1088,8 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 166 && heartrate < 169){
-  	  	        		background = "#32CD32" ;
+  	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 169 && heartrate < 179){
                          color = "white";
@@ -1066,9 +1104,11 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 120 && heartrate < 129){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 129 && heartrate < 151){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 156 && heartrate < 160){
   	  	        		background = "Yellow";
@@ -1077,7 +1117,8 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 165 && heartrate < 168){
-  	  	        		background = "#32CD32" ;
+  	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 168 && heartrate < 179){
                          color = "white";
@@ -1092,6 +1133,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 119 && heartrate < 128){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 128 && heartrate < 150){
                          color = "white";
@@ -1099,6 +1141,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 150 && heartrate < 155){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	
   	  	        }
@@ -1111,6 +1154,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 118 && heartrate < 127){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 127 && heartrate < 149){
                          color = "white";
@@ -1118,6 +1162,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 149 && heartrate < 155){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	
   	  	        }
@@ -1129,6 +1174,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 117 && heartrate < 126){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 126 && heartrate < 148){
                          color = "white";
@@ -1136,6 +1182,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 148 && heartrate < 155){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	
   	  	        }
@@ -1148,6 +1195,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 116 && heartrate < 125){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 125 && heartrate < 147){
                          color = "white";
@@ -1155,6 +1203,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 147 && heartrate < 155){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	
   	  	        }
@@ -1167,6 +1216,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 116 && heartrate < 124){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 124 && heartrate < 146){
                          color = "white";
@@ -1174,6 +1224,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 146 && heartrate < 155){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	
   	  	        }
@@ -1188,6 +1239,7 @@ renderDateRangeDropdown(value,value5){
 				if( userage >=31 && userage < 32){
   	  	        	if(heartrate >= 115 && heartrate < 134){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 134 && heartrate < 146){
                          color = "white";
@@ -1195,6 +1247,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 146 && heartrate < 155){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 155 && heartrate < 160){
   	  	        		background = "Yellow";
@@ -1205,6 +1258,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 168 && heartrate < 171){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 171 && heartrate < 179){
                          color = "white";
@@ -1217,6 +1271,7 @@ renderDateRangeDropdown(value,value5){
                     if( userage >=32 && userage < 33){
   	  	        	if(heartrate >= 115 && heartrate < 133){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 133 && heartrate < 146){
                          color = "white";
@@ -1224,6 +1279,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 146 && heartrate < 154){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 154 && heartrate < 159){
   	  	        		background = "Yellow";
@@ -1234,6 +1290,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 167 && heartrate < 170){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 170 && heartrate < 179){
                          color = "white";
@@ -1246,6 +1303,7 @@ renderDateRangeDropdown(value,value5){
   	  	        if( userage >=33 && userage < 34){
   	  	        	if(heartrate >= 115 && heartrate < 132){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 132 && heartrate < 146){
                          color = "white";
@@ -1253,6 +1311,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 146 && heartrate < 153){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 158){
   	  	        		background = "Yellow";
@@ -1263,6 +1322,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 166 && heartrate < 169){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 169 && heartrate < 179){
                          color = "white";
@@ -1274,6 +1334,7 @@ renderDateRangeDropdown(value,value5){
 				if( userage >=34 && userage < 35){
   	  	        	if(heartrate >= 115 && heartrate < 131){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 131 && heartrate < 146){
                          color = "white";
@@ -1281,6 +1342,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 146 && heartrate < 152){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 152 && heartrate < 157){
   	  	        		background = "Yellow";
@@ -1291,6 +1353,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 165 && heartrate < 166){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 168 && heartrate < 179){
                          color = "white";
@@ -1303,6 +1366,7 @@ renderDateRangeDropdown(value,value5){
 				if( userage >=35 && userage < 36){
   	  	        	if(heartrate >= 115 && heartrate < 130){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 130 && heartrate < 146){
                          color = "white";
@@ -1310,6 +1374,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 146 && heartrate < 151){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 151 && heartrate < 156){
   	  	        		background = "Yellow";
@@ -1320,6 +1385,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 164 && heartrate < 167){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 167 && heartrate < 179){
                          color = "white";
@@ -1331,6 +1397,7 @@ renderDateRangeDropdown(value,value5){
 				if( userage >=36 && userage < 37){
   	  	        	if(heartrate >= 115 && heartrate < 129){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 129 && heartrate < 145){
                          color = "white";
@@ -1338,6 +1405,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 145 && heartrate < 150){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 150 && heartrate < 155){
   	  	        		background = "Yellow";
@@ -1348,6 +1416,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 163 && heartrate < 166){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 166 && heartrate < 179){
                          color = "white";
@@ -1363,6 +1432,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 114 && heartrate < 128){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 128 && heartrate < 144){
                          color = "white";
@@ -1370,6 +1440,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 144 && heartrate < 149){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
 
   	  	        	else if(heartrate >= 149 && heartrate < 154){
@@ -1380,6 +1451,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 162 && heartrate < 165){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 165 && heartrate < 179){
                          color = "white";
@@ -1395,6 +1467,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 113 && heartrate < 127){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 127 && heartrate < 143){
                          color = "white";
@@ -1402,6 +1475,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 143 && heartrate < 148){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
 
   	  	        	else if(heartrate >= 148 && heartrate < 153){
@@ -1412,6 +1486,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 161 && heartrate < 164){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 164 && heartrate < 179){
                          color = "white";
@@ -1427,6 +1502,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 112 && heartrate < 126){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 126 && heartrate < 142){
                          color = "white";
@@ -1434,6 +1510,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 142 && heartrate < 147){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
 
   	  	        	else if(heartrate >= 147 && heartrate < 152){
@@ -1444,6 +1521,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 160 && heartrate < 163){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 163 && heartrate < 179){
                          color = "white";
@@ -1459,6 +1537,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 112 && heartrate < 125){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 125 && heartrate < 141){
                          color = "white";
@@ -1466,6 +1545,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 141 && heartrate < 146){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
 
   	  	        	else if(heartrate >= 146 && heartrate < 151){
@@ -1476,6 +1556,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 159 && heartrate < 162){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 162 && heartrate < 179){
                          color = "white";
@@ -1494,6 +1575,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 110 && heartrate < 124){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 124 && heartrate < 140){
                          color = "white";
@@ -1502,6 +1584,7 @@ renderDateRangeDropdown(value,value5){
 
   	  	        	else if(heartrate >= 140 && heartrate < 145){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 145 && heartrate < 150){
   	  	        		background = "Yellow";
@@ -1511,14 +1594,12 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 158 && heartrate < 161){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
-
   	  	        	else if(heartrate >= 161 && heartrate < 179){
                          color = "white";
   	  	        		background = "green";
-  	  	        	}
-  	  	        	
-  	  	        	
+  	  	        	} 	  	        	
   	  	        }
 
   	  	        	if( userage >=42 && userage < 43){
@@ -1530,6 +1611,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 109 && heartrate < 123){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 123 && heartrate < 139){
                          color = "white";
@@ -1538,6 +1620,7 @@ renderDateRangeDropdown(value,value5){
 
   	  	        	else if(heartrate >= 139 && heartrate < 144){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 144 && heartrate < 149){
   	  	        		background = "Yellow";
@@ -1547,6 +1630,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 157 && heartrate < 160){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 160 && heartrate < 179){
                          color = "white";
@@ -1564,6 +1648,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 108 && heartrate < 122){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 122 && heartrate < 138){
                          color = "white";
@@ -1572,6 +1657,7 @@ renderDateRangeDropdown(value,value5){
 
   	  	        	else if(heartrate >= 138 && heartrate < 143){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 143 && heartrate < 148){
   	  	        		background = "Yellow";
@@ -1581,6 +1667,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 156 && heartrate < 159){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 159 && heartrate < 179){
                          color = "white";
@@ -1598,6 +1685,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 107 && heartrate < 121){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 121 && heartrate < 137){
                          color = "white";
@@ -1606,6 +1694,7 @@ renderDateRangeDropdown(value,value5){
 
   	  	        	else if(heartrate >= 137 && heartrate < 142){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 142 && heartrate < 147){
   	  	        		background = "Yellow";
@@ -1615,6 +1704,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 155 && heartrate < 158){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 158 && heartrate < 179){
                          color = "white";
@@ -1632,6 +1722,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 106 && heartrate < 120){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 120 && heartrate < 136){
                          color = "white";
@@ -1640,6 +1731,7 @@ renderDateRangeDropdown(value,value5){
 
   	  	        	else if(heartrate >= 136 && heartrate < 141){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 141 && heartrate < 146){
   	  	        		background = "Yellow";
@@ -1649,6 +1741,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 154 && heartrate < 157){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 157 && heartrate < 179){
                          color = "white";
@@ -1667,6 +1760,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 106 && heartrate < 119){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 119 && heartrate < 135){
                          color = "white";
@@ -1675,6 +1769,7 @@ renderDateRangeDropdown(value,value5){
 
   	  	        	else if(heartrate >= 135 && heartrate < 140){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 140 && heartrate < 145){
   	  	        		background = "Yellow";
@@ -1684,6 +1779,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 156){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 156 && heartrate < 179){
                          color = "white";
@@ -1701,6 +1797,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 106 && heartrate < 118){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 118 && heartrate < 134){
                          color = "white";
@@ -1709,6 +1806,7 @@ renderDateRangeDropdown(value,value5){
 
   	  	        	else if(heartrate >= 134 && heartrate < 139){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 140 && heartrate < 144){
   	  	        		background = "Yellow";
@@ -1718,17 +1816,18 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 152 && heartrate < 155){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 155 && heartrate < 179){
                          color = "white";
   	  	        		background = "green";
   	  	        	}	  	        	
-  	  	        	
   	  	        }	
 
   	  	        if( userage >=48 && userage < 49){
   	  	        	if(heartrate >= 106 && heartrate < 117){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 117 && heartrate < 133){
                          color = "white";
@@ -1736,6 +1835,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 133 && heartrate < 138){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 138 && heartrate < 143){
   	  	        		background = "Yellow";
@@ -1746,6 +1846,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 151 && heartrate < 154){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 154 && heartrate < 179){
                          color = "white";
@@ -1758,6 +1859,7 @@ renderDateRangeDropdown(value,value5){
   	  	         if( userage >=49 && userage < 50){
   	  	        	if(heartrate >= 106 && heartrate < 116){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 116 && heartrate < 132){
                     color = "white";
@@ -1765,6 +1867,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 132 && heartrate < 137){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 137 && heartrate < 142){
   	  	        		background = "Yellow";
@@ -1775,6 +1878,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 150 && heartrate < 153){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 179){
                          color = "white";
@@ -1786,6 +1890,7 @@ renderDateRangeDropdown(value,value5){
   	  	        if( userage >=50 && userage < 51){
   	  	        	if(heartrate >= 106 && heartrate < 115){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 115 && heartrate < 131){
                          color = "white";
@@ -1793,6 +1898,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 131 && heartrate < 136){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 136 && heartrate < 141){
   	  	        		background = "Yellow";
@@ -1803,6 +1909,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 149 && heartrate < 152){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 152 && heartrate < 179){
                          color = "white";
@@ -1813,6 +1920,7 @@ renderDateRangeDropdown(value,value5){
 							if( userage >=51 && userage < 52){
   	  	        	if(heartrate >= 106 && heartrate < 114){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 114 && heartrate < 130){
                          color = "white";
@@ -1820,6 +1928,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 130 && heartrate < 135){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 135 && heartrate < 140){
   	  	        		background = "Yellow";
@@ -1830,6 +1939,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 148 && heartrate < 151){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 151 && heartrate < 179){
                          color = "white";
@@ -1840,6 +1950,7 @@ renderDateRangeDropdown(value,value5){
 						if( userage >=52 && userage < 53){
   	  	        	if(heartrate >= 106 && heartrate < 113){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 113 && heartrate < 129){
                          color = "white";
@@ -1847,6 +1958,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 129 && heartrate < 134){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 134 && heartrate < 139){
   	  	        		background = "Yellow";
@@ -1857,6 +1969,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 147 && heartrate < 150){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 150 && heartrate < 179){
                          color = "white";
@@ -1868,6 +1981,7 @@ renderDateRangeDropdown(value,value5){
 				if( userage >=53 && userage < 54){
   	  	        	if(heartrate >= 106 && heartrate < 112){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 112 && heartrate < 128){
                          color = "white";
@@ -1875,6 +1989,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 128 && heartrate < 133){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 133 && heartrate < 138){
   	  	        		background = "Yellow";
@@ -1885,6 +2000,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 146 && heartrate < 149){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 149 && heartrate < 179){
                          color = "white";
@@ -1897,6 +2013,7 @@ renderDateRangeDropdown(value,value5){
 				if( userage >=54 && userage < 55){
   	  	        	if(heartrate >= 106 && heartrate < 111){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 111 && heartrate < 127){
                          color = "white";
@@ -1904,6 +2021,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 127 && heartrate < 132){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 132 && heartrate < 137){
   	  	        		background = "Yellow";
@@ -1914,6 +2032,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 145 && heartrate < 148){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 148 && heartrate < 179){
   	  	        		background = "green";
@@ -1925,6 +2044,7 @@ renderDateRangeDropdown(value,value5){
 				if( userage >=55 && userage < 56){
   	  	        	if(heartrate >= 126 && heartrate < 131){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 131 && heartrate < 136){
   	  	        		background = "Yellow";
@@ -1934,6 +2054,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 144 && heartrate < 149){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
 
   	  	        	else if(heartrate >= 149 && heartrate < 174){
@@ -1942,6 +2063,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 174 && heartrate < 179){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 179 && heartrate < 184){
   	  	        		background = "Yellow";
@@ -1958,6 +2080,7 @@ renderDateRangeDropdown(value,value5){
   	  	        if( userage >=56 && userage < 57){
   	  	        	if(heartrate >= 126 && heartrate < 130){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 130 && heartrate < 135){
   	  	        		background = "Yellow";
@@ -1967,6 +2090,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 143 && heartrate < 148){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
 
   	  	        	else if(heartrate >= 148 && heartrate < 173){
@@ -1975,6 +2099,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 173 && heartrate < 178){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 178 && heartrate < 183){
   	  	        		background = "Yellow";
@@ -1992,6 +2117,7 @@ renderDateRangeDropdown(value,value5){
 					if( userage >=57 && userage < 58){
   	  	        	if(heartrate >= 126 && heartrate < 129){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 129 && heartrate < 134){
   	  	        		background = "Yellow";
@@ -2001,6 +2127,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 142 && heartrate < 147){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
 
   	  	        	else if(heartrate >= 147 && heartrate < 172){
@@ -2009,6 +2136,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 172 && heartrate < 177){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 177 && heartrate < 182){
   	  	        		background = "Yellow";
@@ -2025,6 +2153,7 @@ renderDateRangeDropdown(value,value5){
   	  	        if( userage >=58 && userage < 59){
   	  	        	if(heartrate >= 126 && heartrate < 128){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 128 && heartrate < 133){
   	  	        		background = "Yellow";
@@ -2034,6 +2163,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 141 && heartrate < 146){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
 
   	  	        	else if(heartrate >= 146 && heartrate < 171){
@@ -2042,6 +2172,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 171 && heartrate < 176){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 176 && heartrate < 181){
   	  	        		background = "Yellow";
@@ -2064,6 +2195,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 140 && heartrate < 145){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 145 && heartrate < 170){
                          color = "white";
@@ -2072,6 +2204,7 @@ renderDateRangeDropdown(value,value5){
 
   	  	        	else if(heartrate >= 170 && heartrate < 175){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 175 && heartrate < 180){
   	  	        		background = "Yellow";
@@ -2095,6 +2228,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 139 && heartrate < 144){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 144 && heartrate < 169){
                          color = "white";
@@ -2103,6 +2237,7 @@ renderDateRangeDropdown(value,value5){
 
   	  	        	else if(heartrate >= 169 && heartrate < 174){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 174&& heartrate < 179){
   	  	        		background = "Yellow";
@@ -2125,6 +2260,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 138 && heartrate < 143){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 143&& heartrate < 168){
                          color = "white";
@@ -2133,6 +2269,7 @@ renderDateRangeDropdown(value,value5){
 
   	  	        	else if(heartrate >= 168&& heartrate < 173){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 173&& heartrate < 178){
   	  	        		background = "Yellow";
@@ -2152,6 +2289,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 136 && heartrate < 141){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 141 && heartrate < 166){
                          color = "white";
@@ -2159,6 +2297,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 166 && heartrate < 171){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
 
   	  	        	else if(heartrate >= 171 && heartrate < 176){
@@ -2179,6 +2318,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 135 && heartrate < 140){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 140 && heartrate < 165){
                          color = "white";
@@ -2186,8 +2326,8 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 165 && heartrate < 170){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
-
   	  	        	else if(heartrate >= 170 && heartrate < 175){
   	  	        		background = "Yellow";
   	  	        	}
@@ -2205,6 +2345,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 134 && heartrate < 139){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 139 && heartrate < 164){
                          color = "white";
@@ -2212,6 +2353,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 164 && heartrate < 169){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 169 && heartrate < 174){
   	  	        		background = "Yellow";
@@ -2231,6 +2373,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 133 && heartrate < 138){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 138 && heartrate < 163){
                          color = "white";
@@ -2238,6 +2381,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 163 && heartrate < 168){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 168 && heartrate < 173){
   	  	        		background = "Yellow";
@@ -2256,6 +2400,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 132 && heartrate < 137){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 137 && heartrate < 162){
                          color = "white";
@@ -2263,6 +2408,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 162 && heartrate < 167){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 167 && heartrate < 172){
   	  	        		background = "Yellow";
@@ -2281,6 +2427,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 131 && heartrate < 136){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 136 && heartrate < 161){
                          color = "white";
@@ -2288,6 +2435,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 161 && heartrate < 166){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 166 && heartrate < 171){
   	  	        		background = "Yellow";
@@ -2306,6 +2454,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 130 && heartrate < 135){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 135 && heartrate < 160){
                          color = "white";
@@ -2313,6 +2462,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 160 && heartrate < 165){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 165 && heartrate < 170){
   	  	        		background = "Yellow";
@@ -2328,6 +2478,7 @@ renderDateRangeDropdown(value,value5){
 				if( userage >=70 && userage < 71){
   	  	        	if(heartrate >= 129 && heartrate < 134){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 134 && heartrate < 159){
                          color = "white";
@@ -2335,6 +2486,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 159 && heartrate < 164){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 164 && heartrate < 169){
   	  	        		background = "Yellow";
@@ -2351,6 +2503,7 @@ renderDateRangeDropdown(value,value5){
   	  	        if( userage >=71 && userage < 72){
   	  	        	if(heartrate >= 129 && heartrate < 133){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 133 && heartrate < 158){
                          color = "white";
@@ -2358,6 +2511,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 158 && heartrate < 163){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 163 && heartrate < 168){
   	  	        		background = "Yellow";
@@ -2374,6 +2528,7 @@ renderDateRangeDropdown(value,value5){
 				if( userage >=72 && userage < 73){
   	  	        	if(heartrate >= 129 && heartrate < 132){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 132 && heartrate < 157){
                          color = "white";
@@ -2381,6 +2536,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 157 && heartrate < 162){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 162 && heartrate < 167){
   	  	        		background = "Yellow";
@@ -2397,6 +2553,7 @@ renderDateRangeDropdown(value,value5){
   	  	        if( userage >=73 && userage < 74){
   	  	        	if(heartrate >= 129 && heartrate < 131){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 131 && heartrate < 156){
                          color = "white";
@@ -2404,6 +2561,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 156 && heartrate < 161){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 161 && heartrate < 166){
   	  	        		background = "Yellow";
@@ -2423,6 +2581,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 154 && heartrate < 159){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 159 && heartrate < 164){
   	  	        		background = "Yellow";
@@ -2441,6 +2600,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 158){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 158 && heartrate < 163){
   	  	        		background = "Yellow";
@@ -2459,6 +2619,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 152 && heartrate < 157){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 157 && heartrate < 162){
   	  	        		background = "Yellow";
@@ -2478,6 +2639,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 151 && heartrate < 156){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 156 && heartrate < 161){
   	  	        		background = "Yellow";
@@ -2497,6 +2659,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 150 && heartrate < 155){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 155 && heartrate < 160){
   	  	        		background = "Yellow";
@@ -2511,6 +2674,7 @@ renderDateRangeDropdown(value,value5){
 				if( userage >=80 && userage < 81){
   	  	        	if(heartrate >= 105 && heartrate < 109){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 109 && heartrate < 125){
                          color = "white";
@@ -2518,6 +2682,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 125 && heartrate < 126){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 127 && heartrate < 129){
   	  	        		background = "Orange";
@@ -2528,6 +2693,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}  	
   	  	        	else if(heartrate >= 149 && heartrate < 154){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 154 && heartrate < 159){
   	  	        		background = "Yellow";
@@ -2543,6 +2709,7 @@ renderDateRangeDropdown(value,value5){
   	  	        if( userage >=81 && userage < 82){
   	  	        	if(heartrate >= 105 && heartrate < 109){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 109 && heartrate < 124){
                          color = "white";
@@ -2550,6 +2717,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 124 && heartrate < 125){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 125 && heartrate < 126){
   	  	        		background = "Yellow";
@@ -2563,6 +2731,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 148 && heartrate < 153){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 158){
   	  	        		background = "Yellow";
@@ -2578,6 +2747,7 @@ renderDateRangeDropdown(value,value5){
   	  	        if( userage >=82 && userage < 83){
   	  	        	if(heartrate >= 105 && heartrate < 109){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 109 && heartrate < 123){
                          color = "white";
@@ -2585,6 +2755,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 123 && heartrate < 124){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 124 && heartrate < 125){
   	  	        		background = "Yellow";
@@ -2598,6 +2769,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 147 && heartrate < 152){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 152 && heartrate < 157){
   	  	        		background = "Yellow";
@@ -2613,6 +2785,7 @@ renderDateRangeDropdown(value,value5){
 				if( userage >=83 && userage < 84){
   	  	        	if(heartrate >= 105 && heartrate < 108){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 108 && heartrate < 122){
                          color = "white";
@@ -2620,6 +2793,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 122 && heartrate < 123){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 123 && heartrate < 124){
   	  	        		background = "Yellow";
@@ -2633,6 +2807,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 146 && heartrate < 151){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 151 && heartrate < 156){
   	  	        		background = "Yellow";
@@ -2648,6 +2823,7 @@ renderDateRangeDropdown(value,value5){
   	  	        if( userage >=84 && userage < 85){
   	  	        	if(heartrate >= 105 && heartrate < 108){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 108 && heartrate < 121){
                          color = "white";
@@ -2655,6 +2831,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 121 && heartrate < 122){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 122 && heartrate < 123){
   	  	        		background = "Yellow";
@@ -2668,6 +2845,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 145 && heartrate < 150){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 150 && heartrate < 155){
   	  	        		background = "Yellow";
@@ -2683,6 +2861,7 @@ renderDateRangeDropdown(value,value5){
 				 if( userage >=85 && userage < 86){
   	  	        	if(heartrate >= 105 && heartrate < 108){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 108 && heartrate < 120){
                          color = "white";
@@ -2690,6 +2869,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 120 && heartrate < 121){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 121 && heartrate < 122){
   	  	        		background = "Yellow";
@@ -2702,6 +2882,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 144 && heartrate < 149){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 149 && heartrate < 154){
   	  	        		background = "Yellow";
@@ -2717,12 +2898,14 @@ renderDateRangeDropdown(value,value5){
 				if( userage >=86 && userage < 87){
   	  	        	if(heartrate >= 105 && heartrate < 107){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 107 && heartrate < 119){
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 119 && heartrate < 120){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 120 && heartrate < 121){
   	  	        		background = "Yellow";
@@ -2736,6 +2919,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 143 && heartrate < 148){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 148 && heartrate < 153){
   	  	        		background = "Yellow";
@@ -2751,6 +2935,7 @@ renderDateRangeDropdown(value,value5){
 				if( userage >=87 && userage < 88){
   	  	        	if(heartrate >= 105 && heartrate < 107){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 107 && heartrate < 118){
                          color = "white";
@@ -2758,6 +2943,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 118 && heartrate < 119){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 119 && heartrate < 120){
   	  	        		background = "Yellow";
@@ -2771,6 +2957,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 142 && heartrate < 147){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 147 && heartrate < 152){
   	  	        		background = "Yellow";
@@ -2786,6 +2973,7 @@ renderDateRangeDropdown(value,value5){
   	  	        if( userage >=88 && userage < 89){
   	  	        	if(heartrate >= 105 && heartrate < 107){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 107 && heartrate < 117){
                          color = "white";
@@ -2793,6 +2981,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 117 && heartrate < 118){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 118 && heartrate < 119){
   	  	        		background = "Yellow";
@@ -2806,6 +2995,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 141 && heartrate < 146){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 146 && heartrate < 151){
   	  	        		background = "Yellow";
@@ -2821,6 +3011,7 @@ renderDateRangeDropdown(value,value5){
   	  	        if( userage >=89 && userage < 90){
   	  	        	if(heartrate >= 105 && heartrate < 106){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 106 && heartrate < 116){
                          color = "white";
@@ -2828,6 +3019,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 116 && heartrate < 117){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 117 && heartrate < 118){
   	  	        		background = "Yellow";
@@ -2841,6 +3033,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 140 && heartrate < 145){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 145 && heartrate < 150){
   	  	        		background = "Yellow";
@@ -2855,6 +3048,7 @@ renderDateRangeDropdown(value,value5){
   	  	         if( userage >=90 && userage < 91){
   	  	        	if(heartrate >= 105 && heartrate < 106){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 106 && heartrate < 115){
                          color = "white";
@@ -2862,6 +3056,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 115 && heartrate < 116){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 116 && heartrate < 117){
   	  	        		background = "Yellow";
@@ -2874,6 +3069,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 139 && heartrate < 144){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 144 && heartrate < 149){
   	  	        		background = "Yellow";
@@ -2895,6 +3091,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 110 && heartrate < 124){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 124 && heartrate < 140){
                          color = "white";
@@ -2902,6 +3099,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 140 && heartrate < 144){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 145 && heartrate < 150){
   	  	        		background = "Yellow";
@@ -2911,6 +3109,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 158 && heartrate < 161){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 161 && heartrate < 179){
                          color = "white";
@@ -2929,6 +3128,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 109 && heartrate < 123){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 123 && heartrate < 139){
                          color = "white";
@@ -2936,6 +3136,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 139 && heartrate < 143){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 143 && heartrate < 149){
   	  	        		background = "Yellow";
@@ -2945,6 +3146,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 157 && heartrate < 160){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 160 && heartrate < 179){
                          color = "white";
@@ -2962,6 +3164,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 108 && heartrate < 122){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 122 && heartrate < 138){
                          color = "white";
@@ -2969,6 +3172,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 138 && heartrate < 143){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 143 && heartrate < 148){
   	  	        		background = "Yellow";
@@ -2978,6 +3182,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 156 && heartrate < 159){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 159 && heartrate < 179){
                          color = "white";
@@ -2995,6 +3200,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 107 && heartrate < 121){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 121 && heartrate < 137){
                          color = "white";
@@ -3002,6 +3208,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 137 && heartrate < 142){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 142 && heartrate < 147){
   	  	        		background = "Yellow";
@@ -3011,6 +3218,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 155 && heartrate < 158){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 158 && heartrate < 179){
                          color = "white";
@@ -3027,6 +3235,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 106 && heartrate < 120){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 120 && heartrate < 136){
                          color = "white";
@@ -3034,6 +3243,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 136 && heartrate < 141){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 141 && heartrate < 146){
   	  	        		background = "Yellow";
@@ -3043,6 +3253,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 154 && heartrate < 157){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 157 && heartrate < 179){
                          color = "white";
@@ -3060,6 +3271,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 105 && heartrate < 119){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 119 && heartrate < 135){
                          color = "white";
@@ -3067,6 +3279,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 135 && heartrate < 140){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 140 && heartrate < 145){
   	  	        		background = "Yellow";
@@ -3076,6 +3289,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 156){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 156 && heartrate < 179){
                          color = "white";
@@ -3092,6 +3306,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 104 && heartrate < 118){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 118 && heartrate < 134){
                          color = "white";
@@ -3099,6 +3314,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 134 && heartrate < 139){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 139 && heartrate < 144){
   	  	        		background = "Yellow";
@@ -3108,6 +3324,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 152 && heartrate < 155){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 155 && heartrate < 179){
                          color = "white";
@@ -3124,6 +3341,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 104 && heartrate < 106){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 106 && heartrate < 114){
                          color = "white";
@@ -3131,6 +3349,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 114 && heartrate < 115){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 115 && heartrate < 116){
   	  	        		background = "Yellow";
@@ -3144,6 +3363,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}  	
   	  	        	else if(heartrate >= 138 && heartrate < 143){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	} 
   	  	        	else if(heartrate >= 143 && heartrate < 148){
   	  	        		background = "Yellow";
@@ -3165,6 +3385,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 103 && heartrate < 105){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 105 && heartrate < 113){
                          color = "white";
@@ -3172,6 +3393,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 113 && heartrate < 114){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 114 && heartrate < 115){
   	  	        		background = "Yellow";
@@ -3185,6 +3407,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}  	
   	  	        	else if(heartrate >= 137 && heartrate < 142){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	} 
   	  	        	else if(heartrate >= 142 && heartrate < 147){
   	  	        		background = "Yellow";
@@ -3207,6 +3430,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 102 && heartrate < 104){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 104 && heartrate < 112){
                          color = "white";
@@ -3214,6 +3438,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 112 && heartrate < 113){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 113 && heartrate < 114){
   	  	        		background = "Yellow";
@@ -3227,6 +3452,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}  	
   	  	        	else if(heartrate >= 136 && heartrate < 141){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	} 
   	  	        	else if(heartrate >= 141 && heartrate < 146){
   	  	        		background = "Yellow";
@@ -3250,6 +3476,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 101 && heartrate < 103){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 103 && heartrate < 111){
                          color = "white";
@@ -3257,6 +3484,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 111 && heartrate < 112){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 112 && heartrate < 113){
   	  	        		background = "Yellow";
@@ -3270,6 +3498,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}  	
   	  	        	else if(heartrate >= 135 && heartrate < 140){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	} 
   	  	        	else if(heartrate >= 140 && heartrate < 145){
   	  	        		background = "Yellow";
@@ -3292,6 +3521,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 100 && heartrate < 102){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 102 && heartrate < 110){
                          color = "white";
@@ -3299,6 +3529,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 110 && heartrate < 111){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 111 && heartrate < 112){
   	  	        		background = "Yellow";
@@ -3312,6 +3543,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}  	
   	  	        	else if(heartrate >= 134 && heartrate < 139){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	} 
   	  	        	else if(heartrate >= 139 && heartrate < 144){
   	  	        		background = "Yellow";
@@ -3334,6 +3566,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 99 && heartrate < 101){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 101 && heartrate < 109){
                          color = "white";
@@ -3341,6 +3574,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 109 && heartrate < 110){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 110 && heartrate < 111){
   	  	        		background = "Yellow";
@@ -3354,6 +3588,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}  	
   	  	        	else if(heartrate >= 133 && heartrate < 138){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	} 
   	  	        	else if(heartrate >= 138 && heartrate < 143){
   	  	        		background = "Yellow";
@@ -3376,6 +3611,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 98 && heartrate < 100){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 100 && heartrate < 108){
                          color = "white";
@@ -3383,6 +3619,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 108 && heartrate < 109){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 109 && heartrate < 110){
   	  	        		background = "Yellow";
@@ -3396,6 +3633,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}  	
   	  	        	else if(heartrate >= 132 && heartrate < 137){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	} 
   	  	        	else if(heartrate >= 137 && heartrate < 142){
   	  	        		background = "Yellow";
@@ -3418,6 +3656,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 97 && heartrate < 99){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 99 && heartrate < 107){
                          color = "white";
@@ -3425,6 +3664,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 107 && heartrate < 108){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 108 && heartrate < 109){
   	  	        		background = "Yellow";
@@ -3434,6 +3674,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 131 && heartrate < 136){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 136 && heartrate < 141){
   	  	        		background = "Yellow";
@@ -3457,6 +3698,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 96 && heartrate < 98){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 98 && heartrate < 106){
                          color = "white";
@@ -3464,6 +3706,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 106 && heartrate < 107){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 107 && heartrate < 108){
   	  	        		background = "Yellow";
@@ -3473,6 +3716,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 131 && heartrate < 135){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 135 && heartrate < 140){
   	  	        		background = "Yellow";
@@ -3495,6 +3739,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 95 && heartrate < 97){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 97 && heartrate < 105){
                          color = "white";
@@ -3502,6 +3747,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 105 && heartrate < 106){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 106 && heartrate < 107){
   	  	        		background = "Yellow";
@@ -3511,6 +3757,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 131 && heartrate < 134){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 134 && heartrate < 139){
   	  	        		background = "Yellow";
@@ -3520,9 +3767,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 144 && heartrate < 200){
   	  	        		background = "Red";
-  	  	        	}  	
-  	  	        	
-  	  	        	    	        	    	
+  	  	        	}  		        	    	
   	  	        }	
 				
 				 if( userage >=100 && userage < 101){
@@ -3534,6 +3779,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 94 && heartrate < 97){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 97 && heartrate < 104){
                          color = "white";
@@ -3541,6 +3787,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 104 && heartrate < 105){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 105 && heartrate < 106){
   	  	        		background = "Yellow";
@@ -3550,6 +3797,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 128 && heartrate < 129){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}  	
   	  	        	else if(heartrate >= 129 && heartrate < 130){
                          color = "white";
@@ -3557,6 +3805,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	} 
   	  	        	else if(heartrate >= 130 && heartrate < 133){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        	else if(heartrate >= 133 && heartrate < 138){
   	  	        		background = "Yellow";
@@ -3573,6 +3822,7 @@ renderDateRangeDropdown(value,value5){
 				if( userage >=74 && userage < 101){
   	  	        	if(heartrate >= 129 && heartrate < 130){
   	  	        		background = "#32CD32";
+                      color = "white";
   	  	        	}
   	  	        }
 				
@@ -3693,7 +3943,6 @@ renderDateRangeDropdown(value,value5){
 	heartRateNotRecordedTimeZone(value,durationdate){
     let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min,durationdate);
 		let score = this.aaExercisestats(this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate),workout_duration_hours_min_score);
-    
 		let hrr_not_recorded_prcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_hr_not_recorded_duration,durationdate));
         if( score == "No workout"){
 			return (
