@@ -495,17 +495,34 @@ def find_act_hrr(user_input_activities,activity_hr_time):
 	return activity_hr_time_copy,hr_not_recorded_ids
 
 
-def delete_aa(user_get,start_date,user_input_activities):
+def delete_aa(user_get,start_date,user_input_activities,type):
 	#start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-	try:
-		aa_object=AA.objects.filter(user=user_get,created_at__icontains=start_date).delete()
-	except ValueError:
-		print("ValueError")
+	if type=='chart1':
+		try:
+			aa_object=AA.objects.filter(user=user_get,created_at__icontains=start_date).delete()
+		except ValueError:
+			print("ValueError")
+	elif type=='chart2':
+		try:
+			aa_object=AaWorkoutCalculations.objects.filter(user_aa_workout=user_get,created_at__icontains=start_date).delete()
+		except ValueError:
+			print("ValueError")
+	elif type=='chart3':
+		try:
+			aa_object=TimeHeartZones.objects.filter(user=user_get,created_at__icontains=start_date).delete()
+		except ValueError:
+			print("ValueError")
+	elif type=='chart4':
+		try:
+			aa_object=AaCalculations.objects.filter(user_aa=user_get,created_at__icontains=start_date).delete()
+		except ValueError:
+			print("ValueError")
+
 
 
 def fitbit_aa_chart_one_new(user_get,start_date,user_input_activities=None):
 	if user_input_activities:
-		delete_aa(user_get,start_date,user_input_activities)
+		delete_aa(user_get,start_date,user_input_activities,type='chart1')
 		user_input_activities,deleted_activities,ui_exercise_act = get_filtered_activities(user_input_activities)
 	else:
 		user_input_activities = []
@@ -684,7 +701,7 @@ def calculate_AA2_workout(user,start_date,user_input_activities=None):
 	fibit_activities_qs = UserFitbitDataActivities.objects.filter(
 		user=user,created_at=start_date)
 	if user_input_activities:
-		delete_aa(user_get,start_date,user_input_activities)
+		delete_aa(user,start_date,user_input_activities,type='chart2')
 		user_input_activities,deleted_activities,ui_exercise_act = get_filtered_activities(user_input_activities)
 	else:
 		deleted_activities = []
@@ -1128,7 +1145,7 @@ def add_to_final_data(final_data,user_input_activities,hr_not_recorded_ids):
 
 def calculate_AA2_daily(user,start_date,user_input_activities=None):
 	if user_input_activities:
-		delete_aa(user_get,start_date,user_input_activities)
+		delete_aa(user,start_date,user_input_activities,type='chart4')
 		user_input_activities,deleted_activities,ui_exercise_act = get_filtered_activities(user_input_activities)
 	else:
 		deleted_activities =[]
@@ -1346,7 +1363,7 @@ def calculate_AA_chart3(
 
 def calculate_AA3(user,start_date,user_input_activities=None):
 	if user_input_activities:
-		delete_aa(user_get,start_date,user_input_activities)
+		delete_aa(user,start_date,user_input_activities,type='chart3')
 		user_input_activities,deleted_activities,ui_exercise_act = get_filtered_activities(user_input_activities)
 	else:
 		deleted_activities = []
