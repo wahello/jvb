@@ -3154,7 +3154,7 @@ handleScroll() {
                            
                             
                       
-                        { ((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
+                      {/*}  { ((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                           <FormGroup>   
                               <Label className="padding">1.11 Did you measure your heart rate recovery (HRR) after today’s aerobic workout (touch the
                               information button for instructions about how to record this)?
@@ -3241,7 +3241,7 @@ handleScroll() {
                               exercise recommendations to help you achieve your goals.
                                </div>                             
                               </ModalBody>
-                           </Modal> 
+                           </Modal> */}
                          
                          { ((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                             this.state.workout_type !== "strength" &&
@@ -3278,7 +3278,7 @@ handleScroll() {
                             this.state.workout_input_type !== "strength" && this.state.report_type == 'full' &&
                              
                           <FormGroup>      
-                            <Label className="padding">1.13 Approximately How Many Calories Did You Consume During Your Workout?</Label>
+                            <Label className="padding">1.11 Approximately How Many Calories Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
                               <div className="input1">
                                  <Input type="text" name="calories" 
@@ -3300,7 +3300,7 @@ handleScroll() {
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" && this.state.report_type == 'full' &&
                           <FormGroup>      
-                            <Label className="padding">1.14 What Specifically Did You Consume During Your Workout?</Label>
+                            <Label className="padding">1.12 What Specifically Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
                               <div className="input1">
                                  <Textarea  name="calories_item"
