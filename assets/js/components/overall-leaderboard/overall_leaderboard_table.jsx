@@ -955,7 +955,7 @@ class OverallLeaderboardTable extends Component{
 							<th>Drinks Per Day / Per Week</th>
 							<th>
 							<table>
-							<tr><td>TRL</td><td>ILL</td></tr>
+							<tr><td>TVL</td><td>ILL</td></tr>
 							<tr><td>STR</td><td>REP</td></tr> 
 							</table>
 							</th>
@@ -992,7 +992,7 @@ class OverallLeaderboardTable extends Component{
 							ECS: Exercise Consistency Score
 							</p>
 							<p className="footer_content" style={{marginLeft:"15px"}}>
-							TRL: Total number of days in period traveled (% of total days reported in the duration)
+							TVL: Total number of days in period traveled (% of total days reported in the duration)
 							</p>
 							<p className="footer_content" style={{marginLeft:"15px"}}>
 							ILL: Total number of days in period sick (% of total days reported in the duration)
