@@ -2910,7 +2910,7 @@ handleScroll() {
                               </ModalBody>
                            </Modal> 
 
-                        { ((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
+                       {/*  { ((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                             <FormGroup>  
                               {this.state.editable &&
                                 <div className="input1">
@@ -3150,13 +3150,13 @@ handleScroll() {
                             }
                           </FormGroup>   
                        }
-                       </Collapse>
+                       </Collapse>*/}  
                            
                             
                       
                         { ((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                           <FormGroup>   
-                              <Label className="padding">1.12 Did you measure your heart rate recovery (HRR) after today’s aerobic workout (touch the
+                              <Label className="padding">1.11 Did you measure your heart rate recovery (HRR) after today’s aerobic workout (touch the
                               information button for instructions about how to record this)?
                                <span id="hrr"
                              onClick={this.toggleHrr} 
