@@ -632,19 +632,14 @@ renderDateRangeDropdown(value,value5){
   		let background = '';
       let color = '';
   	  let userage = this.state.userage;
-      heartrate = 0;
-      heartRateNotRecorded = 0;
-      workout_duration_hours_min_score = "7:00";
      if( heartrate == null || heartrate == undefined ){ 
   	  	background = '';
         color = '';
-        return[background,color]                                                                
-  	 }
+        return[background,color];                                    
+         }
      else if ( heartrate == 0){
-      console.log("heartrate is 0");
         if( heartRateNotRecorded == 0 && (workout_duration_hours_min_score != ' ' && 
            workout_duration_hours_min_score)){
-          console.log("heartRateNotRecorded is 0")
            color = ""
            background="";
            return [background,color]
@@ -652,7 +647,6 @@ renderDateRangeDropdown(value,value5){
        }
        else if( (heartRateNotRecorded != ' '||heartRateNotRecorded) && (workout_duration_hours_min_score != ' ' && 
                   workout_duration_hours_min_score) ){
-          console.log("heartRateNotRecorded is not 0")
           background = 'green';
           color = 'white';
           return [background,color]
@@ -3854,7 +3848,6 @@ renderDateRangeDropdown(value,value5){
     let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min,durationdate);
      let aerobicPrcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_aerobic_duration,durationdate));
      let score = this.aaExercisestats(this.renderValue(value.hr_aerobic_duration_hour_min,durationdate),workout_duration_hours_min_score);
-     score = "5:30";
      let heartRateNotRecorded = this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate)
     let  avgheartratecolor  = this.aaColorRanges(this.renderValue(value.avg_non_strength_exercise_heart_rate,durationdate),heartRateNotRecorded,workout_duration_hours_min_score); 
       if( score == "No workout" ){
@@ -3888,7 +3881,6 @@ renderDateRangeDropdown(value,value5){
     let heartRateNotRecorded = this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate)
     let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min,durationdate);
 		let score = this.aaExercisestats(this.renderValue(value.hr_anaerobic_duration_hour_min,durationdate),workout_duration_hours_min_score);
-    score = "5:30";
 		let anerobicPrcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_anaerobic_duration,durationdate));
     let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_non_strength_exercise_heart_rate,durationdate),heartRateNotRecorded,workout_duration_hours_min_score);    
         if( score == "No workout"){
@@ -3921,7 +3913,6 @@ renderDateRangeDropdown(value,value5){
     let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min,durationdate);
     let heartRateNotRecorded = this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate)
 		let score = this.aaExercisestats(this.renderValue(value.hr_below_aerobic_duration_hour_min,durationdate),workout_duration_hours_min_score);
-    score = "5:30";
 		let belowAerobicPrcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_below_aerobic_duration,durationdate))
         let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_non_strength_exercise_heart_rate,durationdate),heartRateNotRecorded,workout_duration_hours_min_score);
         if( score == "No workout")
@@ -3952,7 +3943,6 @@ renderDateRangeDropdown(value,value5){
 	heartRateNotRecordedTimeZone(value,durationdate){
     let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min,durationdate);
 		let score = this.aaExercisestats(this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate),workout_duration_hours_min_score);
-    score = "5:30";
 		let hrr_not_recorded_prcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_hr_not_recorded_duration,durationdate));
         if( score == "No workout"){
 			return (
