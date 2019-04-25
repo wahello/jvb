@@ -455,7 +455,7 @@ class HeartRateCal extends Component{
                         </Button>
 						</span>
                         <span>
-						<label><strong className="updated_hrr" style = {{marginLeft:"75px"}}>Use Updated HRR?&nbsp;</strong></label>
+						<label><strong className="updated_hrr" style = {{marginLeft:"75px"}}>User Updated HRR?&nbsp;</strong></label>
 			                      <span className="yes_no">{this.state.use_updated_hrr? 'Yes': 'No'}</span>
 				        </span>
                     	<span className="in_button">

@@ -193,15 +193,12 @@ def fitbit_aa_chart_one(user_get,start_date,user_input_activities=None):
 	if activity_qs:
 		activity_data = ast.literal_eval(activity_qs[0]['activities_data'].replace(
 			"'activity_fitbit': {...}","'activity_fitbit': {}"))
-		#duration_in_milli_seconds = activity_queryset_data['activities'][0]['originalDuration']
-		#duration_in_hr_min_sec = convertMillis(duration_in_milli_seconds)
 		for key,activity_list in activity_data.items():
-			for index,single_activity in enumerate(activity_list): 
-				if single_activity == 'activities':
+			for index,single_activity in enumerate(activity_list):
+				if single_activity:
 					act_duration = activity_data['activities'][index]['originalDuration']
 					act_start = activity_data['activities'][index]['originalStartTime']
 					act_id = activity_data['activities'][index]['logId']
-
 					if str(act_id) in exercise_act:
 						activity_start_data,offset = quicklook.calculations.converter.fitbit_to_garmin_converter.get_epoch_offset_from_timestamp(
 														act_start)
@@ -259,7 +256,6 @@ def fitbit_hr_diff_calculation(user_get,start_date,user_input_activities=None):
 		log_id = single_activity[single_activity_id[0]]["log_id"]
 		single_activity_hr_time = get_hr_timediff(hr_dataset,start_date,end_date,log_id)
 		activity_hr_time.append(single_activity_hr_time)
-
 	return activity_hr_time
 
 def fitbit_hrr_diff_calculation(user_get,start_date):
@@ -274,7 +270,6 @@ def fitbit_hrr_diff_calculation(user_get,start_date):
 	return day_hr_time
 
 def all_activities_hr_and_time_diff(hr_time_diff):
-
 	all_activities_heartrate_list = []
 	all_activities_timestamp_list = []
 	for index,single_activity in enumerate(hr_time_diff):
@@ -396,7 +391,7 @@ def cal_aa1_data(
 	percent_below_aerobic = None
 	percent_anaerobic = None
 	total_percent = None
-	
+
 	update = Update_AA_ranges_by_ages(user)
 	below_aerobic_value = update[0]
 	anaerobic_value = update[1]
@@ -434,6 +429,7 @@ def cal_aa1_data(
 	time_in_aerobic = sum(aerobic_list)
 	time_in_below_aerobic = sum(below_aerobic_list)
 	time_in_anaerobic = sum(anaerobic_range_list)
+
 	hr_not_recorded = get_hr_not_recorded_duration(user_input_activities)
 
 	if hr_not_recorded:
@@ -555,7 +551,6 @@ def fitbit_aa_chart_one_new(user_get,start_date,user_input_activities=None):
 	else:
 		user_input_activities = []
 		deleted_activities = []
-
 	hr_time_diff = fitbit_hr_diff_calculation(user_get,start_date,user_input_activities)
 	hr_time_diff = deleted_fitbit_activity(hr_time_diff,deleted_activities)
 	if hr_time_diff and hr_time_diff[0]:
@@ -601,7 +596,7 @@ def fitbit_aa_chart_one_new(user_get,start_date,user_input_activities=None):
 				all_activities_timestamp_list,
 				user_input_activities,
 				fitbit_act)
-			
+	
 			return final_data
 	else:
 		return {}

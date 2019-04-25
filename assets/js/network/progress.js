@@ -27,7 +27,24 @@ export default function fetchProgress(successProgress,errorProgress,
   });
 
 }
+export function fetchAaRanges(successAaRanges,errorAaRanges,selectedDate){   
+  selectedDate = moment(selectedDate);
+  const URL=`/hrr/aa_ranges`;
+  const config={
+   method:"get",
+   params:{
+      date: selectedDate.format('YYYY-MM-DD')
+ },
+   url:URL,
+   withCredentials: true
+  };
+  axios(config).then((response)=>{
+   successAaRanges(response);
+  }).catch(function(error){
+    errorAaRanges(error);
+  });
 
+}
 export function fetchUserRank(successRank,errorProgress,selectedDate,
   custom_ranges=undefined,renderAfterSuccess=undefined,lbcategories=undefined){ 
   selectedDate = moment(selectedDate);

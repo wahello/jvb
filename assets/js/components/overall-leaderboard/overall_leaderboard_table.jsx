@@ -193,7 +193,7 @@ class OverallLeaderboardTable extends Component{
 		}
         return grade;
     }
-	getAlcoholColors(alcoholperday,alcoholperweek,rank, gender){
+	getAlcoholColors(alcoholperday,alcoholperweek,gender,rank){
 		let background= '';
 		let color='';
 		if(isNaN(alcoholperweek) || alcoholperweek == null){
@@ -880,8 +880,9 @@ class OverallLeaderboardTable extends Component{
 							}
 						td_values.push(this.getAlcoholColors(alcohol_drink_per_day,
 															 alcohol_drink_per_week,
+															 this.props.gender,
 															 value[key1].rank),
-															 this.props.gender);
+															 );
 						}
 					 else if( key1 == "user_daily_inputs" ){
 					  let reported_inputs = value[key1].other_scores.prcnt_days_reported_inputs.value;
@@ -955,7 +956,7 @@ class OverallLeaderboardTable extends Component{
 							<th>Drinks Per Day / Per Week</th>
 							<th>
 							<table>
-							<tr><td>TRL</td><td>ILL</td></tr>
+							<tr><td>TVL</td><td>ILL</td></tr>
 							<tr><td>STR</td><td>REP</td></tr> 
 							</table>
 							</th>
@@ -992,7 +993,7 @@ class OverallLeaderboardTable extends Component{
 							ECS: Exercise Consistency Score
 							</p>
 							<p className="footer_content" style={{marginLeft:"15px"}}>
-							TRL: Total number of days in period traveled (% of total days reported in the duration)
+							TVL: Total number of days in period traveled (% of total days reported in the duration)
 							</p>
 							<p className="footer_content" style={{marginLeft:"15px"}}>
 							ILL: Total number of days in period sick (% of total days reported in the duration)
