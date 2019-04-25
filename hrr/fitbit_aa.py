@@ -547,7 +547,7 @@ def find_act_hrr(user_input_activities,activity_hr_time):
 			for i,activity in enumerate(activity_hr_time_copy):
 				act_key = list(activity.keys())
 				activity.pop(act_key[0],None)
-	return activity_hr_time_copy,hr_not_recorded_idss
+	return activity_hr_time_copy,hr_not_recorded_ids
 
 def fitbit_aa_chart_one_new(user_get,start_date,user_input_activities=None):
 	if user_input_activities:
