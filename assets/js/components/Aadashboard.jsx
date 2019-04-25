@@ -17,7 +17,7 @@ import { Collapse, Navbar, NavbarToggler,
         FormText,Label,Input,Card, CardImg, CardText, 
         CardBody,CardTitle, CardSubtitle} from 'reactstrap';
 import NavbarMenu from './navbar';
-import fetchProgress from '../network/progress';
+import fetchProgress, {fetchAaRanges} from '../network/progress';
 import {getUserProfile} from '../network/auth';
 import {fetchLastSync} from '../network/quick';
 
@@ -79,8 +79,8 @@ class Aadashboard extends Component{
 			 summary:{
             
 
-			"exercise":{     
-			"avg_exercise_heart_rate":'80',         
+			"exercise":{   
+			"avg_non_strength_exercise_heart_rate":this.getInitialDur(),         
 			"hr_aerobic_duration_hour_min":this.getInitialDur(), 
 			"hr_anaerobic_duration_hour_min":this.getInitialDur(),
 			"hr_below_aerobic_duration_hour_min": this.getInitialDur(),                                      
@@ -89,7 +89,7 @@ class Aadashboard extends Component{
 			"prcnt_anaerobic_duration":this.getInitialDur(), 
 			"prcnt_below_aerobic_duration" : this.getInitialDur(),
 			"prcnt_hr_not_recorded_duration" : this.getInitialDur(),
-			"total_workout_duration_over_range" : this.getInitialDur()             
+			"workout_duration_hours_min" : this.getInitialDur()             
 			 }
 			},
 			"duration_date": this.getInitialDur(),
@@ -107,7 +107,8 @@ class Aadashboard extends Component{
 			all_verbose_name:"",
 			dateRange4:false,
 			isStressInfoModelOpen:false,
-      numberOfDays:null
+      numberOfDays:null,
+      aa_ranges:{},
 			};
 
 	
@@ -145,15 +146,34 @@ class Aadashboard extends Component{
         this.toggleDate4 = this.toggleDate4.bind(this);
         this.toggle1 = this.toggle1.bind(this);
         this.successLastSync = this.successLastSync.bind(this);
+        this.aaExercisestatsPrct = this.aaExercisestatsPrct.bind(this);
+        this.successAaRanges = this.successAaRanges.bind(this);
+        this.errorAaRanges = this.errorAaRanges.bind(this);
         
 	}
-reanderAllHrr(period,date,capt,selectedrange){
+reanderAllHrr(period,date,capt,selectedRange){
       this.setState({
         selected_range:period,
         date:date,
         capt:capt,
 
-      });  
+      }); 
+
+      let numberOfDays;
+    if(selectedRange.rangeType !== 'today' && selectedRange.rangeType !== 'yesterday'){
+      let startDate = selectedRange.dateRange.split("to")[0].trim();
+      let endDate = selectedRange.dateRange.split("to")[1].trim();
+      let numberOfDays = Math.abs(moment(endDate).diff(moment(startDate), 'days'))+1;
+      this.setState({
+        numberOfDays:numberOfDays,
+      })
+    }
+    else{
+      this.setState({
+        numberOfDays:null,
+      })
+    }
+
     }
 
   	toggle1() {
@@ -448,6 +468,7 @@ toggleDate3(){
                                      
 	    },()=>{
 	      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
+        fetchAaRanges(this.successAaRanges,this.errorAaRanges,this.state.selectedDate);
 	    });
   	}
 
@@ -472,11 +493,23 @@ toggleDate3(){
 				 fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
 				 getUserProfile(this.succesCallback);
          fetchLastSync(this.successLastSync,this.errorquick);
+         fetchAaRanges(this.successAaRanges,this.errorAaRanges,this.state.selectedDate);
 	}
+  successAaRanges(data)
+  {
+    this.setState({
+      aa_ranges:data.data,
+    })
+  }
+  errorAaRanges(error)
+  {
+    console.log(error.message)
+  }
 
 
 	successProgress(data,renderAfterSuccess=undefined){
-		let date =moment(data.data.duration_date["today"]).format("MMM DD, YYYY @ hh:mm:a");
+    
+		let date =moment(data.data.duration_date["today"]).format("MMM DD, YYYY");
 	    this.setState({
 	    	fetching_ql1:false,
             fetching_ql2:false,
@@ -486,7 +519,8 @@ toggleDate3(){
 	        summary:data.data.summary,
 	        avg_exercise_heart_rate:data.data.avg_exercise_heart_rate,
 	        duration_date:data.data.duration_date,
-	        capt:"Wearable Device Last Synced on",
+	       // capt:"Wearable Device Last Synced on",
+         capt:"Today",
 	        date:date,
 
 	    },()=>{
@@ -494,7 +528,9 @@ toggleDate3(){
                 this.reanderAllHrr(
                     renderAfterSuccess.range,
                     renderAfterSuccess.duration,
-                    renderAfterSuccess.caption
+                    renderAfterSuccess.caption,
+                    renderAfterSuccess.selectedRange,
+                    
                 );
             }
         });
@@ -515,7 +551,7 @@ renderDateRangeDropdown(value,value5){
   		let duration_type1 = ["today","yesterday","week","month","year",];
   		let durations = [];
   		for(let [key,value1] of Object.entries(value)){
-  			if(key == "overall_health"){
+  			if(key == "exercise"){
 	  			for(let [key1,value2] of Object.entries(value1)){
 	  				if(key1 == "overall_health_gpa"){
 		  				for(let duration of duration_type){
@@ -530,60 +566,92 @@ renderDateRangeDropdown(value,value5){
 	  			}
 	  		}
   		}
-  
+      let rank;
   		let date;
 	  	let tableHeaders = [];
 	  	for(let dur of duration_type1){
-	  		let rank;
+	  		
+        let selectedRange = {
+          dateRange:null,
+          rangeType:null
+        };
         
 	  		let capt = dur[0].toUpperCase() + dur.slice(1)
 	  		if(dur == "today"){
 	  			date = moment(value5[dur]).format('MMM DD, YYYY');
-          
+        
+          selectedRange['dateRange'] = value5[dur];
+          selectedRange['rangeType'] = dur;
 	  			
 	  		}
 	  		else if(dur == "yesterday"){
 	  			date = moment(value5[dur]).format('MMM DD, YYYY');
-        
+          selectedRange['dateRange'] = value5[dur];
+          selectedRange['rangeType'] = dur;
 	  			
 	  		}
 	  		else if(dur == "week"){
 		  		date = this.headerDates(value5[dur]);
-		  	
+		  	  selectedRange['dateRange'] = value5[dur];
+          selectedRange['rangeType'] = dur; 
 	  		}
 	  		else if(dur == "month"){
 		  		date = this.headerDates(value5[dur]);
+          selectedRange['dateRange'] = value5[dur];
+          selectedRange['rangeType'] = dur;
 	
 	  		}
 	  		else if(dur == "year"){
 		  		date = this.headerDates(value5[dur]);
+          selectedRange['dateRange'] = value5[dur];
+          selectedRange['rangeType'] = dur;
           
 		  		
 	  		}
 	  		else{
 	  			date = this.headerDates(dur);
 	  			capt = "";
+          rank = value['custom_range'][dur].all_rank;
+          selectedRange['dateRange'] = dur;
+          selectedRange['rangeType'] = 'custom_range';
          
 	  		}
 
   			tableHeaders.push(
   			 <DropdownItem>
   			 <a className="dropdown-item" 
-	  			onClick = {this.reanderAllHrr.bind(this,dur,date,capt)}
+	  			onClick = {this.reanderAllHrr.bind(this,dur,date,capt,selectedRange)}
 	  			style = {{fontSize:"13px"}}>
 	  			{capt}<br/>{date}
   			</a></DropdownItem>);
 	  	}
 	  return tableHeaders;	
   	}
- //,selectedRange
-  	aaColorRanges(heartrate){
+
+  	aaColorRanges(heartrate,heartRateNotRecorded,workout_duration_hours_min_score){
   		let background = '';
       let color = '';
-  	    let userage = this.state.userage;
-     if( heartrate == null || heartrate == undefined || heartrate == 0){
+  	  let userage = this.state.userage;
+     if( heartrate == null || heartrate == undefined ){
   	  	background = '';
+        color = '';
+        return[background,color]
   	 }
+     else if ( heartrate == 0){
+        if( heartRateNotRecorded == 0 && (workout_duration_hours_min_score != ' ' || 
+           !workout_duration_hours_min_score)){
+           color = "white"
+           background="green";
+           return [background,color]
+          
+       }
+       else if( (heartRateNotRecorded != ' '||!heartRateNotRecorded) && (workout_duration_hours_min_score != ' ' || 
+                  !workout_duration_hours_min_score) ){
+          background = '';
+          color = '';
+          return [background,color]
+     }
+   }
   	 else{
   	  	    if(userage >=13 && userage <=16){
                    if( heartrate >= 153 && heartrate < 166){
@@ -599,7 +667,8 @@ renderDateRangeDropdown(value,value5){
                       background="#32CD32";	
                     }
                    else if(heartrate >= 179 && heartrate < 182){
-                      background="green";	
+                      background="green";
+                      color = "white";	
                     }
                     else if(heartrate >= 182 && heartrate < 187){
                       background="#32CD32";	
@@ -626,6 +695,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 141 && heartrate <= 153){
+                    color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        }
@@ -635,6 +705,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 140 && heartrate < 153){
+                    color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        }
@@ -644,6 +715,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 139 && heartrate < 153){
+                    color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        }
@@ -674,6 +746,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 167 && heartrate < 179){
+                    color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        }
@@ -719,6 +792,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 110 && heartrate < 125){
+                    color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        }
@@ -728,6 +802,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 138 && heartrate < 153){
+                    color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 165){
@@ -743,6 +818,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32" ;
   	  	        	}
   	  	        	else if(heartrate >= 178 && heartrate < 181){
+                    color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 181 && heartrate < 186){
@@ -764,6 +840,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 137 && heartrate < 153){
+                    color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 164){
@@ -779,6 +856,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32" ;
   	  	        	}
   	  	        	else if(heartrate >= 177 && heartrate < 180){
+                    color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 180 && heartrate < 185){
@@ -801,6 +879,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 136 && heartrate < 153){
+                    color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 163){
@@ -816,6 +895,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32" ;
   	  	        	}
   	  	        	else if(heartrate >= 176 && heartrate < 179){
+                    color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	          }	
@@ -825,6 +905,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 135 && heartrate < 153){
+                    color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 162){
@@ -834,12 +915,14 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Yellow";
   	  	        	}
   	  	        	else if(heartrate >= 166 && heartrate < 171){
+
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 171 && heartrate < 174){
   	  	        		background = "#32CD32" ;
   	  	        	}
   	  	        	else if(heartrate >= 174 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	          }
@@ -849,6 +932,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 134 && heartrate < 153){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 161){
@@ -864,6 +948,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32" ;
   	  	        	}
   	  	        	else if(heartrate >= 173 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	          }
@@ -873,6 +958,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 133 && heartrate < 153){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 160){
@@ -888,6 +974,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32" ;
   	  	        	}
   	  	        	else if(heartrate >= 172 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	          }
@@ -897,6 +984,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 132 && heartrate < 153){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 159){
@@ -912,6 +1000,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32" ;
   	  	        	}
   	  	        	else if(heartrate >= 171 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
     	  	      }
@@ -922,6 +1011,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 131 && heartrate < 153){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 158){
@@ -937,6 +1027,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32" ;
   	  	        	}
   	  	        	else if(heartrate >= 170 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        }
@@ -947,6 +1038,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 130 && heartrate < 152){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 152 && heartrate < 157){
@@ -962,6 +1054,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32" ;
   	  	        	}
   	  	        	else if(heartrate >= 169 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        }
@@ -987,6 +1080,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32" ;
   	  	        	}
   	  	        	else if(heartrate >= 168 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        }
@@ -1000,6 +1094,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 128 && heartrate < 150){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 150 && heartrate < 155){
@@ -1018,6 +1113,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 127 && heartrate < 149){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 149 && heartrate < 155){
@@ -1035,6 +1131,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 126 && heartrate < 148){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 148 && heartrate < 155){
@@ -1053,6 +1150,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 125 && heartrate < 147){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 147 && heartrate < 155){
@@ -1071,6 +1169,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 124 && heartrate < 146){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 146 && heartrate < 155){
@@ -1091,6 +1190,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 134 && heartrate < 146){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 146 && heartrate < 155){
@@ -1107,6 +1207,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 171 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	
@@ -1118,6 +1219,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 133 && heartrate < 146){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 146 && heartrate < 154){
@@ -1134,6 +1236,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 170 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	
@@ -1145,6 +1248,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 132 && heartrate < 146){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 146 && heartrate < 153){
@@ -1161,6 +1265,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 169 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	
@@ -1171,6 +1276,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 131 && heartrate < 146){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 146 && heartrate < 152){
@@ -1187,6 +1293,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 168 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	
@@ -1198,6 +1305,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 130 && heartrate < 146){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 146 && heartrate < 151){
@@ -1214,6 +1322,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 167 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	
@@ -1224,6 +1333,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 129 && heartrate < 145){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 145 && heartrate < 150){
@@ -1240,6 +1350,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 166 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	
@@ -1254,6 +1365,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 128 && heartrate < 144){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 144 && heartrate < 149){
@@ -1270,6 +1382,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 165 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	
@@ -1284,6 +1397,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 127 && heartrate < 143){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 143 && heartrate < 148){
@@ -1300,6 +1414,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 164 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	
@@ -1314,6 +1429,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 126 && heartrate < 142){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 142 && heartrate < 147){
@@ -1330,6 +1446,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 163 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	
@@ -1344,6 +1461,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 125 && heartrate < 141){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 141 && heartrate < 146){
@@ -1360,6 +1478,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 162 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	
@@ -1377,6 +1496,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 124 && heartrate < 140){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
 
@@ -1394,6 +1514,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
 
   	  	        	else if(heartrate >= 161 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	
@@ -1411,6 +1532,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 123 && heartrate < 139){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
 
@@ -1427,6 +1549,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 160 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}	  	        	
   	  	        	
@@ -1443,6 +1566,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 122 && heartrate < 138){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
 
@@ -1459,6 +1583,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 159 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}	  	        	
   	  	        	
@@ -1475,6 +1600,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 121 && heartrate < 137){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
 
@@ -1491,6 +1617,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 158 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}	  	        	
   	  	        	
@@ -1507,6 +1634,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 120 && heartrate < 136){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
 
@@ -1523,6 +1651,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 157 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}	  	        	
   	  	        	
@@ -1540,6 +1669,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 119 && heartrate < 135){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
 
@@ -1556,6 +1686,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 156 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}	  	        	
   	  	        	
@@ -1572,6 +1703,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 118 && heartrate < 134){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
 
@@ -1588,6 +1720,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 155 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}	  	        	
   	  	        	
@@ -1598,6 +1731,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 117 && heartrate < 133){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 133 && heartrate < 138){
@@ -1614,6 +1748,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 154 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	} 	  	    	
   	  	        	
@@ -1642,6 +1777,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	} 	  	    	
   	  	        	
@@ -1652,6 +1788,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 115 && heartrate < 131){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 131 && heartrate < 136){
@@ -1668,6 +1805,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 152 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	} 	  	    	
   	  	        	
@@ -1677,6 +1815,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 114 && heartrate < 130){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 130 && heartrate < 135){
@@ -1693,6 +1832,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 151 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	} 	  	    	
   	  	        	
@@ -1702,6 +1842,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 113 && heartrate < 129){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 129 && heartrate < 134){
@@ -1718,6 +1859,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 150 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	} 	  	    	
   	  	        	
@@ -1728,6 +1870,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 112 && heartrate < 128){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 128 && heartrate < 133){
@@ -1744,6 +1887,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 149 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	} 	  	    	
   	  	        	
@@ -1755,6 +1899,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 111 && heartrate < 127){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 127 && heartrate < 132){
@@ -1772,6 +1917,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
   	  	        	else if(heartrate >= 148 && heartrate < 179){
   	  	        		background = "green";
+                         color = "white";
   	  	        	} 	  	    	
   	  	        	
   	  	        }				
@@ -1791,6 +1937,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
 
   	  	        	else if(heartrate >= 149 && heartrate < 174){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 174 && heartrate < 179){
@@ -1823,6 +1970,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
 
   	  	        	else if(heartrate >= 148 && heartrate < 173){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 173 && heartrate < 178){
@@ -1856,6 +2004,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
 
   	  	        	else if(heartrate >= 147 && heartrate < 172){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 172 && heartrate < 177){
@@ -1888,6 +2037,7 @@ renderDateRangeDropdown(value,value5){
   	  	        	}
 
   	  	        	else if(heartrate >= 146 && heartrate < 171){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 171 && heartrate < 176){
@@ -1916,6 +2066,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 145 && heartrate < 170){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
 
@@ -1946,6 +2097,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 144 && heartrate < 169){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
 
@@ -1975,6 +2127,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 143&& heartrate < 168){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
 
@@ -2001,6 +2154,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 141 && heartrate < 166){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 166 && heartrate < 171){
@@ -2027,6 +2181,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 140 && heartrate < 165){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 165 && heartrate < 170){
@@ -2052,6 +2207,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 139 && heartrate < 164){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 164 && heartrate < 169){
@@ -2077,6 +2233,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 138 && heartrate < 163){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 163 && heartrate < 168){
@@ -2101,6 +2258,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 137 && heartrate < 162){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 162 && heartrate < 167){
@@ -2125,6 +2283,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 136 && heartrate < 161){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 161 && heartrate < 166){
@@ -2149,6 +2308,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 135 && heartrate < 160){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 160 && heartrate < 165){
@@ -2170,6 +2330,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 134 && heartrate < 159){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 159 && heartrate < 164){
@@ -2192,6 +2353,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 133 && heartrate < 158){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 158 && heartrate < 163){
@@ -2214,6 +2376,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 132 && heartrate < 157){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 157 && heartrate < 162){
@@ -2236,6 +2399,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 131 && heartrate < 156){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 156 && heartrate < 161){
@@ -2254,6 +2418,7 @@ renderDateRangeDropdown(value,value5){
   	  	        }
   	  	        if( userage >=75 && userage < 76){
   	  	        	if(heartrate >= 130 && heartrate < 154){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 154 && heartrate < 159){
@@ -2271,6 +2436,7 @@ renderDateRangeDropdown(value,value5){
   	  	        }
   	  	        if( userage >=76 && userage < 77){
   	  	        	if(heartrate >= 130 && heartrate < 153){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 153 && heartrate < 158){
@@ -2288,6 +2454,7 @@ renderDateRangeDropdown(value,value5){
   	  	        }
   	  	        if( userage >=77 && userage < 78){
   	  	        	if(heartrate >= 130 && heartrate < 152){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 152 && heartrate < 157){
@@ -2306,6 +2473,7 @@ renderDateRangeDropdown(value,value5){
 				
 				if( userage >=78 && userage < 79){
   	  	        	if(heartrate >= 130 && heartrate < 151){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 151 && heartrate < 156){
@@ -2324,6 +2492,7 @@ renderDateRangeDropdown(value,value5){
 				
 				if( userage >=79 && userage < 80){
   	  	        	if(heartrate >= 130 && heartrate < 150){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 150 && heartrate < 155){
@@ -2344,6 +2513,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 109 && heartrate < 125){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 125 && heartrate < 126){
@@ -2353,6 +2523,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 130 && heartrate < 149){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}  	
   	  	        	else if(heartrate >= 149 && heartrate < 154){
@@ -2374,6 +2545,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 109 && heartrate < 124){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 124 && heartrate < 125){
@@ -2386,6 +2558,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}  	
   	  	        	else if(heartrate >= 130 && heartrate < 148){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 148 && heartrate < 153){
@@ -2407,6 +2580,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 109 && heartrate < 123){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 123 && heartrate < 124){
@@ -2419,6 +2593,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}  	
   	  	        	else if(heartrate >= 130 && heartrate < 147){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 147 && heartrate < 152){
@@ -2440,6 +2615,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 108 && heartrate < 122){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 122 && heartrate < 123){
@@ -2452,6 +2628,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}  	
   	  	        	else if(heartrate >= 130 && heartrate < 146){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 146 && heartrate < 151){
@@ -2473,6 +2650,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 108 && heartrate < 121){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 121 && heartrate < 122){
@@ -2485,6 +2663,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}  	
   	  	        	else if(heartrate >= 130 && heartrate < 145){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 145 && heartrate < 150){
@@ -2506,6 +2685,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 108 && heartrate < 120){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 120 && heartrate < 121){
@@ -2551,6 +2731,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}  	
   	  	        	else if(heartrate >= 130 && heartrate < 143){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 143 && heartrate < 148){
@@ -2572,6 +2753,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 107 && heartrate < 118){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 118 && heartrate < 119){
@@ -2584,6 +2766,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}  	
   	  	        	else if(heartrate >= 130 && heartrate < 142){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 142 && heartrate < 147){
@@ -2605,6 +2788,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 107 && heartrate < 117){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 117 && heartrate < 118){
@@ -2617,6 +2801,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}  	
   	  	        	else if(heartrate >= 130 && heartrate < 141){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 141 && heartrate < 146){
@@ -2638,6 +2823,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 106 && heartrate < 116){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 116 && heartrate < 117){
@@ -2650,6 +2836,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}  	
   	  	        	else if(heartrate >= 130 && heartrate < 140){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 140 && heartrate < 145){
@@ -2670,6 +2857,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 106 && heartrate < 115){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 115 && heartrate < 116){
@@ -2709,6 +2897,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 124 && heartrate < 140){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 140 && heartrate < 144){
@@ -2724,6 +2913,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}  	
   	  	        	else if(heartrate >= 161 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	} 
   	  	        	    	        	    	
@@ -2741,6 +2931,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 123 && heartrate < 139){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 139 && heartrate < 143){
@@ -2756,6 +2947,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}  	
   	  	        	else if(heartrate >= 160 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	} 
   	  	        	    	        	    	
@@ -2772,6 +2964,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 122 && heartrate < 138){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 138 && heartrate < 143){
@@ -2787,6 +2980,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}  	
   	  	        	else if(heartrate >= 159 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	} 
   	  	        	    	        	    	
@@ -2803,6 +2997,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 121 && heartrate < 137){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 137 && heartrate < 142){
@@ -2818,6 +3013,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}  	
   	  	        	else if(heartrate >= 158 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	} 
   	  	        	    	        	    	
@@ -2833,6 +3029,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 120 && heartrate < 136){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 136 && heartrate < 141){
@@ -2848,6 +3045,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}  	
   	  	        	else if(heartrate >= 157 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	} 
   	  	        	    	        	    	
@@ -2864,6 +3062,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 119 && heartrate < 135){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 135 && heartrate < 140){
@@ -2879,6 +3078,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}  	
   	  	        	else if(heartrate >= 156 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	} 
   	  	        	    	        	    	
@@ -2894,6 +3094,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 118 && heartrate < 134){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 134 && heartrate < 139){
@@ -2909,6 +3110,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}  	
   	  	        	else if(heartrate >= 155 && heartrate < 179){
+                         color = "white";
   	  	        		background = "green";
   	  	        	} 
   	  	        	    	        	    	
@@ -2924,6 +3126,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 106 && heartrate < 114){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 114 && heartrate < 115){
@@ -2936,6 +3139,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 130 && heartrate < 138){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}  	
   	  	        	else if(heartrate >= 138 && heartrate < 143){
@@ -2963,6 +3167,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 105 && heartrate < 113){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 113 && heartrate < 114){
@@ -2975,6 +3180,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 130 && heartrate < 137){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}  	
   	  	        	else if(heartrate >= 137 && heartrate < 142){
@@ -3003,6 +3209,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 104 && heartrate < 112){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 112 && heartrate < 113){
@@ -3015,6 +3222,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 130 && heartrate < 136){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}  	
   	  	        	else if(heartrate >= 136 && heartrate < 141){
@@ -3044,6 +3252,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 103 && heartrate < 111){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 111 && heartrate < 112){
@@ -3056,6 +3265,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 130 && heartrate < 135){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}  	
   	  	        	else if(heartrate >= 135 && heartrate < 140){
@@ -3084,6 +3294,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 102 && heartrate < 110){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 110 && heartrate < 111){
@@ -3096,6 +3307,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 130 && heartrate < 134){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}  	
   	  	        	else if(heartrate >= 134 && heartrate < 139){
@@ -3124,6 +3336,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 101 && heartrate < 109){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 109 && heartrate < 110){
@@ -3136,6 +3349,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 130 && heartrate < 133){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}  	
   	  	        	else if(heartrate >= 133 && heartrate < 138){
@@ -3164,6 +3378,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 100 && heartrate < 108){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 108 && heartrate < 109){
@@ -3176,6 +3391,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "Orange";
   	  	        	}
   	  	        	else if(heartrate >= 130 && heartrate < 132){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}  	
   	  	        	else if(heartrate >= 132 && heartrate < 137){
@@ -3204,6 +3420,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 99 && heartrate < 107){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 107 && heartrate < 108){
@@ -3242,6 +3459,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 98 && heartrate < 106){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 106 && heartrate < 107){
@@ -3279,6 +3497,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 97 && heartrate < 105){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 105 && heartrate < 106){
@@ -3317,6 +3536,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}
   	  	        	else if(heartrate >= 97 && heartrate < 104){
+                         color = "white";
   	  	        		background = "green";
   	  	        	}
   	  	        	else if(heartrate >= 104 && heartrate < 105){
@@ -3332,6 +3552,7 @@ renderDateRangeDropdown(value,value5){
   	  	        		background = "#32CD32";
   	  	        	}  	
   	  	        	else if(heartrate >= 129 && heartrate < 130){
+                         color = "white";
   	  	        		background = "green";
   	  	        	} 
   	  	        	else if(heartrate >= 130 && heartrate < 133){
@@ -3357,88 +3578,101 @@ renderDateRangeDropdown(value,value5){
 				
 				if( userage >=98 && userage < 101){
   	  	        	if(heartrate >= 130 && heartrate < 131){
+                    color="white";
   	  	        		background = "green";
   	  	        	}
   	  	        }				
   	  	 }
-  	  
        return [background,color];
   	}
 
 	aerobicTimeZone(value,durationdate){
-     let aerobicPrcnt = this.aaExercisestats(this.renderValue(value.prcnt_aerobic_duration,durationdate));
-     let score = this.aaExercisestats(this.renderValue(value.hr_aerobic_duration_hour_min,durationdate));
-     let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_exercise_heart_rate,durationdate));
-      
-     if( score == "No workout" && aerobicPrcnt == "No workout" ){
-     return(
-     		
-			<Card  className = "card_style" style={{backgroundColor:'',color:''}}>
-			<CardBody>
-			<CardTitle className = "header_style">Time in Aerobic Zone (102-137)  
-			</CardTitle> 
-			<CardText className = "value_style">{score}{' '}{'('+aerobicPrcnt+')'}</CardText>
-			</CardBody>
-			</Card>  
-			    
+    let lower_aerobic_zone;
+    let higher_aerobic_zone;
+
+    for(let [key,ranges] of Object.entries(this.state.aa_ranges)){
+      lower_aerobic_zone = ranges[1];
+      higher_aerobic_zone = ranges[2]-1;
+    }
+    let aa_ranges = this.state.aa_ranges['0'];
+    let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min,durationdate);
+     let aerobicPrcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_aerobic_duration,durationdate));
+     let score = this.aaExercisestats(this.renderValue(value.hr_aerobic_duration_hour_min,durationdate),workout_duration_hours_min_score);
+     let heartRateNotRecorded = this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate)
+    let  avgheartratecolor  = this.aaColorRanges(this.renderValue(value.avg_non_strength_exercise_heart_rate,durationdate),heartRateNotRecorded,workout_duration_hours_min_score); 
+      if( score == "No workout" ){
+     return(  
+      <Card  className = "card_style" style={{backgroundColor:'',color:''}}>
+      <CardBody>
+      <CardTitle className = "header_style">{'Time in Aerobic Zone ('+lower_aerobic_zone+' - '+higher_aerobic_zone+')'}
+      </CardTitle> 
+      <CardText className = "value_style">{score}</CardText>
+      </CardBody>
+      </Card>  
          );
-      }
-      else{
-      	return(
-      		
+     }  
+     else{ 
+      return(   
       <Card  className = "card_style" >
-			<CardBody style={{backgroundColor:avgheartratecolor[0],color:avgheartratecolor[1]}}>
-			<CardTitle className = "header_style">Time in Aerobic Zone (102-137)  </CardTitle> 
-			<CardText className = "value_style">{score}{' '}{'('+aerobicPrcnt+'%'+')'}</CardText>
-			</CardBody>
-			</Card>
-	
-      	);
-      }        	
+      <CardBody style={{backgroundColor:avgheartratecolor[0],color:avgheartratecolor[1]}}>
+      <CardTitle className = "header_style">{'Time in Aerobic Zone ('+lower_aerobic_zone+' - '+higher_aerobic_zone+')'}</CardTitle> 
+      <CardText className = "value_style">{score}{' '}{'('+aerobicPrcnt+'%'+')'}</CardText>
+      </CardBody>
+      </Card>
+        );
+       }       	
 	}
 
 	anerobicTimeZone(value,durationdate){
-		let score = this.aaExercisestats(this.renderValue(value.hr_anaerobic_duration_hour_min,durationdate));
-		let anerobicPrcnt = this.aaExercisestats(this.renderValue(value.prcnt_anaerobic_duration,durationdate));
-        let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_exercise_heart_rate,durationdate));
-        if( score == "No workout" && anerobicPrcnt == "No workout"){
+    let anerobic_zone;
+    for(let [key,ranges] of Object.entries(this.state.aa_ranges)){
+      anerobic_zone = ranges[2];
+    }
+    let heartRateNotRecorded = this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate)
+    let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min,durationdate);
+		let score = this.aaExercisestats(this.renderValue(value.hr_anaerobic_duration_hour_min,durationdate),workout_duration_hours_min_score);
+		let anerobicPrcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_anaerobic_duration,durationdate));
+    let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_non_strength_exercise_heart_rate,durationdate),heartRateNotRecorded,workout_duration_hours_min_score);    
+        if( score == "No workout"){
 			return (
-				
 			<Card className = "card_style">
       <CardBody>
-			<CardTitle className = "header_style">Time in Anaerobic Zone (138 or above)</CardTitle>
-			<CardText className = "value_style">{score}{' '}{'('+anerobicPrcnt+')'}</CardText>
+			<CardTitle className = "header_style">{'Time in Anaerobic Zone ('+anerobic_zone+' or above)'}</CardTitle>
+			<CardText className = "value_style">{score}</CardText>
 			</CardBody>
 			</Card>
-		
 		   );
 		}
 		else{
-		   return (
-		   	
+		   return (	
 			<Card className = "card_style">
       <CardBody style={{backgroundColor:avgheartratecolor[0],color:avgheartratecolor[1]}}>
-			<CardTitle className = "header_style">Time in Anaerobic Zone (138 or above)</CardTitle>
+			<CardTitle className = "header_style">{'Time in Anaerobic Zone ('+anerobic_zone+' or above)'}</CardTitle>
 			<CardText className = "value_style">{score}{' '}{'('+anerobicPrcnt+'%'+')'}</CardText>
 			</CardBody>
 			</Card>
-			
 		   );	
 		}     
 	}
 
 	belowAerobicTimeZone(value,durationdate){
-		let score = this.aaExercisestats(this.renderValue(value.hr_below_aerobic_duration_hour_min,durationdate));
-		let belowAerobicPrcnt = this.aaExercisestats(this.renderValue(value.prcnt_below_aerobic_duration,durationdate));
-        let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_exercise_heart_rate,durationdate));
-        if( score == "No workout" && belowAerobicPrcnt == "No workout")
+    let below_aerobic_zone;
+    for(let [key,ranges] of Object.entries(this.state.aa_ranges)){
+      below_aerobic_zone = ranges[0];
+    }
+    let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min,durationdate);
+    let heartRateNotRecorded = this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate)
+		let score = this.aaExercisestats(this.renderValue(value.hr_below_aerobic_duration_hour_min,durationdate),workout_duration_hours_min_score);
+		let belowAerobicPrcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_below_aerobic_duration,durationdate))
+        let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_non_strength_exercise_heart_rate,durationdate),heartRateNotRecorded,workout_duration_hours_min_score);
+        if( score == "No workout")
         {
 			return(
 				
 				<Card className = "card_style" id = "my-card">
 				<CardBody>
-				<CardTitle className = "header_style">Time in below Aerobic Zone (below 102)</CardTitle>
-				<CardText className = "value_style">{score}{' '}{'('+belowAerobicPrcnt+')'}</CardText>
+				<CardTitle className = "header_style">{'Time in below Aerobic Zone (below '+below_aerobic_zone+')'}</CardTitle>
+				<CardText className = "value_style">{score}</CardText>
 				</CardBody>
 				</Card>
 				
@@ -3446,28 +3680,27 @@ renderDateRangeDropdown(value,value5){
 			}
 			else{
 			  return(
-			  	
 				<Card className = "card_style" id = "my-card">
          <CardBody style={{backgroundColor:avgheartratecolor[0],color:avgheartratecolor[1]}}>
-				<CardTitle className = "header_style">Time in below Aerobic Zone (below 102)</CardTitle>
-				<CardText className = "value_style">{score}{' '}{'('+ 0 +'%'+')'}</CardText>
+				<CardTitle className = "header_style">{'Time in below Aerobic Zone (below '+below_aerobic_zone+')'}</CardTitle>
+				<CardText className = "value_style">{score}{' '}{'('+ belowAerobicPrcnt +'%'+')'}</CardText>
 				</CardBody>
 				</Card>
-				
 			  );
 			}		                         
 	}
 
 	heartRateNotRecordedTimeZone(value,durationdate){
-		let score = this.aaExercisestats(this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate));
-		let hrr_not_recorded_prcnt = this.aaExercisestats(this.renderValue(value.prcnt_hr_not_recorded_duration,durationdate));
-        let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_exercise_heart_rate,durationdate));
-        if( score == "No workout" && hrr_not_recorded_prcnt == "No workout"){
+    let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min,durationdate);
+		let score = this.aaExercisestats(this.renderValue(value.hr_not_recorded_duration_hour_min,durationdate),workout_duration_hours_min_score);
+    
+		let hrr_not_recorded_prcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_hr_not_recorded_duration,durationdate));
+        if( score == "No workout"){
 			return (
 				<Card className = "card_style">
 				<CardBody>
-				<CardTitle className = "header_style">Heart Rate Not Reorded</CardTitle>
-				<CardText className = "value_style">{score}{' '}{'('+hrr_not_recorded_prcnt+')'}</CardText>
+				<CardTitle className = "header_style">Heart Rate Not Recorded</CardTitle>
+				<CardText className = "value_style">{score}</CardText>
 				</CardBody>
 				</Card>
            );
@@ -3476,40 +3709,52 @@ renderDateRangeDropdown(value,value5){
          	return (		
 				<Card className = "card_style">
 				<CardBody>
-				<CardTitle className = "header_style">Heart Rate Not Reorded</CardTitle>
+				<CardTitle className = "header_style">Heart Rate Not Recorded</CardTitle>
 				<CardText className = "value_style">{score}{' '}{'('+hrr_not_recorded_prcnt+'%'+')'}</CardText>
 				</CardBody>
 				</Card>
 				);
-         }
-
-	}
+      }
+	 }
 
     totalworkoutdurationTimeZone(value,durationdate){
-		let score = this.aaExercisestats(this.renderValue(value.total_workout_duration_over_range,durationdate)); 
+		let score = this.renderValue(value.workout_duration_hours_min,durationdate);
+    if(score == undefined || score == 0 || score == "" || score == "00:00" || score==null){
+      score="No workout";
+    }
+    else{
+      score=score;
+    } 
         if(isNaN(score)){
 		return (
-			
 			<Card className = "card_style">
 			<CardBody>
 			<CardTitle className = "header_style">Total Workout Duration </CardTitle>
 			<CardText className = "value_style">{score}</CardText>
 			</CardBody>
-			</Card>   
-			           
+			</Card>            
          ); 
        }
 	}
 
-	 aaExercisestats(value){
-	 	if(value == undefined || value == 0 || value == "" || value == "00:00" ){
+	 aaExercisestats(value,workout_duration_hours_min_score){
+	 	if((value == undefined || value == 0 || value == "" || value == "00:00" || value==null) && (workout_duration_hours_min_score == undefined || workout_duration_hours_min_score == 0 || workout_duration_hours_min_score == "" || workout_duration_hours_min_score == "00:00"||workout_duration_hours_min_score == null) ){
         	value = "No workout"
       	}
-      	else{
+      	else if(workout_duration_hours_min_score && workout_duration_hours_min_score!=""){
         	value = value
       	}
     	return value;
 	 }
+   aaExercisestatsPrct(value){
+    if((value == undefined || value == 0 || value == "" || value == "00:00" || value==null)){
+          value = "0"
+        }
+        else{
+          value = value
+        }
+      return value;
+   }
 
 	render(){
 		return(
@@ -3817,6 +4062,8 @@ renderDateRangeDropdown(value,value5){
 							         {this.renderDateRangeDropdown(this.state.summary,this.state.duration_date)}
 							        </DropdownMenu>
 						      	</Dropdown>
+                    <span className = "weekdate" style={{marginLeft:"350px",marginRight:"auto"}}><span className='weekdate'>{this.state.capt}</span><span>{" (" + this.state.date + ")"}{this.state.numberOfDays&&<span>{" - "+"Total Days: "+this.state.numberOfDays}</span>}</span></span>
+
                   </div>
                  </div>
 						      

@@ -7,6 +7,9 @@ from hrr.models import Hrr,AACustomRanges
 from progress_analyzer.tasks import set_pa_report_update_date
 from hrr.tasks import aa_custom_ranges
 
+from apple.models import (UserAppleDataSteps,UserAppleDataActivities)
+from quicklook.tasks import generate_quicklook
+
 @receiver(post_save, sender=Hrr)
 def set_pa_update_date(sender,instance,created,**kwargs):
 	if(not created):
@@ -30,3 +33,44 @@ def aa_custom_ranges_signal(sender,instance,created,**kwargs):
 
 	aa_custom_ranges.delay(user_id,from_date_str)
 
+
+
+@receiver(post_save,sender=UserAppleDataActivities)
+def create_or_update_activities(sender,instance,created,**kwargs):
+	'''this function is used to create_or_update apple activities data '''
+	if created:
+		# print("created activities ")
+		request = kwargs.get('request')
+		user_id = instance.user.id
+		from_date = instance.belong_to
+		from_date_str = from_date[0:10]
+		'''generate_quicklook function goto quicklook/task.py'''
+		generate_quicklook.delay(user_id,from_date_str,from_date_str)
+	else:
+		# print("updated activities")
+		request = kwargs.get('request')
+		user_id = instance.user.id
+		from_date = instance.belong_to
+		from_date_str = from_date[0:10]
+		generate_quicklook.delay(user_id,from_date_str,from_date_str)
+
+
+@receiver(post_save,sender=UserAppleDataSteps)
+def create_or_update_steps(sender,instance,created, **kwargs):
+	'''this function is used to create_or_update apple steps data '''
+	if created:
+		# print("created steps")
+		'''this condition for creating new user '''
+		request = kwargs.get('request')
+		user_id = instance.user.id
+		from_date = instance.belong_to
+		from_date_str = from_date[0:10]
+		'''generate_quicklook function goto quicklook/task.py'''
+		generate_quicklook.delay(user_id,from_date_str,from_date_str)
+	else:
+		# print("updated steps")
+		request = kwargs.get('request')
+		user_id = instance.user.id
+		from_date = instance.belong_to
+		from_date_str = from_date[0:10]
+		generate_quicklook.delay(user_id,from_date_str,from_date_str)

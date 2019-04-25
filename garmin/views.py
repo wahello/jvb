@@ -205,11 +205,17 @@ class GarminConnectPing(APIView):
 				user=user,fit_file=file2,
 				meta_data_fitfile=oauthToken_fitfile,
 				fit_file_belong_date=fitfile_belong_date)
-			create_hrrdata.delay(
-				user.id,
-				date_str,
-				date_str
-			)
+			if fitfile_belong_date:
+				year = str(fitfile_belong_date.year)
+				month = str(fitfile_belong_date.month)
+				day = str(fitfile_belong_date.day)
+				date_str = year+'-'+month+'-'+day
+				print(date_str,"date str")
+				create_hrrdata.delay(
+					user.id,
+					date_str,
+					date_str
+				)
 		
 		headers={"Location":"/"}
 		return Response(status = status.HTTP_201_CREATED,headers=headers)

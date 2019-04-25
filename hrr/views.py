@@ -570,6 +570,12 @@ class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
 			queryset = TwentyfourHourTimeHeartZones.objects.all()
 		return queryset
 
+def aa_ranges_api(request):
+	user = request.user
+	user_age = user.profile.age()
+	aa_ranges =fitbit_aa.belowaerobic_aerobic_anaerobic(user,user_age)
+	return JsonResponse({"0":aa_ranges})
+
 def calculate_garmin_twentyfour_hour_AA3(user,start_date,user_input_activities=None):
 	hr_dataset = get_garmin_hr_data(user,start_date)
 	start_dt = 0
@@ -990,6 +996,7 @@ def aa_data(user,start_date):
 	ui_data_keys = [ui_keys for ui_keys in ui_data.keys()]
 	ui_data_hrr = []
 	ui_data_keys_test = []
+
 	for ui_data_single in ui_data.values():
 		if ui_data_single.get('activityType') == 'HEART_RATE_RECOVERY':
 			summaryId = ui_data_single['summaryId']
@@ -1240,7 +1247,6 @@ def aa_data(user,start_date):
 					"percent_below_aerobic":None,
 					"percent_anaerobic":None,
 					"total_percent":None}
-	
 	if user_created_activity_list:
 		added_data = add_created_activity1(
 			user_created_activity_list,data,below_aerobic_value,anaerobic_value,aerobic_range,anaerobic_range,below_aerobic_range)
@@ -2549,15 +2555,16 @@ def aa_low_high_end_data(user,start_date):
 
 	data2 = {}
 	classification_dic = {}
-	low_end_values = [-60,-55,-50,-45,-40,-35,-30,-25,-20,-15,-10,+1,6,10,14,19,24,
+	low_end_values = [-60,-55,-50,-45,-40,-35,-30,-25,-20,-15,-10,+1,6,11,14,19,24,
 						29,34,39,44,49,54,59]
 	high_end_values = [-56,-51,-46,-41,-36,-31,-26,-21,-16,-11,0,5,10,13,18,23,28,
 						33,38,43,48,53,58,63]
+	
 
-	low_end_heart = [180-user_age+tmp for tmp in low_end_values]
 	high_end_heart = [180-user_age+tmp for tmp in high_end_values]
+	low_end_heart = [180-user_age+tmp for tmp in low_end_values]
 
-	for a,b in zip(low_end_heart,high_end_heart):					
+	for a,b in zip(low_end_heart,high_end_heart):			
 		if a and b > anaerobic_value:
 			classification_dic[a] = 'anaerobic_zone'
 		elif a and b < below_aerobic_value:
@@ -2571,7 +2578,6 @@ def aa_low_high_end_data(user,start_date):
 			  "time_in_zone":0,
 			  "prcnt_total_duration_in_zone":0,
 			 }
-
 		data2[str(a)]=data
 	total = {"total_duration":0,
 				"total_percent":0}
@@ -2590,7 +2596,7 @@ def aa_low_high_end_data(user,start_date):
 					low_end_dict[a] = low_end_dict[a] + d
 		# print(low_end_dict,"low_end_dict")
 		total_time_duration = sum(low_end_dict.values())		
-		for a,b in zip(low_end_heart,high_end_heart):					
+		for a,b in zip(low_end_heart,high_end_heart):	
 			if a and b > anaerobic_value:
 				classification_dic[a] = 'anaerobic_zone'
 			elif a and b < below_aerobic_value:
@@ -2649,7 +2655,6 @@ def aa_low_high_end_data(user,start_date):
 				data2['total']['total_duration']+data2['heartrate_not_recorded'].get('time_in_zone',0)+sum(
 					duration_activites))
 		data2 = percent_added_activity(data2,data2['total']['total_duration'])
-
 	if data2["total"]["total_duration"]:
 		return data2
 	else:
@@ -2685,6 +2690,7 @@ def aa_low_high_end_calculations(request):
 	return JsonResponse(data)
 
 def store_garmin_aa3(user,from_date,to_date):
+	activities_dict = get_usernput_activities(user,from_date)
 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 	current_date = to_date_obj
@@ -2739,7 +2745,6 @@ def store_aa_low_high_end_calculations(user,from_date,to_date):
 		print("Fitbit AA chat3 data calculation got started")
 		store_fitbit_aa3(user,from_date,to_date)
 		print("Fitbit AA chat3 data calculation finished")
-
 def hrr_data(user,start_date):
 	Did_heartrate_reach_99 = ''
 	time_99 = 0.0
@@ -2818,7 +2823,6 @@ def hrr_data(user,start_date):
 		daily_starttime = garmin_data_daily['startTimeInSeconds']
 	else:
 		daily_starttime = None
-
 	start = start_date
 	end = start_date + timedelta(days=3)
 	fitfiles_obj = get_fitfiles(user,start_date,start,end,start_date_timestamp,end_date_timestamp)
@@ -2829,7 +2833,7 @@ def hrr_data(user,start_date):
 		hrr file if it fails then else block will do assumtion calculation for idetifying
 		the HRR fit file
 	'''
-	try:
+	try:		
 		if activities_dic:
 			for tmp in fitfiles_obj:
 				meta = tmp.meta_data_fitfile
@@ -2839,7 +2843,7 @@ def hrr_data(user,start_date):
 					hrr.append(tmp)
 				elif data_id in workout_id:
 					workout.append(tmp)
-		else:
+		else:		
 			for tmp in fitfiles_obj:
 				meta = tmp.meta_data_fitfile
 				meta = ast.literal_eval(meta)
@@ -2850,6 +2854,7 @@ def hrr_data(user,start_date):
 					hrr.append(tmp)
 	except:
 		logging.exception("message")
+
 	all_activities_heartrate = []
 	all_activities_timestamp = []
 	all_activities_timestamp_raw = []
@@ -2865,7 +2870,7 @@ def hrr_data(user,start_date):
 		workout_final_timestamp = ''
 		workout_timestamp = ''
 	Did_you_measure_HRR = ""
-	if hrr and workout and all_activities_heartrate:
+	if hrr and workout and all_activities_heartrate:	
 		hrr_data = fitfile_parse(hrr,offset,start_date_str)
 		hrr_final_heartrate,hrr_final_timestamp,hrr_timestamp = hrr_data
 		Did_you_measure_HRR = 'yes'
@@ -3015,7 +3020,7 @@ def hrr_data(user,start_date):
 
 	else:
 		Did_you_measure_HRR = 'no'
-
+		
 	if (not hrr) and workout and workout_final_heartrate:
 		end_time_activity = workout_timestamp[-1]-(offset)
 		end_heartrate_activity  = workout_final_heartrate[-1]
@@ -3243,7 +3248,8 @@ def store_garmin_hrr(user,from_date,to_date,type_data):
 			hrr_obj = Hrr.objects.get(user_hrr=user,created_at=current_date)
 		except:
 			hrr_obj = None
-		if not hrr_obj.use_updated_hrr:
+			logging.exception("message")
+		if not hrr_obj or not hrr_obj.use_updated_hrr:
 			if type_data == 'dailies' or not hrr_obj or hrr_obj.Did_you_measure_HRR == 'no':
 				hrr_only_store(user,current_date)
 			elif not type_data:
