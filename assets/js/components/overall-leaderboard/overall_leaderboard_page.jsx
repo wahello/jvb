@@ -111,6 +111,7 @@ class OverallLeaderboard extends Component{
 		this.reanderAllHrr = this.reanderAllHrr.bind(this);
 		this.toggleInfo = this.toggleInfo.bind(this);
 		this.infoPrint = this.infoPrint.bind(this);
+		this.successProfile = this.successProfile.bind(this);
 	}
 
 	successOverallMovementRank(data,custom_range=undefined){

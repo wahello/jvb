@@ -193,7 +193,7 @@ class OverallLeaderboardTable extends Component{
 		}
         return grade;
     }
-	getAlcoholColors(alcoholperday,alcoholperweek,rank, gender){
+	getAlcoholColors(alcoholperday,alcoholperweek,gender,rank){
 		let background= '';
 		let color='';
 		if(isNaN(alcoholperweek) || alcoholperweek == null){
@@ -880,8 +880,9 @@ class OverallLeaderboardTable extends Component{
 							}
 						td_values.push(this.getAlcoholColors(alcohol_drink_per_day,
 															 alcohol_drink_per_week,
+															 this.props.gender,
 															 value[key1].rank),
-															 this.props.gender);
+															 );
 						}
 					 else if( key1 == "user_daily_inputs" ){
 					  let reported_inputs = value[key1].other_scores.prcnt_days_reported_inputs.value;
