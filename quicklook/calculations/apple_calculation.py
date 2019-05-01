@@ -457,13 +457,17 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 		if todays_activity_data:
 			todays_activity_data = list(map(apple_to_garmin_activities,
 				todays_activity_data))
-		combined_user_exercise_activities,combined_user_exec_non_exec_activities =\
-			quicklook.calculations.garmin_calculation.\
-				get_filtered_activity_stats(
-					todays_activity_data[0],user_age,
-					userinput_activities = userinput_activities,
-					epoch_summaries = todays_epoch_data,
-					provide_all=True)
+
+			combined_user_exercise_activities,combined_user_exec_non_exec_activities =\
+				quicklook.calculations.garmin_calculation.\
+					get_filtered_activity_stats(
+						todays_activity_data[0],user_age,
+						userinput_activities = userinput_activities,
+						epoch_summaries = todays_epoch_data,
+						provide_all=True)
+		else:
+			combined_user_exercise_activities = []
+			combined_user_exec_non_exec_activities = []
 
 		ui_bedtime = None
 		ui_awaketime = None
@@ -683,12 +687,13 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 			moment_non_exercise_steps_grade_point[1]
 			
 		# Exercise Grade and point calculation
-		exe_consistency_grade = get_exercise_consistency_grade(
-			user,current_date,user_age,weekly_user_input_activities)
-		grades_calculated_data['exercise_consistency_grade'] = \
-			exe_consistency_grade[0]
-		grades_calculated_data['exercise_consistency_score'] = \
-			exe_consistency_grade[1]
+		# exe_consistency_grade = quicklook.calculations\
+		# 	.garmin_calculation.get_exercise_consistency_grade(
+		# 	user,current_date,user_age,weekly_user_input_activities)
+		# grades_calculated_data['exercise_consistency_grade'] = \
+		# 	exe_consistency_grade[0]
+		# grades_calculated_data['exercise_consistency_score'] = \
+		# 	exe_consistency_grade[1]
 
 		# Movement consistency and movement consistency grade calculation
 		# Time user go to bed last night

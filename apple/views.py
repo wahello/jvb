@@ -128,7 +128,7 @@ def merge_user_data(user, start_date):
 	# date_qs = UserAppleDataSteps.objects.filter(Q(
 	# 	belong_to__gte=start_date) & Q(
 	# 	belong_to__lt=start_date),user=user)
-	date_qs = UserAppleDataSteps.objects.filter(
+	date_qs = UserAppleDataSteps.objects.filter(user=user,
 		belong_to__range=[start_date,start_date+timedelta(days=1)])
 	data = []
 	[data.append(ast.literal_eval(single_obj.data)) for single_obj in date_qs]
