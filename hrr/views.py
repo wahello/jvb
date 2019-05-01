@@ -3088,7 +3088,8 @@ def hrr_data(user,start_date):
 		else:
 			time_heart_rate_reached_99 = None
 		if daily_diff_data_99 == None:
-			Did_heartrate_reach_99 = "Heart Rate Data Not Provided"
+			# Did_heartrate_reach_99 = "Heart Rate Data Not Provided"
+			Did_heartrate_reach_99 = "no"
 			no_fitfile_hrr_time_reach_99 = 0.00
 			time_heart_rate_reached_99 = 0.00
 
@@ -3143,7 +3144,8 @@ def hrr_data(user,start_date):
 			}
 	elif workout and not workout_final_heartrate:
 		data = {"Did_you_measure_HRR":'no',
-			"Did_heartrate_reach_99":'Heart rate data did not provided',
+			# "Did_heartrate_reach_99":'Heart rate data did not provided',
+			"Did_heartrate_reach_99":'no',
 			"time_99":None,
 			"HRR_start_beat":None,
 			"lowest_hrr_1min":None,
