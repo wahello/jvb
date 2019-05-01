@@ -17,7 +17,12 @@
   margin-left : 0px;
   margin-right : 0px;
 }
-
+.paweekdate{
+    margin-left: 10px;
+    color: gray;
+    padding-top: 5px;
+    font-size: 13px;
+}
 @media (min-width:320px ) and (max-width: 376px) and (orientation: portrait ){
   .bifurcation_table{
     margin-right: 20px;
