@@ -44,7 +44,8 @@ import ProgressDashboard from '../components/progressanalyzer_dashboard';
 import ActiveDashboard from '../components/Active_dashboard';
 import BackfillRequest from '../components/BackfillRequest';
 import MovementLeaderboard from '../components/movement-leaderboard/movement_leaderboard';
-import OverallLeaderboard from '../components/overall-leaderboard/overall_leaderboard_page'
+import OverallLeaderboard from '../components/overall-leaderboard/overall_leaderboard_page';
+import Bifurcation from '../components/bifurcation-dashboard/bifurcation'
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
 import {isLoggedIn} from '../network/auth';
@@ -112,6 +113,7 @@ function initializeLocalState(){
 					<Route path='/backfill' component={RequireAuth(BackfillRequest)} />
 					<Route path='/movement_leaderboard' component={RequireAuth(MovementLeaderboard)}/>
 					<Route path='/overall_leaderboard' component={RequireAuth(OverallLeaderboard)}/>
+				   <Route path='/bifurcationdashboard' component={RequireAuth(Bifurcation)}/>
 				</Switch>
 			  </BrowserRouter>
 			</Provider> 
