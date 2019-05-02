@@ -43,7 +43,7 @@ class Bifurcation extends React.Component{
 				capt:'',
         gender:'',
         age:'',
-				selected_range:"today",
+				selected_range:"week",
         selectedRange:{
               dateRange:null,
               rangeType:'today'
@@ -516,7 +516,7 @@ class Bifurcation extends React.Component{
 	        report_date:data.data.report_date,
 	        summary:data.data.summary,
 	        duration_date:data.data.duration_date,
-	        capt:"Today",
+	        capt:"Week",
 	        date:date,
 
 	    },()=>{
@@ -619,7 +619,7 @@ class Bifurcation extends React.Component{
 	      selectedDate: selectedDate,
 	      calendarOpen:!this.state.calendarOpen,
         numberOfDays:7,
-	      selected_range:"today",                              
+	      selected_range:"week",                              
 	    },()=>{
 	      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
 	    });
