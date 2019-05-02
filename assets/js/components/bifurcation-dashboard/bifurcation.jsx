@@ -507,6 +507,11 @@ class Bifurcation extends React.Component{
   }
 
   successProgress(data,renderAfterSuccess=undefined){
+    console.log(data.data.duration_date,"duration date")
+    let week = data.data.duration_date["week"]
+    let week_start = moment(data.data.duration_date["week"].split('to')[0]).format("MMM DD, YYYY")
+    let week_end = moment(data.data.duration_date["week"].split('to')[1]).format("MMM DD, YYYY")
+    week = week_start + ' to ' + week_end;
 		let date =moment(data.data.duration_date["today"]).format("MMM DD, YYYY"); 
 	    this.setState({
 	    	fetching_ql1:false,
@@ -517,7 +522,7 @@ class Bifurcation extends React.Component{
 	        summary:data.data.summary,
 	        duration_date:data.data.duration_date,
 	        capt:"Week",
-	        date:date,
+	        date:week,
 
 	    },()=>{
             if(renderAfterSuccess){
