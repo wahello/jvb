@@ -20,6 +20,7 @@ import NavbarMenu from './navbar';
 import fetchProgress, {fetchAaRanges} from '../network/progress';
 import {getUserProfile} from '../network/auth';
 import {fetchLastSync} from '../network/quick';
+import {renderProgressFetchOverlay,renderProgress2FetchOverlay,renderProgress3FetchOverlay,renderProgressSelectedDateFetchOverlay} from './dashboard_healpers';
 
 
 axiosRetry(axios, { retries: 3});
@@ -149,6 +150,10 @@ class Aadashboard extends Component{
         this.aaExercisestatsPrct = this.aaExercisestatsPrct.bind(this);
         this.successAaRanges = this.successAaRanges.bind(this);
         this.errorAaRanges = this.errorAaRanges.bind(this);
+        this.renderProgressFetchOverlay = renderProgressFetchOverlay.bind(this);
+        this.renderProgress2FetchOverlay = renderProgress2FetchOverlay.bind(this);
+        this.renderProgress3FetchOverlay = renderProgress3FetchOverlay.bind(this);
+        this.renderProgressSelectedDateFetchOverlay = renderProgressSelectedDateFetchOverlay.bind(this);
         
 	}
 reanderAllHrr(period,date,capt,selectedRange){
@@ -4345,6 +4350,10 @@ renderDateRangeDropdown(value,value5){
 <span>{this.totalworkoutdurationTimeZone(this.state.summary.exercise,this.state.selected_range)}</span>
 </div>
 </div>
+{this.renderProgressFetchOverlay()}
+{this.renderProgress2FetchOverlay()}
+{this.renderProgress3FetchOverlay()}
+{this.renderProgressSelectedDateFetchOverlay()}
 </div>
 
 		);
