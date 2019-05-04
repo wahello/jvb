@@ -2745,6 +2745,34 @@ def store_aa_low_high_end_calculations(user,from_date,to_date):
 		print("Fitbit AA chat3 data calculation got started")
 		store_fitbit_aa3(user,from_date,to_date)
 		print("Fitbit AA chat3 data calculation finished")
+
+def store_garmin_aa_dashboard(user,from_date,to_date):
+	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
+	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
+	current_date = to_date_obj
+	while (current_date >= from_date_obj):
+		data = aa_low_high_end_data(user,current_date)
+		# data = json.dumps(data)
+		if data:
+			try:
+				time_hr_zone_obj = TimeHeartZones.objects.get(
+					user=user, created_at=current_date)
+				if time_hr_zone_obj:
+					update_heartzone_instance(user, current_date,data)
+			except TimeHeartZones.DoesNotExist:
+				create_heartzone_instance(user, data, current_date)
+		current_date -= timedelta(days=1)
+	return None
+
+def store_aa_dashboard(user,from_date,to_date):
+	device_type = quicklook.calculations.calculation_driver.which_device(user)
+	if device_type == "garmin":
+		store_garmin_aa_dashboard(user,from_date,to_date)
+	elif device_type == 'fitbit':
+		print("Fitbit AA chat3 data calculation got started")
+		store_fitbit_aa3(user,from_date,to_date)
+		# print("Fitbit AA chat3 data calculation finished")
+
 def hrr_data(user,start_date):
 	Did_heartrate_reach_99 = ''
 	time_99 = 0.0
