@@ -80,8 +80,7 @@ def apple_to_garmin_activities(active_summary):
 	
 	if active_summary:
 		result_reponse = []
-
-		for each in ast.literal_eval(active_summary):
+		for each in active_summary:
 			
 			garmin_activites = {
 				'summaryId': '',

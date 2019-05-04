@@ -236,10 +236,21 @@ def _get_apple_activities_data(user,target_date):
 	# 	activity_data = ast.literal_eval(activity_data[0].replace(
 	# 		"'activity_fitbit': {...}","'activity_fitbit': {}"))
 	# 	activity_data = activity_data['activities']
-
+	activity_data = ast.literal_eval(activity_data[0])
+	activity_data_copy = activity_data.copy()
+	activty_data_list = []
+	for index,activity in enumerate(activity_data_copy):
+		start_time = activity.get('Start date')
+		if not activty_data_list:
+			activty_data_list.append(activity)
+		for index_2, activity_2 in enumerate(activty_data_list):
+			st_time = activity_2.get('Start date')
+			if st_time != start_time:
+				 activty_data_list.append()
+	activity_data = activty_data_list		 
 	if activity_data:
 		activity_data = [quicklook.calculations.converter.\
-				apple_to_garmin_converter.apple_to_garmin_activities(act) for act in activity_data] 
+				apple_to_garmin_converter.apple_to_garmin_activities(activity_data)] 
 		for act_data in activity_data:
 			activity_data = act_data
 			combined_user_activities = quicklook.calculations.garmin_calculation.\

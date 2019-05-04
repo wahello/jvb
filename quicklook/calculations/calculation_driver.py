@@ -17,7 +17,7 @@ def create_quick_look(user,from_date,to_date):
 		return create_garmin_quick_look(user,from_date,to_date)
 	elif device and device == 'fitbit':
 		return create_fitbit_quick_look(user, from_date, to_date)
-	else:
+	elif device and device == 'apple':
 		return create_apple_quick_look(user, from_date, to_date)
 	# else:
 	# 	return {}
