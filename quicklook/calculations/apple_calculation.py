@@ -455,6 +455,7 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 			UserAppleDataActivities,user,current_date.date(),current_date.date())
 		
 		if todays_activity_data:
+			todays_activity_data = [ast.literal_eval(todays_activity_data[0])]
 			todays_activity_data = list(map(apple_to_garmin_activities,
 				todays_activity_data))
 
