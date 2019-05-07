@@ -1,4 +1,4 @@
-def aa_ranges(user,user_age):
+def all_age_aa_ranges():
 	aa_dashboard = {'13':{'0-109':{'color':'red','classification':'Below_Aerobic'},
 	                     '110-120':{'color':'yellow','classification':'Aerobic'},
 	                     '121-140':{'color':'lightgreen','classification':'Aerobic'},
@@ -11,7 +11,7 @@ def aa_ranges(user,user_age):
 	                     '182-186':{'color':'lightgreen','classification':'Anerobic'},
                          '187-189':{'color':'yellow','classification':'Anerobic'},
                          '190-191':{'color':'orange','classification':'Anerobic'},
-                         '192-above':{'color':'red','classification':'Anerobic'}},
+                         '192-240':{'color':'red','classification':'Anerobic'}},
 
                             
 	                '14':{'0-109':{'color':'red','classification':'Below_Aerobic'},
@@ -26,7 +26,7 @@ def aa_ranges(user,user_age):
 	                     '182-186':{'color':'lightgreen','classification':'Anerobic'},
                          '187-189':{'color':'yellow','classification':'Anerobic'},
                          '190-191':{'color':'orange','classification':'Anerobic'},
-                         '192-above':{'color':'red','classification':'Anerobic'}},
+                         '192-240':{'color':'red','classification':'Anerobic'}},
      
 
                     '15':{'0-109':{'color':'red','classification':'Below_Aerobic'},
@@ -41,7 +41,7 @@ def aa_ranges(user,user_age):
 	                     '182-186':{'color':'lightgreen','classification':'Anerobic'},
                          '187-189':{'color':'yellow','classification':'Anerobic'},
                          '190-191':{'color':'orange','classification':'Anerobic'},
-                         '192-above':{'color':'red','classification':'Anerobic'}},
+                         '192-240':{'color':'red','classification':'Anerobic'}},
 	
            
                  
@@ -57,7 +57,7 @@ def aa_ranges(user,user_age):
                          '181-185':{'color':'lightgreen','classification':'Anerobic'},
                          '186-188':{'color':'yellow','classification':'Anerobic'},
                          '189-190':{'color':'orange','classification':'Anerobic'},
-                         '191-above':{'color':'red','classification':'Anerobic'}},
+                         '191-240':{'color':'red','classification':'Anerobic'}},
 
 
 
@@ -74,7 +74,7 @@ def aa_ranges(user,user_age):
 	                     '180-184':{'color':'lightgreen','classification':'Anerobic'},
                          '185-187':{'color':'yellow','classification':'Anerobic'},
                          '188-189':{'color':'orange','classification':'Anerobic'},
-                         '190-above':{'color':'red','classification':'Anerobic'}},     
+                         '190-240':{'color':'red','classification':'Anerobic'}},     
 
 
                     '18':{'0-109':{'color':'red','classification':'Below_Aerobic'},
@@ -89,7 +89,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},   
+                         '189-240':{'color':'red','classification':'Anerobic'}},   
   
 
 
@@ -106,7 +106,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},   
+                         '189-240':{'color':'red','classification':'Anerobic'}},   
 
 
 
@@ -122,7 +122,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},        
+                         '189-240':{'color':'red','classification':'Anerobic'}},        
 
                     '21':{'0-109':{'color':'red','classification':'Below_Aerobic'},
 	                     '110-120':{'color':'yellow','classification':'Aerobic'},
@@ -136,7 +136,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},        
+                         '189-240':{'color':'red','classification':'Anerobic'}},        
 
             
                     '22':{'0-109':{'color':'red','classification':'Below_Aerobic'},
@@ -151,7 +151,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},        
+                         '189-240':{'color':'red','classification':'Anerobic'}},        
 
             
                     '23':{'0-109':{'color':'red','classification':'Below_Aerobic'},
@@ -166,7 +166,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},        
+                         '189-240':{'color':'red','classification':'Anerobic'}},        
             
                     '24':{'0-109':{'color':'red','classification':'Below_Aerobic'},
 	                     '110-120':{'color':'yellow','classification':'Aerobic'},
@@ -180,7 +180,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},            
+                         '189-240':{'color':'red','classification':'Anerobic'}},            
 
 
 
@@ -196,7 +196,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                         '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},        
+                         '189-240':{'color':'red','classification':'Anerobic'}},        
             
             
                    
@@ -213,7 +213,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                 
+                         '189-240':{'color':'red','classification':'Anerobic'}},                 
            
 
                      '27':{'0-109':{'color':'red','classification':'Below_Aerobic'},
@@ -228,7 +228,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                 
+                         '189-240':{'color':'red','classification':'Anerobic'}},                 
              
 
                     '28':{'0-109':{'color':'red','classification':'Below_Aerobic'},
@@ -243,7 +243,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                 
+                         '189-240':{'color':'red','classification':'Anerobic'}},                 
            
 
                     '29':{'0-109':{'color':'red','classification':'Below_Aerobic'},
@@ -258,7 +258,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                 
+                         '189-240':{'color':'red','classification':'Anerobic'}},                 
            
 
                     '30':{'0-109':{'color':'red','classification':'Below_Aerobic'},
@@ -273,7 +273,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                 
+                         '189-240':{'color':'red','classification':'Anerobic'}},                 
            
 
                     '31':{'0-109':{'color':'red','classification':'Below_Aerobic'},
@@ -288,7 +288,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                 
+                         '189-240':{'color':'red','classification':'Anerobic'}},                 
            
                     
                     '32':{'0-109':{'color':'red','classification':'Below_Aerobic'},
@@ -303,7 +303,7 @@ def aa_ranges(user,user_age):
 	                    '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                 
+                         '189-240':{'color':'red','classification':'Anerobic'}},                 
 
                     
 
@@ -320,7 +320,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},              
+                         '189-240':{'color':'red','classification':'Anerobic'}},              
 
 
                     '34':{'0-109':{'color':'red','classification':'Below_Aerobic'},
@@ -335,7 +335,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                   
+                         '189-240':{'color':'red','classification':'Anerobic'}},                   
 
                     '35':{'0-109':{'color':'red','classification':'Below_Aerobic'},
 	                     '110-114':{'color':'yellow','classification':'Aerobic'},
@@ -349,7 +349,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},        
+                         '189-240':{'color':'red','classification':'Anerobic'}},        
 
 
                     '36':{'0-109':{'color':'red','classification':'Below_Aerobic'},
@@ -364,7 +364,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                         '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},           
+                         '189-240':{'color':'red','classification':'Anerobic'}},           
 
 
 
@@ -381,7 +381,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                                          
+                         '189-240':{'color':'red','classification':'Anerobic'}},                                          
 
 
 
@@ -398,7 +398,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                                          
+                         '189-240':{'color':'red','classification':'Anerobic'}},                                          
 
 
 
@@ -415,7 +415,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                         
+                         '189-240':{'color':'red','classification':'Anerobic'}},                         
 	
                     
                     '40':{'0-109':{'color':'red','classification':'Below_Aerobic'},
@@ -430,7 +430,7 @@ def aa_ranges(user,user_age):
 	                    '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                        '189-above':{'color':'red','classification':'Anerobic'}},                         
+                        '189-240':{'color':'red','classification':'Anerobic'}},                         
 	
 
 	                '41':{'0-108':{'color':'red','classification':'Below_Aerobic'},
@@ -445,7 +445,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                         
+                         '189-240':{'color':'red','classification':'Anerobic'}},                         
 
                      
                     '42':{'0-107':{'color':'red','classification':'Below_Aerobic'},
@@ -460,7 +460,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                         
+                         '189-240':{'color':'red','classification':'Anerobic'}},                         
 
 
 
@@ -477,7 +477,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                         
+                         '189-240':{'color':'red','classification':'Anerobic'}},                         
 
                     '44':{'0-105':{'color':'red','classification':'Below_Aerobic'},
 	                     '106-106':{'color':'yellow','classification':'Aerobic'},
@@ -491,7 +491,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                  
+                         '189-240':{'color':'red','classification':'Anerobic'}},                  
 
                     
                     '45':{'0-104':{'color':'red','classification':'Below_Aerobic'},
@@ -506,7 +506,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                  
+                         '189-240':{'color':'red','classification':'Anerobic'}},                  
 
 
 
@@ -523,7 +523,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                  
+                         '189-240':{'color':'red','classification':'Anerobic'}},                  
 
 
                            
@@ -539,7 +539,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                  
+                         '189-240':{'color':'red','classification':'Anerobic'}},                  
 
                       
 
@@ -556,7 +556,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                  
+                         '189-240':{'color':'red','classification':'Anerobic'}},                  
   
 
                     
@@ -572,7 +572,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                  
+                         '189-240':{'color':'red','classification':'Anerobic'}},                  
   
 
 
@@ -589,7 +589,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                  
+                         '189-240':{'color':'red','classification':'Anerobic'}},                  
   
 
                     
@@ -605,7 +605,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                         '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                  
+                         '189-240':{'color':'red','classification':'Anerobic'}},                  
   
 
                     
@@ -621,7 +621,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                  
+                         '189-240':{'color':'red','classification':'Anerobic'}},                  
   
 
                     
@@ -637,7 +637,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                  
+                         '189-240':{'color':'red','classification':'Anerobic'}},                  
   
 
                      
@@ -653,7 +653,7 @@ def aa_ranges(user,user_age):
 	                     '179-183':{'color':'lightgreen','classification':'Anerobic'},
                          '184-186':{'color':'yellow','classification':'Anerobic'},
                          '187-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                  
+                         '189-240':{'color':'red','classification':'Anerobic'}},                  
   
   
                     
@@ -669,7 +669,7 @@ def aa_ranges(user,user_age):
 	                     '174-178':{'color':'lightgreen','classification':'Anerobic'},
                          '179-183':{'color':'yellow','classification':'Anerobic'},
                          '184-188':{'color':'orange','classification':'Anerobic'},
-                         '189-above':{'color':'red','classification':'Anerobic'}},                  
+                         '189-240':{'color':'red','classification':'Anerobic'}},                  
   
 
 	
@@ -686,7 +686,7 @@ def aa_ranges(user,user_age):
 	                     '173-177':{'color':'lightgreen','classification':'Anerobic'},
                          '178-182':{'color':'yellow','classification':'Anerobic'},
                          '183-187':{'color':'orange','classification':'Anerobic'},
-                         '188-above':{'color':'red','classification':'Anerobic'}},                  
+                         '188-240':{'color':'red','classification':'Anerobic'}},                  
   
 
 	
@@ -703,7 +703,7 @@ def aa_ranges(user,user_age):
 	                     '172-176':{'color':'lightgreen','classification':'Anerobic'},
                          '177-181':{'color':'yellow','classification':'Anerobic'},
                          '182-186':{'color':'orange','classification':'Anerobic'},
-                         '187-above':{'color':'red','classification':'Anerobic'}},                           
+                         '187-240':{'color':'red','classification':'Anerobic'}},                           
   
                     
 
@@ -722,7 +722,7 @@ def aa_ranges(user,user_age):
 	                     '171-175':{'color':'lightgreen','classification':'Anerobic'},
                          '176-180':{'color':'yellow','classification':'Anerobic'},
                          '181-185':{'color':'orange','classification':'Anerobic'},
-                         '186-above':{'color':'red','classification':'Anerobic'}},                  
+                         '186-240':{'color':'red','classification':'Anerobic'}},                  
 	
 
 
@@ -739,7 +739,7 @@ def aa_ranges(user,user_age):
 	                     '170-174':{'color':'lightgreen','classification':'Anerobic'},
                          '175-179':{'color':'yellow','classification':'Anerobic'},
                          '180-184':{'color':'orange','classification':'Anerobic'},
-                         '185-above':{'color':'red','classification':'Anerobic'}},                  
+                         '185-240':{'color':'red','classification':'Anerobic'}},                  
 
 	
                         
@@ -755,7 +755,7 @@ def aa_ranges(user,user_age):
 	                     '169-173':{'color':'lightgreen','classification':'Anerobic'},
                          '174-178':{'color':'yellow','classification':'Anerobic'},
                          '179-183':{'color':'orange','classification':'Anerobic'},
-                         '184-above':{'color':'red','classification':'Anerobic'}},                  
+                         '184-240':{'color':'red','classification':'Anerobic'}},                  
 
 
 	                    
@@ -771,7 +771,7 @@ def aa_ranges(user,user_age):
 	                     '168-172':{'color':'lightgreen','classification':'Anerobic'},
                          '173-177':{'color':'yellow','classification':'Anerobic'},
                          '178-182':{'color':'orange','classification':'Anerobic'},
-                         '183-above':{'color':'red','classification':'Anerobic'}},                  
+                         '183-240':{'color':'red','classification':'Anerobic'}},                  
 
 	
 
@@ -791,7 +791,7 @@ def aa_ranges(user,user_age):
 	                     '167-171':{'color':'lightgreen','classification':'Anerobic'},
                          '172-176':{'color':'yellow','classification':'Anerobic'},
                         '177-181':{'color':'orange','classification':'Anerobic'},
-                         '182-above':{'color':'red','classification':'Anerobic'}},                  
+                         '182-240':{'color':'red','classification':'Anerobic'}},                  
 
 
                     
@@ -809,7 +809,7 @@ def aa_ranges(user,user_age):
 	                    '166-170':{'color':'lightgreen','classification':'Anerobic'},
                          '171-175':{'color':'yellow','classification':'Anerobic'},
                          '176-180':{'color':'orange','classification':'Anerobic'},
-                         '181-above':{'color':'red','classification':'Anerobic'}},                  
+                         '181-240':{'color':'red','classification':'Anerobic'}},                  
 
 	
 
@@ -826,7 +826,7 @@ def aa_ranges(user,user_age):
 	                     '172-176':{'color':'lightgreen','classification':'Anerobic'},
                          '177-181':{'color':'yellow','classification':'Anerobic'},
                          '182-186':{'color':'orange','classification':'Anerobic'},
-                         '187-above':{'color':'red','classification':'Anerobic'}},                  
+                         '187-240':{'color':'red','classification':'Anerobic'}},                  
 	
 
                         
@@ -842,7 +842,7 @@ def aa_ranges(user,user_age):
 	                     '164-168':{'color':'lightgreen','classification':'Anerobic'},
                          '169-173':{'color':'yellow','classification':'Anerobic'},
                          '174-178':{'color':'orange','classification':'Anerobic'},
-                         '179-above':{'color':'red','classification':'Anerobic'}},                  
+                         '179-240':{'color':'red','classification':'Anerobic'}},                  
 
 	
                         
@@ -858,7 +858,7 @@ def aa_ranges(user,user_age):
 	                     '163-167':{'color':'lightgreen','classification':'Anerobic'},
                          '168-172':{'color':'yellow','classification':'Anerobic'},
                          '173-177':{'color':'orange','classification':'Anerobic'},
-                         '178-above':{'color':'red','classification':'Anerobic'}},              
+                         '178-240':{'color':'red','classification':'Anerobic'}},              
 
 
 
@@ -874,7 +874,7 @@ def aa_ranges(user,user_age):
 	                     '162-166':{'color':'lightgreen','classification':'Anerobic'},
                          '167-171':{'color':'yellow','classification':'Anerobic'},
                          '172-176':{'color':'orange','classification':'Anerobic'},
-                         '177-above':{'color':'red','classification':'Anerobic'}},                  
+                         '177-240':{'color':'red','classification':'Anerobic'}},                  
 
 
 
@@ -891,7 +891,7 @@ def aa_ranges(user,user_age):
 	                     '161-165':{'color':'lightgreen','classification':'Anerobic'},
                          '166-170':{'color':'yellow','classification':'Anerobic'},
                          '171-175':{'color':'orange','classification':'Anerobic'},
-                         '176-above':{'color':'red','classification':'Anerobic'}},                  
+                         '176-240':{'color':'red','classification':'Anerobic'}},                  
 
 
 
@@ -908,7 +908,7 @@ def aa_ranges(user,user_age):
 	                     '160-164':{'color':'lightgreen','classification':'Anerobic'},
                          '165-169':{'color':'yellow','classification':'Anerobic'},
                         '170-174':{'color':'orange','classification':'Anerobic'},
-                         '175-above':{'color':'red','classification':'Anerobic'}},                  
+                         '175-240':{'color':'red','classification':'Anerobic'}},                  
 
 
 	
@@ -927,7 +927,7 @@ def aa_ranges(user,user_age):
 	                     '159-163':{'color':'lightgreen','classification':'Anerobic'},
                          '164-168':{'color':'yellow','classification':'Anerobic'},
                          '169-173':{'color':'orange','classification':'Anerobic'},
-                         '174-above':{'color':'red','classification':'Anerobic'}},               
+                         '174-240':{'color':'red','classification':'Anerobic'}},               
 	
 
                         
@@ -943,7 +943,7 @@ def aa_ranges(user,user_age):
 	                     '158-162':{'color':'lightgreen','classification':'Anerobic'},
                          '163-167':{'color':'yellow','classification':'Anerobic'},
                          '168-172':{'color':'orange','classification':'Anerobic'},
-                         '173-above':{'color':'red','classification':'Anerobic'}},               
+                         '173-240':{'color':'red','classification':'Anerobic'}},               
 	                 
 
 
@@ -961,7 +961,7 @@ def aa_ranges(user,user_age):
 	                     '157-161':{'color':'lightgreen','classification':'Anerobic'},
                          '162-166':{'color':'yellow','classification':'Anerobic'},
                          '167-171':{'color':'orange','classification':'Anerobic'},
-                         '172-above':{'color':'red','classification':'Anerobic'}},               
+                         '172-240':{'color':'red','classification':'Anerobic'}},               
 
  
                     '73':{'0-101':{'color':'red','classification':'Below_Aerobic'},
@@ -976,7 +976,7 @@ def aa_ranges(user,user_age):
 	                     '156-160':{'color':'lightgreen','classification':'Anerobic'},
                          '161-165':{'color':'yellow','classification':'Anerobic'},
                          '166-170':{'color':'orange','classification':'Anerobic'},
-                         '171-above':{'color':'red','classification':'Anerobic'}},               
+                         '171-240':{'color':'red','classification':'Anerobic'}},               
 	   
 
 
@@ -994,7 +994,7 @@ def aa_ranges(user,user_age):
 	                     '155-159':{'color':'lightgreen','classification':'Anerobic'},
                          '160-164':{'color':'yellow','classification':'Anerobic'},
                          '165-169':{'color':'orange','classification':'Anerobic'},
-                         '170-above':{'color':'red','classification':'Anerobic'}},               
+                         '170-240':{'color':'red','classification':'Anerobic'}},               
 	   
 
 
@@ -1011,7 +1011,7 @@ def aa_ranges(user,user_age):
 	                     '154-158':{'color':'lightgreen','classification':'Anerobic'},
                          '159-163':{'color':'yellow','classification':'Anerobic'},
                          '164-168':{'color':'orange','classification':'Anerobic'},
-                         '169-above':{'color':'red','classification':'Anerobic'}},           
+                         '169-240':{'color':'red','classification':'Anerobic'}},           
 
 
 
@@ -1027,7 +1027,7 @@ def aa_ranges(user,user_age):
 	                     '153-157':{'color':'lightgreen','classification':'Anerobic'},
                          '158-162':{'color':'yellow','classification':'Anerobic'},
                          '163-167':{'color':'orange','classification':'Anerobic'},
-                         '168-above':{'color':'red','classification':'Anerobic'}},           
+                         '168-240':{'color':'red','classification':'Anerobic'}},           
    
 
                    '77':{'0-101':{'color':'red','classification':'Below_Aerobic'},
@@ -1042,7 +1042,7 @@ def aa_ranges(user,user_age):
 	                     '152-156':{'color':'lightgreen','classification':'Anerobic'},
                          '157-161':{'color':'yellow','classification':'Anerobic'},
                          '162-166':{'color':'orange','classification':'Anerobic'},
-                         '167-above':{'color':'red','classification':'Anerobic'}},           
+                         '167-240':{'color':'red','classification':'Anerobic'}},           
 
 	
                     
@@ -1058,7 +1058,7 @@ def aa_ranges(user,user_age):
 	                     '151-155':{'color':'lightgreen','classification':'Anerobic'},
                          '156-160':{'color':'yellow','classification':'Anerobic'},
                          '161-165':{'color':'orange','classification':'Anerobic'},
-                         '166-above':{'color':'red','classification':'Anerobic'}},           
+                         '166-240':{'color':'red','classification':'Anerobic'}},           
 
 
                     '79':{'0-101':{'color':'red','classification':'Below_Aerobic'},
@@ -1073,7 +1073,7 @@ def aa_ranges(user,user_age):
 	                     '150-154':{'color':'lightgreen','classification':'Anerobic'},
                          '155-159':{'color':'yellow','classification':'Anerobic'},
                          '160-164':{'color':'orange','classification':'Anerobic'},
-                         '165-above':{'color':'red','classification':'Anerobic'}},           
+                         '165-240':{'color':'red','classification':'Anerobic'}},           
 
 
 
@@ -1091,7 +1091,7 @@ def aa_ranges(user,user_age):
 	                     '149-153':{'color':'lightgreen','classification':'Anerobic'},
                          '154-158':{'color':'yellow','classification':'Anerobic'},
                          '159-163':{'color':'orange','classification':'Anerobic'},
-                         '164-above':{'color':'red','classification':'Anerobic'}},  
+                         '164-240':{'color':'red','classification':'Anerobic'}},  
 
 
                     '81':{'0-100':{'color':'red','classification':'Below_Aerobic'},
@@ -1106,7 +1106,7 @@ def aa_ranges(user,user_age):
 	                     '148-152':{'color':'lightgreen','classification':'Anerobic'},
                          '153-157':{'color':'yellow','classification':'Anerobic'},
                          '158-162':{'color':'orange','classification':'Anerobic'},
-                         '163-above':{'color':'red','classification':'Anerobic'}},  
+                         '163-240':{'color':'red','classification':'Anerobic'}},  
 
 
                     '82':{'0-100':{'color':'red','classification':'Below_Aerobic'},
@@ -1121,7 +1121,7 @@ def aa_ranges(user,user_age):
 	                     '147-151':{'color':'lightgreen','classification':'Anerobic'},
                          '152-156':{'color':'yellow','classification':'Anerobic'},
                          '157-161':{'color':'orange','classification':'Anerobic'},
-                         '162-above':{'color':'red','classification':'Anerobic'}},  
+                         '162-240':{'color':'red','classification':'Anerobic'}},  
 
 
 	                '83':{'0-100':{'color':'red','classification':'Below_Aerobic'},
@@ -1136,7 +1136,7 @@ def aa_ranges(user,user_age):
 	                     '146-150':{'color':'lightgreen','classification':'Anerobic'},
                          '151-155':{'color':'yellow','classification':'Anerobic'},
                          '156-160':{'color':'orange','classification':'Anerobic'},
-                         '161-above':{'color':'red','classification':'Anerobic'}},  
+                         '161-240':{'color':'red','classification':'Anerobic'}},  
 
 
 
@@ -1152,7 +1152,7 @@ def aa_ranges(user,user_age):
 	                     '145-149':{'color':'lightgreen','classification':'Anerobic'},
                          '150-154':{'color':'yellow','classification':'Anerobic'},
                          '155-159':{'color':'orange','classification':'Anerobic'},
-                         '160-above':{'color':'red','classification':'Anerobic'}},  
+                         '160-240':{'color':'red','classification':'Anerobic'}},  
 
 
                     '85':{'0-100':{'color':'red','classification':'Below_Aerobic'},
@@ -1167,7 +1167,7 @@ def aa_ranges(user,user_age):
 	                     '144-148':{'color':'lightgreen','classification':'Anerobic'},
                          '149-153':{'color':'yellow','classification':'Anerobic'},
                          '154-158':{'color':'orange','classification':'Anerobic'},
-                         '159-above':{'color':'red','classification':'Anerobic'}},  
+                         '159-240':{'color':'red','classification':'Anerobic'}},  
 
  
 
@@ -1183,7 +1183,7 @@ def aa_ranges(user,user_age):
 	                     '143-147':{'color':'lightgreen','classification':'Anerobic'},
                          '148-152':{'color':'yellow','classification':'Anerobic'},
                          '153-157':{'color':'orange','classification':'Anerobic'},
-                         '158-above':{'color':'red','classification':'Anerobic'}},  
+                         '158-240':{'color':'red','classification':'Anerobic'}},  
 
 
 
@@ -1201,7 +1201,7 @@ def aa_ranges(user,user_age):
 	                     '142-146':{'color':'lightgreen','classification':'Anerobic'},
                          '147-151':{'color':'yellow','classification':'Anerobic'},
                          '152-156':{'color':'orange','classification':'Anerobic'},
-                         '157-above':{'color':'red','classification':'Anerobic'}},  
+                         '157-240':{'color':'red','classification':'Anerobic'}},  
 
 
 
@@ -1218,7 +1218,7 @@ def aa_ranges(user,user_age):
 	                    '141-145':{'color':'lightgreen','classification':'Anerobic'},
                         '146-150':{'color':'yellow','classification':'Anerobic'},
                          '151-155':{'color':'orange','classification':'Anerobic'},
-                         '156-above':{'color':'red','classification':'Anerobic'}},  
+                         '156-240':{'color':'red','classification':'Anerobic'}},  
 
 
                     
@@ -1235,7 +1235,7 @@ def aa_ranges(user,user_age):
 	                     '140-144':{'color':'lightgreen','classification':'Anerobic'},
                         '145-149':{'color':'yellow','classification':'Anerobic'},
                          '150-154':{'color':'orange','classification':'Anerobic'},
-                         '155-above':{'color':'red','classification':'Anerobic'}},  
+                         '155-240':{'color':'red','classification':'Anerobic'}},  
 	
 
 
@@ -1252,7 +1252,7 @@ def aa_ranges(user,user_age):
 	                     '139-143':{'color':'lightgreen','classification':'Anerobic'},
                          '144-148':{'color':'yellow','classification':'Anerobic'},
                          '149-153':{'color':'orange','classification':'Anerobic'},
-                         '154-above':{'color':'red','classification':'Anerobic'}},  
+                         '154-240':{'color':'red','classification':'Anerobic'}},  
 
 
 
@@ -1270,7 +1270,7 @@ def aa_ranges(user,user_age):
 	                     '138-142':{'color':'lightgreen','classification':'Anerobic'},
                          '143-147':{'color':'yellow','classification':'Anerobic'},
                          '148-152':{'color':'orange','classification':'Anerobic'},
-                         '153-above':{'color':'red','classification':'Anerobic'}},  
+                         '153-240':{'color':'red','classification':'Anerobic'}},  
 
 
 
@@ -1288,7 +1288,7 @@ def aa_ranges(user,user_age):
 	                     '137-141':{'color':'lightgreen','classification':'Anerobic'},
                          '142-146':{'color':'yellow','classification':'Anerobic'},
                          '147-151':{'color':'orange','classification':'Anerobic'},
-                         '152-above':{'color':'red','classification':'Anerobic'}},  
+                         '152-240':{'color':'red','classification':'Anerobic'}},  
                     
 	
                     '93':{'0-97':{'color':'red','classification':'Below_Aerobic'},
@@ -1303,7 +1303,7 @@ def aa_ranges(user,user_age):
 	                     '136-140':{'color':'lightgreen','classification':'Anerobic'},
                          '141-145':{'color':'yellow','classification':'Anerobic'},
                          '146-150':{'color':'orange','classification':'Anerobic'},
-                         '151-above':{'color':'red','classification':'Anerobic'}},  
+                         '151-240':{'color':'red','classification':'Anerobic'}},  
                     
 
 
@@ -1320,7 +1320,7 @@ def aa_ranges(user,user_age):
 	                     '135-139':{'color':'lightgreen','classification':'Anerobic'},
                          '140-144':{'color':'yellow','classification':'Anerobic'},
                          '145-149':{'color':'orange','classification':'Anerobic'},
-                         '150-above':{'color':'red','classification':'Anerobic'}},  
+                         '150-240':{'color':'red','classification':'Anerobic'}},  
 
 
 
@@ -1336,7 +1336,7 @@ def aa_ranges(user,user_age):
 	                     '134-138':{'color':'lightgreen','classification':'Anerobic'},
                          '139-143':{'color':'yellow','classification':'Anerobic'},
                          '144-148':{'color':'orange','classification':'Anerobic'},
-                         '149-above':{'color':'red','classification':'Anerobic'}},  
+                         '149-240':{'color':'red','classification':'Anerobic'}},  
 
 	
 
@@ -1352,7 +1352,7 @@ def aa_ranges(user,user_age):
 	                     '133-137':{'color':'lightgreen','classification':'Anerobic'},
                         '138-142':{'color':'yellow','classification':'Anerobic'},
                          '143-147':{'color':'orange','classification':'Anerobic'},
-                        '148-above':{'color':'red','classification':'Anerobic'}},  
+                        '148-240':{'color':'red','classification':'Anerobic'}},  
 
 	
                     '97':{'0-93':{'color':'red','classification':'Below_Aerobic'},
@@ -1367,7 +1367,7 @@ def aa_ranges(user,user_age):
 	                     '132-136':{'color':'lightgreen','classification':'Anerobic'},
                          '137-141':{'color':'yellow','classification':'Anerobic'},
                          '142-146':{'color':'orange','classification':'Anerobic'},
-                         '147-above':{'color':'red','classification':'Anerobic'}},  
+                         '147-240':{'color':'red','classification':'Anerobic'}},  
 	
 
                     
@@ -1383,7 +1383,7 @@ def aa_ranges(user,user_age):
 	                    '131-135':{'color':'lightgreen','classification':'Anerobic'},
                          '136-140':{'color':'yellow','classification':'Anerobic'},
                          '141-145':{'color':'orange','classification':'Anerobic'},
-                         '146-above':{'color':'red','classification':'Anerobic'}},  
+                         '146-240':{'color':'red','classification':'Anerobic'}},  
 	
 
 
@@ -1400,7 +1400,7 @@ def aa_ranges(user,user_age):
 	                     '131-134':{'color':'lightgreen','classification':'Anerobic'},
                          '135-139':{'color':'yellow','classification':'Anerobic'},
                          '140-144':{'color':'orange','classification':'Anerobic'},
-                         '145-above':{'color':'red','classification':'Anerobic'}},  
+                         '145-240':{'color':'red','classification':'Anerobic'}},  
 
 
 
@@ -1416,11 +1416,11 @@ def aa_ranges(user,user_age):
 	                    '131-133':{'color':'lightgreen','classification':'Anerobic'},
                        '134-138':{'color':'yellow','classification':'Anerobic'},
                          '139-143':{'color':'orange','classification':'Anerobic'},
-                         '144-above':{'color':'red','classification':'Anerobic'}},  
+                         '144-240':{'color':'red','classification':'Anerobic'}},  
 
 
 
-                    '100-above':{'0-989':{'color':'red','classification':'Below_Aerobic'},
+                    '100-240':{'0-989':{'color':'red','classification':'Below_Aerobic'},
 	                     '90-93':{'color':'yellow','classification':'Aerobic'},
 	                     '94-96':{'color':'lightgreen','classification':'Aerobic'},
 	                     '97-103':{'color':'thickgreen','classification':'Aerobic'},
@@ -1432,8 +1432,9 @@ def aa_ranges(user,user_age):
 	                     '130-132':{'color':'lightgreen','classification':'Anerobic'},
                          '133-137':{'color':'yellow','classification':'Anerobic'},
                          '138-142':{'color':'orange','classification':'Anerobic'},
-                         '143-above':{'color':'red','classification':'Anerobic'}},
+                         '143-240':{'color':'red','classification':'Anerobic'}},
 
 
-	} 
+	}
+	return aa_dashboard
 

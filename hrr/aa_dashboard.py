@@ -1,6 +1,114 @@
+import ast
+import time
+from datetime import datetime,timedelta,date
+from decimal import Decimal, ROUND_HALF_UP
 
+from django.http import JsonResponse
+from django.shortcuts import render
+from django.contrib.auth.models import User
+from rest_framework.views import APIView
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
 
-def aa_low_high_end_data(user,start_date):
+from django.db.models import Q
+
+from registration.models import Profile
+
+from garmin.models import GarminFitFiles,\
+						UserGarminDataDaily,\
+						UserGarminDataActivity,\
+						UserGarminDataManuallyUpdated
+
+from quicklook.calculations.garmin_calculation import get_filtered_activity_stats
+from user_input.utils.daily_activity import get_daily_activities_in_base_format
+from user_input.views.garmin_views import _get_activities
+from fitparse import FitFile
+import fitbit
+import quicklook
+from hrr.models import Hrr
+import pprint
+from hrr import aa_ranges
+from hrr.calculation_helper import fitfile_parse
+
+def get_garmin_activities(user,start_date_timestamp,end_date_timestamp):
+	'''
+		Get Garmin activities from Garmn models
+	'''
+	try:
+		garmin_data_activities = UserGarminDataActivity.objects.filter(
+			user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+		garmin_list = []
+		garmin_dic = {}
+		if garmin_data_activities:
+			garmin_activity_files = [pr.data for pr in garmin_data_activities]
+			for i,k in enumerate(garmin_activity_files):
+				act_files=ast.literal_eval(garmin_activity_files[i])
+				act_id=act_files['summaryId']
+				garmin_dic[act_id]=act_files
+				garmin_list.append(act_files)
+	except (ValueError, SyntaxError):
+		garmin_list = []
+		garmin_dic = {}
+	return garmin_list,garmin_dic
+
+def get_garmin_manully_activities(user,start_date_timestamp,end_date_timestamp):
+	'''
+		Get Garmin manually edited activities from Garmn models
+	'''
+	try:
+		manually_updated_activities = UserGarminDataManuallyUpdated.objects.filter(
+			user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+		manually_edited_dic = {}
+		manually_edited_list = []
+		if manually_updated_activities:
+			manual_activity_files = [activity.data for activity in manually_updated_activities]
+			for i,k in enumerate(manual_activity_files):
+				manual_files=ast.literal_eval(manual_activity_files[i])
+				manual_act_id=manual_files['summaryId']
+				manually_edited_dic[manual_act_id]=manual_files
+				manually_edited_list.append(manual_files)
+	except (ValueError, SyntaxError):
+		manually_edited_dic = {}
+		manually_edited_list = []
+	return manually_edited_dic,manually_edited_list
+
+def get_usernput_activities(user,start_date):
+	'''
+		Get activities from user input models
+	'''
+	activities_dic = get_daily_activities_in_base_format(user,start_date)
+	if activities_dic:
+		return activities_dic
+	else:
+		return {}
+
+def get_fitfiles(user,start_date,start,end,start_date_timestamp=None,end_date_timestamp=None):
+	'''
+		get the today fitfiles or 3 days fitfiles
+	'''
+	activity_files_qs=UserGarminDataActivity.objects.filter(
+		user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+	fitfiles_obj = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=start_date)
+	if not fitfiles_obj or len(activity_files_qs) != len(fitfiles_obj):
+		fitfiles_obj=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
+	return fitfiles_obj
+
+def generate_aa_new_table(heartrate,time_difference,current_user_aa_ranges):
+	'''This function will generaate the new table for AA dashboard
+	Args: heart rate(int)
+	      time_difference(int)
+	      current_user_aa_ranges(dict)
+	Return: dict witj updated current user aa ranges
+	'''
+	for ranges,values in current_user_aa_ranges.items():
+		from_hr = int(ranges.split('-')[0])
+		to_hr = int(ranges.split('-')[1])+1
+		if heartrate in range(from_hr,to_hr):
+			values['duration'] = time_difference + values.get('duration',0)
+	return current_user_aa_ranges
+
+def aa_dashboard_ranges(user,start_date):
 	'''
 		This function calculates the A/A third chart data
 	''' 
@@ -8,7 +116,7 @@ def aa_low_high_end_data(user,start_date):
 	heart_rate_zone_high_end = ""
 	time_in_zone_for_last_7_days = ""
 	prcnt_total_duration_in_zone = ""
-
+	start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 	start_date_str = start_date.strftime('%Y-%m-%d')
 
 	start_date_timestamp = start_date
@@ -16,13 +124,13 @@ def aa_low_high_end_data(user,start_date):
 	start_date_timestamp = time.mktime(start_date_timestamp)
 	end_date_timestamp = start_date_timestamp + 86400
 
-	# activity_files_qs=UserGarminDataActivity.objects.filter(user= user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+	activity_files_qs=UserGarminDataActivity.objects.filter(user= user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
 	# garmin_activity_keys = []
 	# garmin_workout = []
-	# if activity_files_qs:
-	# 	activity_files = [pr.data for pr in activity_files_qs]
-	# 	one_activity_file_dict =  ast.literal_eval(activity_files[0])
-	# 	offset = one_activity_file_dict['startTimeOffsetInSeconds']
+	if activity_files_qs:
+		activity_files = [pr.data for pr in activity_files_qs]
+		one_activity_file_dict =  ast.literal_eval(activity_files[0])
+		offset = one_activity_file_dict['startTimeOffsetInSeconds']
 	# 	for i,single_activity in enumerate(activity_files):
 	# 		one_activity_file =  ast.literal_eval(single_activity)
 	# 		garmin_activity_keys.append(one_activity_file['summaryId'])
@@ -77,7 +185,7 @@ def aa_low_high_end_data(user,start_date):
 				workout_summary_id.append(filtered_activities_files[i]['summaryId'])
 
 	# user_created_activity = list(set(workout_summary_id)- set(garmin_activity_keys))
-	garmin_workout_keys = set(garmin_activity_keys) - set(hrr_summary_id)
+	# garmin_workout_keys = set(garmin_activity_keys) - set(hrr_summary_id)
 	# user_created_activity_list = []
 	# if workout_data and user_created_activity:
 	# 	for single_activity in workout_data:
@@ -144,7 +252,7 @@ def aa_low_high_end_data(user,start_date):
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
 			data_id = meta['activityIds'][0]
-			if str(data_id) in workout_summary_id and str(data_id) not in remove_in_workout:
+			if str(data_id) in workout_summary_id and str(data_id):
 				workout.append(tmp)
 			elif str(data_id) in hrr_summary_id	:
 				hrr.append(tmp)
@@ -158,8 +266,16 @@ def aa_low_high_end_data(user,start_date):
 			elif str(data_id) in hrr_summary_id:
 				hrr.append(tmp)
 
+	aa_ranges_all_users = aa_ranges.all_age_aa_ranges()
+	# print(aa_ranges_all_users,"user age")
+	current_user_aa_ranges = aa_ranges_all_users.get(str(user_age))
 	if workout:
 		workout_data = fitfile_parse(workout,offset,start_date_str)
 		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
-		for c,d in zip(workout_final_heartrate,workout_final_timestamp):
+		for heartrate,time_difference in zip(workout_final_heartrate,workout_final_timestamp):
+			aa_dashboard_table = generate_aa_new_table(
+									heartrate,time_difference,current_user_aa_ranges)
+	print(aa_dashboard_table,"aa_dashboard_table")
+	return None
+
 			
