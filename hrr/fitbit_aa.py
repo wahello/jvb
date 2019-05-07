@@ -603,7 +603,7 @@ def fitbit_aa_chart_one_new(user_get,start_date,user_input_activities=None):
 			fitbit_act_len = len(fitbit_act)
 		else:
 			fitbit_act_len = 0
-		if len(ui_act_ids) == fibit_act_len:
+		if len(ui_act_ids) == fitbit_act_len:
 			data = cal_aa1_data(
 		user_get,all_activities_heartrate_list,all_activities_timestamp_list,user_input_activities,fitbit_act)
 			return data
