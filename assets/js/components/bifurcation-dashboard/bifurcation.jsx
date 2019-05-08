@@ -321,6 +321,13 @@ class Bifurcation extends React.Component{
      this.getGradeStartEndRange = this.getGradeStartEndRange.bind(this);
      this.minuteToHM = this.minuteToHM.bind(this);
      this.strToMin = this.strToMin.bind(this);
+     this.renderPercent = this.renderPercent.bind(this);
+     this.getAlcoholPercent = this.getAlcoholPercent.bind(this);
+     // this.renderBifurcationProgressFetchOverlay = this.renderBifurcationProgressFetchOverlay.bind(this);
+     // this.renderBifurcationProgress2FetchOverlay = this.renderBifurcationProgress2FetchOverlay.bind(this);
+     // this.renderBifurcationProgress3FetchOverlay = this.renderBifurcationProgress3FetchOverlay.bind(this);
+     // this.renderBifurcationProgressSelectedDateFetchOverlay = this.renderBifurcationProgressFetchOverlay.bind(this);
+
 
    }
 
@@ -507,7 +514,6 @@ class Bifurcation extends React.Component{
   }
 
   successProgress(data,renderAfterSuccess=undefined){
-    console.log(data.data.duration_date,"duration date")
     let week = data.data.duration_date["week"]
     let week_start = moment(data.data.duration_date["week"].split('to')[0]).format("MMM DD, YYYY")
     let week_end = moment(data.data.duration_date["week"].split('to')[1]).format("MMM DD, YYYY")
@@ -765,11 +771,11 @@ class Bifurcation extends React.Component{
    let ohgpa_c = this.renderValue(ohgpavalue.cum_days_ohg_got_c,dur);
    let ohgpa_d = this.renderValue(ohgpavalue.cum_days_ohg_got_d,dur);
    let ohgpa_f = this.renderValue(ohgpavalue.cum_days_ohg_got_f,dur);
-   let ohgpa_prcnt_a = this.renderValue(ohgpavalue.prcnt_days_ohg_got_a,dur);
-   let ohgpa_prcnt_b = this.renderValue(ohgpavalue.prcnt_days_ohg_got_b,dur);
-   let ohgpa_prcnt_c = this.renderValue(ohgpavalue.prcnt_days_ohg_got_c,dur);
-   let ohgpa_prcnt_d = this.renderValue(ohgpavalue.prcnt_days_ohg_got_d,dur);
-   let ohgpa_prcnt_f = this.renderValue(ohgpavalue.prcnt_days_ohg_got_f,dur);
+   let ohgpa_prcnt_a = this.renderPercent(this.renderValue(ohgpavalue.prcnt_days_ohg_got_a,dur));
+   let ohgpa_prcnt_b = this.renderPercent(this.renderValue(ohgpavalue.prcnt_days_ohg_got_b,dur));
+   let ohgpa_prcnt_c = this.renderPercent(this.renderValue(ohgpavalue.prcnt_days_ohg_got_c,dur));
+   let ohgpa_prcnt_d = this.renderPercent(this.renderValue(ohgpavalue.prcnt_days_ohg_got_d,dur));
+   let ohgpa_prcnt_f = this.renderPercent(this.renderValue(ohgpavalue.prcnt_days_ohg_got_f,dur));
    let numberOfDays = this.state.numberOfDays;
 
     if( overallgpa == null || overallgpa == undefined ){
@@ -910,21 +916,21 @@ renderNonExerciseSteps(nesvalue,dur){
   let nesvalue_c = this.renderValue(nesvalue.cum_days_nes_got_c,dur);
   let nesvalue_d = this.renderValue(nesvalue.cum_days_nes_got_d,dur);
   let nesvalue_f = this.renderValue(nesvalue.cum_days_nes_got_f,dur);
-  let nesvalue_prcnt_a = this.renderValue(nesvalue.prcnt_days_nes_got_a,dur);
-  let nesvalue_prcnt_b = this.renderValue(nesvalue.prcnt_days_nes_got_b,dur);
-  let nesvalue_prcnt_c = this.renderValue(nesvalue.prcnt_days_nes_got_c,dur);
-  let nesvalue_prcnt_d = this.renderValue(nesvalue.prcnt_days_nes_got_d,dur);
-  let nesvalue_prcnt_f = this.renderValue(nesvalue.prcnt_days_nes_got_f,dur);
+  let nesvalue_prcnt_a = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_got_a,dur));
+  let nesvalue_prcnt_b = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_got_b,dur));
+  let nesvalue_prcnt_c = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_got_c,dur));
+  let nesvalue_prcnt_d = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_got_d,dur));
+  let nesvalue_prcnt_f = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_got_f,dur));
   let nesvalue_above_10k = this.renderValue(nesvalue.cum_days_nes_above_10k,dur);
   let nesvalue_above_20k = this.renderValue(nesvalue.cum_days_nes_above_20k,dur);
   let nesvalue_above_25k = this.renderValue(nesvalue.cum_days_nes_above_25k,dur);
   let nesvalue_above_30k = this.renderValue(nesvalue.cum_days_nes_above_30k,dur);
   let nesvalue_above_40k = this.renderValue(nesvalue.cum_days_nes_above_40k,dur);
-  let nesvalue_prcnt_above_10k = this.renderValue(nesvalue.prcnt_days_nes_above_10k,dur);
-  let nesvalue_prcnt_above_20k = this.renderValue(nesvalue.prcnt_days_nes_above_20k,dur);
-  let nesvalue_prcnt_above_25k = this.renderValue(nesvalue.prcnt_days_nes_above_25k,dur);
-  let nesvalue_prcnt_above_30k = this.renderValue(nesvalue.prcnt_days_nes_above_30k,dur);
-  let nesvalue_prcnt_above_40k = this.renderValue(nesvalue.prcnt_days_nes_above_40k,dur);
+  let nesvalue_prcnt_above_10k = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_above_10k,dur));
+  let nesvalue_prcnt_above_20k = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_above_20k,dur));
+  let nesvalue_prcnt_above_25k = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_above_25k,dur));
+  let nesvalue_prcnt_above_30k = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_above_30k,dur));
+  let nesvalue_prcnt_above_40k = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_above_40k,dur));
   let numberOfDays = this.state.numberOfDays;
 
   if( avg_nonExerciseStepsScore == null || avg_nonExerciseStepsScore == undefined ){
@@ -1017,7 +1023,7 @@ renderNonExerciseSteps(nesvalue,dur){
                 <th colSpan={3}>Non Exercise Steps Grade</th>
                 </tr>
                 <tr>
-                <td colSpan={2} style={{backgroundColor:avg_nonExerciseStepsColor[0],color:avg_nonExerciseStepsColor[1]}}>{avg_nonExerciseStepsScore}</td>
+                <td colSpan={2} style={{backgroundColor:avg_nonExerciseStepsColor[0],color:avg_nonExerciseStepsColor[1]}}>{this.renderComma(avg_nonExerciseStepsScore)}</td>
                 <td colSpan={3} style={{backgroundColor:nonExerciseStepsgradecolor[0],color:nonExerciseStepsgradecolor[1]}}>{nonExerciseStepsgrade}</td>
                 </tr>
                 <th colSpan={5}>Daily Distribution</th>
@@ -1113,21 +1119,21 @@ renderTotalExerciseSteps(tesvalue,dur){
   let tesvalue_c = this.renderValue(tesvalue.cum_days_ts_got_c,dur);
   let tesvalue_d = this.renderValue(tesvalue.cum_days_ts_got_d,dur);
   let tesvalue_f = this.renderValue(tesvalue.cum_days_ts_got_f,dur);
-  let tesvalue_prcnt_a = this.renderValue(tesvalue.prcnt_days_ts_got_a,dur);
-  let tesvalue_prcnt_b = this.renderValue(tesvalue.prcnt_days_ts_got_b,dur);
-  let tesvalue_prcnt_c = this.renderValue(tesvalue.prcnt_days_ts_got_c,dur);
-  let tesvalue_prcnt_d = this.renderValue(tesvalue.prcnt_days_ts_got_d,dur);
-  let tesvalue_prcnt_f = this.renderValue(tesvalue.prcnt_days_ts_got_f,dur);
+  let tesvalue_prcnt_a = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_got_a,dur));
+  let tesvalue_prcnt_b = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_got_b,dur));
+  let tesvalue_prcnt_c = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_got_c,dur));
+  let tesvalue_prcnt_d = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_got_d,dur));
+  let tesvalue_prcnt_f = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_got_f,dur));
   let tesvalue_above_10k = this.renderValue(tesvalue.cum_days_ts_above_10k,dur);
   let tesvalue_above_20k = this.renderValue(tesvalue.cum_days_ts_above_20k,dur);
   let tesvalue_above_25k = this.renderValue(tesvalue.cum_days_ts_above_25k,dur);
   let tesvalue_above_30k = this.renderValue(tesvalue.cum_days_ts_above_30k,dur);
   let tesvalue_above_40k = this.renderValue(tesvalue.cum_days_ts_above_40k,dur);
-  let tesvalue_prcnt_above_10k = this.renderValue(tesvalue.prcnt_days_ts_above_10k,dur);
-  let tesvalue_prcnt_above_20k = this.renderValue(tesvalue.prcnt_days_ts_above_20k,dur);
-  let tesvalue_prcnt_above_25k = this.renderValue(tesvalue.prcnt_days_ts_above_25k,dur);
-  let tesvalue_prcnt_above_30k = this.renderValue(tesvalue.prcnt_days_ts_above_30k,dur);
-  let tesvalue_prcnt_above_40k = this.renderValue(tesvalue.prcnt_days_ts_above_40k,dur);
+  let tesvalue_prcnt_above_10k = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_above_10k,dur));
+  let tesvalue_prcnt_above_20k = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_above_20k,dur));
+  let tesvalue_prcnt_above_25k = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_above_25k,dur));
+  let tesvalue_prcnt_above_30k = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_above_30k,dur));
+  let tesvalue_prcnt_above_40k = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_above_40k,dur));
   let totalSteps = this.renderValue(tesvalue.total_steps,dur);
   let numberOfDays = this.state.numberOfDays;
 
@@ -1205,7 +1211,7 @@ renderTotalExerciseSteps(tesvalue,dur){
                   <th colSpan={5}>Total Steps</th>
                   </tr>
                   <tr>
-                  <td colSpan={5}>{totalSteps}</td>
+                  <td colSpan={5}> {this.renderComma(totalSteps)}</td>
                   </tr>
                   <th colSpan={5}>Daily Distribution</th> 
                   <tr>
@@ -1257,6 +1263,24 @@ renderTotalExerciseSteps(tesvalue,dur){
                   </table>
     return Table;   
 }
+   renderComma(value){
+    let steps = '';
+    if(value){
+      value += '';
+        var x = value.split('.');
+        var x1 = x[0];
+          var x2 = x.length > 1 ? '.' + x[1] : '';
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+          }
+          steps = x1 + x2;
+      } 
+        return steps;
+  }
+
+
+ 
 
 renderMcs(mcvalue,dur){
   let mcvalue_a = this.renderValue(mcvalue.cum_days_mcs_got_a,dur);
@@ -1264,11 +1288,11 @@ renderMcs(mcvalue,dur){
   let mcvalue_c = this.renderValue(mcvalue.cum_days_mcs_got_c,dur);
   let mcvalue_d = this.renderValue(mcvalue.cum_days_mcs_got_d,dur);
   let mcvalue_f = this.renderValue(mcvalue.cum_days_mcs_got_f,dur);
-  let mcvalue_prcnt_a = this.renderValue(mcvalue.prcnt_days_mcs_got_a,dur);
-  let mcvalue_prcnt_b = this.renderValue(mcvalue.prcnt_days_mcs_got_b,dur);
-  let mcvalue_prcnt_c = this.renderValue(mcvalue.prcnt_days_mcs_got_c,dur);
-  let mcvalue_prcnt_d = this.renderValue(mcvalue.prcnt_days_mcs_got_d,dur);
-  let mcvalue_prcnt_f = this.renderValue(mcvalue.prcnt_days_mcs_got_f,dur);
+  let mcvalue_prcnt_a = this.renderPercent(this.renderValue(mcvalue.prcnt_days_mcs_got_a,dur));
+  let mcvalue_prcnt_b = this.renderPercent(this.renderValue(mcvalue.prcnt_days_mcs_got_b,dur));
+  let mcvalue_prcnt_c = this.renderPercent(this.renderValue(mcvalue.prcnt_days_mcs_got_c,dur));
+  let mcvalue_prcnt_d = this.renderPercent(this.renderValue(mcvalue.prcnt_days_mcs_got_d,dur));
+  let mcvalue_prcnt_f = this.renderPercent(this.renderValue(mcvalue.prcnt_days_mcs_got_f,dur));
   let mcgrade = this.renderValue(mcvalue.movement_consistency_grade,dur);
   let mcscore = this.renderValue(mcvalue.movement_consistency_score,dur);
   let numberOfDays = this.state.numberOfDays;
@@ -1404,11 +1428,11 @@ renderMcs(mcvalue,dur){
     let ecvalue_c = this.renderValue(ecvalue.cum_days_ec_got_c,dur);
     let ecvalue_d = this.renderValue(ecvalue.cum_days_ec_got_d,dur);
     let ecvalue_f = this.renderValue(ecvalue.cum_days_ec_got_f,dur);
-    let ecvalue_prcnt_a = this.renderValue(ecvalue.prcnt_days_ec_got_a,dur);
-    let ecvalue_prcnt_b = this.renderValue(ecvalue.prcnt_days_ec_got_b,dur);
-    let ecvalue_prcnt_c = this.renderValue(ecvalue.prcnt_days_ec_got_c,dur);
-    let ecvalue_prcnt_d = this.renderValue(ecvalue.prcnt_days_ec_got_d,dur);
-    let ecvalue_prcnt_f = this.renderValue(ecvalue.prcnt_days_ec_got_f,dur);
+    let ecvalue_prcnt_a = this.renderPercent(this.renderValue(ecvalue.prcnt_days_ec_got_a,dur));
+    let ecvalue_prcnt_b = this.renderPercent(this.renderValue(ecvalue.prcnt_days_ec_got_b,dur));
+    let ecvalue_prcnt_c = this.renderPercent(this.renderValue(ecvalue.prcnt_days_ec_got_c,dur));
+    let ecvalue_prcnt_d = this.renderPercent(this.renderValue(ecvalue.prcnt_days_ec_got_d,dur));
+    let ecvalue_prcnt_f = this.renderPercent(this.renderValue(ecvalue.prcnt_days_ec_got_f,dur));
     let avgExercisePerWeekValue = this.renderValue(ecvalue.avg_no_of_days_exercises_per_week,dur);
     let ecGrade = this.renderValue(ecvalue.exercise_consistency_grade,dur);
     let numberOfDays = this.state.numberOfDays;
@@ -1485,7 +1509,7 @@ renderMcs(mcvalue,dur){
                   <th style={{backgroundColor:'red',color:'black'}}>F</th>
                   </tr> 
                   <tr>
-                  <td style={{backgroundColor:'green',color:'white'}}>>=4</td>
+                  <td style={{backgroundColor:'green',color:'white'}}>{'<='}4</td>
                   <td style={{backgroundColor:'#32CD32',color:'white'}}>3.0 -<br/>3.99</td>
                   <td style={{backgroundColor:'Yellow',color:'black'}}>2.0 -<br/>2.99</td>
                   <td style={{backgroundColor:'orange',color:'white'}}>1.0 -<br/>1.99</td>
@@ -1548,11 +1572,11 @@ renderMcs(mcvalue,dur){
     let exvalue_c = this.renderValue(exvalue.cum_days_workout_dur_got_c,dur);
     let exvalue_d = this.renderValue(exvalue.cum_days_workout_dur_got_d,dur);
     let exvalue_f = this.renderValue(exvalue.cum_days_workout_dur_got_f,dur);
-    let exvalue_prcnt_a = this.renderValue(exvalue.prcnt_days_workout_dur_got_a,dur);
-    let exvalue_prcnt_b = this.renderValue(exvalue.prcnt_days_workout_dur_got_b,dur);
-    let exvalue_prcnt_c = this.renderValue(exvalue.prcnt_days_workout_dur_got_c,dur);
-    let exvalue_prcnt_d = this.renderValue(exvalue.prcnt_days_workout_dur_got_d,dur);
-    let exvalue_prcnt_f = this.renderValue(exvalue.prcnt_days_workout_dur_got_f,dur);
+    let exvalue_prcnt_a = this.renderPercent(this.renderValue(exvalue.prcnt_days_workout_dur_got_a,dur));
+    let exvalue_prcnt_b = this.renderPercent(this.renderValue(exvalue.prcnt_days_workout_dur_got_b,dur));
+    let exvalue_prcnt_c = this.renderPercent(this.renderValue(exvalue.prcnt_days_workout_dur_got_c,dur));
+    let exvalue_prcnt_d = this.renderPercent(this.renderValue(exvalue.prcnt_days_workout_dur_got_d,dur));
+    let exvalue_prcnt_f = this.renderPercent(this.renderValue(exvalue.prcnt_days_workout_dur_got_f,dur));
     let workoutDurationHrMin = this.renderValue(exvalue.workout_duration_hours_min,dur);
     let numberOfDays = this.state.numberOfDays;
     
@@ -1622,10 +1646,10 @@ renderMcs(mcvalue,dur){
                   </tr>
                   <tr>
                   <td>{exvalue_a}</td>
-                  <td>{exvalue_a}</td>
-                  <td>{exvalue_a}</td>
-                  <td>{exvalue_a}</td>
-                  <td>{exvalue_a}</td>
+                  <td>{exvalue_b}</td>
+                  <td>{exvalue_c}</td>
+                  <td>{exvalue_d}</td>
+                  <td>{exvalue_f}</td>
                   </tr>
                   <tr>
                   <td>{exvalue_prcnt_a}</td>
@@ -1661,8 +1685,10 @@ renderMcs(mcvalue,dur){
       let startDate = selectedRange.dateRange.split("to")[0].trim();
       let endDate = selectedRange.dateRange.split("to")[1].trim();
       let numberOfDays = Math.abs(moment(endDate).diff(moment(startDate), 'days'))+1;
+       // numberOfDays = 9 ;
       if(numberOfDays >= 7){
           let avgValueInSecPer7Days = Math.round(exDurHrMinInSeconds / numberOfDays) * 7
+
           if(avgValueInSecPer7Days == 'NA' || avgValueInSecPer7Days == 'NR' || avgValueInSecPer7Days == 'NP'){
             background= "";
               color= "";
@@ -1739,11 +1765,11 @@ renderMcs(mcvalue,dur){
   let totalactminvalue_c = this.renderValue(totalactminvalue.cum_days_total_act_min_got_c,dur);
   let totalactminvalue_d = this.renderValue(totalactminvalue.cum_days_total_act_min_got_d,dur);
   let totalactminvalue_f = this.renderValue(totalactminvalue.cum_days_total_act_min_got_f,dur);
-  let totalactminvalue_prcnt_a = this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_a,dur);
-  let totalactminvalue_prcnt_b = this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_b,dur);
-  let totalactminvalue_prcnt_c = this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_c,dur);
-  let totalactminvalue_prcnt_d = this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_d,dur);
-  let totalactminvalue_prcnt_f = this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_f,dur);
+  let totalactminvalue_prcnt_a = this.renderPercent(this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_a,dur));
+  let totalactminvalue_prcnt_b = this.renderPercent(this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_b,dur));
+  let totalactminvalue_prcnt_c = this.renderPercent(this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_c,dur));
+  let totalactminvalue_prcnt_d = this.renderPercent(this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_d,dur));
+  let totalactminvalue_prcnt_f = this.renderPercent(this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_f,dur));
   let numberOfDays = this.state.numberOfDays;
   
    if( avg_actminWithoutSleep == null || avg_actminWithoutSleep == undefined ){
@@ -1925,11 +1951,11 @@ renderActiveMinutesColors(totalActiveDuration,exerciseActiveMin=null){
    let amexsvalue_c = this.renderValue(amexsvalue.cum_days_act_min_no_sleep_exec_got_c,dur);
    let amexsvalue_d = this.renderValue(amexsvalue.cum_days_act_min_no_sleep_exec_got_d,dur);
    let amexsvalue_f = this.renderValue(amexsvalue.cum_days_act_min_no_sleep_exec_got_f,dur);
-   let amexsvalue_prcnt_a = this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_a,dur);
-   let amexsvalue_prcnt_b = this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_b,dur);
-   let amexsvalue_prcnt_c = this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_c,dur);
-   let amexsvalue_prcnt_d = this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_d,dur);
-   let amexsvalue_prcnt_f = this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_f,dur);
+   let amexsvalue_prcnt_a = this.renderPercent(this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_a,dur));
+   let amexsvalue_prcnt_b = this.renderPercent(this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_b,dur));
+   let amexsvalue_prcnt_c = this.renderPercent(this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_c,dur));
+   let amexsvalue_prcnt_d = this.renderPercent(this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_d,dur));
+   let amexsvalue_prcnt_f = this.renderPercent(this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_f,dur));
    let numberOfDays = this.state.numberOfDays;
 
    
@@ -1938,7 +1964,7 @@ renderActiveMinutesColors(totalActiveDuration,exerciseActiveMin=null){
    }
    if( amexsvalue_avg == "Not Reported"){
       amexsvalue_avg = 'NR';
-   }
+   }  
    if( amexsvalue_avg == "Not Provided"){
       amexsvalue_avg = 'NP'
     }
@@ -2011,17 +2037,17 @@ renderActiveMinutesColors(totalActiveDuration,exerciseActiveMin=null){
  }
 
  renderRestingHeartRate(restinghrvalue,dur){
-  let restinghr_avg_score = this.renderValue(restinghrvalue.resting_hr,dur);
+  let restinghr_avg_score =this.renderValue(restinghrvalue.resting_hr,dur);
   let restinghrvalue_a = this.renderValue(restinghrvalue.cum_days_resting_hr_got_a,dur);
   let restinghrvalue_b = this.renderValue(restinghrvalue.cum_days_resting_hr_got_b,dur);
   let restinghrvalue_c = this.renderValue(restinghrvalue.cum_days_resting_hr_got_c,dur);
   let restinghrvalue_d = this.renderValue(restinghrvalue.cum_days_resting_hr_got_d,dur);
   let restinghrvalue_f = this.renderValue(restinghrvalue.cum_days_resting_hr_got_f,dur);
-  let restinghrvalue_prcnt_a = this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_a,dur);  
-  let restinghrvalue_prcnt_b = this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_b,dur);  
-  let restinghrvalue_prcnt_c = this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_c,dur);  
-  let restinghrvalue_prcnt_d = this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_d,dur);  
-  let restinghrvalue_prcnt_f = this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_f,dur);  
+  let restinghrvalue_prcnt_a = this.renderPercent(this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_a,dur));  
+  let restinghrvalue_prcnt_b = this.renderPercent(this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_b,dur));  
+  let restinghrvalue_prcnt_c = this.renderPercent(this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_c,dur));  
+  let restinghrvalue_prcnt_d = this.renderPercent(this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_d,dur));  
+  let restinghrvalue_prcnt_f = this.renderPercent(this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_f,dur));  
   let numberOfDays = this.state.numberOfDays;
 
   if( restinghr_avg_score == null || restinghr_avg_score == undefined ){
@@ -2039,18 +2065,39 @@ renderActiveMinutesColors(totalActiveDuration,exerciseActiveMin=null){
   if( restinghrvalue_a == null || restinghrvalue_a == undefined || restinghrvalue_a == ' ' ){
       restinghrvalue_a = '-';
     }
+   else if(restinghrvalue_a!= null || restinghrvalue_a!= undefined || restinghrvalue_a!= ' ' ){
+        let outres11 = parseFloat(restinghrvalue_a)
+        restinghrvalue_a =outres11.toFixed(1)
+   }
   if( restinghrvalue_b == null || restinghrvalue_b == undefined || restinghrvalue_b == ' ' ){
       restinghrvalue_b = '-';
     }
+  else if(restinghrvalue_b!= null || restinghrvalue_b!= undefined || restinghrvalue_b!= ' ' ){
+        let outres12 = parseFloat(restinghrvalue_b)
+        restinghrvalue_b =outres12.toFixed(1)
+   }
   if( restinghrvalue_c == null || restinghrvalue_c == undefined || restinghrvalue_c == ' ' ){
       restinghrvalue_c = '-';
     }
+  else if(restinghrvalue_c!= null || restinghrvalue_c!= undefined || restinghrvalue_c!= ' ' ){
+        let outres13 = parseFloat(restinghrvalue_c)
+        restinghrvalue_c =outres13.toFixed(1)
+   }
   if( restinghrvalue_d == null || restinghrvalue_d == undefined || restinghrvalue_d == ' ' ){
       restinghrvalue_d = '-';
     }
+  else if(restinghrvalue_d!= null || restinghrvalue_d!= undefined || restinghrvalue_d!= ' ' ){
+       let outres14 = parseFloat(restinghrvalue_d)
+        restinghrvalue_d =outres14.toFixed(1)
+   }
   if( restinghrvalue_f == null || restinghrvalue_f == undefined || restinghrvalue_f == ' ' ){
       restinghrvalue_f = '-';
-    }        
+
+    }     
+  else if(restinghrvalue_f!= null || restinghrvalue_f!= undefined || restinghrvalue_f!= ' ' ){
+       let outres15 = parseFloat(restinghrvalue_f)
+        restinghrvalue_f =outres15.toFixed(1)
+   }   
   if( restinghrvalue_prcnt_a == null || restinghrvalue_prcnt_a == undefined || restinghrvalue_prcnt_a == ' ' ){
       restinghrvalue_prcnt_a = '-';
     }
@@ -2141,15 +2188,15 @@ restingHrColors(rhrscore){
   let sleepgrade = this.renderValue(sleepvalue.average_sleep_grade,dur);
   let awake_time = this.renderValue(sleepvalue.total_sleep_in_hours_min,dur);
   let sleepvalue_a = this.renderValue(sleepvalue.cum_days_sleep_got_a,dur); 
-  let sleepvalue_b = this.renderValue(sleepvalue.cum_days_sleep_got_a,dur); 
-  let sleepvalue_c = this.renderValue(sleepvalue.cum_days_sleep_got_a,dur); 
-  let sleepvalue_d = this.renderValue(sleepvalue.cum_days_sleep_got_a,dur); 
-  let sleepvalue_f = this.renderValue(sleepvalue.cum_days_sleep_got_a,dur); 
-  let sleepvalue_prcnt_a = this.renderValue(sleepvalue.prcnt_days_sleep_got_a,dur);
-  let sleepvalue_prcnt_b = this.renderValue(sleepvalue.prcnt_days_sleep_got_b,dur);
-  let sleepvalue_prcnt_c = this.renderValue(sleepvalue.prcnt_days_sleep_got_c,dur);
-  let sleepvalue_prcnt_d = this.renderValue(sleepvalue.prcnt_days_sleep_got_d,dur);
-  let sleepvalue_prcnt_f = this.renderValue(sleepvalue.prcnt_days_sleep_got_f,dur);
+  let sleepvalue_b = this.renderValue(sleepvalue.cum_days_sleep_got_b,dur); 
+  let sleepvalue_c = this.renderValue(sleepvalue.cum_days_sleep_got_c,dur); 
+  let sleepvalue_d = this.renderValue(sleepvalue.cum_days_sleep_got_d,dur); 
+  let sleepvalue_f = this.renderValue(sleepvalue.cum_days_sleep_got_f,dur); 
+  let sleepvalue_prcnt_a = this.renderPercent(this.renderValue(sleepvalue.prcnt_days_sleep_got_a,dur));
+  let sleepvalue_prcnt_b = this.renderPercent(this.renderValue(sleepvalue.prcnt_days_sleep_got_b,dur));
+  let sleepvalue_prcnt_c = this.renderPercent(this.renderValue(sleepvalue.prcnt_days_sleep_got_c,dur));
+  let sleepvalue_prcnt_d = this.renderPercent(this.renderValue(sleepvalue.prcnt_days_sleep_got_d,dur));
+  let sleepvalue_prcnt_f = this.renderPercent(this.renderValue(sleepvalue.prcnt_days_sleep_got_f,dur));
   let numberOfDays = this.state.numberOfDays;
 
   if( sleepgrade == null || sleepgrade == undefined ){
@@ -2321,15 +2368,16 @@ restingHrColors(rhrscore){
   let nutritionvalue_c = this.renderValue(nutritionvalue.cum_days_ufood_got_c,dur);
   let nutritionvalue_d = this.renderValue(nutritionvalue.cum_days_ufood_got_d,dur);
   let nutritionvalue_f = this.renderValue(nutritionvalue.cum_days_ufood_got_f,dur);
-  let nutritionvalue_prcnt_a = this.renderValue(nutritionvalue.prcnt_days_ufood_got_a,dur);
-  let nutritionvalue_prcnt_b = this.renderValue(nutritionvalue.prcnt_days_ufood_got_b,dur);
-  let nutritionvalue_prcnt_c = this.renderValue(nutritionvalue.prcnt_days_ufood_got_c,dur);
-  let nutritionvalue_prcnt_d = this.renderValue(nutritionvalue.prcnt_days_ufood_got_d,dur);
-  let nutritionvalue_prcnt_f = this.renderValue(nutritionvalue.prcnt_days_ufood_got_f,dur);
+  let nutritionvalue_prcnt_a = this.renderPercent(this.renderValue(nutritionvalue.prcnt_days_ufood_got_a,dur));
+  let nutritionvalue_prcnt_b = this.renderPercent(this.renderValue(nutritionvalue.prcnt_days_ufood_got_b,dur));
+  let nutritionvalue_prcnt_c = this.renderPercent(this.renderValue(nutritionvalue.prcnt_days_ufood_got_c,dur));
+  let nutritionvalue_prcnt_d = this.renderPercent(this.renderValue(nutritionvalue.prcnt_days_ufood_got_d,dur));
+  let nutritionvalue_prcnt_f = this.renderPercent(this.renderValue(nutritionvalue.prcnt_days_ufood_got_f,dur));
   let numberOfDays = this.state.numberOfDays;
 
   if( prcnt_unproc_food == null || prcnt_unproc_food == undefined ){
       prcnt_unproc_food = 'NA';
+
     }
    if( prcnt_unproc_food == "Not Reported" ){
       prcnt_unproc_food = 'NR';
@@ -2339,6 +2387,7 @@ restingHrColors(rhrscore){
     } 
       
   let foodcolors = this.getStylesForNutritionFood(prcnt_unproc_food);
+  let prcnt_unproc_food_value = this.renderPercent(prcnt_unproc_food);
   
   if( food_grade == null || food_grade == undefined ){
       food_grade = 'NA';
@@ -2349,10 +2398,11 @@ restingHrColors(rhrscore){
   if( food_grade == "Not Provided" ){
       food_grade = 'NP';
     }
+    
 
     let foodGradecolors = this.getStylesForSummaryGrades(food_grade);
 
-  if( nutritionvalue_a == null || nutritionvalue_a == undefined || nutritionvalue_a == ' ' ){
+  if( nutritionvalue_a == null || nutritionvalue_a == undefined || nutritionvalue_a == ' '){
       nutritionvalue_a = '-';
     }
   if( nutritionvalue_b == null || nutritionvalue_b == undefined || nutritionvalue_b == ' ' ){
@@ -2382,13 +2432,14 @@ restingHrColors(rhrscore){
   if( nutritionvalue_prcnt_f == null || nutritionvalue_prcnt_f == undefined || nutritionvalue_prcnt_f == ' ' ){
       nutritionvalue_prcnt_f = '-';
     }    
+  
   let Table =  <table className="bifurcation_table">
                   <tr>
                   <th colSpan={2}>% Unprocess Food Consumed</th>
                   <th colSpan={3}>Nutrition Grade</th>
                   </tr>
                   <tr>
-                  <td colSpan={2} style={{backgroundColor:foodcolors[0],color:foodcolors[1]}}>{prcnt_unproc_food}</td>
+                  <td colSpan={2} style={{backgroundColor:foodcolors[0],color:foodcolors[1]}}>{prcnt_unproc_food_value}</td>
                   <td colSpan={3} style={{backgroundColor:foodGradecolors[0],color:foodGradecolors[1]}}>{food_grade}</td>
                   </tr>
                   <th colSpan={5}>Daily Distribution</th>
@@ -2427,6 +2478,19 @@ restingHrColors(rhrscore){
 
  }
 
+   renderPercent(value){
+    let percent ='';
+    if( value == 'NA' || value == '' || value == null || value == undefined){
+      percent= value ;
+      return percent;
+    }
+   else {
+      percent = value +" "+ '%';
+      console.log("percent value"+percent)
+      return percent;
+    }
+  }
+
   getStylesForNutritionFood(foodscore){
     let background = "";
     let color = "";
@@ -2450,7 +2514,7 @@ restingHrColors(rhrscore){
       else if (foodscore >= 50 && foodscore < 60){
           background ='#FF8C00';
           color = 'white';
-        }
+        } 
       else if (foodscore < 50){
           background = "red";
           color = "black";
@@ -2496,11 +2560,11 @@ restingHrColors(rhrscore){
   let alcoholvalue_c = this.renderValue(alcoholvalue.cum_days_alcohol_week_got_c,dur);
   let alcoholvalue_d = this.renderValue(alcoholvalue.cum_days_alcohol_week_got_d,dur);
   let alcoholvalue_f = this.renderValue(alcoholvalue.cum_days_alcohol_week_got_f,dur);
-  let alcoholvalue_prcnt_a = this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_a,dur);
-  let alcoholvalue_prcnt_b = this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_b,dur);
-  let alcoholvalue_prcnt_c = this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_c,dur);
-  let alcoholvalue_prcnt_d = this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_d,dur);
-  let alcoholvalue_prcnt_f = this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_f,dur);
+  let alcoholvalue_prcnt_a = this.renderPercent(this.getAlcoholPercent(this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_a,dur)));
+  let alcoholvalue_prcnt_b = this.renderPercent(this.getAlcoholPercent(this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_b,dur)));
+  let alcoholvalue_prcnt_c = this.renderPercent(this.getAlcoholPercent(this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_c,dur)));
+  let alcoholvalue_prcnt_d = this.renderPercent(this.getAlcoholPercent(this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_d,dur)));
+  let alcoholvalue_prcnt_f = this.renderPercent(this.getAlcoholPercent(this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_f,dur)));
   let numberOfDays = this.state.numberOfDays;
 
   if( alcoholgpa == null || alcoholgpa == undefined ){
@@ -2557,7 +2621,8 @@ restingHrColors(rhrscore){
     }
   if( alcoholvalue_prcnt_f == null || alcoholvalue_prcnt_f == undefined || alcoholvalue_prcnt_f == ' ' ){
       alcoholvalue_prcnt_f = '-';
-    }        
+    }  
+
   let Table =  <table className="bifurcation_table">
                   <tr>
                   <th colSpan={2}>Average Drinks Per Week (7 Days)</th>
@@ -2601,12 +2666,20 @@ restingHrColors(rhrscore){
 
     return Table;
  }
+
+ getAlcoholPercent(value){
+  let intvalue;
+  if( value != null || value != undefined || value != '' ){
+   intvalue = value/100;  
+  }
+  return intvalue;
+ }
  
  getAlcoholColors(drink_avg,gender,grade){
     let background='';
     let color='';
 
-    if (gender === 'F') {
+    if (gender === 'Form') {
           if(drink_avg == 'NA' || grade == 'NA' || drink_avg == 'NP' || grade == 'NP'|| drink_avg == 'NR' || grade == 'NR'){
             background='';
             color='';
@@ -2671,14 +2744,23 @@ restingHrColors(rhrscore){
  
  renderGarminStats(garminvalue,dur){
   let garmin_avg = this.renderValue(garminvalue.garmin_stress_lvl,dur);
-  let garminvalue_a = this.renderValue(garminvalue.cum_garmin_stress_days_got_a,dur);
+
+ ;
+
+  // if(garminvalue_a!=null|| garminvalue_a!=undefined||garminvalue_a!=''){
+  //     let res = garminvalue_a
+  //    console.log("ddddd"+res)
+  //    let rr= parseFloat(res).toFixed(1);
+  //    console.log(rr)
+  // }
+  let garminvalue_a = this.renderValue(garminvalue.cum_garmin_stress_days_got_a,dur)
   let garminvalue_b = this.renderValue(garminvalue.cum_garmin_stress_days_got_b,dur);
   let garminvalue_c = this.renderValue(garminvalue.cum_garmin_stress_days_got_c,dur);
   let garminvalue_f = this.renderValue(garminvalue.cum_garmin_stress_days_got_f,dur);
-  let garminvalue_prcnt_a = this.renderValue(garminvalue.prcnt_garmin_stress_days_got_a,dur);
-  let garminvalue_prcnt_b = this.renderValue(garminvalue.prcnt_garmin_stress_days_got_b,dur);
-  let garminvalue_prcnt_c = this.renderValue(garminvalue.prcnt_garmin_stress_days_got_c,dur);
-  let garminvalue_prcnt_f = this.renderValue(garminvalue.prcnt_garmin_stress_days_got_f,dur);
+  let garminvalue_prcnt_a = this.renderPercent(this.renderValue(garminvalue.prcnt_garmin_stress_days_got_a,dur));
+  let garminvalue_prcnt_b = this.renderPercent(this.renderValue(garminvalue.prcnt_garmin_stress_days_got_b,dur));
+  let garminvalue_prcnt_c = this.renderPercent(this.renderValue(garminvalue.prcnt_garmin_stress_days_got_c,dur));
+  let garminvalue_prcnt_f = this.renderPercent(this.renderValue(garminvalue.prcnt_garmin_stress_days_got_f,dur));
   let numberOfDays = this.state.numberOfDays;
 
   if( garmin_avg == null || garmin_avg == undefined ){
@@ -2694,16 +2776,37 @@ restingHrColors(rhrscore){
     let avg_garmin_color = this.GarminStressColors(garmin_avg); 
 
   if( garminvalue_a == null || garminvalue_a == undefined || garminvalue_a == ' ' ){
-      garminvalue_a = '-';
+      garminvalue_a = '-';  
     }
+  else if(garminvalue_a!= null||garminvalue_a!= undefined|| garminvalue_a!= ' '){
+    let outres1 = parseFloat(garminvalue_a)
+    garminvalue_a =outres1.toFixed(1)
+    console.log(garminvalue_a)
+    }
+   
   if( garminvalue_b == null || garminvalue_b == undefined || garminvalue_b == ' ' ){
       garminvalue_b = '-';
+    }
+     else if(garminvalue_b!= null||garminvalue_b!= undefined|| garminvalue_b!= ' '){
+    let outres2 = parseFloat(garminvalue_b)
+    garminvalue_b =outres2.toFixed(1)
+   
     }
  if( garminvalue_c == null || garminvalue_c == undefined || garminvalue_c == ' ' ){
       garminvalue_c = '-';
     }
+     else if(garminvalue_c!= null||garminvalue_c!= undefined|| garminvalue_c!= ' '){
+    let outres3 = parseFloat(garminvalue_c)
+    garminvalue_c =outres3.toFixed(1)
+  
+    }
  if( garminvalue_f == null || garminvalue_f == undefined || garminvalue_f == ' ' ){
       garminvalue_f = '-';
+    }
+     else if(garminvalue_f!= null||garminvalue_f!= undefined|| garminvalue_f!= ' '){
+    let outres4 = parseFloat(garminvalue_f)
+    garminvalue_f =outres4.toFixed(1)
+  
     }                        
  if( garminvalue_prcnt_a == null || garminvalue_prcnt_a == undefined || garminvalue_prcnt_a == ' ' ){
       garminvalue_prcnt_a = '-';
