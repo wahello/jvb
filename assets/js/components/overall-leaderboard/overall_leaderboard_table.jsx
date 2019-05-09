@@ -155,10 +155,10 @@ class OverallLeaderboardTable extends Component{
 			if (drink_avg <= 3){
         		grade = 'A'
 	        }   
-	        else if (drink_avg > 3 && drink_avg < 5){
+	        else if (drink_avg > 3 && drink_avg <= 5){
 	            grade = 'B'
 	        }
-	        else if (drink_avg >= 5 && drink_avg < 7){
+	        else if (drink_avg > 5 && drink_avg <= 7){
 	            grade = 'C';
 	        }
 	        else if (drink_avg >= 7 && drink_avg < 9){
