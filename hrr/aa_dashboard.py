@@ -108,6 +108,7 @@ def generate_aa_new_table(heartrate,time_difference,current_user_aa_ranges):
 			values['duration'] = time_difference + values.get('duration',0)
 	return current_user_aa_ranges
 
+
 def aa_dashboard_ranges(user,start_date):
 	'''
 		This function calculates the A/A third chart data
@@ -275,7 +276,9 @@ def aa_dashboard_ranges(user,start_date):
 		for heartrate,time_difference in zip(workout_final_heartrate,workout_final_timestamp):
 			aa_dashboard_table = generate_aa_new_table(
 									heartrate,time_difference,current_user_aa_ranges)
-	print(aa_dashboard_table,"aa_dashboard_table")
+	else:
+		aa_dashboard_table = {}
+	
 	return None
 
 			
