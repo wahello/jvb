@@ -1,3 +1,8 @@
+.hrr-container {
+	position: relative;
+	height: 100vh;
+}
+
 .hr_table_style{
     margin-top:50px;
 	padding-top: 30px;
@@ -14,6 +19,18 @@
 	padding:0px 50px;
 	margin-top:20px;
 }
+
+.no_hrr_message{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.hrr_chart_footnote {
+	margin-left: 32px;
+}
+
 @media (max-width: 1023px){
 	.hr_table_padd{
 		padding:0px 25px;

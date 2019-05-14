@@ -111,6 +111,7 @@ class OverallLeaderboard extends Component{
 		this.reanderAllHrr = this.reanderAllHrr.bind(this);
 		this.toggleInfo = this.toggleInfo.bind(this);
 		this.infoPrint = this.infoPrint.bind(this);
+		this.successProfile = this.successProfile.bind(this);
 	}
 
 	successOverallMovementRank(data,custom_range=undefined){
@@ -120,7 +121,7 @@ class OverallLeaderboard extends Component{
 			duration_date:data.data.duration_date,
 			all_movement_rank_data:data.data.overall.today.all_rank,
 			date:moment(date).format("MMM D, YYYY"),
-			capt:"Today",
+			// capt:"Today",
 			fetching_hrr1:false,
 	        fetching_hrr2:false,
 	        fetching_hrr3:false,
@@ -550,7 +551,7 @@ class OverallLeaderboard extends Component{
 								ECS: Exercise Consistency Score
 								</p>
 								<p className="footer_content" style={{marginLeft:"15px"}}>
-								TRL: Total number of days in period traveled (% of total days reported in the duration)
+								TVL: Total number of days in period traveled (% of total days reported in the duration)
 								</p>
 								<p className="footer_content" style={{marginLeft:"15px"}}>
 								ILL: Total number of days in period sick (% of total days reported in the duration)

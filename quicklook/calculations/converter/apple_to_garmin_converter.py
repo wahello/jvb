@@ -77,7 +77,7 @@ def get_epoch_offset_from_timestamp(timestamp, timezone):
 		return (time_in_utc_seconds,0) 
 
 def apple_to_garmin_activities(active_summary):
-
+	
 	if active_summary:
 		result_reponse = []
 

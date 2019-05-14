@@ -1,6 +1,8 @@
+from django.contrib.auth.models import User
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
@@ -109,3 +111,9 @@ class AACustomRangesView(generics.ListCreateAPIView):
 			serializer.save()
 			return Response(serializer.data,status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+def get_user_id(request):
+	user = request.user
+	print(user,"user")
+	user = User.objects.get(username=user)
+	return JsonResponse({'user_id':user.id})

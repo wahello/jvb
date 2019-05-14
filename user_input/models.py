@@ -116,6 +116,7 @@ class DailyUserInputStrong(models.Model):
         ('20','20'),('20+','More than 20')
     )
     YN_CHOICE = (
+        ('',''),
         ('','-'),
         (YES,'Yes'),
         (NO,'No'),
@@ -266,8 +267,11 @@ class DailyUserInputEncouraged(models.Model):
     )
 
     YN_CHOICE = (
+    ('',''),
     ('','-'),
     (YES,'Yes'),
+    (YES,'yes'),
+    (NO,'no'),
     (NO,'No'),
     )
 

@@ -88,6 +88,7 @@ class UserAppleDataStepsView(generics.CreateAPIView):
 	serializer_class = UserAppleDataStepsSerializer
 
 	def post(self,request):
+		print(request,"request")
 		user = request.user
 		summary_type = "steps"
 		state="unprocessed"
@@ -95,7 +96,9 @@ class UserAppleDataStepsView(generics.CreateAPIView):
 		updated_data = request.data.get('data')
 		user = request.data.get('user')
 		summary_id = request.data.get('summary_id')
+		print(obj_date,"obj_date")
 		obj_date_str = obj_date[0:10]
+		print(obj_date_str,"dateeeeeeee")
 		try:
 			obj=UserAppleDataSteps.objects.get(user=user,belong_to__contains=obj_date_str)
 			return update_steps_data(obj,updated_data)
@@ -125,7 +128,7 @@ def merge_user_data(user, start_date):
 	# date_qs = UserAppleDataSteps.objects.filter(Q(
 	# 	belong_to__gte=start_date) & Q(
 	# 	belong_to__lt=start_date),user=user)
-	date_qs = UserAppleDataSteps.objects.filter(
+	date_qs = UserAppleDataSteps.objects.filter(user=user,
 		belong_to__range=[start_date,start_date+timedelta(days=1)])
 	data = []
 	[data.append(ast.literal_eval(single_obj.data)) for single_obj in date_qs]

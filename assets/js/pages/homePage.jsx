@@ -30,7 +30,8 @@ import FitBit from '../components/fitbitData';
 import HeartRate from '../components/Heart_rate_recovery';
 import LeaderBoard1 from '../components/leader_exp';
 import AllRank_Data1 from '../components/leader_all_exp';
-import HeartRateCal from '../components/HRR/heart_rate_calculation';
+// import HeartRateCal from '../components/HRR/heart_rate_calculation';
+import HeartRateRecoveryChart from '../components/HRR/HeartRateRecovery';
 import Workout from '../components/workout_stats';
 import HeartrateZone from '../components/heart_rate_zone';
 import Movement_Dashboard from '../components/Movement_dashboard';
@@ -43,7 +44,8 @@ import ProgressDashboard from '../components/progressanalyzer_dashboard';
 import ActiveDashboard from '../components/Active_dashboard';
 import BackfillRequest from '../components/BackfillRequest';
 import MovementLeaderboard from '../components/movement-leaderboard/movement_leaderboard';
-import OverallLeaderboard from '../components/overall-leaderboard/overall_leaderboard_page'
+import OverallLeaderboard from '../components/overall-leaderboard/overall_leaderboard_page';
+import Bifurcation from '../components/bifurcation-dashboard/bifurcation'
 
 import {loadLocalState,saveLocalState} from '../components/localStorage';
 import {isLoggedIn} from '../network/auth';
@@ -74,7 +76,7 @@ function initializeLocalState(){
 			        <Route path='/service_connect' component={RequireAuth(ServiceConnect)} />
 			        <Route path='/service_connect_fitbit' component={RequireAuth(ServiceConnect_fitBit)} />
 			        <Route path='/activity_type' component={RequireAuth(Activity_Type)} />
-			        <Route path='/hrr_recovery' component={RequireAuth(HeartRateCal)} />
+			        <Route path='/hrr_recovery' component={RequireAuth(HeartRateRecoveryChart)} />
 			        <Route path='/workout_stats' component={RequireAuth(Workout)} />
 			        <Route path='/heartrate_zone' component={RequireAuth(HeartrateZone)} />
 					{/*<Route path='/forgotpassword/' component={Forgotpassword} />*/}
@@ -111,6 +113,7 @@ function initializeLocalState(){
 					<Route path='/backfill' component={RequireAuth(BackfillRequest)} />
 					<Route path='/movement_leaderboard' component={RequireAuth(MovementLeaderboard)}/>
 					<Route path='/overall_leaderboard' component={RequireAuth(OverallLeaderboard)}/>
+				   <Route path='/bifurcationdashboard' component={RequireAuth(Bifurcation)}/>
 				</Switch>
 			  </BrowserRouter>
 			</Provider> 

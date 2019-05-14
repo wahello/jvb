@@ -1,0 +1,47 @@
+.bifurcation_table {
+  margin-left: 25px;
+  margin-top: 20px;
+  margin-right: 25px;
+}
+.bifurcation_table th{
+  font-size: 12px;
+  padding: 3px;
+  height: 30px;
+  min-width: 66px;
+}
+.bifurcation_table td{
+  font-size: 12px;
+  padding:0px;
+}
+.row{
+  margin-left : 0px;
+  margin-right : 0px;
+}
+.paweekdate{
+    margin-left: 50px;
+    color: gray;
+    padding-top: 5px;
+    font-size: 16px;
+}
+@media (min-width:320px ) and (max-width: 376px) and (orientation: portrait ){
+  .bifurcation_table{
+    margin-right: 20px;
+    margin-left: 20px;
+  }
+  .bifurcation_table th{
+     min-width: 54px;
+  }
+  .bifurcation_table td{
+     min-width: 54px;
+  }
+}
+
+@media (max-width:768px ) and (orientation:portrait){
+  .bifurcation_table th{
+   min-width:  50px;
+  }
+  .bifurcation_table td{
+    min-width: 50px;
+  }
+}
+

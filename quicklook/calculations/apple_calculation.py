@@ -457,14 +457,17 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 		if todays_activity_data:
 			todays_activity_data = list(map(apple_to_garmin_activities,
 				todays_activity_data))
-		
-		combined_user_exercise_activities,combined_user_exec_non_exec_activities =\
-			quicklook.calculations.garmin_calculation.\
-				get_filtered_activity_stats(
-					todays_activity_data[0],user_age,
-					userinput_activities = userinput_activities,
-					epoch_summaries = todays_epoch_data,
-					provide_all=True)
+
+			combined_user_exercise_activities,combined_user_exec_non_exec_activities =\
+				quicklook.calculations.garmin_calculation.\
+					get_filtered_activity_stats(
+						todays_activity_data[0],user_age,
+						userinput_activities = userinput_activities,
+						epoch_summaries = todays_epoch_data,
+						provide_all=True)
+		else:
+			combined_user_exercise_activities = []
+			combined_user_exec_non_exec_activities = []
 
 		ui_bedtime = None
 		ui_awaketime = None
@@ -675,16 +678,17 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 		steps_calculated_data['total_steps'] = total_steps
 
 
-		# # Non exercise steps grade and gpa calculation
-		# moment_non_exercise_steps_grade_point = quicklook.calculations\
-		# 	.garmin_calculation.cal_non_exercise_step_grade(non_exercise_steps)
-		# grades_calculated_data['movement_non_exercise_steps_grade'] = \
-		# 	moment_non_exercise_steps_grade_point[0]
-		# grades_calculated_data['movement_non_exercise_steps_gpa'] = \
-		# 	moment_non_exercise_steps_grade_point[1]
+		# Non exercise steps grade and gpa calculation
+		moment_non_exercise_steps_grade_point = quicklook.calculations\
+			.garmin_calculation.cal_non_exercise_step_grade(non_exercise_steps)
+		grades_calculated_data['movement_non_exercise_steps_grade'] = \
+			moment_non_exercise_steps_grade_point[0]
+		grades_calculated_data['movement_non_exercise_steps_gpa'] = \
+			moment_non_exercise_steps_grade_point[1]
 			
 		# Exercise Grade and point calculation
-		# exe_consistency_grade = get_exercise_consistency_grade(
+		# exe_consistency_grade = quicklook.calculations\
+		# 	.garmin_calculation.get_exercise_consistency_grade(
 		# 	user,current_date,user_age,weekly_user_input_activities)
 		# grades_calculated_data['exercise_consistency_grade'] = \
 		# 	exe_consistency_grade[0]
@@ -750,13 +754,13 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 		if movement_consistency:
 			steps_calculated_data['movement_consistency'] = json.dumps(movement_consistency)
 			inactive_hours = movement_consistency.get("inactive_hours")
-			# grade = quicklook.calculations.garmin_calculation\
-			# 	.cal_movement_consistency_grade(inactive_hours)
-			# grades_calculated_data['movement_consistency_grade'] = grade
-		# # overal grades gpa and grade
-		# overall_grade_pt = get_overall_grades(grades_calculated_data)
-		# grades_calculated_data['overall_health_grade'] = overall_grade_pt[0]
-		# grades_calculated_data['overall_health_gpa'] = overall_grade_pt[1]
+			grade = quicklook.calculations.garmin_calculation\
+				.cal_movement_consistency_grade(inactive_hours)
+			grades_calculated_data['movement_consistency_grade'] = grade
+		# overal grades gpa and grade
+		overall_grade_pt = get_overall_grades(grades_calculated_data)
+		grades_calculated_data['overall_health_grade'] = overall_grade_pt[0]
+		grades_calculated_data['overall_health_gpa'] = overall_grade_pt[1]
 
 		# If quick look for provided date exist then update it otherwise
 		# create new quicklook instance 
