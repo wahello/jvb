@@ -9,48 +9,55 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import FontAwesome from "react-fontawesome";
 import fetchProgress from '../../network/progress';
-import { getUserProfile } from '../../network/auth';      
+import { getUserProfile } from '../../network/auth';
+import {renderOverallBifurcationSelectedDateFetchOverlay,renderOverallBifurcation1FetchOverlay,renderOverallBifurcation2FetchOverlay,renderOverallBifurcation3FetchOverlay,renderOverallBifurcation4FetchOverlay,renderOverallBifurcationSelectedRangeFetchOverlay} from '../leaderboard_healpers';     
 
 var CalendarWidget = require('react-calendar-widget');  
 var ReactDOM = require('react-dom');
 
 class Bifurcation extends React.Component{
    constructor(props){
-   	super(props);
+    super(props);
      this.state = {
-				selectedDate: new Date(),
+        selectedDate: new Date(),
         dateRange1:false,
-				dateRange2:false,
-				dateRange3:false,
-				dateRange4:false,
-				isOpen1:false,
-				dropdownOpen1:false,
+        dateRange2:false,
+        dateRange3:false,
+        dateRange4:false,
+        isOpen1:false,
+        dropdownOpen1:false,
         dropdownOpen:false,
-				fetching_ql1:false,
-				fetching_ql2:false,
-				fetching_ql3:false,
-				fetching_ql4:false,
-				bf1_start_date:'',
-				bf2_start_date:'', 
-				bf3_start_date:'',
-				bf1_end_date:'',
-				bf2_end_date:'',
-				bf3_end_date:'', 
+        fetching_ql1:false,
+        fetching_ql2:false,
+        fetching_ql3:false,
+        fetching_ql4:false,
+        bf1_start_date:'',
+        bf2_start_date:'', 
+        bf3_start_date:'',
+        bf1_end_date:'',
+        bf2_end_date:'',
+        bf3_end_date:'', 
         numberOfDays:7,
-				duration_date:this.getInitialDur(),
-				scrollingLock:false,
-				date:'',
-				capt:'',
+        duration_date:this.getInitialDur(),
+        scrollingLock:false,
+        date:'',
+        capt:'',
         gender:'',
         age:'',
-				selected_range:"week",
+        selected_range:"week",
         selectedRange:{
               dateRange:null,
               rangeType:'today'
             },
-				calendarOpen:false,
-				active_view:true,
-				summary:{
+        calendarOpen:false,
+        active_view:true,
+        fetching_bifurcation:false,
+        fetching_bifurcation1:false,
+        fetching_bifurcation2:false,
+        fetching_bifurcation3:false,
+        fetching_bifurcation4:false,
+        fetching_bifurcation5:false,
+        summary:{
           "overall_health":{
                  "overall_health_gpa_grade":this.getInitialDur(),
                  "cum_days_ohg_got_a":this.getInitialDur(),
@@ -264,7 +271,7 @@ class Bifurcation extends React.Component{
 
       },
 
-				
+        
     }
 
      this.onSubmitDate1 = this.onSubmitDate1.bind(this);
@@ -276,7 +283,7 @@ class Bifurcation extends React.Component{
      this.handleScroll = this.handleScroll.bind(this);
      this.toggle = this.toggle.bind(this);
      this.toggle1 = this.toggle1.bind(this);
-     this.toggleDate1 = this.toggleDate1.bind(this);
+     this.toggleDate1 = this.toggleDate1.bind(this);renderOverallBifurcationSelectedDateFetchOverlay
      this.toggleDate2 = this.toggleDate2.bind(this);
      this.toggleDate3 = this.toggleDate3.bind(this);
      this.toggleDate4 = this.toggleDate4.bind(this);
@@ -299,7 +306,7 @@ class Bifurcation extends React.Component{
      this.renderEc = this.renderEc.bind(this);  
      this.getExerciseConsistencyColors = this.getExerciseConsistencyColors.bind(this);
      this.renderExerciseStats = this.renderExerciseStats.bind(this); 
-     this.getStylesForExerciseduration = this.getStylesForExerciseduration.bind(this);
+     //this.getStylesForExerciseduration = this.getStylesForExerciseduration.bind(this);
      this.exerciseDurColrsSingleDayOr2to6Days = this.exerciseDurColrsSingleDayOr2to6Days.bind(this);
      this.renderActiveMinutes = this.renderActiveMinutes.bind(this);
      this.renderActiveMinutesColors = this.renderActiveMinutesColors.bind(this);
@@ -321,12 +328,21 @@ class Bifurcation extends React.Component{
      this.getGradeStartEndRange = this.getGradeStartEndRange.bind(this);
      this.minuteToHM = this.minuteToHM.bind(this);
      this.strToMin = this.strToMin.bind(this);
+     this.renderPercent = this.renderPercent.bind(this);
+     this.getAlcoholPercent = this.getAlcoholPercent.bind(this);
+     
+     this.renderOverallBifurcationSelectedDateFetchOverlay = renderOverallBifurcationSelectedDateFetchOverlay.bind(this);
+    this.renderOverallBifurcation1FetchOverlay = renderOverallBifurcation1FetchOverlay.bind(this);
+    this.renderOverallBifurcation2FetchOverlay = renderOverallBifurcation2FetchOverlay.bind(this);
+    this.renderOverallBifurcation3FetchOverlay = renderOverallBifurcation3FetchOverlay.bind(this);
+    this.renderOverallBifurcation4FetchOverlay = renderOverallBifurcation4FetchOverlay.bind(this);
+    this.renderOverallBifurcationSelectedRangeFetchOverlay = renderOverallBifurcationSelectedRangeFetchOverlay.bind(this);
 
    }
 
-   	getInitialDur(){
-		 let paDurationInitialState = {
- 			"week":"-",
+    getInitialDur(){
+     let paDurationInitialState = {
+      "week":"-",
             "yesterday":"-",
             "month":"-",
            "custom_range":"-",
@@ -334,13 +350,13 @@ class Bifurcation extends React.Component{
             "year":"-"
        };
        return paDurationInitialState;
-	}
+  }
 
     toggle(){
-		this.setState({
-			dropdownOpen1:!this.state.dropdownOpen1
-		});
-	}
+    this.setState({
+      dropdownOpen1:!this.state.dropdownOpen1
+    });
+  }
 
     toggle1() {
       this.setState({
@@ -349,22 +365,22 @@ class Bifurcation extends React.Component{
     }
 
    toggleDate1(){
-	    this.setState({
-	      dateRange1:!this.state.dateRange1
-	    });
-   	}
+      this.setState({
+        dateRange1:!this.state.dateRange1
+      });
+    }
 
- 	toggleDate2(){
-	    this.setState({
-	      dateRange2:!this.state.dateRange2
-	    });
-   	}
+  toggleDate2(){
+      this.setState({
+        dateRange2:!this.state.dateRange2
+      });
+    }
 
     toggleDate3(){
-	    this.setState({
-	      dateRange3:!this.state.dateRange3
-	    });
-   	}
+      this.setState({
+        dateRange3:!this.state.dateRange3
+      });
+    }
 
     toggleDate4(){
         this.setState({
@@ -373,16 +389,16 @@ class Bifurcation extends React.Component{
     }
     
     toggleDropdown() {
-	    this.setState({
-      		dropdownOpen: !this.state.dropdownOpen
-	    });
-	}
+      this.setState({
+          dropdownOpen: !this.state.dropdownOpen
+      });
+  }
 
     toggleCalendar(){
-	    this.setState({
-      		calendarOpen:!this.state.calendarOpen
-	    });
-  	}
+      this.setState({
+          calendarOpen:!this.state.calendarOpen
+      });
+    }
 
     handleChange(event){
         const target = event.target;
@@ -393,62 +409,62 @@ class Bifurcation extends React.Component{
         });
     }
 
-	onSubmitDate1(event){
-		event.preventDefault();
-		this.setState({
-			dateRange1:!this.state.dateRange1,
-			fetching_ql1:true,
-		},()=>{
-				let custom_ranges = [];
-				if(this.state.bf2_start_date && this.state.bf2_end_date){
-					custom_ranges.push(this.state.bf2_start_date);
-					custom_ranges.push(this.state.bf2_end_date);
-				}
-				if(this.state.bf3_start_date && this.state.bf3_end_date){
-					custom_ranges.push(this.state.bf3_start_date);
-					custom_ranges.push(this.state.bf3_end_date);
-				}
-				custom_ranges.push(this.state.bf1_start_date);
-				custom_ranges.push(this.state.bf1_end_date);
-				let crange1 = this.state.bf1_start_date + " " + "to" + " " + this.state.bf1_end_date ;
+  onSubmitDate1(event){
+    event.preventDefault();
+    this.setState({
+      dateRange1:!this.state.dateRange1,
+      fetching_ql1:true,
+    },()=>{
+        let custom_ranges = [];
+        if(this.state.bf2_start_date && this.state.bf2_end_date){
+          custom_ranges.push(this.state.bf2_start_date);
+          custom_ranges.push(this.state.bf2_end_date);
+        }
+        if(this.state.bf3_start_date && this.state.bf3_end_date){
+          custom_ranges.push(this.state.bf3_start_date);
+          custom_ranges.push(this.state.bf3_end_date);
+        }
+        custom_ranges.push(this.state.bf1_start_date);
+        custom_ranges.push(this.state.bf1_end_date);
+        let crange1 = this.state.bf1_start_date + " " + "to" + " " + this.state.bf1_end_date ;
         let selected_range = {
             range:crange1,
             duration:this.headerDates(crange1),
             caption:""
        }
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,
-				              custom_ranges,selected_range);
-		});
-	}
+                      custom_ranges,selected_range);
+    });
+  }
 
-	onSubmitDate2(event){
-		event.preventDefault();
-		this.setState({
-			dateRange2:!this.state.dateRange2,
-			fetching_ql2:true,
-		},()=>{
-			let custom_ranges = [];
-			if(this.state.bf1_start_date && this.state.bf1_end_date){
-			custom_ranges.push(this.state.bf1_start_date);
-			custom_ranges.push(this.state.bf1_end_date);
-			}
-			if(this.state.bf3_start_date && this.state.bf3_end_date){
-			custom_ranges.push(this.state.bf3_start_date);
-			custom_ranges.push(this.state.bf3_end_date);
-			}
+  onSubmitDate2(event){
+    event.preventDefault();
+    this.setState({
+      dateRange2:!this.state.dateRange2,
+      fetching_ql2:true,
+    },()=>{
+      let custom_ranges = [];
+      if(this.state.bf1_start_date && this.state.bf1_end_date){
+      custom_ranges.push(this.state.bf1_start_date);
+      custom_ranges.push(this.state.bf1_end_date);
+      }
+      if(this.state.bf3_start_date && this.state.bf3_end_date){
+      custom_ranges.push(this.state.bf3_start_date);
+      custom_ranges.push(this.state.bf3_end_date);
+      }
 
-			custom_ranges.push(this.state.bf2_start_date);
-			custom_ranges.push(this.state.bf2_end_date);
-			let crange1 = this.state.bf2_start_date + " " + "to" + " " + this.state.bf2_end_date; 
-			let selected_range = {
-			range:crange1,
-			duration:this.headerDates(crange1),
-			caption:""
-			}
-			fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,
-				          custom_ranges,selected_range);
-		});
-	}
+      custom_ranges.push(this.state.bf2_start_date);
+      custom_ranges.push(this.state.bf2_end_date);
+      let crange1 = this.state.bf2_start_date + " " + "to" + " " + this.state.bf2_end_date; 
+      let selected_range = {
+      range:crange1,
+      duration:this.headerDates(crange1),
+      caption:""
+      }
+      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,
+                  custom_ranges,selected_range);
+    });
+  }
  onSubmitDate3(event){
     event.preventDefault();
     this.setState({
@@ -473,7 +489,7 @@ class Bifurcation extends React.Component{
             caption:""
        }
      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,
-     	           custom_ranges,selected_range);
+                 custom_ranges,selected_range);
     });
   }
 
@@ -507,24 +523,29 @@ class Bifurcation extends React.Component{
   }
 
   successProgress(data,renderAfterSuccess=undefined){
-    console.log(data.data.duration_date,"duration date")
     let week = data.data.duration_date["week"]
     let week_start = moment(data.data.duration_date["week"].split('to')[0]).format("MMM DD, YYYY")
     let week_end = moment(data.data.duration_date["week"].split('to')[1]).format("MMM DD, YYYY")
     week = week_start + ' to ' + week_end;
-		let date =moment(data.data.duration_date["today"]).format("MMM DD, YYYY"); 
-	    this.setState({
-	    	fetching_ql1:false,
+    let date =moment(data.data.duration_date["today"]).format("MMM DD, YYYY"); 
+      this.setState({
+        fetching_ql1:false,
             fetching_ql2:false,
             fetching_ql3:false,
             fetching_ql4:false,
-	        report_date:data.data.report_date,
-	        summary:data.data.summary,
-	        duration_date:data.data.duration_date,
-	        capt:"Week",
-	        date:week,
+             // fetching_bifurcation:false,
+             // fetching_bifurcation1:false,   
+             fetching_bifurcation2:false, 
+             fetching_bifurcation3:false, 
+             fetching_bifurcation4:false,
+             // fetching_bifurcation5:false, 
+          report_date:data.data.report_date,
+          summary:data.data.summary,
+          duration_date:data.data.duration_date,
+          capt:"Week",
+          date:week,
 
-	    },()=>{
+      },()=>{
             if(renderAfterSuccess){
                 let crange = renderAfterSuccess.range;
                 let selectedRange = {
@@ -540,20 +561,28 @@ class Bifurcation extends React.Component{
                     selectedRange
                 );
             }
-        });
-  	}
-  	errorProgress(error){
-       console.log(error.message);
+        });setTimeout(()=>{this.setState({
+                fetching_bifurcation:false,
+                 fetching_bifurcation1:false, 
+              })},200)
+    }
+    errorProgress(error){
+        console.log(error.message);
        this.setState({
-       		fetching_ql1:false,
+          fetching_ql1:false,
             fetching_ql2:false,
             fetching_ql3:false,
             fetching_ql4:false,
+            fetching_bifurcation:false,
+            fetching_bifurcation1:false,  
+            fetching_bifurcation2:false,  
+            fetching_bifurcation3:false,  
+            fetching_bifurcation4:false,
        })
     }
 
   reanderAllHrr(period,date,capt,selectedRange){
-  	let numberOfDays;
+    let numberOfDays;
     if(selectedRange.rangeType !== 'today' && selectedRange.rangeType !== 'yesterday'){
       let startDate = selectedRange.dateRange.split("to")[0].trim();
       let endDate = selectedRange.dateRange.split("to")[1].trim();
@@ -565,7 +594,9 @@ class Bifurcation extends React.Component{
     else if(selectedRange.rangeType == 'today'){
               this.setState({
                 numberOfDays:moment(this.state.selectedDate).format('MMM D, YYYY'),
+                
               })
+             
          }
     else if(selectedRange.rangeType == 'yesterday'){
       var d = new Date(this.state.selectedDate)
@@ -582,12 +613,21 @@ class Bifurcation extends React.Component{
       })
     }
       this.setState({
-  			selected_range:period,
-  			date:date,
-  			capt:capt,
+        selected_range:period,
+        date:date,
+        capt:capt,
         selectedRange:selectedRange,
-  		});
-  	}
+        
+      },()=>{
+        this.setState({
+          fetching_bifurcation5:true, 
+        })
+        
+      });
+       setTimeout(()=>{this.setState({
+                fetching_bifurcation5:false,
+              })},200)
+    }
 
    successProfile(data){
     this.setState({
@@ -595,18 +635,18 @@ class Bifurcation extends React.Component{
       age:data.data.user_age
     })
    }
-	componentDidMount(){
-		this.setState({
-			fetching_ql4:true,     
-		},()=>{
-			fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
+  componentDidMount(){
+    this.setState({
+      fetching_bifurcation1:true,     
+    },()=>{
+      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
       getUserProfile(this.successProfile);
 
-		});
-		window.addEventListener('scroll', this.handleScroll);
-	}
+    });
+    window.addEventListener('scroll', this.handleScroll);
+  }
 
-	handleScroll() {
+  handleScroll() {
       if (window.scrollY >= 150 && !this.state.scrollingLock) {
         this.setState({
           scrollingLock: true
@@ -616,122 +656,123 @@ class Bifurcation extends React.Component{
           scrollingLock: false
         });
       }
-  	}
+    }
 
-  	processDate(selectedDate){ 
-	    this.setState({
-	      fetching_ql4:true,
-	      selectedDate: selectedDate,
-	      calendarOpen:!this.state.calendarOpen,
+    processDate(selectedDate){ 
+      this.setState({
+        fetching_ql4:true,
+        selectedDate: selectedDate,
+        calendarOpen:!this.state.calendarOpen,
         numberOfDays:7,
-	      selected_range:"week",                              
-	    },()=>{
-	      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
-	    });
-  	}
+        selected_range:"week",
+        fetching_bifurcation:true,   
+        fetching_bifurcation1:true, 
+        fetching_bifurcation2:true, 
+        fetching_bifurcation3:true, 
+        fetching_bifurcation4:true,                         
+      },()=>{
+        fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
+      });
+    }
 
    createExcelPrintURL(){
-    	// code
-	    let custom_ranges = [];
-	    let selected_date = moment(this.state.selectedDate).format("YYYY-MM-DD");
-	    if(this.state.bf1_start_date && this.state.bf1_end_date){
-	        custom_ranges.push(this.state.bf1_start_date);
-	        custom_ranges.push(this.state.bf1_end_date);
-	    }
+      // code
+      let custom_ranges = [];
+      let selected_date = moment(this.state.selectedDate).format("YYYY-MM-DD");
+      if(this.state.bf1_start_date && this.state.bf1_end_date){
+          custom_ranges.push(this.state.bf1_start_date);
+          custom_ranges.push(this.state.bf1_end_date);
+      }
 
-	    if(this.state.bf2_start_date && this.state.bf2_end_date){
-	        custom_ranges.push(this.state.bf2_start_date);
-	        custom_ranges.push(this.state.bf2_end_date);
-	    }
-	     if(this.state.bf3_start_date && this.state.bf3_end_date){
-	        custom_ranges.push(this.state.bf3_start_date);
-	        custom_ranges.push(this.state.bf3_end_date);
-	    }
-	    custom_ranges = (custom_ranges && custom_ranges.length) ? custom_ranges.toString():'';
-	    let excelURL = `progress/print/progress/excel?date=${selected_date}&&custom_ranges=${custom_ranges}`;
-	    return excelURL;
-	}
+      if(this.state.bf2_start_date && this.state.bf2_end_date){
+          custom_ranges.push(this.state.bf2_start_date);
+          custom_ranges.push(this.state.bf2_end_date);
+      }
+       if(this.state.bf3_start_date && this.state.bf3_end_date){
+          custom_ranges.push(this.state.bf3_start_date);
+          custom_ranges.push(this.state.bf3_end_date);
+      }
+      custom_ranges = (custom_ranges && custom_ranges.length) ? custom_ranges.toString():'';
+      let excelURL = `progress/print/progress/excel?date=${selected_date}&&custom_ranges=${custom_ranges}`;
+      return excelURL;
+  }
 
-	renderDateRangeDropdown(value,value5){
-  		let duration_type = ["today","yesterday","week","month","year","custom_range"];
-  		let duration_type1 = ["today","yesterday","week","month","year",];
-  		let durations = [];
-  		for(let [key,value1] of Object.entries(value)){
-  			if(key == "overall_health"){
-	  			for(let [key1,value2] of Object.entries(value1)){
-	  				if(key1 == "overall_health_gpa"){
-		  				for(let duration of duration_type){
-		  					let val = value2[duration];
-		  					if(duration == "custom_range" && val){
-		  						for(let [range,value3] of Object.entries(val)){
-		  							duration_type1.push(range);
-		  						}
-		  					}
-		  				}
-		  			}
-	  			}
-	  		}
-  		}
+  renderDateRangeDropdown(value,value5){
+      let duration_type = ["today","yesterday","week","month","year","custom_range"];
+      let duration_type1 = ["today","yesterday","week","month","year",];
+      let durations = [];
+      for(let [key,value1] of Object.entries(value)){
+        if(key == "overall_health"){
+          for(let [key1,value2] of Object.entries(value1)){
+            if(key1 == "overall_health_gpa"){
+              for(let duration of duration_type){
+                let val = value2[duration];
+                if(duration == "custom_range" && val){
+                  for(let [range,value3] of Object.entries(val)){
+                    duration_type1.push(range);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
   
-  		let date;
-	  	let tableHeaders = [];
-	  	for(let dur of duration_type1){
+      let date;
+      let tableHeaders = [];
+      for(let dur of duration_type1){
         let selectedRange = {
           dateRange:null,
           rangeType:null
         };
-	  		let rank;
-	  		let capt = dur[0].toUpperCase() + dur.slice(1)
-	  		if(dur == "today"){
-	  			date = moment(value5[dur]).format('MMM DD, YYYY');
+        let rank;
+        let capt = dur[0].toUpperCase() + dur.slice(1)
+        if(dur == "today"){
+          date = moment(value5[dur]).format('MMM DD, YYYY');
           selectedRange['dateRange'] = value5[dur];
           selectedRange['rangeType'] = dur;
-	  			
-	  		}
-	  		else if(dur == "yesterday"){
-	  			date = moment(value5[dur]).format('MMM DD, YYYY');
+          
+        }
+        else if(dur == "yesterday"){
+          date = moment(value5[dur]).format('MMM DD, YYYY');
            selectedRange['dateRange'] = value5[dur];
            selectedRange['rangeType'] = dur;
-	  			
-	  		}
-	  		else if(dur == "week"){
-		  		date = this.headerDates(value5[dur]);
+        }
+        else if(dur == "week"){
+          date = this.headerDates(value5[dur]);
           selectedRange['dateRange'] = value5[dur];
            selectedRange['rangeType'] = dur;
-		  		
-	  		}
-	  		else if(dur == "month"){
-		  		date = this.headerDates(value5[dur]);
+        }
+        else if(dur == "month"){
+          date = this.headerDates(value5[dur]);
           selectedRange['dateRange'] = value5[dur];
            selectedRange['rangeType'] = dur;
-		  		
-	  		}
-	  		else if(dur == "year"){
-		  		date = this.headerDates(value5[dur]);
+        }
+        else if(dur == "year"){
+          date = this.headerDates(value5[dur]);
           selectedRange['dateRange'] = value5[dur];
            selectedRange['rangeType'] = dur;
-		  		
-	  		}
-	  		else{
-	  			date = this.headerDates(dur);
-	  			capt = "";
+        }
+        else{
+          date = this.headerDates(dur);
+          capt = "";
           selectedRange['dateRange'] = dur;
           selectedRange['rangeType'] = 'custom_range';
-	  		}
+        }
 
-  			tableHeaders.push(
-  			 <DropdownItem>
-  			 <a className="dropdown-item" 
-	  			onClick = {this.reanderAllHrr.bind(this,dur,date,capt,selectedRange)}
-	  			style = {{fontSize:"13px"}}>
-	  			{capt}<br/>{date}
-  			</a></DropdownItem>);
-	  	}
-	  return tableHeaders;	
-  	}
-	
-	headerDates(value){
-   	   let str = value;
+        tableHeaders.push(
+         <DropdownItem>
+         <a className="dropdown-item" 
+          onClick = {this.reanderAllHrr.bind(this,dur,date,capt,selectedRange)}
+          style = {{fontSize:"13px"}}>
+          {capt}<br/>{date}
+        </a></DropdownItem>);
+      }
+    return tableHeaders;  
+    }
+  
+  headerDates(value){
+       let str = value;
        let d = str.split(" ");
        let d1 = d[0];
        let date1 =moment(d1).format('MMM DD, YYYY');
@@ -739,7 +780,7 @@ class Bifurcation extends React.Component{
        let date2 =moment(d2).format('MMM DD, YYYY');
        let date = date1 + ' to ' + date2;
        return date;  
-	}
+  }
 
    renderValue(value,dur){
       let score = "";
@@ -765,11 +806,11 @@ class Bifurcation extends React.Component{
    let ohgpa_c = this.renderValue(ohgpavalue.cum_days_ohg_got_c,dur);
    let ohgpa_d = this.renderValue(ohgpavalue.cum_days_ohg_got_d,dur);
    let ohgpa_f = this.renderValue(ohgpavalue.cum_days_ohg_got_f,dur);
-   let ohgpa_prcnt_a = this.renderValue(ohgpavalue.prcnt_days_ohg_got_a,dur);
-   let ohgpa_prcnt_b = this.renderValue(ohgpavalue.prcnt_days_ohg_got_b,dur);
-   let ohgpa_prcnt_c = this.renderValue(ohgpavalue.prcnt_days_ohg_got_c,dur);
-   let ohgpa_prcnt_d = this.renderValue(ohgpavalue.prcnt_days_ohg_got_d,dur);
-   let ohgpa_prcnt_f = this.renderValue(ohgpavalue.prcnt_days_ohg_got_f,dur);
+   let ohgpa_prcnt_a = this.renderPercent(this.renderValue(ohgpavalue.prcnt_days_ohg_got_a,dur));
+   let ohgpa_prcnt_b = this.renderPercent(this.renderValue(ohgpavalue.prcnt_days_ohg_got_b,dur));
+   let ohgpa_prcnt_c = this.renderPercent(this.renderValue(ohgpavalue.prcnt_days_ohg_got_c,dur));
+   let ohgpa_prcnt_d = this.renderPercent(this.renderValue(ohgpavalue.prcnt_days_ohg_got_d,dur));
+   let ohgpa_prcnt_f = this.renderPercent(this.renderValue(ohgpavalue.prcnt_days_ohg_got_f,dur));
    let numberOfDays = this.state.numberOfDays;
 
     if( overallgpa == null || overallgpa == undefined ){
@@ -826,7 +867,6 @@ class Bifurcation extends React.Component{
     ohgpa_prcnt_f = '-';
    }
 
-
    let Table =  <table className="bifurcation_table">
                 <tr>
                 <th colSpan={2}>Avg Overall Health GPA</th>
@@ -870,7 +910,7 @@ class Bifurcation extends React.Component{
 
   return Table;
   }
-	
+  
   getOverallGpaColors(ogpascore){
     let background= '';
     let color='';
@@ -910,21 +950,21 @@ renderNonExerciseSteps(nesvalue,dur){
   let nesvalue_c = this.renderValue(nesvalue.cum_days_nes_got_c,dur);
   let nesvalue_d = this.renderValue(nesvalue.cum_days_nes_got_d,dur);
   let nesvalue_f = this.renderValue(nesvalue.cum_days_nes_got_f,dur);
-  let nesvalue_prcnt_a = this.renderValue(nesvalue.prcnt_days_nes_got_a,dur);
-  let nesvalue_prcnt_b = this.renderValue(nesvalue.prcnt_days_nes_got_b,dur);
-  let nesvalue_prcnt_c = this.renderValue(nesvalue.prcnt_days_nes_got_c,dur);
-  let nesvalue_prcnt_d = this.renderValue(nesvalue.prcnt_days_nes_got_d,dur);
-  let nesvalue_prcnt_f = this.renderValue(nesvalue.prcnt_days_nes_got_f,dur);
+  let nesvalue_prcnt_a = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_got_a,dur));
+  let nesvalue_prcnt_b = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_got_b,dur));
+  let nesvalue_prcnt_c = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_got_c,dur));
+  let nesvalue_prcnt_d = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_got_d,dur));
+  let nesvalue_prcnt_f = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_got_f,dur));
   let nesvalue_above_10k = this.renderValue(nesvalue.cum_days_nes_above_10k,dur);
   let nesvalue_above_20k = this.renderValue(nesvalue.cum_days_nes_above_20k,dur);
   let nesvalue_above_25k = this.renderValue(nesvalue.cum_days_nes_above_25k,dur);
   let nesvalue_above_30k = this.renderValue(nesvalue.cum_days_nes_above_30k,dur);
   let nesvalue_above_40k = this.renderValue(nesvalue.cum_days_nes_above_40k,dur);
-  let nesvalue_prcnt_above_10k = this.renderValue(nesvalue.prcnt_days_nes_above_10k,dur);
-  let nesvalue_prcnt_above_20k = this.renderValue(nesvalue.prcnt_days_nes_above_20k,dur);
-  let nesvalue_prcnt_above_25k = this.renderValue(nesvalue.prcnt_days_nes_above_25k,dur);
-  let nesvalue_prcnt_above_30k = this.renderValue(nesvalue.prcnt_days_nes_above_30k,dur);
-  let nesvalue_prcnt_above_40k = this.renderValue(nesvalue.prcnt_days_nes_above_40k,dur);
+  let nesvalue_prcnt_above_10k = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_above_10k,dur));
+  let nesvalue_prcnt_above_20k = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_above_20k,dur));
+  let nesvalue_prcnt_above_25k = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_above_25k,dur));
+  let nesvalue_prcnt_above_30k = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_above_30k,dur));
+  let nesvalue_prcnt_above_40k = this.renderPercent(this.renderValue(nesvalue.prcnt_days_nes_above_40k,dur));
   let numberOfDays = this.state.numberOfDays;
 
   if( avg_nonExerciseStepsScore == null || avg_nonExerciseStepsScore == undefined ){
@@ -1017,7 +1057,7 @@ renderNonExerciseSteps(nesvalue,dur){
                 <th colSpan={3}>Non Exercise Steps Grade</th>
                 </tr>
                 <tr>
-                <td colSpan={2} style={{backgroundColor:avg_nonExerciseStepsColor[0],color:avg_nonExerciseStepsColor[1]}}>{avg_nonExerciseStepsScore}</td>
+                <td colSpan={2} style={{backgroundColor:avg_nonExerciseStepsColor[0],color:avg_nonExerciseStepsColor[1]}}>{this.renderComma(avg_nonExerciseStepsScore)}</td>
                 <td colSpan={3} style={{backgroundColor:nonExerciseStepsgradecolor[0],color:nonExerciseStepsgradecolor[1]}}>{nonExerciseStepsgrade}</td>
                 </tr>
                 <th colSpan={5}>Daily Distribution</th>
@@ -1113,21 +1153,21 @@ renderTotalExerciseSteps(tesvalue,dur){
   let tesvalue_c = this.renderValue(tesvalue.cum_days_ts_got_c,dur);
   let tesvalue_d = this.renderValue(tesvalue.cum_days_ts_got_d,dur);
   let tesvalue_f = this.renderValue(tesvalue.cum_days_ts_got_f,dur);
-  let tesvalue_prcnt_a = this.renderValue(tesvalue.prcnt_days_ts_got_a,dur);
-  let tesvalue_prcnt_b = this.renderValue(tesvalue.prcnt_days_ts_got_b,dur);
-  let tesvalue_prcnt_c = this.renderValue(tesvalue.prcnt_days_ts_got_c,dur);
-  let tesvalue_prcnt_d = this.renderValue(tesvalue.prcnt_days_ts_got_d,dur);
-  let tesvalue_prcnt_f = this.renderValue(tesvalue.prcnt_days_ts_got_f,dur);
+  let tesvalue_prcnt_a = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_got_a,dur));
+  let tesvalue_prcnt_b = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_got_b,dur));
+  let tesvalue_prcnt_c = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_got_c,dur));
+  let tesvalue_prcnt_d = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_got_d,dur));
+  let tesvalue_prcnt_f = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_got_f,dur));
   let tesvalue_above_10k = this.renderValue(tesvalue.cum_days_ts_above_10k,dur);
   let tesvalue_above_20k = this.renderValue(tesvalue.cum_days_ts_above_20k,dur);
   let tesvalue_above_25k = this.renderValue(tesvalue.cum_days_ts_above_25k,dur);
   let tesvalue_above_30k = this.renderValue(tesvalue.cum_days_ts_above_30k,dur);
   let tesvalue_above_40k = this.renderValue(tesvalue.cum_days_ts_above_40k,dur);
-  let tesvalue_prcnt_above_10k = this.renderValue(tesvalue.prcnt_days_ts_above_10k,dur);
-  let tesvalue_prcnt_above_20k = this.renderValue(tesvalue.prcnt_days_ts_above_20k,dur);
-  let tesvalue_prcnt_above_25k = this.renderValue(tesvalue.prcnt_days_ts_above_25k,dur);
-  let tesvalue_prcnt_above_30k = this.renderValue(tesvalue.prcnt_days_ts_above_30k,dur);
-  let tesvalue_prcnt_above_40k = this.renderValue(tesvalue.prcnt_days_ts_above_40k,dur);
+  let tesvalue_prcnt_above_10k = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_above_10k,dur));
+  let tesvalue_prcnt_above_20k = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_above_20k,dur));
+  let tesvalue_prcnt_above_25k = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_above_25k,dur));
+  let tesvalue_prcnt_above_30k = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_above_30k,dur));
+  let tesvalue_prcnt_above_40k = this.renderPercent(this.renderValue(tesvalue.prcnt_days_ts_above_40k,dur));
   let totalSteps = this.renderValue(tesvalue.total_steps,dur);
   let numberOfDays = this.state.numberOfDays;
 
@@ -1205,9 +1245,10 @@ renderTotalExerciseSteps(tesvalue,dur){
                   <th colSpan={5}>Total Steps</th>
                   </tr>
                   <tr>
-                  <td colSpan={5}>{totalSteps}</td>
+                  <td  colSpan={5} style={{fontWeight:'bold'}}>{this.renderComma(totalSteps)}</td>
                   </tr>
                   <th colSpan={5}>Daily Distribution</th> 
+
                   <tr>
                   <td style={{backgroundColor:'green',color:'white'}}>10k+</td>
                   <td style={{backgroundColor:'#32CD32',color:'white'}}>7.5k -<br/>9.99k</td>
@@ -1257,6 +1298,21 @@ renderTotalExerciseSteps(tesvalue,dur){
                   </table>
     return Table;   
 }
+renderComma(value){
+  let steps = '';
+  if(value){
+    value += '';
+    var x = value.split('.');
+    var x1 = x[0];
+      var x2 = x.length > 1 ? '.' + x[1] : '';
+      var rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      }
+      steps = x1 + x2;
+    } 
+  return steps;
+}
 
 renderMcs(mcvalue,dur){
   let mcvalue_a = this.renderValue(mcvalue.cum_days_mcs_got_a,dur);
@@ -1264,11 +1320,11 @@ renderMcs(mcvalue,dur){
   let mcvalue_c = this.renderValue(mcvalue.cum_days_mcs_got_c,dur);
   let mcvalue_d = this.renderValue(mcvalue.cum_days_mcs_got_d,dur);
   let mcvalue_f = this.renderValue(mcvalue.cum_days_mcs_got_f,dur);
-  let mcvalue_prcnt_a = this.renderValue(mcvalue.prcnt_days_mcs_got_a,dur);
-  let mcvalue_prcnt_b = this.renderValue(mcvalue.prcnt_days_mcs_got_b,dur);
-  let mcvalue_prcnt_c = this.renderValue(mcvalue.prcnt_days_mcs_got_c,dur);
-  let mcvalue_prcnt_d = this.renderValue(mcvalue.prcnt_days_mcs_got_d,dur);
-  let mcvalue_prcnt_f = this.renderValue(mcvalue.prcnt_days_mcs_got_f,dur);
+  let mcvalue_prcnt_a = this.renderPercent(this.renderValue(mcvalue.prcnt_days_mcs_got_a,dur));
+  let mcvalue_prcnt_b = this.renderPercent(this.renderValue(mcvalue.prcnt_days_mcs_got_b,dur));
+  let mcvalue_prcnt_c = this.renderPercent(this.renderValue(mcvalue.prcnt_days_mcs_got_c,dur));
+  let mcvalue_prcnt_d = this.renderPercent(this.renderValue(mcvalue.prcnt_days_mcs_got_d,dur));
+  let mcvalue_prcnt_f = this.renderPercent(this.renderValue(mcvalue.prcnt_days_mcs_got_f,dur));
   let mcgrade = this.renderValue(mcvalue.movement_consistency_grade,dur);
   let mcscore = this.renderValue(mcvalue.movement_consistency_score,dur);
   let numberOfDays = this.state.numberOfDays;
@@ -1325,7 +1381,7 @@ renderMcs(mcvalue,dur){
  
  let Table =  <table className="bifurcation_table">
                 <tr>
-                <th colSpan={2}>Moment Consistency Score</th>
+                <th colSpan={2}>Movement Consistency Score (MCS)</th>
                 <th colSpan={3}>MCS Grade</th>
                 </tr>
                 <tr>
@@ -1404,11 +1460,11 @@ renderMcs(mcvalue,dur){
     let ecvalue_c = this.renderValue(ecvalue.cum_days_ec_got_c,dur);
     let ecvalue_d = this.renderValue(ecvalue.cum_days_ec_got_d,dur);
     let ecvalue_f = this.renderValue(ecvalue.cum_days_ec_got_f,dur);
-    let ecvalue_prcnt_a = this.renderValue(ecvalue.prcnt_days_ec_got_a,dur);
-    let ecvalue_prcnt_b = this.renderValue(ecvalue.prcnt_days_ec_got_b,dur);
-    let ecvalue_prcnt_c = this.renderValue(ecvalue.prcnt_days_ec_got_c,dur);
-    let ecvalue_prcnt_d = this.renderValue(ecvalue.prcnt_days_ec_got_d,dur);
-    let ecvalue_prcnt_f = this.renderValue(ecvalue.prcnt_days_ec_got_f,dur);
+    let ecvalue_prcnt_a = this.renderPercent(this.renderValue(ecvalue.prcnt_days_ec_got_a,dur));
+    let ecvalue_prcnt_b = this.renderPercent(this.renderValue(ecvalue.prcnt_days_ec_got_b,dur));
+    let ecvalue_prcnt_c = this.renderPercent(this.renderValue(ecvalue.prcnt_days_ec_got_c,dur));
+    let ecvalue_prcnt_d = this.renderPercent(this.renderValue(ecvalue.prcnt_days_ec_got_d,dur));
+    let ecvalue_prcnt_f = this.renderPercent(this.renderValue(ecvalue.prcnt_days_ec_got_f,dur));
     let avgExercisePerWeekValue = this.renderValue(ecvalue.avg_no_of_days_exercises_per_week,dur);
     let ecGrade = this.renderValue(ecvalue.exercise_consistency_grade,dur);
     let numberOfDays = this.state.numberOfDays;
@@ -1485,7 +1541,7 @@ renderMcs(mcvalue,dur){
                   <th style={{backgroundColor:'red',color:'black'}}>F</th>
                   </tr> 
                   <tr>
-                  <td style={{backgroundColor:'green',color:'white'}}>>=4</td>
+                  <td style={{backgroundColor:'green',color:'white'}}>{'<='}4</td>
                   <td style={{backgroundColor:'#32CD32',color:'white'}}>3.0 -<br/>3.99</td>
                   <td style={{backgroundColor:'Yellow',color:'black'}}>2.0 -<br/>2.99</td>
                   <td style={{backgroundColor:'orange',color:'white'}}>1.0 -<br/>1.99</td>
@@ -1548,14 +1604,14 @@ renderMcs(mcvalue,dur){
     let exvalue_c = this.renderValue(exvalue.cum_days_workout_dur_got_c,dur);
     let exvalue_d = this.renderValue(exvalue.cum_days_workout_dur_got_d,dur);
     let exvalue_f = this.renderValue(exvalue.cum_days_workout_dur_got_f,dur);
-    let exvalue_prcnt_a = this.renderValue(exvalue.prcnt_days_workout_dur_got_a,dur);
-    let exvalue_prcnt_b = this.renderValue(exvalue.prcnt_days_workout_dur_got_b,dur);
-    let exvalue_prcnt_c = this.renderValue(exvalue.prcnt_days_workout_dur_got_c,dur);
-    let exvalue_prcnt_d = this.renderValue(exvalue.prcnt_days_workout_dur_got_d,dur);
-    let exvalue_prcnt_f = this.renderValue(exvalue.prcnt_days_workout_dur_got_f,dur);
+    let exvalue_prcnt_a = this.renderPercent(this.renderValue(exvalue.prcnt_days_workout_dur_got_a,dur));
+    let exvalue_prcnt_b = this.renderPercent(this.renderValue(exvalue.prcnt_days_workout_dur_got_b,dur));
+    let exvalue_prcnt_c = this.renderPercent(this.renderValue(exvalue.prcnt_days_workout_dur_got_c,dur));
+    let exvalue_prcnt_d = this.renderPercent(this.renderValue(exvalue.prcnt_days_workout_dur_got_d,dur));
+    let exvalue_prcnt_f = this.renderPercent(this.renderValue(exvalue.prcnt_days_workout_dur_got_f,dur));
     let workoutDurationHrMin = this.renderValue(exvalue.workout_duration_hours_min,dur);
     let numberOfDays = this.state.numberOfDays;
-    
+
     if( exvalue_a == null || exvalue_a == undefined || exvalue_a == ' ' ){
           exvalue_a = '-';
         }
@@ -1595,8 +1651,8 @@ renderMcs(mcvalue,dur){
     if( workoutDurationHrMin == "Not Provided"){
       workoutDurationHrMin = 'NP'
     }
-
-    let workoutdurationColors = this.getStylesForExerciseduration(workoutDurationHrMin,this.state.selectedRange);
+  
+    let workoutdurationColors = this.exerciseDurColrsSingleDayOr2to6Days(workoutDurationHrMin);
     
     let Table =  <table className="bifurcation_table">
                   <tr>
@@ -1622,10 +1678,10 @@ renderMcs(mcvalue,dur){
                   </tr>
                   <tr>
                   <td>{exvalue_a}</td>
-                  <td>{exvalue_a}</td>
-                  <td>{exvalue_a}</td>
-                  <td>{exvalue_a}</td>
-                  <td>{exvalue_a}</td>
+                  <td>{exvalue_b}</td>
+                  <td>{exvalue_c}</td>
+                  <td>{exvalue_d}</td>
+                  <td>{exvalue_f}</td>
                   </tr>
                   <tr>
                   <td>{exvalue_prcnt_a}</td>
@@ -1647,85 +1703,31 @@ renderMcs(mcvalue,dur){
     return s_time;
   }
 
- getStylesForExerciseduration(exDurHrMin,selectedRange){
-    let exDurHrMinInSeconds = this.strToSecond(exDurHrMin);
-    let background = "";
-    let color = "";
-    let dateRange;
-    
-    if(selectedRange.rangeType == 'today' || selectedRange.rangeType == 'yesterday'){
-      let oneTosixdaysColors = this.exerciseDurColrsSingleDayOr2to6Days(exDurHrMinInSeconds,background,color);
-      return oneTosixdaysColors; 
-    }
-    
-      let startDate = selectedRange.dateRange.split("to")[0].trim();
-      let endDate = selectedRange.dateRange.split("to")[1].trim();
-      let numberOfDays = Math.abs(moment(endDate).diff(moment(startDate), 'days'))+1;
-      if(numberOfDays >= 7){
-          let avgValueInSecPer7Days = Math.round(exDurHrMinInSeconds / numberOfDays) * 7
-          if(avgValueInSecPer7Days == 'NA' || avgValueInSecPer7Days == 'NR' || avgValueInSecPer7Days == 'NP'){
-            background= "";
-              color= "";
-          }
-          else if(avgValueInSecPer7Days == this.strToSecond("0:00")){
-              background = "red";
-              color = "black";
-          }
-          else if(avgValueInSecPer7Days > this.strToSecond("0:00") 
-                  && avgValueInSecPer7Days <= this.strToSecond("01:39")){
-              background = "orange";
-              color = "white";
-          }
-          else if(avgValueInSecPer7Days > this.strToSecond("01:39") 
-                   && avgValueInSecPer7Days <= this.strToSecond("02:29")){
-              background = "yellow";
-              color = "black";
-          }
-          else if((avgValueInSecPer7Days > this.strToSecond("02:29") 
-                   && avgValueInSecPer7Days <= this.strToSecond("04:59"))){
-              background = "#32CD32";
-              color = "white";
-          }
-          else if(avgValueInSecPer7Days > this.strToSecond("04:59")){
-              background = "green";
-              color = "white";
-          }
-           return[background,color];
-        }
-       
-      else if(numberOfDays >= 2 && numberOfDays <= 6){
-        let avgValueInSecPerDay = Math.round(exDurHrMinInSeconds / numberOfDays)
-        let oneTosixdaysColors = this.exerciseDurColrsSingleDayOr2to6Days(avgValueInSecPerDay,background,color);
-        return oneTosixdaysColors;
-      }
-      else {
-        let oneTosixdaysColors = this.exerciseDurColrsSingleDayOr2to6Days(exDurHrMinInSeconds,background,color);
-        return oneTosixdaysColors;
-      }         
-  }
-
-  exerciseDurColrsSingleDayOr2to6Days(ExDurHrMinvalue,background,color){
-      if(ExDurHrMinvalue == 'NA' || ExDurHrMinvalue == 'NR' || ExDurHrMinvalue == 'NP'){
+  exerciseDurColrsSingleDayOr2to6Days(ExDurHrMinvalue){
+    let background='';
+    let color='';
+    let exDurHrMinInSeconds = this.strToSecond(ExDurHrMinvalue);    
+      if(exDurHrMinInSeconds == 'NA' || exDurHrMinInSeconds == 'NR' || exDurHrMinInSeconds == 'NP'){
         background='';
         color='';
       }
-      else if(ExDurHrMinvalue == this.strToSecond("0:00")){
+      else if(exDurHrMinInSeconds == this.strToSecond("0:00")){
         background = "red";
           color = "black";
       }
-      else if(this.strToSecond("0:01") <= ExDurHrMinvalue && ExDurHrMinvalue < this.strToSecond("00:15")){
+      else if(this.strToSecond("00:01") <= exDurHrMinInSeconds && exDurHrMinInSeconds < this.strToSecond("00:15")){
         background = "orange";
             color = "white";
         }
-      else if(this.strToSecond("00:15") <= ExDurHrMinvalue && ExDurHrMinvalue < this.strToSecond("00:30")){
+      else if(this.strToSecond("00:15") <= exDurHrMinInSeconds && exDurHrMinInSeconds < this.strToSecond("00:30")){
         background = "yellow";
             color = "black";
         }
-      else if((this.strToSecond("00:30") <= ExDurHrMinvalue && ExDurHrMinvalue < this.strToSecond("01:00"))){
+      else if((this.strToSecond("00:30") <= exDurHrMinInSeconds && exDurHrMinInSeconds < this.strToSecond("01:00"))){
         background = "#32CD32";
             color = "white";
         }
-      else if(this.strToSecond("01:00")<=ExDurHrMinvalue){
+      else if(this.strToSecond("01:00")<=exDurHrMinInSeconds){
         background = "green";
             color = "white";
         }
@@ -1739,11 +1741,11 @@ renderMcs(mcvalue,dur){
   let totalactminvalue_c = this.renderValue(totalactminvalue.cum_days_total_act_min_got_c,dur);
   let totalactminvalue_d = this.renderValue(totalactminvalue.cum_days_total_act_min_got_d,dur);
   let totalactminvalue_f = this.renderValue(totalactminvalue.cum_days_total_act_min_got_f,dur);
-  let totalactminvalue_prcnt_a = this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_a,dur);
-  let totalactminvalue_prcnt_b = this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_b,dur);
-  let totalactminvalue_prcnt_c = this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_c,dur);
-  let totalactminvalue_prcnt_d = this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_d,dur);
-  let totalactminvalue_prcnt_f = this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_f,dur);
+  let totalactminvalue_prcnt_a = this.renderPercent(this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_a,dur));
+  let totalactminvalue_prcnt_b = this.renderPercent(this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_b,dur));
+  let totalactminvalue_prcnt_c = this.renderPercent(this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_c,dur));
+  let totalactminvalue_prcnt_d = this.renderPercent(this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_d,dur));
+  let totalactminvalue_prcnt_f = this.renderPercent(this.renderValue(totalactminvalue.prcnt_days_total_act_min_got_f,dur));
   let numberOfDays = this.state.numberOfDays;
   
    if( avg_actminWithoutSleep == null || avg_actminWithoutSleep == undefined ){
@@ -1925,11 +1927,11 @@ renderActiveMinutesColors(totalActiveDuration,exerciseActiveMin=null){
    let amexsvalue_c = this.renderValue(amexsvalue.cum_days_act_min_no_sleep_exec_got_c,dur);
    let amexsvalue_d = this.renderValue(amexsvalue.cum_days_act_min_no_sleep_exec_got_d,dur);
    let amexsvalue_f = this.renderValue(amexsvalue.cum_days_act_min_no_sleep_exec_got_f,dur);
-   let amexsvalue_prcnt_a = this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_a,dur);
-   let amexsvalue_prcnt_b = this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_b,dur);
-   let amexsvalue_prcnt_c = this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_c,dur);
-   let amexsvalue_prcnt_d = this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_d,dur);
-   let amexsvalue_prcnt_f = this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_f,dur);
+   let amexsvalue_prcnt_a = this.renderPercent(this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_a,dur));
+   let amexsvalue_prcnt_b = this.renderPercent(this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_b,dur));
+   let amexsvalue_prcnt_c = this.renderPercent(this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_c,dur));
+   let amexsvalue_prcnt_d = this.renderPercent(this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_d,dur));
+   let amexsvalue_prcnt_f = this.renderPercent(this.renderValue(amexsvalue.prcnt_days_act_min_no_sleep_exec_got_f,dur));
    let numberOfDays = this.state.numberOfDays;
 
    
@@ -1938,7 +1940,7 @@ renderActiveMinutesColors(totalActiveDuration,exerciseActiveMin=null){
    }
    if( amexsvalue_avg == "Not Reported"){
       amexsvalue_avg = 'NR';
-   }
+   }  
    if( amexsvalue_avg == "Not Provided"){
       amexsvalue_avg = 'NP'
     }
@@ -2011,17 +2013,17 @@ renderActiveMinutesColors(totalActiveDuration,exerciseActiveMin=null){
  }
 
  renderRestingHeartRate(restinghrvalue,dur){
-  let restinghr_avg_score = this.renderValue(restinghrvalue.resting_hr,dur);
+  let restinghr_avg_score =this.renderValue(restinghrvalue.resting_hr,dur);
   let restinghrvalue_a = this.renderValue(restinghrvalue.cum_days_resting_hr_got_a,dur);
   let restinghrvalue_b = this.renderValue(restinghrvalue.cum_days_resting_hr_got_b,dur);
   let restinghrvalue_c = this.renderValue(restinghrvalue.cum_days_resting_hr_got_c,dur);
   let restinghrvalue_d = this.renderValue(restinghrvalue.cum_days_resting_hr_got_d,dur);
   let restinghrvalue_f = this.renderValue(restinghrvalue.cum_days_resting_hr_got_f,dur);
-  let restinghrvalue_prcnt_a = this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_a,dur);  
-  let restinghrvalue_prcnt_b = this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_b,dur);  
-  let restinghrvalue_prcnt_c = this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_c,dur);  
-  let restinghrvalue_prcnt_d = this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_d,dur);  
-  let restinghrvalue_prcnt_f = this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_f,dur);  
+  let restinghrvalue_prcnt_a = this.renderPercent(this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_a,dur));  
+  let restinghrvalue_prcnt_b = this.renderPercent(this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_b,dur));  
+  let restinghrvalue_prcnt_c = this.renderPercent(this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_c,dur));  
+  let restinghrvalue_prcnt_d = this.renderPercent(this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_d,dur));  
+  let restinghrvalue_prcnt_f = this.renderPercent(this.renderValue(restinghrvalue.prcnt_days_resting_hr_got_f,dur));  
   let numberOfDays = this.state.numberOfDays;
 
   if( restinghr_avg_score == null || restinghr_avg_score == undefined ){
@@ -2039,18 +2041,39 @@ renderActiveMinutesColors(totalActiveDuration,exerciseActiveMin=null){
   if( restinghrvalue_a == null || restinghrvalue_a == undefined || restinghrvalue_a == ' ' ){
       restinghrvalue_a = '-';
     }
+   else if(restinghrvalue_a!= null || restinghrvalue_a!= undefined || restinghrvalue_a!= ' ' ){
+        let outres11 = parseFloat(restinghrvalue_a)
+        restinghrvalue_a =outres11.toFixed(1)
+   }
   if( restinghrvalue_b == null || restinghrvalue_b == undefined || restinghrvalue_b == ' ' ){
       restinghrvalue_b = '-';
     }
+  else if(restinghrvalue_b!= null || restinghrvalue_b!= undefined || restinghrvalue_b!= ' ' ){
+        let outres12 = parseFloat(restinghrvalue_b)
+        restinghrvalue_b =outres12.toFixed(1)
+   }
   if( restinghrvalue_c == null || restinghrvalue_c == undefined || restinghrvalue_c == ' ' ){
       restinghrvalue_c = '-';
     }
+  else if(restinghrvalue_c!= null || restinghrvalue_c!= undefined || restinghrvalue_c!= ' ' ){
+        let outres13 = parseFloat(restinghrvalue_c)
+        restinghrvalue_c =outres13.toFixed(1)
+   }
   if( restinghrvalue_d == null || restinghrvalue_d == undefined || restinghrvalue_d == ' ' ){
       restinghrvalue_d = '-';
     }
+  else if(restinghrvalue_d!= null || restinghrvalue_d!= undefined || restinghrvalue_d!= ' ' ){
+       let outres14 = parseFloat(restinghrvalue_d)
+        restinghrvalue_d =outres14.toFixed(1)
+   }
   if( restinghrvalue_f == null || restinghrvalue_f == undefined || restinghrvalue_f == ' ' ){
       restinghrvalue_f = '-';
-    }        
+
+    }     
+  else if(restinghrvalue_f!= null || restinghrvalue_f!= undefined || restinghrvalue_f!= ' ' ){
+       let outres15 = parseFloat(restinghrvalue_f)
+        restinghrvalue_f =outres15.toFixed(1)
+   }   
   if( restinghrvalue_prcnt_a == null || restinghrvalue_prcnt_a == undefined || restinghrvalue_prcnt_a == ' ' ){
       restinghrvalue_prcnt_a = '-';
     }
@@ -2141,15 +2164,15 @@ restingHrColors(rhrscore){
   let sleepgrade = this.renderValue(sleepvalue.average_sleep_grade,dur);
   let awake_time = this.renderValue(sleepvalue.total_sleep_in_hours_min,dur);
   let sleepvalue_a = this.renderValue(sleepvalue.cum_days_sleep_got_a,dur); 
-  let sleepvalue_b = this.renderValue(sleepvalue.cum_days_sleep_got_a,dur); 
-  let sleepvalue_c = this.renderValue(sleepvalue.cum_days_sleep_got_a,dur); 
-  let sleepvalue_d = this.renderValue(sleepvalue.cum_days_sleep_got_a,dur); 
-  let sleepvalue_f = this.renderValue(sleepvalue.cum_days_sleep_got_a,dur); 
-  let sleepvalue_prcnt_a = this.renderValue(sleepvalue.prcnt_days_sleep_got_a,dur);
-  let sleepvalue_prcnt_b = this.renderValue(sleepvalue.prcnt_days_sleep_got_b,dur);
-  let sleepvalue_prcnt_c = this.renderValue(sleepvalue.prcnt_days_sleep_got_c,dur);
-  let sleepvalue_prcnt_d = this.renderValue(sleepvalue.prcnt_days_sleep_got_d,dur);
-  let sleepvalue_prcnt_f = this.renderValue(sleepvalue.prcnt_days_sleep_got_f,dur);
+  let sleepvalue_b = this.renderValue(sleepvalue.cum_days_sleep_got_b,dur); 
+  let sleepvalue_c = this.renderValue(sleepvalue.cum_days_sleep_got_c,dur); 
+  let sleepvalue_d = this.renderValue(sleepvalue.cum_days_sleep_got_d,dur); 
+  let sleepvalue_f = this.renderValue(sleepvalue.cum_days_sleep_got_f,dur); 
+  let sleepvalue_prcnt_a = this.renderPercent(this.renderValue(sleepvalue.prcnt_days_sleep_got_a,dur));
+  let sleepvalue_prcnt_b = this.renderPercent(this.renderValue(sleepvalue.prcnt_days_sleep_got_b,dur));
+  let sleepvalue_prcnt_c = this.renderPercent(this.renderValue(sleepvalue.prcnt_days_sleep_got_c,dur));
+  let sleepvalue_prcnt_d = this.renderPercent(this.renderValue(sleepvalue.prcnt_days_sleep_got_d,dur));
+  let sleepvalue_prcnt_f = this.renderPercent(this.renderValue(sleepvalue.prcnt_days_sleep_got_f,dur));
   let numberOfDays = this.state.numberOfDays;
 
   if( sleepgrade == null || sleepgrade == undefined ){
@@ -2314,22 +2337,23 @@ restingHrColors(rhrscore){
   }
 
  renderNutritionStats(nutritionvalue,dur){
-  let prcnt_unproc_food = this.renderValue(nutritionvalue.prcnt_unprocessed_food_gpa,dur);
+  let prcnt_unproc_food = this.renderValue(nutritionvalue.prcnt_unprocessed_volume_of_food,dur);
   let food_grade = this.renderValue(nutritionvalue.prcnt_unprocessed_food_grade,dur);
   let nutritionvalue_a = this.renderValue(nutritionvalue.cum_days_ufood_got_a,dur);
   let nutritionvalue_b = this.renderValue(nutritionvalue.cum_days_ufood_got_b,dur);
   let nutritionvalue_c = this.renderValue(nutritionvalue.cum_days_ufood_got_c,dur);
   let nutritionvalue_d = this.renderValue(nutritionvalue.cum_days_ufood_got_d,dur);
   let nutritionvalue_f = this.renderValue(nutritionvalue.cum_days_ufood_got_f,dur);
-  let nutritionvalue_prcnt_a = this.renderValue(nutritionvalue.prcnt_days_ufood_got_a,dur);
-  let nutritionvalue_prcnt_b = this.renderValue(nutritionvalue.prcnt_days_ufood_got_b,dur);
-  let nutritionvalue_prcnt_c = this.renderValue(nutritionvalue.prcnt_days_ufood_got_c,dur);
-  let nutritionvalue_prcnt_d = this.renderValue(nutritionvalue.prcnt_days_ufood_got_d,dur);
-  let nutritionvalue_prcnt_f = this.renderValue(nutritionvalue.prcnt_days_ufood_got_f,dur);
+  let nutritionvalue_prcnt_a = this.renderPercent(this.renderValue(nutritionvalue.prcnt_days_ufood_got_a,dur));
+  let nutritionvalue_prcnt_b = this.renderPercent(this.renderValue(nutritionvalue.prcnt_days_ufood_got_b,dur));
+  let nutritionvalue_prcnt_c = this.renderPercent(this.renderValue(nutritionvalue.prcnt_days_ufood_got_c,dur));
+  let nutritionvalue_prcnt_d = this.renderPercent(this.renderValue(nutritionvalue.prcnt_days_ufood_got_d,dur));
+  let nutritionvalue_prcnt_f = this.renderPercent(this.renderValue(nutritionvalue.prcnt_days_ufood_got_f,dur));
   let numberOfDays = this.state.numberOfDays;
 
   if( prcnt_unproc_food == null || prcnt_unproc_food == undefined ){
       prcnt_unproc_food = 'NA';
+
     }
    if( prcnt_unproc_food == "Not Reported" ){
       prcnt_unproc_food = 'NR';
@@ -2339,6 +2363,7 @@ restingHrColors(rhrscore){
     } 
       
   let foodcolors = this.getStylesForNutritionFood(prcnt_unproc_food);
+  let prcnt_unproc_food_value = this.renderPercent(prcnt_unproc_food);
   
   if( food_grade == null || food_grade == undefined ){
       food_grade = 'NA';
@@ -2349,10 +2374,11 @@ restingHrColors(rhrscore){
   if( food_grade == "Not Provided" ){
       food_grade = 'NP';
     }
+    
 
     let foodGradecolors = this.getStylesForSummaryGrades(food_grade);
 
-  if( nutritionvalue_a == null || nutritionvalue_a == undefined || nutritionvalue_a == ' ' ){
+  if( nutritionvalue_a == null || nutritionvalue_a == undefined || nutritionvalue_a == ' '){
       nutritionvalue_a = '-';
     }
   if( nutritionvalue_b == null || nutritionvalue_b == undefined || nutritionvalue_b == ' ' ){
@@ -2382,13 +2408,14 @@ restingHrColors(rhrscore){
   if( nutritionvalue_prcnt_f == null || nutritionvalue_prcnt_f == undefined || nutritionvalue_prcnt_f == ' ' ){
       nutritionvalue_prcnt_f = '-';
     }    
+  
   let Table =  <table className="bifurcation_table">
                   <tr>
-                  <th colSpan={2}>% Unprocess Food Consumed</th>
+                  <th colSpan={2}>%Unprocessed Food Consumed</th>
                   <th colSpan={3}>Nutrition Grade</th>
                   </tr>
                   <tr>
-                  <td colSpan={2} style={{backgroundColor:foodcolors[0],color:foodcolors[1]}}>{prcnt_unproc_food}</td>
+                  <td colSpan={2} style={{backgroundColor:foodcolors[0],color:foodcolors[1]}}>{prcnt_unproc_food_value}</td>
                   <td colSpan={3} style={{backgroundColor:foodGradecolors[0],color:foodGradecolors[1]}}>{food_grade}</td>
                   </tr>
                   <th colSpan={5}>Daily Distribution</th>
@@ -2427,6 +2454,19 @@ restingHrColors(rhrscore){
 
  }
 
+   renderPercent(value){
+    let percent ='';
+    if( value == 'NA' || value == '' || value == null || value == undefined){
+      percent= value ;
+      return percent;
+    }
+   else {
+      percent = value+'%';
+
+      return percent;
+    }
+  }
+
   getStylesForNutritionFood(foodscore){
     let background = "";
     let color = "";
@@ -2450,7 +2490,7 @@ restingHrColors(rhrscore){
       else if (foodscore >= 50 && foodscore < 60){
           background ='#FF8C00';
           color = 'white';
-        }
+        } 
       else if (foodscore < 50){
           background = "red";
           color = "black";
@@ -2489,18 +2529,18 @@ restingHrColors(rhrscore){
      return [background,color];   
  }
  renderAlcoholStats(alcoholvalue,gendr,dur){
-  let alcoholgpa = this.renderValue(alcoholvalue.alcoholic_drinks_per_week_gpa,dur);
+  let alcoholgpa = this.renderValue(alcoholvalue.avg_drink_per_week,dur);
   let alcoholgrade = this.renderValue(alcoholvalue.alcoholic_drinks_per_week_grade,dur);
   let alcoholvalue_a = this.renderValue(alcoholvalue.cum_days_alcohol_week_got_a,dur);
   let alcoholvalue_b = this.renderValue(alcoholvalue.cum_days_alcohol_week_got_b,dur);
   let alcoholvalue_c = this.renderValue(alcoholvalue.cum_days_alcohol_week_got_c,dur);
   let alcoholvalue_d = this.renderValue(alcoholvalue.cum_days_alcohol_week_got_d,dur);
   let alcoholvalue_f = this.renderValue(alcoholvalue.cum_days_alcohol_week_got_f,dur);
-  let alcoholvalue_prcnt_a = this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_a,dur);
-  let alcoholvalue_prcnt_b = this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_b,dur);
-  let alcoholvalue_prcnt_c = this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_c,dur);
-  let alcoholvalue_prcnt_d = this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_d,dur);
-  let alcoholvalue_prcnt_f = this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_f,dur);
+  let alcoholvalue_prcnt_a = this.renderPercent(this.getAlcoholPercent(this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_a,dur)));
+  let alcoholvalue_prcnt_b = this.renderPercent(this.getAlcoholPercent(this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_b,dur)));
+  let alcoholvalue_prcnt_c = this.renderPercent(this.getAlcoholPercent(this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_c,dur)));
+  let alcoholvalue_prcnt_d = this.renderPercent(this.getAlcoholPercent(this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_d,dur)));
+  let alcoholvalue_prcnt_f = this.renderPercent(this.getAlcoholPercent(this.renderValue(alcoholvalue.prcnt_days_alcohol_week_got_f,dur)));
   let numberOfDays = this.state.numberOfDays;
 
   if( alcoholgpa == null || alcoholgpa == undefined ){
@@ -2557,7 +2597,8 @@ restingHrColors(rhrscore){
     }
   if( alcoholvalue_prcnt_f == null || alcoholvalue_prcnt_f == undefined || alcoholvalue_prcnt_f == ' ' ){
       alcoholvalue_prcnt_f = '-';
-    }        
+    }  
+
   let Table =  <table className="bifurcation_table">
                   <tr>
                   <th colSpan={2}>Average Drinks Per Week (7 Days)</th>
@@ -2601,12 +2642,20 @@ restingHrColors(rhrscore){
 
     return Table;
  }
+
+ getAlcoholPercent(value){
+  let intvalue;
+  if( value != null || value != undefined || value != '' ){
+   intvalue = value/100;  
+  }
+  return intvalue;
+ }
  
  getAlcoholColors(drink_avg,gender,grade){
     let background='';
     let color='';
 
-    if (gender === 'F') {
+    if (gender === 'Form') {
           if(drink_avg == 'NA' || grade == 'NA' || drink_avg == 'NP' || grade == 'NP'|| drink_avg == 'NR' || grade == 'NR'){
             background='';
             color='';
@@ -2671,14 +2720,14 @@ restingHrColors(rhrscore){
  
  renderGarminStats(garminvalue,dur){
   let garmin_avg = this.renderValue(garminvalue.garmin_stress_lvl,dur);
-  let garminvalue_a = this.renderValue(garminvalue.cum_garmin_stress_days_got_a,dur);
+  let garminvalue_a = this.renderValue(garminvalue.cum_garmin_stress_days_got_a,dur)
   let garminvalue_b = this.renderValue(garminvalue.cum_garmin_stress_days_got_b,dur);
   let garminvalue_c = this.renderValue(garminvalue.cum_garmin_stress_days_got_c,dur);
   let garminvalue_f = this.renderValue(garminvalue.cum_garmin_stress_days_got_f,dur);
-  let garminvalue_prcnt_a = this.renderValue(garminvalue.prcnt_garmin_stress_days_got_a,dur);
-  let garminvalue_prcnt_b = this.renderValue(garminvalue.prcnt_garmin_stress_days_got_b,dur);
-  let garminvalue_prcnt_c = this.renderValue(garminvalue.prcnt_garmin_stress_days_got_c,dur);
-  let garminvalue_prcnt_f = this.renderValue(garminvalue.prcnt_garmin_stress_days_got_f,dur);
+  let garminvalue_prcnt_a = this.renderPercent(this.renderValue(garminvalue.prcnt_garmin_stress_days_got_a,dur));
+  let garminvalue_prcnt_b = this.renderPercent(this.renderValue(garminvalue.prcnt_garmin_stress_days_got_b,dur));
+  let garminvalue_prcnt_c = this.renderPercent(this.renderValue(garminvalue.prcnt_garmin_stress_days_got_c,dur));
+  let garminvalue_prcnt_f = this.renderPercent(this.renderValue(garminvalue.prcnt_garmin_stress_days_got_f,dur));
   let numberOfDays = this.state.numberOfDays;
 
   if( garmin_avg == null || garmin_avg == undefined ){
@@ -2694,16 +2743,36 @@ restingHrColors(rhrscore){
     let avg_garmin_color = this.GarminStressColors(garmin_avg); 
 
   if( garminvalue_a == null || garminvalue_a == undefined || garminvalue_a == ' ' ){
-      garminvalue_a = '-';
+      garminvalue_a = '-';  
     }
+  else if(garminvalue_a!= null||garminvalue_a!= undefined|| garminvalue_a!= ' '){
+    let outres1 = parseFloat(garminvalue_a)
+    garminvalue_a =outres1.toFixed(1)
+    }
+   
   if( garminvalue_b == null || garminvalue_b == undefined || garminvalue_b == ' ' ){
       garminvalue_b = '-';
+    }
+     else if(garminvalue_b!= null||garminvalue_b!= undefined|| garminvalue_b!= ' '){
+    let outres2 = parseFloat(garminvalue_b)
+    garminvalue_b =outres2.toFixed(1)
+   
     }
  if( garminvalue_c == null || garminvalue_c == undefined || garminvalue_c == ' ' ){
       garminvalue_c = '-';
     }
+     else if(garminvalue_c!= null||garminvalue_c!= undefined|| garminvalue_c!= ' '){
+    let outres3 = parseFloat(garminvalue_c)
+    garminvalue_c =outres3.toFixed(1)
+  
+    }
  if( garminvalue_f == null || garminvalue_f == undefined || garminvalue_f == ' ' ){
       garminvalue_f = '-';
+    }
+     else if(garminvalue_f!= null||garminvalue_f!= undefined|| garminvalue_f!= ' '){
+    let outres4 = parseFloat(garminvalue_f)
+    garminvalue_f =outres4.toFixed(1)
+  
     }                        
  if( garminvalue_prcnt_a == null || garminvalue_prcnt_a == undefined || garminvalue_prcnt_a == ' ' ){
       garminvalue_prcnt_a = '-';
@@ -2782,12 +2851,12 @@ restingHrColors(rhrscore){
    return [background,color];
   } 
 
-	render(){
-		return(
-				<div>
-				<NavbarMenu title={"Bifurcation Dashboard"}/>
+  render(){
+    return(
+        <div>
+        <NavbarMenu title={"Bifurcation Dashboard"}/>
                 {this.state.active_view &&
-				<div className="nav3" id='bottom-nav'>
+        <div className="nav3" id='bottom-nav'>
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
                            <Navbar light toggleable className="navbar nav1 user_nav">
                                 <NavbarToggler className="navbar-toggler hidden-sm-up user_clndr" onClick={this.toggle1}>
@@ -3062,21 +3131,21 @@ restingHrColors(rhrscore){
                             </div>
                        </PopoverBody>
                     </Popover> 
-                         	{this.state.active_view && 
-	                    <div className = "row gd_padding">
-						    <div className = "row padropStyles">
-						        <Dropdown isOpen={this.state.dropdownOpen1} toggle={this.toggle}>
-							        <DropdownToggle caret>
-							          Select Range
-							        </DropdownToggle>
-							        <DropdownMenu>
-							         {this.renderDateRangeDropdown(this.state.summary,this.state.duration_date)}
-							        </DropdownMenu>
-						      	</Dropdown>
-						      	<span className="paweekdate"><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span>
-				        	</div>
-						</div>
-					}
+                          {this.state.active_view && 
+                      <div className = "row gd_padding">
+                <div className = "row padropStyles">
+                    <Dropdown isOpen={this.state.dropdownOpen1} toggle={this.toggle}>
+                      <DropdownToggle caret>
+                        Select Range
+                      </DropdownToggle>
+                      <DropdownMenu>
+                       {this.renderDateRangeDropdown(this.state.summary,this.state.duration_date)}
+                      </DropdownMenu>
+                    </Dropdown>
+                    <span className="paweekdate"><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span>
+                  </div>
+            </div>
+          }
           <div>
            <div className="row"> 
               <div className="col-md-6"> 
@@ -3131,9 +3200,16 @@ restingHrColors(rhrscore){
              </div>
             </div> 
             </div>
-				</div>
-			);
-		}
+            {this.renderOverallBifurcationSelectedDateFetchOverlay()}
+            {this.renderOverallBifurcation1FetchOverlay()}
+            {this.renderOverallBifurcation2FetchOverlay()}
+            {this.renderOverallBifurcation3FetchOverlay()}
+            {this.renderOverallBifurcation4FetchOverlay()}
+            {this.renderOverallBifurcationSelectedRangeFetchOverlay()}
+            
+        </div>
+      );
+    }
 
-	}
+  }
 export default Bifurcation;

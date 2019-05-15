@@ -16,7 +16,7 @@ export function renderLeaderBoardFetchOverlay(){
 							pulse spin
 							className="mx-auto"   
 						/>
-					</div>
+					</div>fetching_hrr4
 					<br/>
 					<p>Fetching Rank Data from {lb1_start_date.format('MMMM D, YYYY')} to {lb1_end_date.format('MMMM D, YYYY')}  </p>
 				</div>
@@ -355,6 +355,139 @@ export function renderOverallLeaderBoardSelectedDateFetchOverlay(){
 					</div>
 					<br/>
 					<p>Fetching Overall Leaderboard Data For {selectedDate.format('MMMM D, YYYY')}  </p>
+				</div>
+			</div>
+		);
+	}
+}
+
+//Bifurcation dashboard starts here
+
+export function renderOverallBifurcationSelectedDateFetchOverlay(){
+	if(this.state.fetching_bifurcation){
+		let selectedDate = moment(this.state.selectedDate);
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"   
+						/>
+					</div>
+					<br/>
+					<p>Fetching Bifurcation Dashboard Data For {selectedDate.format('MMMM D, YYYY')}  </p>
+				</div>
+			</div>
+		);
+	}
+}
+export function renderOverallBifurcation1FetchOverlay(){
+	if(this.state.fetching_bifurcation1){
+		let selectedDate = moment(this.state.selectedDate);
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"   
+						/>
+					</div>
+					<br/>
+					<p>Fetching Bifurcation Dashboard Data For {selectedDate.format('MMMM D, YYYY')}  </p>
+				</div>
+			</div>
+		);
+	}
+}
+export function renderOverallBifurcationSelectedRangeFetchOverlay(){
+	if(this.state.fetching_bifurcation5){
+		let selectedDate =this.state.date;
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"   
+						/>
+					</div>
+					<br/>
+					<p>Fetching Bifurcation Dashboard Data For {this.state.date}  </p>
+				</div>
+			</div>
+		);
+	}
+}
+export function renderOverallBifurcation2FetchOverlay(){
+	if(this.state.fetching_bifurcation2){
+		let lb2_start_date = moment(this.state.lb2_start_date);
+		let lb2_end_date = moment(this.state.lb2_end_date);
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"   
+						/>
+					</div>
+					<br/>
+					<p>Fetching Bifurcation Dashboard Data from {lb2_start_date.format('MMMM D, YYYY')} to {lb2_end_date.format('MMMM D, YYYY')}  </p>
+				</div>
+			</div>
+		);
+	}
+}
+
+export function renderOverallBifurcation3FetchOverlay(){
+	if(this.state.fetching_bifurcation3){
+		let lb3_start_date = moment(this.state.lb3_start_date);
+		let lb3_end_date = moment(this.state.lb3_end_date);
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"   
+						/>
+					</div>
+					<br/>
+					<p>Fetching Bifurcation Dashboard Data from {lb3_start_date.format('MMMM D, YYYY')} to {lb3_end_date.format('MMMM D, YYYY')}  </p>
+				</div>
+			</div>
+		);
+	}
+}
+export function renderOverallBifurcation4FetchOverlay(){
+	if(this.state.fetching_bifurcation4){
+		let lb3_start_date = moment(this.state.lb3_start_date);
+		let lb3_end_date = moment(this.state.lb3_end_date);
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"   
+						/>
+					</div>
+					<br/>
+					<p>Fetching Bifurcation Dashboard Data from {lb3_start_date.format('MMMM D, YYYY')} to {lb3_end_date.format('MMMM D, YYYY')}  </p>
 				</div>
 			</div>
 		);
