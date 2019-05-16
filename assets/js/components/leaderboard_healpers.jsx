@@ -186,7 +186,7 @@ export function renderOverallMovement1FetchOverlay(){
 	if(this.state.fetching_hrr1){
 		let lb1_start_date = moment(this.state.lb1_start_date);
 		let lb1_end_date = moment(this.state.lb1_end_date);
-		return(bifurcationdashboard/modifications/fe
+		return(
 			<div className="overlay d-flex justify-content-center align-items-center">
 				<div className="overlay-content">
 					<div className="d-flex">
