@@ -283,7 +283,7 @@ class Bifurcation extends React.Component{
      this.handleScroll = this.handleScroll.bind(this);
      this.toggle = this.toggle.bind(this);
      this.toggle1 = this.toggle1.bind(this);
-     this.toggleDate1 = this.toggleDate1.bind(this);renderOverallBifurcationSelectedDateFetchOverlay
+     this.toggleDate1 = this.toggleDate1.bind(this);
      this.toggleDate2 = this.toggleDate2.bind(this);
      this.toggleDate3 = this.toggleDate3.bind(this);
      this.toggleDate4 = this.toggleDate4.bind(this);
