@@ -254,7 +254,8 @@ class Food(models.Model):
 
 	non_processed_food = models.TextField(blank=True)
 	processed_food = models.TextField(blank=True)
-
+	no_plants_consumed_ql = models.CharField(max_length=5, blank=True)
+	list_of_pants_consumed_ql = models.TextField(blank=True)
 	# choices are not provided, will be choice field in the future
 	diet_type = models.TextField(blank=True)
 

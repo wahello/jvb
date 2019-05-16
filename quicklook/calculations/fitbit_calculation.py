@@ -570,6 +570,8 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 				ui_prcnt_unprocessed_food_consumed_yesterday = int(prcnt_non_processed_food)
 			ui_non_processed_food = todays_user_input.strong_input.list_of_unprocessed_food_consumed_yesterday
 			ui_processed_food = todays_user_input.strong_input.list_of_processed_food_consumed_yesterday
+			ui_no_plants_consumed = todays_user_input.strong_input.no_plants_consumed
+			ui_list_of_pants_consumed = todays_user_input.strong_input.list_of_pants_consumed
 			ui_diet_type = todays_user_input.optional_input.type_of_diet_eaten
 			ui_alcohol_day = todays_user_input.strong_input.number_of_alcohol_consumed_yesterday
 			ui_sleep_aid_penalty = todays_user_input.strong_input.prescription_or_non_prescription_sleep_aids_last_night
@@ -602,6 +604,8 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		food_calculated_data['non_processed_food'] = ui_non_processed_food
 		food_calculated_data['processed_food'] = ui_processed_food
 		food_calculated_data['diet_type'] =  ui_diet_type
+		food_calculated_data['no_plants_consumed_ql'] = ui_no_plants_consumed
+		food_calculated_data['list_of_pants_consumed_ql'] = ui_list_of_pants_consumed
 
 		# Grades
 		todays_daily_strong = []

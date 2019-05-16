@@ -3118,6 +3118,10 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		food_calculated_data['processed_food'] = safe_get(todays_daily_strong,
 								 "list_of_processed_food_consumed_yesterday", "")
 		food_calculated_data['diet_type'] = safe_get(daily_optional,"type_of_diet_eaten","")
+		food_calculated_data['no_plants_consumed_ql'] = safe_get(
+										todays_daily_strong,"no_plants_consumed",0)
+		food_calculated_data['list_of_pants_consumed_ql'] = safe_get(
+								todays_daily_strong,"list_of_pants_consumed","")
 
 		# Alcohol
 		alcohol_today = safe_get(todays_daily_strong,"number_of_alcohol_consumed_yesterday","")
