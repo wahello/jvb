@@ -9,48 +9,55 @@ import PropTypes from 'prop-types';
 import moment from 'moment';
 import FontAwesome from "react-fontawesome";
 import fetchProgress from '../../network/progress';
-import { getUserProfile } from '../../network/auth';      
+import { getUserProfile } from '../../network/auth';
+import {renderOverallBifurcationSelectedDateFetchOverlay,renderOverallBifurcation1FetchOverlay,renderOverallBifurcation2FetchOverlay,renderOverallBifurcation3FetchOverlay,renderOverallBifurcation4FetchOverlay,renderOverallBifurcationSelectedRangeFetchOverlay} from '../leaderboard_healpers';     
 
 var CalendarWidget = require('react-calendar-widget');  
 var ReactDOM = require('react-dom');
 
 class Bifurcation extends React.Component{
    constructor(props){
-   	super(props);
+    super(props);
      this.state = {
-				selectedDate: new Date(),
+        selectedDate: new Date(),
         dateRange1:false,
-				dateRange2:false,
-				dateRange3:false,
-				dateRange4:false,
-				isOpen1:false,
-				dropdownOpen1:false,
+        dateRange2:false,
+        dateRange3:false,
+        dateRange4:false,
+        isOpen1:false,
+        dropdownOpen1:false,
         dropdownOpen:false,
-				fetching_ql1:false,
-				fetching_ql2:false,
-				fetching_ql3:false,
-				fetching_ql4:false,
-				bf1_start_date:'',
-				bf2_start_date:'', 
-				bf3_start_date:'',
-				bf1_end_date:'',
-				bf2_end_date:'',
-				bf3_end_date:'', 
+        fetching_ql1:false,
+        fetching_ql2:false,
+        fetching_ql3:false,
+        fetching_ql4:false,
+        bf1_start_date:'',
+        bf2_start_date:'', 
+        bf3_start_date:'',
+        bf1_end_date:'',
+        bf2_end_date:'',
+        bf3_end_date:'', 
         numberOfDays:7,
-				duration_date:this.getInitialDur(),
-				scrollingLock:false,
-				date:'',
-				capt:'',
+        duration_date:this.getInitialDur(),
+        scrollingLock:false,
+        date:'',
+        capt:'',
         gender:'',
         age:'',
-				selected_range:"week",
+        selected_range:"week",
         selectedRange:{
               dateRange:null,
               rangeType:'today'
             },
-				calendarOpen:false,
-				active_view:true,
-				summary:{
+        calendarOpen:false,
+        active_view:true,
+        fetching_bifurcation:false,
+        fetching_bifurcation1:false,
+        fetching_bifurcation2:false,
+        fetching_bifurcation3:false,
+        fetching_bifurcation4:false,
+        fetching_bifurcation5:false,
+        summary:{
           "overall_health":{
                  "overall_health_gpa_grade":this.getInitialDur(),
                  "cum_days_ohg_got_a":this.getInitialDur(),
@@ -264,7 +271,7 @@ class Bifurcation extends React.Component{
 
       },
 
-				
+        
     }
 
      this.onSubmitDate1 = this.onSubmitDate1.bind(this);
@@ -299,7 +306,7 @@ class Bifurcation extends React.Component{
      this.renderEc = this.renderEc.bind(this);  
      this.getExerciseConsistencyColors = this.getExerciseConsistencyColors.bind(this);
      this.renderExerciseStats = this.renderExerciseStats.bind(this); 
-     this.getStylesForExerciseduration = this.getStylesForExerciseduration.bind(this);
+     //this.getStylesForExerciseduration = this.getStylesForExerciseduration.bind(this);
      this.exerciseDurColrsSingleDayOr2to6Days = this.exerciseDurColrsSingleDayOr2to6Days.bind(this);
      this.renderActiveMinutes = this.renderActiveMinutes.bind(this);
      this.renderActiveMinutesColors = this.renderActiveMinutesColors.bind(this);
@@ -323,17 +330,20 @@ class Bifurcation extends React.Component{
      this.strToMin = this.strToMin.bind(this);
      this.renderPercent = this.renderPercent.bind(this);
      this.getAlcoholPercent = this.getAlcoholPercent.bind(this);
-     // this.renderBifurcationProgressFetchOverlay = this.renderBifurcationProgressFetchOverlay.bind(this);
-     // this.renderBifurcationProgress2FetchOverlay = this.renderBifurcationProgress2FetchOverlay.bind(this);
-     // this.renderBifurcationProgress3FetchOverlay = this.renderBifurcationProgress3FetchOverlay.bind(this);
-     // this.renderBifurcationProgressSelectedDateFetchOverlay = this.renderBifurcationProgressFetchOverlay.bind(this);
 
+     
+     this.renderOverallBifurcationSelectedDateFetchOverlay = renderOverallBifurcationSelectedDateFetchOverlay.bind(this);
+    this.renderOverallBifurcation1FetchOverlay = renderOverallBifurcation1FetchOverlay.bind(this);
+    this.renderOverallBifurcation2FetchOverlay = renderOverallBifurcation2FetchOverlay.bind(this);
+    this.renderOverallBifurcation3FetchOverlay = renderOverallBifurcation3FetchOverlay.bind(this);
+    this.renderOverallBifurcation4FetchOverlay = renderOverallBifurcation4FetchOverlay.bind(this);
+    this.renderOverallBifurcationSelectedRangeFetchOverlay = renderOverallBifurcationSelectedRangeFetchOverlay.bind(this);
 
    }
 
-   	getInitialDur(){
-		 let paDurationInitialState = {
- 			"week":"-",
+    getInitialDur(){
+     let paDurationInitialState = {
+      "week":"-",
             "yesterday":"-",
             "month":"-",
            "custom_range":"-",
@@ -341,13 +351,13 @@ class Bifurcation extends React.Component{
             "year":"-"
        };
        return paDurationInitialState;
-	}
+  }
 
     toggle(){
-		this.setState({
-			dropdownOpen1:!this.state.dropdownOpen1
-		});
-	}
+    this.setState({
+      dropdownOpen1:!this.state.dropdownOpen1
+    });
+  }
 
     toggle1() {
       this.setState({
@@ -356,22 +366,22 @@ class Bifurcation extends React.Component{
     }
 
    toggleDate1(){
-	    this.setState({
-	      dateRange1:!this.state.dateRange1
-	    });
-   	}
+      this.setState({
+        dateRange1:!this.state.dateRange1
+      });
+    }
 
- 	toggleDate2(){
-	    this.setState({
-	      dateRange2:!this.state.dateRange2
-	    });
-   	}
+  toggleDate2(){
+      this.setState({
+        dateRange2:!this.state.dateRange2
+      });
+    }
 
     toggleDate3(){
-	    this.setState({
-	      dateRange3:!this.state.dateRange3
-	    });
-   	}
+      this.setState({
+        dateRange3:!this.state.dateRange3
+      });
+    }
 
     toggleDate4(){
         this.setState({
@@ -380,16 +390,16 @@ class Bifurcation extends React.Component{
     }
     
     toggleDropdown() {
-	    this.setState({
-      		dropdownOpen: !this.state.dropdownOpen
-	    });
-	}
+      this.setState({
+          dropdownOpen: !this.state.dropdownOpen
+      });
+  }
 
     toggleCalendar(){
-	    this.setState({
-      		calendarOpen:!this.state.calendarOpen
-	    });
-  	}
+      this.setState({
+          calendarOpen:!this.state.calendarOpen
+      });
+    }
 
     handleChange(event){
         const target = event.target;
@@ -400,62 +410,62 @@ class Bifurcation extends React.Component{
         });
     }
 
-	onSubmitDate1(event){
-		event.preventDefault();
-		this.setState({
-			dateRange1:!this.state.dateRange1,
-			fetching_ql1:true,
-		},()=>{
-				let custom_ranges = [];
-				if(this.state.bf2_start_date && this.state.bf2_end_date){
-					custom_ranges.push(this.state.bf2_start_date);
-					custom_ranges.push(this.state.bf2_end_date);
-				}
-				if(this.state.bf3_start_date && this.state.bf3_end_date){
-					custom_ranges.push(this.state.bf3_start_date);
-					custom_ranges.push(this.state.bf3_end_date);
-				}
-				custom_ranges.push(this.state.bf1_start_date);
-				custom_ranges.push(this.state.bf1_end_date);
-				let crange1 = this.state.bf1_start_date + " " + "to" + " " + this.state.bf1_end_date ;
+  onSubmitDate1(event){
+    event.preventDefault();
+    this.setState({
+      dateRange1:!this.state.dateRange1,
+      fetching_ql1:true,
+    },()=>{
+        let custom_ranges = [];
+        if(this.state.bf2_start_date && this.state.bf2_end_date){
+          custom_ranges.push(this.state.bf2_start_date);
+          custom_ranges.push(this.state.bf2_end_date);
+        }
+        if(this.state.bf3_start_date && this.state.bf3_end_date){
+          custom_ranges.push(this.state.bf3_start_date);
+          custom_ranges.push(this.state.bf3_end_date);
+        }
+        custom_ranges.push(this.state.bf1_start_date);
+        custom_ranges.push(this.state.bf1_end_date);
+        let crange1 = this.state.bf1_start_date + " " + "to" + " " + this.state.bf1_end_date ;
         let selected_range = {
             range:crange1,
             duration:this.headerDates(crange1),
             caption:""
        }
       fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,
-				              custom_ranges,selected_range);
-		});
-	}
+                      custom_ranges,selected_range);
+    });
+  }
 
-	onSubmitDate2(event){
-		event.preventDefault();
-		this.setState({
-			dateRange2:!this.state.dateRange2,
-			fetching_ql2:true,
-		},()=>{
-			let custom_ranges = [];
-			if(this.state.bf1_start_date && this.state.bf1_end_date){
-			custom_ranges.push(this.state.bf1_start_date);
-			custom_ranges.push(this.state.bf1_end_date);
-			}
-			if(this.state.bf3_start_date && this.state.bf3_end_date){
-			custom_ranges.push(this.state.bf3_start_date);
-			custom_ranges.push(this.state.bf3_end_date);
-			}
+  onSubmitDate2(event){
+    event.preventDefault();
+    this.setState({
+      dateRange2:!this.state.dateRange2,
+      fetching_ql2:true,
+    },()=>{
+      let custom_ranges = [];
+      if(this.state.bf1_start_date && this.state.bf1_end_date){
+      custom_ranges.push(this.state.bf1_start_date);
+      custom_ranges.push(this.state.bf1_end_date);
+      }
+      if(this.state.bf3_start_date && this.state.bf3_end_date){
+      custom_ranges.push(this.state.bf3_start_date);
+      custom_ranges.push(this.state.bf3_end_date);
+      }
 
-			custom_ranges.push(this.state.bf2_start_date);
-			custom_ranges.push(this.state.bf2_end_date);
-			let crange1 = this.state.bf2_start_date + " " + "to" + " " + this.state.bf2_end_date; 
-			let selected_range = {
-			range:crange1,
-			duration:this.headerDates(crange1),
-			caption:""
-			}
-			fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,
-				          custom_ranges,selected_range);
-		});
-	}
+      custom_ranges.push(this.state.bf2_start_date);
+      custom_ranges.push(this.state.bf2_end_date);
+      let crange1 = this.state.bf2_start_date + " " + "to" + " " + this.state.bf2_end_date; 
+      let selected_range = {
+      range:crange1,
+      duration:this.headerDates(crange1),
+      caption:""
+      }
+      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,
+                  custom_ranges,selected_range);
+    });
+  }
  onSubmitDate3(event){
     event.preventDefault();
     this.setState({
@@ -480,7 +490,7 @@ class Bifurcation extends React.Component{
             caption:""
        }
      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate,
-     	           custom_ranges,selected_range);
+                 custom_ranges,selected_range);
     });
   }
 
@@ -518,19 +528,25 @@ class Bifurcation extends React.Component{
     let week_start = moment(data.data.duration_date["week"].split('to')[0]).format("MMM DD, YYYY")
     let week_end = moment(data.data.duration_date["week"].split('to')[1]).format("MMM DD, YYYY")
     week = week_start + ' to ' + week_end;
-		let date =moment(data.data.duration_date["today"]).format("MMM DD, YYYY"); 
-	    this.setState({
-	    	fetching_ql1:false,
+    let date =moment(data.data.duration_date["today"]).format("MMM DD, YYYY"); 
+      this.setState({
+        fetching_ql1:false,
             fetching_ql2:false,
             fetching_ql3:false,
             fetching_ql4:false,
-	        report_date:data.data.report_date,
-	        summary:data.data.summary,
-	        duration_date:data.data.duration_date,
-	        capt:"Week",
-	        date:week,
+             // fetching_bifurcation:false,
+             // fetching_bifurcation1:false,   
+             fetching_bifurcation2:false, 
+             fetching_bifurcation3:false, 
+             fetching_bifurcation4:false,
+             // fetching_bifurcation5:false, 
+          report_date:data.data.report_date,
+          summary:data.data.summary,
+          duration_date:data.data.duration_date,
+          capt:"Week",
+          date:week,
 
-	    },()=>{
+      },()=>{
             if(renderAfterSuccess){
                 let crange = renderAfterSuccess.range;
                 let selectedRange = {
@@ -546,20 +562,28 @@ class Bifurcation extends React.Component{
                     selectedRange
                 );
             }
-        });
-  	}
-  	errorProgress(error){
-       console.log(error.message);
+        });setTimeout(()=>{this.setState({
+                fetching_bifurcation:false,
+                 fetching_bifurcation1:false, 
+              })},200)
+    }
+    errorProgress(error){
+        console.log(error.message);
        this.setState({
-       		fetching_ql1:false,
+          fetching_ql1:false,
             fetching_ql2:false,
             fetching_ql3:false,
             fetching_ql4:false,
+            fetching_bifurcation:false,
+            fetching_bifurcation1:false,  
+            fetching_bifurcation2:false,  
+            fetching_bifurcation3:false,  
+            fetching_bifurcation4:false,
        })
     }
 
   reanderAllHrr(period,date,capt,selectedRange){
-  	let numberOfDays;
+    let numberOfDays;
     if(selectedRange.rangeType !== 'today' && selectedRange.rangeType !== 'yesterday'){
       let startDate = selectedRange.dateRange.split("to")[0].trim();
       let endDate = selectedRange.dateRange.split("to")[1].trim();
@@ -571,7 +595,9 @@ class Bifurcation extends React.Component{
     else if(selectedRange.rangeType == 'today'){
               this.setState({
                 numberOfDays:moment(this.state.selectedDate).format('MMM D, YYYY'),
+                
               })
+             
          }
     else if(selectedRange.rangeType == 'yesterday'){
       var d = new Date(this.state.selectedDate)
@@ -588,12 +614,21 @@ class Bifurcation extends React.Component{
       })
     }
       this.setState({
-  			selected_range:period,
-  			date:date,
-  			capt:capt,
+        selected_range:period,
+        date:date,
+        capt:capt,
         selectedRange:selectedRange,
-  		});
-  	}
+        
+      },()=>{
+        this.setState({
+          fetching_bifurcation5:true, 
+        })
+        
+      });
+       setTimeout(()=>{this.setState({
+                fetching_bifurcation5:false,
+              })},200)
+    }
 
    successProfile(data){
     this.setState({
@@ -601,18 +636,18 @@ class Bifurcation extends React.Component{
       age:data.data.user_age
     })
    }
-	componentDidMount(){
-		this.setState({
-			fetching_ql4:true,     
-		},()=>{
-			fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
+  componentDidMount(){
+    this.setState({
+      fetching_bifurcation1:true,     
+    },()=>{
+      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
       getUserProfile(this.successProfile);
 
-		});
-		window.addEventListener('scroll', this.handleScroll);
-	}
+    });
+    window.addEventListener('scroll', this.handleScroll);
+  }
 
-	handleScroll() {
+  handleScroll() {
       if (window.scrollY >= 150 && !this.state.scrollingLock) {
         this.setState({
           scrollingLock: true
@@ -622,122 +657,123 @@ class Bifurcation extends React.Component{
           scrollingLock: false
         });
       }
-  	}
+    }
 
-  	processDate(selectedDate){ 
-	    this.setState({
-	      fetching_ql4:true,
-	      selectedDate: selectedDate,
-	      calendarOpen:!this.state.calendarOpen,
+    processDate(selectedDate){ 
+      this.setState({
+        fetching_ql4:true,
+        selectedDate: selectedDate,
+        calendarOpen:!this.state.calendarOpen,
         numberOfDays:7,
-	      selected_range:"week",                              
-	    },()=>{
-	      fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
-	    });
-  	}
+        selected_range:"week",
+        fetching_bifurcation:true,   
+        fetching_bifurcation1:true, 
+        fetching_bifurcation2:true, 
+        fetching_bifurcation3:true, 
+        fetching_bifurcation4:true,                         
+      },()=>{
+        fetchProgress(this.successProgress,this.errorProgress,this.state.selectedDate);
+      });
+    }
 
    createExcelPrintURL(){
-    	// code
-	    let custom_ranges = [];
-	    let selected_date = moment(this.state.selectedDate).format("YYYY-MM-DD");
-	    if(this.state.bf1_start_date && this.state.bf1_end_date){
-	        custom_ranges.push(this.state.bf1_start_date);
-	        custom_ranges.push(this.state.bf1_end_date);
-	    }
+      // code
+      let custom_ranges = [];
+      let selected_date = moment(this.state.selectedDate).format("YYYY-MM-DD");
+      if(this.state.bf1_start_date && this.state.bf1_end_date){
+          custom_ranges.push(this.state.bf1_start_date);
+          custom_ranges.push(this.state.bf1_end_date);
+      }
 
-	    if(this.state.bf2_start_date && this.state.bf2_end_date){
-	        custom_ranges.push(this.state.bf2_start_date);
-	        custom_ranges.push(this.state.bf2_end_date);
-	    }
-	     if(this.state.bf3_start_date && this.state.bf3_end_date){
-	        custom_ranges.push(this.state.bf3_start_date);
-	        custom_ranges.push(this.state.bf3_end_date);
-	    }
-	    custom_ranges = (custom_ranges && custom_ranges.length) ? custom_ranges.toString():'';
-	    let excelURL = `progress/print/progress/excel?date=${selected_date}&&custom_ranges=${custom_ranges}`;
-	    return excelURL;
-	}
+      if(this.state.bf2_start_date && this.state.bf2_end_date){
+          custom_ranges.push(this.state.bf2_start_date);
+          custom_ranges.push(this.state.bf2_end_date);
+      }
+       if(this.state.bf3_start_date && this.state.bf3_end_date){
+          custom_ranges.push(this.state.bf3_start_date);
+          custom_ranges.push(this.state.bf3_end_date);
+      }
+      custom_ranges = (custom_ranges && custom_ranges.length) ? custom_ranges.toString():'';
+      let excelURL = `progress/print/progress/excel?date=${selected_date}&&custom_ranges=${custom_ranges}`;
+      return excelURL;
+  }
 
-	renderDateRangeDropdown(value,value5){
-  		let duration_type = ["today","yesterday","week","month","year","custom_range"];
-  		let duration_type1 = ["today","yesterday","week","month","year",];
-  		let durations = [];
-  		for(let [key,value1] of Object.entries(value)){
-  			if(key == "overall_health"){
-	  			for(let [key1,value2] of Object.entries(value1)){
-	  				if(key1 == "overall_health_gpa"){
-		  				for(let duration of duration_type){
-		  					let val = value2[duration];
-		  					if(duration == "custom_range" && val){
-		  						for(let [range,value3] of Object.entries(val)){
-		  							duration_type1.push(range);
-		  						}
-		  					}
-		  				}
-		  			}
-	  			}
-	  		}
-  		}
+  renderDateRangeDropdown(value,value5){
+      let duration_type = ["today","yesterday","week","month","year","custom_range"];
+      let duration_type1 = ["today","yesterday","week","month","year",];
+      let durations = [];
+      for(let [key,value1] of Object.entries(value)){
+        if(key == "overall_health"){
+          for(let [key1,value2] of Object.entries(value1)){
+            if(key1 == "overall_health_gpa"){
+              for(let duration of duration_type){
+                let val = value2[duration];
+                if(duration == "custom_range" && val){
+                  for(let [range,value3] of Object.entries(val)){
+                    duration_type1.push(range);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
   
-  		let date;
-	  	let tableHeaders = [];
-	  	for(let dur of duration_type1){
+      let date;
+      let tableHeaders = [];
+      for(let dur of duration_type1){
         let selectedRange = {
           dateRange:null,
           rangeType:null
         };
-	  		let rank;
-	  		let capt = dur[0].toUpperCase() + dur.slice(1)
-	  		if(dur == "today"){
-	  			date = moment(value5[dur]).format('MMM DD, YYYY');
+        let rank;
+        let capt = dur[0].toUpperCase() + dur.slice(1)
+        if(dur == "today"){
+          date = moment(value5[dur]).format('MMM DD, YYYY');
           selectedRange['dateRange'] = value5[dur];
           selectedRange['rangeType'] = dur;
-	  			
-	  		}
-	  		else if(dur == "yesterday"){
-	  			date = moment(value5[dur]).format('MMM DD, YYYY');
+          
+        }
+        else if(dur == "yesterday"){
+          date = moment(value5[dur]).format('MMM DD, YYYY');
            selectedRange['dateRange'] = value5[dur];
            selectedRange['rangeType'] = dur;
-	  			
-	  		}
-	  		else if(dur == "week"){
-		  		date = this.headerDates(value5[dur]);
+        }
+        else if(dur == "week"){
+          date = this.headerDates(value5[dur]);
           selectedRange['dateRange'] = value5[dur];
            selectedRange['rangeType'] = dur;
-		  		
-	  		}
-	  		else if(dur == "month"){
-		  		date = this.headerDates(value5[dur]);
+        }
+        else if(dur == "month"){
+          date = this.headerDates(value5[dur]);
           selectedRange['dateRange'] = value5[dur];
            selectedRange['rangeType'] = dur;
-		  		
-	  		}
-	  		else if(dur == "year"){
-		  		date = this.headerDates(value5[dur]);
+        }
+        else if(dur == "year"){
+          date = this.headerDates(value5[dur]);
           selectedRange['dateRange'] = value5[dur];
            selectedRange['rangeType'] = dur;
-		  		
-	  		}
-	  		else{
-	  			date = this.headerDates(dur);
-	  			capt = "";
+        }
+        else{
+          date = this.headerDates(dur);
+          capt = "";
           selectedRange['dateRange'] = dur;
           selectedRange['rangeType'] = 'custom_range';
-	  		}
+        }
 
-  			tableHeaders.push(
-  			 <DropdownItem>
-  			 <a className="dropdown-item" 
-	  			onClick = {this.reanderAllHrr.bind(this,dur,date,capt,selectedRange)}
-	  			style = {{fontSize:"13px"}}>
-	  			{capt}<br/>{date}
-  			</a></DropdownItem>);
-	  	}
-	  return tableHeaders;	
-  	}
-	
-	headerDates(value){
-   	   let str = value;
+        tableHeaders.push(
+         <DropdownItem>
+         <a className="dropdown-item" 
+          onClick = {this.reanderAllHrr.bind(this,dur,date,capt,selectedRange)}
+          style = {{fontSize:"13px"}}>
+          {capt}<br/>{date}
+        </a></DropdownItem>);
+      }
+    return tableHeaders;  
+    }
+  
+  headerDates(value){
+       let str = value;
        let d = str.split(" ");
        let d1 = d[0];
        let date1 =moment(d1).format('MMM DD, YYYY');
@@ -745,7 +781,7 @@ class Bifurcation extends React.Component{
        let date2 =moment(d2).format('MMM DD, YYYY');
        let date = date1 + ' to ' + date2;
        return date;  
-	}
+  }
 
    renderValue(value,dur){
       let score = "";
@@ -832,7 +868,6 @@ class Bifurcation extends React.Component{
     ohgpa_prcnt_f = '-';
    }
 
-
    let Table =  <table className="bifurcation_table">
                 <tr>
                 <th colSpan={2}>Avg Overall Health GPA</th>
@@ -876,7 +911,7 @@ class Bifurcation extends React.Component{
 
   return Table;
   }
-	
+  
   getOverallGpaColors(ogpascore){
     let background= '';
     let color='';
@@ -1211,9 +1246,11 @@ renderTotalExerciseSteps(tesvalue,dur){
                   <th colSpan={5}>Total Steps</th>
                   </tr>
                   <tr>
-                  <td colSpan={5}> {this.renderComma(totalSteps)}</td>
+
+                  <td  colSpan={5} style={{fontWeight:'bold'}}>{this.renderComma(totalSteps)}</td>
                   </tr>
                   <th colSpan={5}>Daily Distribution</th> 
+
                   <tr>
                   <td style={{backgroundColor:'green',color:'white'}}>10k+</td>
                   <td style={{backgroundColor:'#32CD32',color:'white'}}>7.5k -<br/>9.99k</td>
@@ -1263,24 +1300,22 @@ renderTotalExerciseSteps(tesvalue,dur){
                   </table>
     return Table;   
 }
-   renderComma(value){
-    let steps = '';
-    if(value){
-      value += '';
-        var x = value.split('.');
-        var x1 = x[0];
-          var x2 = x.length > 1 ? '.' + x[1] : '';
-          var rgx = /(\d+)(\d{3})/;
-          while (rgx.test(x1)) {
-            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-          }
-          steps = x1 + x2;
-      } 
-        return steps;
-  }
 
-
- 
+renderComma(value){
+  let steps = '';
+  if(value){
+    value += '';
+    var x = value.split('.');
+    var x1 = x[0];
+      var x2 = x.length > 1 ? '.' + x[1] : '';
+      var rgx = /(\d+)(\d{3})/;
+      while (rgx.test(x1)) {
+        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+      }
+      steps = x1 + x2;
+    } 
+  return steps;
+}
 
 renderMcs(mcvalue,dur){
   let mcvalue_a = this.renderValue(mcvalue.cum_days_mcs_got_a,dur);
@@ -1349,7 +1384,7 @@ renderMcs(mcvalue,dur){
  
  let Table =  <table className="bifurcation_table">
                 <tr>
-                <th colSpan={2}>Moment Consistency Score</th>
+                <th colSpan={2}>Movement Consistency Score (MCS)</th>
                 <th colSpan={3}>MCS Grade</th>
                 </tr>
                 <tr>
@@ -1579,7 +1614,7 @@ renderMcs(mcvalue,dur){
     let exvalue_prcnt_f = this.renderPercent(this.renderValue(exvalue.prcnt_days_workout_dur_got_f,dur));
     let workoutDurationHrMin = this.renderValue(exvalue.workout_duration_hours_min,dur);
     let numberOfDays = this.state.numberOfDays;
-    
+
     if( exvalue_a == null || exvalue_a == undefined || exvalue_a == ' ' ){
           exvalue_a = '-';
         }
@@ -1619,8 +1654,8 @@ renderMcs(mcvalue,dur){
     if( workoutDurationHrMin == "Not Provided"){
       workoutDurationHrMin = 'NP'
     }
-
-    let workoutdurationColors = this.getStylesForExerciseduration(workoutDurationHrMin,this.state.selectedRange);
+  
+    let workoutdurationColors = this.exerciseDurColrsSingleDayOr2to6Days(workoutDurationHrMin);
     
     let Table =  <table className="bifurcation_table">
                   <tr>
@@ -1671,87 +1706,32 @@ renderMcs(mcvalue,dur){
     return s_time;
   }
 
- getStylesForExerciseduration(exDurHrMin,selectedRange){
-    let exDurHrMinInSeconds = this.strToSecond(exDurHrMin);
-    let background = "";
-    let color = "";
-    let dateRange;
-    
-    if(selectedRange.rangeType == 'today' || selectedRange.rangeType == 'yesterday'){
-      let oneTosixdaysColors = this.exerciseDurColrsSingleDayOr2to6Days(exDurHrMinInSeconds,background,color);
-      return oneTosixdaysColors; 
-    }
-    
-      let startDate = selectedRange.dateRange.split("to")[0].trim();
-      let endDate = selectedRange.dateRange.split("to")[1].trim();
-      let numberOfDays = Math.abs(moment(endDate).diff(moment(startDate), 'days'))+1;
-       // numberOfDays = 9 ;
-      if(numberOfDays >= 7){
-          let avgValueInSecPer7Days = Math.round(exDurHrMinInSeconds / numberOfDays) * 7
 
-          if(avgValueInSecPer7Days == 'NA' || avgValueInSecPer7Days == 'NR' || avgValueInSecPer7Days == 'NP'){
-            background= "";
-              color= "";
-          }
-          else if(avgValueInSecPer7Days == this.strToSecond("0:00")){
-              background = "red";
-              color = "black";
-          }
-          else if(avgValueInSecPer7Days > this.strToSecond("0:00") 
-                  && avgValueInSecPer7Days <= this.strToSecond("01:39")){
-              background = "orange";
-              color = "white";
-          }
-          else if(avgValueInSecPer7Days > this.strToSecond("01:39") 
-                   && avgValueInSecPer7Days <= this.strToSecond("02:29")){
-              background = "yellow";
-              color = "black";
-          }
-          else if((avgValueInSecPer7Days > this.strToSecond("02:29") 
-                   && avgValueInSecPer7Days <= this.strToSecond("04:59"))){
-              background = "#32CD32";
-              color = "white";
-          }
-          else if(avgValueInSecPer7Days > this.strToSecond("04:59")){
-              background = "green";
-              color = "white";
-          }
-           return[background,color];
-        }
-       
-      else if(numberOfDays >= 2 && numberOfDays <= 6){
-        let avgValueInSecPerDay = Math.round(exDurHrMinInSeconds / numberOfDays)
-        let oneTosixdaysColors = this.exerciseDurColrsSingleDayOr2to6Days(avgValueInSecPerDay,background,color);
-        return oneTosixdaysColors;
-      }
-      else {
-        let oneTosixdaysColors = this.exerciseDurColrsSingleDayOr2to6Days(exDurHrMinInSeconds,background,color);
-        return oneTosixdaysColors;
-      }         
-  }
-
-  exerciseDurColrsSingleDayOr2to6Days(ExDurHrMinvalue,background,color){
-      if(ExDurHrMinvalue == 'NA' || ExDurHrMinvalue == 'NR' || ExDurHrMinvalue == 'NP'){
+  exerciseDurColrsSingleDayOr2to6Days(ExDurHrMinvalue){
+    let background='';
+    let color='';
+    let exDurHrMinInSeconds = this.strToSecond(ExDurHrMinvalue);    
+      if(exDurHrMinInSeconds == 'NA' || exDurHrMinInSeconds == 'NR' || exDurHrMinInSeconds == 'NP'){
         background='';
         color='';
       }
-      else if(ExDurHrMinvalue == this.strToSecond("0:00")){
+      else if(exDurHrMinInSeconds == this.strToSecond("0:00")){
         background = "red";
           color = "black";
       }
-      else if(this.strToSecond("0:01") <= ExDurHrMinvalue && ExDurHrMinvalue < this.strToSecond("00:15")){
+      else if(this.strToSecond("00:01") <= exDurHrMinInSeconds && exDurHrMinInSeconds < this.strToSecond("00:15")){
         background = "orange";
             color = "white";
         }
-      else if(this.strToSecond("00:15") <= ExDurHrMinvalue && ExDurHrMinvalue < this.strToSecond("00:30")){
+      else if(this.strToSecond("00:15") <= exDurHrMinInSeconds && exDurHrMinInSeconds < this.strToSecond("00:30")){
         background = "yellow";
             color = "black";
         }
-      else if((this.strToSecond("00:30") <= ExDurHrMinvalue && ExDurHrMinvalue < this.strToSecond("01:00"))){
+      else if((this.strToSecond("00:30") <= exDurHrMinInSeconds && exDurHrMinInSeconds < this.strToSecond("01:00"))){
         background = "#32CD32";
             color = "white";
         }
-      else if(this.strToSecond("01:00")<=ExDurHrMinvalue){
+      else if(this.strToSecond("01:00")<=exDurHrMinInSeconds){
         background = "green";
             color = "white";
         }
@@ -2361,7 +2341,7 @@ restingHrColors(rhrscore){
   }
 
  renderNutritionStats(nutritionvalue,dur){
-  let prcnt_unproc_food = this.renderValue(nutritionvalue.prcnt_unprocessed_food_gpa,dur);
+  let prcnt_unproc_food = this.renderValue(nutritionvalue.prcnt_unprocessed_volume_of_food,dur);
   let food_grade = this.renderValue(nutritionvalue.prcnt_unprocessed_food_grade,dur);
   let nutritionvalue_a = this.renderValue(nutritionvalue.cum_days_ufood_got_a,dur);
   let nutritionvalue_b = this.renderValue(nutritionvalue.cum_days_ufood_got_b,dur);
@@ -2435,7 +2415,7 @@ restingHrColors(rhrscore){
   
   let Table =  <table className="bifurcation_table">
                   <tr>
-                  <th colSpan={2}>% Unprocess Food Consumed</th>
+                  <th colSpan={2}>%Unprocessed Food Consumed</th>
                   <th colSpan={3}>Nutrition Grade</th>
                   </tr>
                   <tr>
@@ -2485,8 +2465,7 @@ restingHrColors(rhrscore){
       return percent;
     }
    else {
-      percent = value +" "+ '%';
-      console.log("percent value"+percent)
+      percent = value+'%';
       return percent;
     }
   }
@@ -2553,7 +2532,7 @@ restingHrColors(rhrscore){
      return [background,color];   
  }
  renderAlcoholStats(alcoholvalue,gendr,dur){
-  let alcoholgpa = this.renderValue(alcoholvalue.alcoholic_drinks_per_week_gpa,dur);
+  let alcoholgpa = this.renderValue(alcoholvalue.avg_drink_per_week,dur);
   let alcoholgrade = this.renderValue(alcoholvalue.alcoholic_drinks_per_week_grade,dur);
   let alcoholvalue_a = this.renderValue(alcoholvalue.cum_days_alcohol_week_got_a,dur);
   let alcoholvalue_b = this.renderValue(alcoholvalue.cum_days_alcohol_week_got_b,dur);
@@ -2744,16 +2723,7 @@ restingHrColors(rhrscore){
  
  renderGarminStats(garminvalue,dur){
   let garmin_avg = this.renderValue(garminvalue.garmin_stress_lvl,dur);
-
- ;
-
-  // if(garminvalue_a!=null|| garminvalue_a!=undefined||garminvalue_a!=''){
-  //     let res = garminvalue_a
-  //    console.log("ddddd"+res)
-  //    let rr= parseFloat(res).toFixed(1);
-  //    console.log(rr)
-  // }
-  let garminvalue_a = this.renderValue(garminvalue.cum_garmin_stress_days_got_a,dur)
+  let garminvalue_a = this.renderValue(garminvalue.cum_garmin_stress_days_got_a,dur);
   let garminvalue_b = this.renderValue(garminvalue.cum_garmin_stress_days_got_b,dur);
   let garminvalue_c = this.renderValue(garminvalue.cum_garmin_stress_days_got_c,dur);
   let garminvalue_f = this.renderValue(garminvalue.cum_garmin_stress_days_got_f,dur);
@@ -2776,12 +2746,11 @@ restingHrColors(rhrscore){
     let avg_garmin_color = this.GarminStressColors(garmin_avg); 
 
   if( garminvalue_a == null || garminvalue_a == undefined || garminvalue_a == ' ' ){
-      garminvalue_a = '-';  
+      garminvalue_a = '-'; 
     }
   else if(garminvalue_a!= null||garminvalue_a!= undefined|| garminvalue_a!= ' '){
     let outres1 = parseFloat(garminvalue_a)
     garminvalue_a =outres1.toFixed(1)
-    console.log(garminvalue_a)
     }
    
   if( garminvalue_b == null || garminvalue_b == undefined || garminvalue_b == ' ' ){
@@ -2885,12 +2854,12 @@ restingHrColors(rhrscore){
    return [background,color];
   } 
 
-	render(){
-		return(
-				<div>
-				<NavbarMenu title={"Bifurcation Dashboard"}/>
+  render(){
+    return(
+        <div>
+        <NavbarMenu title={"Bifurcation Dashboard"}/>
                 {this.state.active_view &&
-				<div className="nav3" id='bottom-nav'>
+        <div className="nav3" id='bottom-nav'>
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
                            <Navbar light toggleable className="navbar nav1 user_nav">
                                 <NavbarToggler className="navbar-toggler hidden-sm-up user_clndr" onClick={this.toggle1}>
@@ -3165,21 +3134,21 @@ restingHrColors(rhrscore){
                             </div>
                        </PopoverBody>
                     </Popover> 
-                         	{this.state.active_view && 
-	                    <div className = "row gd_padding">
-						    <div className = "row padropStyles">
-						        <Dropdown isOpen={this.state.dropdownOpen1} toggle={this.toggle}>
-							        <DropdownToggle caret>
-							          Select Range
-							        </DropdownToggle>
-							        <DropdownMenu>
-							         {this.renderDateRangeDropdown(this.state.summary,this.state.duration_date)}
-							        </DropdownMenu>
-						      	</Dropdown>
-						      	<span className="paweekdate"><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span>
-				        	</div>
-						</div>
-					}
+                          {this.state.active_view && 
+                      <div className = "row gd_padding">
+                <div className = "row padropStyles">
+                    <Dropdown isOpen={this.state.dropdownOpen1} toggle={this.toggle}>
+                      <DropdownToggle caret>
+                        Select Range
+                      </DropdownToggle>
+                      <DropdownMenu>
+                       {this.renderDateRangeDropdown(this.state.summary,this.state.duration_date)}
+                      </DropdownMenu>
+                    </Dropdown>
+                    <span className="paweekdate"><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span>
+                  </div>
+            </div>
+          }
           <div>
            <div className="row"> 
               <div className="col-md-6"> 
@@ -3234,9 +3203,16 @@ restingHrColors(rhrscore){
              </div>
             </div> 
             </div>
-				</div>
-			);
-		}
+            {this.renderOverallBifurcationSelectedDateFetchOverlay()}
+            {this.renderOverallBifurcation1FetchOverlay()}
+            {this.renderOverallBifurcation2FetchOverlay()}
+            {this.renderOverallBifurcation3FetchOverlay()}
+            {this.renderOverallBifurcation4FetchOverlay()}
+            {this.renderOverallBifurcationSelectedRangeFetchOverlay()}
+            
+        </div>
+      );
+    }
 
-	}
+  }
 export default Bifurcation;

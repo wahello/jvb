@@ -133,7 +133,7 @@ class OverallLeaderboardTable extends Component{
 					color = "black"
 				}	
 				else if ( grade == 'D'){
-					background ='#FF8C00';
+					background ='orange';
 					color = 'white';
 				}	
 				else if ( grade == 'F'){
@@ -215,7 +215,7 @@ class OverallLeaderboardTable extends Component{
 				color='black';
 			}
 			else if(grade == 'D'){
-				background='#FF8C00';
+				background='orange';
 				color='white';
 			}
 			else if(grade == 'F'){
@@ -274,7 +274,7 @@ class OverallLeaderboardTable extends Component{
 				color='black';
 			}
 			else if(grade == 'D'){
-				background='#FF8C00';
+				background='orange';
 				color='white';
 			}
 			else if(grade == 'F'){
@@ -333,7 +333,7 @@ class OverallLeaderboardTable extends Component{
 				color='black';
 			}
 			else if(grade == 'D'){
-				background='#FF8C00';
+				background='orange';
 				color='white';
 			}
 			else if(grade == 'F'){
@@ -394,7 +394,7 @@ class OverallLeaderboardTable extends Component{
 				color='black';
 			}
 			else if(grade == 'D'){
-				background='#FF8C00';
+				background='orange';
 				color='white';
 			}
 			else if(grade == 'F'){
@@ -452,7 +452,7 @@ class OverallLeaderboardTable extends Component{
 				color='black';
 			}
 			else if(grade == 'D'){
-				background='#FF8C00';
+				background='orange';
 				color='white';
 			}
 			else if(grade == 'F'){
@@ -536,7 +536,7 @@ class OverallLeaderboardTable extends Component{
 	       color = "black";
 	    }
 	    else if (steps <= 4999 && steps >= 3500){
-	       background = "#FF8C00";
+	       background = "orange";
 	       color = "white";
 	    }
 	    else if (steps < 3500){
@@ -592,8 +592,8 @@ class OverallLeaderboardTable extends Component{
 	        }
 	    	else if((strToSecond("06:00")<=sleepDurationInSeconds && sleepDurationInSeconds<= strToSecond("6:29"))
 	    	 || (strToSecond("11:00")<=sleepDurationInSeconds && sleepDurationInSeconds<= strToSecond("12:00"))){
-	    		 	background = '#E26B0A';
-	                color = 'black';
+	    		 	background = 'orange';
+	                color = 'white';
 	             
 	    	}
     	}
