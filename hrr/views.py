@@ -42,7 +42,8 @@ from hrr.models import Hrr,\
 						AaWorkoutCalculations,\
 						AA, \
 						TwentyfourHourAA, \
-						TwentyfourHourTimeHeartZones
+						TwentyfourHourTimeHeartZones,\
+						AAdashboard
 import pprint
 from hrr import fitbit_aa
 from hrr.calculation_helper import week_date,\
@@ -568,6 +569,45 @@ class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
 							  user=user).values()
 		else:
 			queryset = TwentyfourHourTimeHeartZones.objects.all()
+		return queryset
+
+def create_aa_dashboard_format(data,start_dt=None,custom_range=None):
+	all_data = {}
+	start_dt_date_obj = datetime.strptime(start_dt,'%Y-%m-%d').date()
+	yesterday_date = start_dt_date_obj - timdelta(days=1)
+	week_date = yesterday_date - timedelta(days=7)
+	print(week_date,"week_date")
+	for single_data in data:
+		if custom_range:
+			pass
+		elif start_dt and not custom_range:
+			start_date = single_data.created_at
+			if start_date == start_dt:
+				all_data["Today"] = single_data.data
+
+class UserAAdashboadTable(generics.ListCreateAPIView):
+	'''This class create the AA dashboard ranges table'''
+
+	def get(self,request,format="json"):
+		user_get = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		custom_range = self.request.query_params.get('custom_range', None)
+		querset = self.get_queryset()
+		create_aa_dashboard_format(querset,start_dt,custom_range)
+
+	def get_queryset(self):
+		user = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		custom_range = self.request.query_params.get('custom_range', None)
+		if custom_range:
+			queryset = AAdashboard.objects.filter(
+				created_at__range=custom_range,user=user)
+		elif start_dt and not custom_range:
+			current_time  = datetime.now()
+			current_year = current_time.year
+			from_date = '{}-01-01'.format(str(current_year))
+			queryset = AAdashboard.objects.filter(
+				created_at__range=[from_date,start_dt],user=user)
 		return queryset
 
 def aa_ranges_api(request):
@@ -2746,31 +2786,31 @@ def store_aa_low_high_end_calculations(user,from_date,to_date):
 		store_fitbit_aa3(user,from_date,to_date)
 		print("Fitbit AA chat3 data calculation finished")
 
-def store_garmin_aa_dashboard(user,from_date,to_date):
-	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
-	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
-	current_date = to_date_obj
-	while (current_date >= from_date_obj):
-		data = aa_low_high_end_data(user,current_date)
-		# data = json.dumps(data)
-		if data:
-			try:
-				time_hr_zone_obj = TimeHeartZones.objects.get(
-					user=user, created_at=current_date)
-				if time_hr_zone_obj:
-					update_heartzone_instance(user, current_date,data)
-			except TimeHeartZones.DoesNotExist:
-				create_heartzone_instance(user, data, current_date)
-		current_date -= timedelta(days=1)
-	return None
+# def store_garmin_aa_dashboard(user,from_date,to_date):
+# 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
+# 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
+# 	current_date = to_date_obj
+# 	while (current_date >= from_date_obj):
+# 		data = aa_low_high_end_data(user,current_date)
+# 		# data = json.dumps(data)
+# 		if data:
+# 			try:
+# 				time_hr_zone_obj = TimeHeartZones.objects.get(
+# 					user=user, created_at=current_date)
+# 				if time_hr_zone_obj:
+# 					update_heartzone_instance(user, current_date,data)
+# 			except TimeHeartZones.DoesNotExist:
+# 				create_heartzone_instance(user, data, current_date)
+# 		current_date -= timedelta(days=1)
+# 	return None
 
-def store_aa_dashboard(user,from_date,to_date):
-	device_type = quicklook.calculations.calculation_driver.which_device(user)
-	if device_type == "garmin":
-		store_garmin_aa_dashboard(user,from_date,to_date)
-	elif device_type == 'fitbit':
-		print("Fitbit AA chat3 data calculation got started")
-		store_fitbit_aa3(user,from_date,to_date)
+# def store_aa_dashboard(user,from_date,to_date):
+# 	device_type = quicklook.calculations.calculation_driver.which_device(user)
+# 	if device_type == "garmin":
+# 		store_garmin_aa_dashboard(user,from_date,to_date)
+# 	elif device_type == 'fitbit':
+# 		print("Fitbit AA chat3 data calculation got started")
+# 		store_fitbit_aa3(user,from_date,to_date)
 		# print("Fitbit AA chat3 data calculation finished")
 
 def hrr_data(user,start_date):

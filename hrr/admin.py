@@ -6,7 +6,8 @@ from .models import (Hrr,
 					AA,
 					TwentyfourHourAA,
 					TwentyfourHourTimeHeartZones,
-					AACustomRanges)
+					AACustomRanges,
+					AAdashboard)
 # Register your models here.
 
 class HrrAdmin(admin.ModelAdmin):
@@ -57,6 +58,12 @@ class AACustomRangesAdmin(admin.ModelAdmin):
 	search_fields = ('user__username','user__email',
 		'user__first_name','user__last_name',)
 
+class AAdashboardAdmin(admin.ModelAdmin):
+	list_display = ('user','created_at','updated_at')
+
+	search_fields = ('user__username','user__email','user__first_name',
+					 'user__last_name',)
+
 admin.site.register(Hrr,HrrAdmin)
 admin.site.register(AaCalculations,AaCalculationsAdmin)
 admin.site.register(TimeHeartZones,TimeHeartZonesAdmin)
@@ -65,3 +72,4 @@ admin.site.register(AA,AAAdmin)
 admin.site.register(TwentyfourHourAA, TwentyfourHourAAAdmin)
 admin.site.register(TwentyfourHourTimeHeartZones, TwentyfourHourTimeHeartZonesAdmin)
 admin.site.register(AACustomRanges, AACustomRangesAdmin)
+admin.site.register(AAdashboard, AAdashboardAdmin)
