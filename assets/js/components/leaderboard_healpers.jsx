@@ -16,7 +16,7 @@ export function renderLeaderBoardFetchOverlay(){
 							pulse spin
 							className="mx-auto"   
 						/>
-					</div>fetching_hrr4
+					</div>
 					<br/>
 					<p>Fetching Rank Data from {lb1_start_date.format('MMMM D, YYYY')} to {lb1_end_date.format('MMMM D, YYYY')}  </p>
 				</div>
@@ -186,7 +186,7 @@ export function renderOverallMovement1FetchOverlay(){
 	if(this.state.fetching_hrr1){
 		let lb1_start_date = moment(this.state.lb1_start_date);
 		let lb1_end_date = moment(this.state.lb1_end_date);
-		return(
+		return(bifurcationdashboard/modifications/fe
 			<div className="overlay d-flex justify-content-center align-items-center">
 				<div className="overlay-content">
 					<div className="d-flex">
