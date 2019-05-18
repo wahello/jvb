@@ -123,7 +123,7 @@ class Dashboard extends Component {
 							 <h3 id="link_style">Dashboards</h3>
 
 						      <Link to='/aadashboard'>Aerobic and Anaerobic (AA) Dashboard</Link><br /> 
-						      <Link to='/bifurcationdashboard'>Bifurcation (Consistency) Dashboard</Link><br /> 
+						      <Link to='/bifurcationdashboard'>Bifurcation (Consistency) Dashboard (BCD)</Link><br /> 
 				  		 	  <Link to='/movement_dashboard'>Movement Dashboard</Link><br/>
 				  		 	  <Link to='/grades_dashboard'>Grades Dashboard</Link><br/>
 				  		 	  <Link to = '/progressanalyzer_dashboard'>Progress Analyzer Dashboard</Link><br/>
@@ -131,7 +131,7 @@ class Dashboard extends Component {
 				  		 	  <Link to='/weekly_workout_summary'>Weekly Workout Summary Report</Link><br/>
 				  		 	  <Link to='/active_dahsboard'>Time Moving / Active Dashboard</Link><br/>
 							 {/*<Link to='/activity_type'>Activities</Link><br/>*/}
-							 {/*<Link to='/nes'>NES Graph</Link><br/>*/}
+							 {/*<Link to='/nes'>NES Graph</Link><br/>*/}	
 							  {/*<Link to='/sleep'>Sleeping Graph</Link><br/>*/}
 							  {/*<Link to='/overallgrade'>Over All Grade</Link><br/>*/}
 							  {/*<Link to='/weeklygrade'>Weekly Grade</Link><br/>*/}
