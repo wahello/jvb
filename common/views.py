@@ -15,7 +15,7 @@ from users.models import GarminToken
 from quicklook.calculations.calculation_driver import which_device
 from .models import UserDataBackfillRequest
 from .serializers import UserBackfillRequestSerializer,AACustomRangesSerializer
-
+from apple.models import AppleUser
 
 class UserLastSyncedItemview(generics.RetrieveUpdateDestroyAPIView):
 	permission_classes = (IsAuthenticated,)
@@ -65,7 +65,8 @@ class 	HaveTokens(APIView):
 			"linked_devices":False,
 			"have_garmin_health_token":False,
 			"have_garmin_connect_token":False,
-			"have_fitbit_token":False
+			"have_fitbit_token":False,
+			"have_apple_token": False
 		}
 
 		if GarminToken.objects.filter(user=request.user).exists():
@@ -76,6 +77,9 @@ class 	HaveTokens(APIView):
 			have_tokens['linked_devices'] = True
 		if FitbitConnectToken.objects.filter(user=request.user).exists():
 			have_tokens['have_fitbit_token'] = True
+			have_tokens['linked_devices'] = True
+		if AppleUser.objects.filter(user=request.user).exists():
+			have_tokens['have_apple_token'] = True
 			have_tokens['linked_devices'] = True
 
 		return Response(have_tokens,status=status.HTTP_200_OK)
