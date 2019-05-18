@@ -68,3 +68,6 @@ class UserAppleDataActivities(models.Model):
 class AppleUser(models.Model):
 	user       = models.ForeignKey('auth.user',on_delete=models.CASCADE, related_name="apple_status")
 	status     = models.BooleanField(default=False)
+
+	def __str__(self):
+		return "%s"%(self.user.username)

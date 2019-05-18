@@ -17,6 +17,7 @@ from apple.models import (UserAppleDataSteps,
 							ApplePingNotification,
 							UserAppleDataActivities,
 							AppleUser)
+from django.contrib.auth.models import User
 
 def process_notification(user,summary_type,state):
 	""" This function will create instance of ping notification
@@ -185,11 +186,11 @@ class AplpleUserView(generics.CreateAPIView):
 	serializer_class    = AppleUserSerializer
 	
 	def post(self,request):
-		user         =  request.user
 		user         =  request.data.get('user')
 		user_status  =  request.data.get('status')
 		try:
-			AppleUser.objects.create(user_id=user,data=user_status)
+			user = User.objects.get(id=user)
+			AppleUser.objects.create(user=user,status=user_status)
 		except:
 			logging.exception("message")
 			return Response("Something went wrong",status=status.HTTP_400_BAD_REQUEST)
