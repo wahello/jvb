@@ -3,6 +3,7 @@ from datetime import datetime,time,timezone,timedelta
 
 from django.db.models import Q
 
+import quicklook
 from user_input.models import DailyActivity
 
 def get_activity_base_format(activity):
@@ -20,6 +21,7 @@ def get_activity_base_format(activity):
         if activity_weather_dict and activity_weather_dict[k]:
             activity_weathers[k] = activity_weather_dict[k]['value']
     activity_weathers['weather_condition'] = activity_weather_dict['weather_condition']
+    # print(activity_data_dict,"activity_data_dict")
     return {**activity_data_dict, **activity, **activity_weathers}
 
 def get_daily_activities_in_base_format(user,from_date,to_date=None,include_all=False):
@@ -86,16 +88,24 @@ def get_daily_activities_in_base_format(user,from_date,to_date=None,include_all=
                 user=user,
                 start_time_in_seconds__gte = from_date_start_epoch,
                 start_time_in_seconds__lte = to_date_end_epoch).values()
-    
     transformed_activities = {}
+    # print(from_date,to_date,"fffffffff")
     if to_date:
         while(from_date <= to_date):
+            
+            cr_date = from_date - timedelta(days=1)
             transformed_activities[from_date.strftime('%Y-%m-%d')] = {}
             from_date += timedelta(days=1)
+        device_type = quicklook.calculations.calculation_driver.which_device(user)
+        if device_type == 'apple':
+            transformed_activities[from_date.strftime('%Y-%m-%d')] = {}
         for activity in activities:
             activity_id = activity['activity_id']
             activity_date = activity['created_at'].strftime("%Y-%m-%d")
-            transformed_activities[activity_date][activity_id] = get_activity_base_format(activity)
+            # try:
+            transformed_activities[activity_date][str(activity_id)] = get_activity_base_format(activity)
+            # except KeyError:
+            #     transformed_activities[activity_date][str(activity_id)] = get_activity_base_format(activity)
     else:
         for activity in activities:
             activity_id = activity['activity_id']
