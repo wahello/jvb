@@ -22,7 +22,9 @@ Sincerely,
 JVB Health & Wellness'''  
 				
 		email_body = email_body.format(
-			user,device_type.upper(),start_date.strftime('%b %d, %Y'),end_date.strftime('%b %d, %Y')
+			user,device_type.upper(),
+			start_date.strftime('%b %d, %Y'),
+			end_date.strftime('%b %d, %Y')
 		)
 
 		notify_users_task.delay(admin_users_email,email_subject,email_body,notify_admins=False)

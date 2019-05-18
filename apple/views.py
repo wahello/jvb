@@ -5,15 +5,18 @@ from django.shortcuts import render
 from django.http import Http404,HttpResponse
 from django.db.models import Q
 from rest_framework import generics
+from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from apple.serializers import (UserAppleDataStepsSerializer,
-								UserAppleDataActivitiesSerializer)
+								UserAppleDataActivitiesSerializer,
+								AppleUserSerializer)
 from apple.models import (UserAppleDataSteps,
 							ApplePingNotification,
-							UserAppleDataActivities)
+							UserAppleDataActivities,
+							AppleUser)
 
 def process_notification(user,summary_type,state):
 	""" This function will create instance of ping notification
@@ -110,12 +113,13 @@ class UserAppleDataStepsView(generics.CreateAPIView):
 				user_id=user,belong_to=obj_date_str,summary_id=summary_id,data=updated_data)
 			update_notification(instance)
 			update_notification2(instance)
-			return Response("Steps Data Stored in Database Successfully",status=status.HTTP_201_CREATED)	
+			return Response("Steps Data Stored in Database Successfully",status=status.HTTP_201_CREATED)
 			# else:
 			# 	error_notification(instance)
 			# 	return Response("Data Not Stored in Database",status=status.HTTP_400_BAD_REQUEST)
 
-	
+
+
 def merge_user_data(user, start_date):
 	""" this function will merge the apple steps data based on date
 	Args: 
@@ -174,4 +178,22 @@ class UserAppleDataActivitiesView(generics.CreateAPIView):
 			# else:
 			# 	error_notification(instance)
 			# 	return Response("Data Not Stored in Database",status=status.HTTP_400_BAD_REQUEST)
+
+
+class AplpleUserView(generics.CreateAPIView):
+	permission_classes  = (IsAuthenticated,)
+	serializer_class    = AppleUserSerializer
+	
+	def post(self,request):
+		user         =  request.user
+		user         =  request.data.get('user')
+		user_status  =  request.data.get('status')
+		try:
+			AppleUser.objects.create(user_id=user,data=user_status)
+		except:
+			logging.exception("message")
+			return Response("Something went wrong",status=status.HTTP_400_BAD_REQUEST)
+		return Response("User agreed to allow to get apple data",status=status.HTTP_201_CREATED)
+
+
 

@@ -31,4 +31,3 @@ class AACustomRangesSerializer(serializers.ModelSerializer):
 			**validated_data)
 		return instance
 
-

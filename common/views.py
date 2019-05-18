@@ -54,7 +54,7 @@ class UserLastSyncedItemview(generics.RetrieveUpdateDestroyAPIView):
 		else:
 			return Response({})
 
-class HaveTokens(APIView):
+class 	HaveTokens(APIView):
 	'''
 	Check availability of garmin connect, garmin health token
 	and fitbit tokens for current user
@@ -99,6 +99,7 @@ class UserBackfillRequestView(generics.ListCreateAPIView):
 			return Response(serializer.data,status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class AACustomRangesView(generics.ListCreateAPIView):
 
 	permission_classes = (IsAuthenticated,)
@@ -117,3 +118,4 @@ def get_user_id(request):
 	print(user,"user")
 	user = User.objects.get(username=user)
 	return JsonResponse({'user_id':user.id})
+
