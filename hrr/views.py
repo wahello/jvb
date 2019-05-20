@@ -572,18 +572,38 @@ class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
 		return queryset
 
 def create_aa_dashboard_format(data,start_dt=None,custom_range=None):
-	all_data = {}
+	all_data = {
+				"today":[],
+				"yesterday":[],
+				"week":[],
+				"month":[],
+				"year":[],
+				}
+	# print(start_dt,"start_dt")
 	start_dt_date_obj = datetime.strptime(start_dt,'%Y-%m-%d').date()
-	yesterday_date = start_dt_date_obj - timdelta(days=1)
-	week_date = yesterday_date - timedelta(days=7)
-	print(week_date,"week_date")
+	yesterday_date = start_dt_date_obj - timedelta(days=1)
+	# print(yesterday_date,"yesterday_date")
+	week_date = yesterday_date - timedelta(days=6)
+	# print(week_date,"week_date")
+	month_date = yesterday_date - timedelta(days=29)
+	# print(month_date,"month_date")
 	for single_data in data:
+		# print(single_data,"single data")
 		if custom_range:
 			pass
 		elif start_dt and not custom_range:
 			start_date = single_data.created_at
-			if start_date == start_dt:
-				all_data["Today"] = single_data.data
+			if start_dt_date_obj == start_date:
+				all_data["today"].append(single_data.data)
+			if yesterday_date == start_date:
+				all_data["yesterday"].append(single_data.data)
+			if start_date <= yesterday_date and start_date >= week_date:
+				all_data["week"].append(single_data.data)
+			if start_date <= yesterday_date and start_date >= month_date:
+				all_data["month"].append(single_data.data)
+			if start_date <= yesterday_date:
+				all_data["year"].append(single_data.data)
+	print(all_data,"all_data")
 
 class UserAAdashboadTable(generics.ListCreateAPIView):
 	'''This class create the AA dashboard ranges table'''
