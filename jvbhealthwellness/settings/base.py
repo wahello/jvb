@@ -24,7 +24,7 @@ ADMINS = (
 
 #AUTH_USER_MODEL = 'users.User'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django_su',
