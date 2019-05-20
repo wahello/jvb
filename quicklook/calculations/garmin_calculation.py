@@ -332,6 +332,8 @@ def get_blank_model_fields(model):
 			'non_processed_food': '',
 			'processed_food':'',
 			'diet_type':'',
+			'no_plants_consumed_ql':'',
+			'list_of_pants_consumed_ql':'',
 		}
 		return fields
 

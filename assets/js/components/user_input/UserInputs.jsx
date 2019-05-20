@@ -103,8 +103,8 @@ class UserInputs extends React.Component{
         calories:'',
         calories_item:'',
 
-        measured_hr:'-', 
-        hr_down_99:'-',
+        measured_hr:'', 
+        hr_down_99:'',
         time_to_99_min:'',
         time_to_99_sec:'',
         hr_level:'',
