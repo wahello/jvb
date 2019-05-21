@@ -75,7 +75,11 @@ export function renderProcessedFoodModal(){
 	  const updateState = function(val,name){
 						  this.setState({
 						  [name]: val
-						  })}.bind(this);
+						  },()=>{
+								console.log("name of the text area state",name)
+								console.log("value of the text area state",val)
+								console.log(this.state.no_plants_consumed,"no of plants consumed after entering text")
+							})}.bind(this);
 
 		  return(
 		<UnprocesedFoodModal
@@ -84,6 +88,8 @@ export function renderProcessedFoodModal(){
 		updateState={updateState}
 		editable = {this.state.editable}
 		report_type = {this.state.report_type}
+		no_plants_consumed = {this.state.no_plants_consumed}
+		list_of_pants_consumed = {this.state.list_of_pants_consumed}
 	  />
 	  );
 	}

@@ -94,6 +94,8 @@ class UserInputs extends React.Component{
         processed_food_list:'',
         alchol_consumed:'',
         alcohol_drink_consumed_list:'',
+        no_plants_consumed:'',
+        list_of_pants_consumed:'',
         stress:'',
         sick:'',
         sickness:'',
@@ -103,8 +105,8 @@ class UserInputs extends React.Component{
         calories:'',
         calories_item:'',
 
-        measured_hr:'-', 
-        hr_down_99:'-',
+        measured_hr:'', 
+        hr_down_99:'',
         time_to_99_min:'',
         time_to_99_sec:'',
         hr_level:'',
@@ -517,6 +519,9 @@ shouldFetchWeatherData(activities){
           processed_food_list:have_strong_input?data.data.strong_input.list_of_processed_food_consumed_yesterday:'',
           alchol_consumed:have_strong_input?data.data.strong_input.number_of_alcohol_consumed_yesterday:'',
           alcohol_drink_consumed_list:have_strong_input?data.data.strong_input.alcohol_drink_consumed_list:'',
+          no_plants_consumed:have_strong_input?data.data.strong_input.no_plants_consumed:'',
+          list_of_pants_consumed:have_strong_input?data.data.strong_input.list_of_pants_consumed:'',
+          
           stress:have_encouraged_input?data.data.encouraged_input.stress_level_yesterday:'',
           sick:have_optional_input?data.data.optional_input.sick:'',
           sickness:have_optional_input?data.data.optional_input.sickness:'',
@@ -3872,7 +3877,7 @@ handleScroll() {
                                   onChange={this.handleChangeProcessedFood}>
                                   <option key="select" value="">select</option>
                                   {this.createDropdown(0,100,5)}
-                                  </Input>
+                                 </Input>
                                 </div>
                               }
                               {
