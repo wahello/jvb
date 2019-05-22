@@ -572,13 +572,18 @@ class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
 		return queryset
 
 def avg_all_dashboard_data(all_data):
-	week_data = all_data.['week']
-	month_data = all_data.['month']
-	year_data = all_data.['year']
+	week_data = all_data['week']
+	month_data = all_data['month']
+	year_data = all_data['year']
 	if week_data and len(week_data) >= 2:
-		pass
+		print(week_data,"week data")
 	if month_data and len(month_data) >= 2:
-		pass
+		for index,value in enumerate(month_data):
+			value = ast.literal_eval(value)
+			if index > 0:
+				for key,data in value.items():
+					pass
+
 	if week_data and len(week_data) >= 2:
 		pass
 
@@ -599,7 +604,7 @@ def create_aa_dashboard_format(data,start_dt=None,custom_range=None):
 	month_date = yesterday_date - timedelta(days=29)
 	# print(month_date,"month_date")
 	for single_data in data:
-		# print(single_data,"single data")
+		print(type(single_data.data),"single data")
 		if custom_range:
 			pass
 		elif start_dt and not custom_range:
