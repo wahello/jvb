@@ -571,6 +571,17 @@ class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
 			queryset = TwentyfourHourTimeHeartZones.objects.all()
 		return queryset
 
+def avg_all_dashboard_data(all_data):
+	week_data = all_data.['week']
+	month_data = all_data.['month']
+	year_data = all_data.['year']
+	if week_data and len(week_data) >= 2:
+		pass
+	if month_data and len(month_data) >= 2:
+		pass
+	if week_data and len(week_data) >= 2:
+		pass
+
 def create_aa_dashboard_format(data,start_dt=None,custom_range=None):
 	all_data = {
 				"today":[],
@@ -603,7 +614,8 @@ def create_aa_dashboard_format(data,start_dt=None,custom_range=None):
 				all_data["month"].append(single_data.data)
 			if start_date <= yesterday_date:
 				all_data["year"].append(single_data.data)
-	print(all_data,"all_data")
+	avg_all_dashboard_data(all_data)
+	# print(all_data,"all_data")
 
 class UserAAdashboadTable(generics.ListCreateAPIView):
 	'''This class create the AA dashboard ranges table'''
