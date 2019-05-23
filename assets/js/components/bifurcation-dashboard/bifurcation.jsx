@@ -2048,28 +2048,28 @@ renderActiveMinutesColors(totalActiveDuration,exerciseActiveMin=null){
     }
    else if(restinghrvalue_a!= null || restinghrvalue_a!= undefined || restinghrvalue_a!= ' ' ){
         let outres11 = parseFloat(restinghrvalue_a)
-        restinghrvalue_a =outres11.toFixed(1)
+        // restinghrvalue_a =outres11.toFixed(1)
    }
   if( restinghrvalue_b == null || restinghrvalue_b == undefined || restinghrvalue_b == ' ' ){
       restinghrvalue_b = '-';
     }
   else if(restinghrvalue_b!= null || restinghrvalue_b!= undefined || restinghrvalue_b!= ' ' ){
         let outres12 = parseFloat(restinghrvalue_b)
-        restinghrvalue_b =outres12.toFixed(1)
+        // restinghrvalue_b =outres12.toFixed(1)
    }
   if( restinghrvalue_c == null || restinghrvalue_c == undefined || restinghrvalue_c == ' ' ){
       restinghrvalue_c = '-';
     }
   else if(restinghrvalue_c!= null || restinghrvalue_c!= undefined || restinghrvalue_c!= ' ' ){
         let outres13 = parseFloat(restinghrvalue_c)
-        restinghrvalue_c =outres13.toFixed(1)
+        // restinghrvalue_c =outres13.toFixed(1)
    }
   if( restinghrvalue_d == null || restinghrvalue_d == undefined || restinghrvalue_d == ' ' ){
       restinghrvalue_d = '-';
     }
   else if(restinghrvalue_d!= null || restinghrvalue_d!= undefined || restinghrvalue_d!= ' ' ){
        let outres14 = parseFloat(restinghrvalue_d)
-        restinghrvalue_d =outres14.toFixed(1)
+        // restinghrvalue_d =outres14.toFixed(1)
    }
   if( restinghrvalue_f == null || restinghrvalue_f == undefined || restinghrvalue_f == ' ' ){
       restinghrvalue_f = '-';
@@ -2077,7 +2077,7 @@ renderActiveMinutesColors(totalActiveDuration,exerciseActiveMin=null){
     }     
   else if(restinghrvalue_f!= null || restinghrvalue_f!= undefined || restinghrvalue_f!= ' ' ){
        let outres15 = parseFloat(restinghrvalue_f)
-        restinghrvalue_f =outres15.toFixed(1)
+        // restinghrvalue_f =outres15.toFixed(1)
    }   
   if( restinghrvalue_prcnt_a == null || restinghrvalue_prcnt_a == undefined || restinghrvalue_prcnt_a == ' ' ){
       restinghrvalue_prcnt_a = '-';
@@ -2751,7 +2751,7 @@ restingHrColors(rhrscore){
     }
   else if(garminvalue_a!= null||garminvalue_a!= undefined|| garminvalue_a!= ' '){
     let outres1 = parseFloat(garminvalue_a)
-    garminvalue_a =outres1.toFixed(1)
+    // garminvalue_a =outres1.toFixed(1)
     }
    
   if( garminvalue_b == null || garminvalue_b == undefined || garminvalue_b == ' ' ){
@@ -2759,7 +2759,7 @@ restingHrColors(rhrscore){
     }
      else if(garminvalue_b!= null||garminvalue_b!= undefined|| garminvalue_b!= ' '){
     let outres2 = parseFloat(garminvalue_b)
-    garminvalue_b =outres2.toFixed(1)
+    // garminvalue_b =outres2.toFixed(1)
    
     }
  if( garminvalue_c == null || garminvalue_c == undefined || garminvalue_c == ' ' ){
@@ -2767,7 +2767,7 @@ restingHrColors(rhrscore){
     }
      else if(garminvalue_c!= null||garminvalue_c!= undefined|| garminvalue_c!= ' '){
     let outres3 = parseFloat(garminvalue_c)
-    garminvalue_c =outres3.toFixed(1)
+    // garminvalue_c =outres3.toFixed(1)
   
     }
  if( garminvalue_f == null || garminvalue_f == undefined || garminvalue_f == ' ' ){
@@ -2775,7 +2775,7 @@ restingHrColors(rhrscore){
     }
      else if(garminvalue_f!= null||garminvalue_f!= undefined|| garminvalue_f!= ' '){
     let outres4 = parseFloat(garminvalue_f)
-    garminvalue_f =outres4.toFixed(1)
+    // garminvalue_f =outres4.toFixed(1)
   
     }                        
  if( garminvalue_prcnt_a == null || garminvalue_prcnt_a == undefined || garminvalue_prcnt_a == ' ' ){
@@ -2858,7 +2858,7 @@ restingHrColors(rhrscore){
   render(){
     return(
         <div>
-        <NavbarMenu title={"Bifurcation Dashboard"}/>
+        <NavbarMenu title={"Bifurcation (Consistency) Dashboard (BCD)"}/>
                 {this.state.active_view &&
         <div className="nav3" id='bottom-nav'>
                            <div className="nav1" style={{position: this.state.scrollingLock ? "fixed" : "relative"}}>
@@ -3110,12 +3110,11 @@ restingHrColors(rhrscore){
                                    name="bf3_start_date"
                                    value={this.state.bf3_start_date}
                                    onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
-
                                 </div>
                                 <div id="date" className="justify-content-center">
-
+       
                                   <Label>End date</Label>&nbsp;<b style={{fontWeight:"bold"}}>:</b>&nbsp;
-                                  <Input type="date"
+                                   <Input type="date"
                                    name="bf3_end_date"
                                    value={this.state.bf3_end_date}
                                    onChange={this.handleChange} style={{height:"35px",borderRadius:"7px"}}/>
@@ -3125,13 +3124,13 @@ restingHrColors(rhrscore){
 
                                 <button
                                 id="nav-btn"
-                                 style={{backgroundColor:"#ed9507"}}
+                                 style={{backgroundColor:"#ed9507"}}           
                                  type="submit"
                                  className="btn btn-block-lg"
                                  onClick={this.onSubmitDate3} style={{width:"175px"}}>SUBMIT</button>
                                  </div>
 
-                               </Form>
+                               </Form> 
                             </div>
                        </PopoverBody>
                     </Popover> 
@@ -3146,7 +3145,7 @@ restingHrColors(rhrscore){
                        {this.renderDateRangeDropdown(this.state.summary,this.state.duration_date)}
                       </DropdownMenu>
                     </Dropdown>
-                    <span className="paweekdate"><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span>
+                    <span className="paweekdate"><span>{this.state.capt}</span><span>{"(" + this.state.date + ")"}</span></span>
                   </div>
             </div>
           }
@@ -3158,7 +3157,7 @@ restingHrColors(rhrscore){
                <div className="col-md-6">
                   {this.renderMcs(this.state.summary.mc,this.state.selected_range)}
              </div>
-           </div>
+           </div>  
            <div className="row">
             <div className="col-md-6">
                   {this.renderNonExerciseSteps(this.state.summary.non_exercise,this.state.selected_range)}
@@ -3201,7 +3200,7 @@ restingHrColors(rhrscore){
             <div>
              <div className="col-md-6">
              {this.renderGarminStats(this.state.summary.stress,this.state.selected_range)}
-             </div>
+             </div>     
             </div> 
             </div>
             {this.renderOverallBifurcationSelectedDateFetchOverlay()}
