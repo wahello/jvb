@@ -581,7 +581,7 @@ def get_total_duration(value):
 def add_percent_field(all_data,key,total_duration):
 	data = all_data[key][0]
 	for keys,value in data.items():
-		value['percent'] = (value.get('duration')/total_duration) * 100
+		value['percent'] = round((value.get('duration')/total_duration) * 100)
 	return all_data
 
 def add_percent_aa_dashboard(all_data):
