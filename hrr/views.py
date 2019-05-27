@@ -570,25 +570,38 @@ class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
 		else:
 			queryset = TwentyfourHourTimeHeartZones.objects.all()
 		return queryset
+# def conver_to_list_of_dict(all_data):
+
 
 def avg_all_dashboard_data(all_data):
 	week_data = all_data['week']
 	month_data = all_data['month']
 	year_data = all_data['year']
 	if week_data and len(week_data) >= 2:
-		print(week_data,"week data")
+		for index,value in enumerate(week_data):
+			if index > 0:
+				for key,data in value.items():
+					week_data[0][key]['duration'] = data.get(
+						'duration',0) + week_data[0][key]['duration']
 	if month_data and len(month_data) >= 2:
 		for index,value in enumerate(month_data):
 			if index > 0:
 				for key,data in value.items():
 					month_data[0][key]['duration'] = data.get(
 						'duration',0) + month_data[0][key]['duration']
-	# print(all_data['month'],"month")
-	print(month_data[0],"month_data")
+	if year_data and len(year_data) >= 2:
+		for index,value in enumerate(year_data):
+			if index > 0:
+				for key,data in value.items():
+					year_data[0][key]['duration'] = data.get(
+						'duration',0) + year_data[0][key]['duration']
 
-	if week_data and len(week_data) >= 2:
-		pass
- 
+	# conver_to_list_of_dict(all_data)
+	all_data['week'] = week_data[0:1]
+	all_data['month'] = month_data[0:1]
+	all_data['year'] = year_data[0:1]
+	return all_data
+
 def create_aa_dashboard_format(data,start_dt=None,custom_range=None):
 	all_data = {
 				"today":[],
@@ -612,16 +625,16 @@ def create_aa_dashboard_format(data,start_dt=None,custom_range=None):
 		elif start_dt and not custom_range:
 			start_date = single_data.created_at
 			if start_dt_date_obj == start_date:
-				all_data["today"].append(single_data.data)
+				all_data["today"].append(ast.literal_eval(single_data.data))
 			if yesterday_date == start_date:
-				all_data["yesterday"].append(single_data.data)
+				all_data["yesterday"].append(ast.literal_eval(single_data.data))
 			if start_date <= yesterday_date and start_date >= week_date:
 				all_data["week"].append(ast.literal_eval(single_data.data))
 			if start_date <= yesterday_date and start_date >= month_date:
 				all_data["month"].append(ast.literal_eval(single_data.data))
 			if start_date <= yesterday_date:
-				all_data["year"].append(single_data.data)
-	avg_all_dashboard_data(all_data)
+				all_data["year"].append(ast.literal_eval(single_data.data))
+	return avg_all_dashboard_data(all_data)
 	# print(all_data,"all_data")
 
 class UserAAdashboadTable(generics.ListCreateAPIView):
@@ -632,7 +645,9 @@ class UserAAdashboadTable(generics.ListCreateAPIView):
 		start_dt = self.request.query_params.get('start_date', None)
 		custom_range = self.request.query_params.get('custom_range', None)
 		querset = self.get_queryset()
-		create_aa_dashboard_format(querset,start_dt,custom_range)
+		aa_dashboard_data = create_aa_dashboard_format(
+			querset,start_dt,custom_range)
+		return Response(aa_dashboard_data, status=status.HTTP_200_OK)
 
 	def get_queryset(self):
 		user = self.request.user
