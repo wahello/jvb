@@ -40,4 +40,7 @@ urlpatterns = [
 	url(r'^aa_twentyfour_hour_low_high_calculations$',views.UserAA_twentyfour_hour_low_high_values.as_view(),
 								  name="aa_whole_day_database"),
 	url(r'^aa_ranges$',views.aa_ranges_api,name="aa ranges api"),
+	url(r'^aa_dashboard/table$',views.UserAAdashboadTable.as_view(),name="aa dashboard table"),
+
+
 ]

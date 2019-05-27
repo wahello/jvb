@@ -12,6 +12,8 @@ from hrr.views import hrr_calculations,\
 						store_aa_calculations,\
 						add_date_to_fitfile
 
+from hrr.aa_dashboard import store_aadashboard_calculations
+
 from common.common_calculations import update_aa_calculation
 
 logger = get_task_logger(__name__)
@@ -41,6 +43,14 @@ def create_hrrdata(user_id,from_date,to_date):
 		try:
 			store_aa_calculations(user,from_date,to_date)
 		except Exception as e:	
+			logger.error(e,exc_info=True)
+		# try:
+		# 	store_aa_dashboard(user,from_date,to_date)
+		# except Exception as e:	
+		# 	logger.error(e,exc_info=True)
+		try:
+			store_aadashboard_calculations(user,from_date,to_date)
+		except Exception as e:
 			logger.error(e,exc_info=True)
 
 @task(name="hrr.save_only_hrr_data")
