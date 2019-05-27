@@ -92,8 +92,6 @@ def get_daily_activities_in_base_format(user,from_date,to_date=None,include_all=
     # print(from_date,to_date,"fffffffff")
     if to_date:
         while(from_date <= to_date):
-            
-            cr_date = from_date - timedelta(days=1)
             transformed_activities[from_date.strftime('%Y-%m-%d')] = {}
             from_date += timedelta(days=1)
         device_type = quicklook.calculations.calculation_driver.which_device(user)
@@ -102,9 +100,10 @@ def get_daily_activities_in_base_format(user,from_date,to_date=None,include_all=
         for activity in activities:
             activity_id = activity['activity_id']
             activity_date = activity['created_at'].strftime("%Y-%m-%d")
-            # try:
-            transformed_activities[activity_date][str(activity_id)] = get_activity_base_format(activity)
-            # except KeyError:
+            try:
+                transformed_activities[activity_date][str(activity_id)] = get_activity_base_format(activity)
+            except KeyError:
+                pass
             #     transformed_activities[activity_date][str(activity_id)] = get_activity_base_format(activity)
     else:
         for activity in activities:
