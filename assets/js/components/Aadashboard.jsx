@@ -4033,10 +4033,8 @@ class Aadashboard extends Component {
 		timezonesData = timezonesData[0]
   if ( timezonesData !=null && timezonesData !=undefined)
 		{let sequences = Object.keys(timezonesData)
-		// console.log(sequences)
 		let lastSequence = sequences[sequences.length - 1]
 		let lastTimeZone = timezonesData[lastSequence]
-		console.log(lastTimeZone)
 		sequences.map((timezone) => {
 			let currentTimeZone = timezonesData[timezone]
 			if (count % 4 == 0) {
