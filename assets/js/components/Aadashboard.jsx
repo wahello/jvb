@@ -4031,7 +4031,8 @@ class Aadashboard extends Component {
 		let timezonesData = this.state.durationInTimeZones[this.state.selected_range]
 		if (timezonesData == undefined) return null
 		timezonesData = timezonesData[0]
-		let sequences = Object.keys(timezonesData)
+  if ( timezonesData !=null && timezonesData !=undefined)
+		{let sequences = Object.keys(timezonesData)
 		// console.log(sequences)
 		let lastSequence = sequences[sequences.length - 1]
 		let lastTimeZone = timezonesData[lastSequence]
@@ -4056,6 +4057,7 @@ class Aadashboard extends Component {
 			</h3>
 		</div>
 		return table
+  }
 
 	}
 
@@ -4419,7 +4421,8 @@ class Aadashboard extends Component {
 
 				<div style={{ "textAlign": "center" }} className="row mt-5 mb-5 justify-content-center">{/* Duration in Time zones table */}
 					{this.renderDurationInTimeZones()}
-				</div >
+		
+        </div>
 				{this.renderProgressFetchOverlay()}
 				{this.renderProgress2FetchOverlay()}
 				{this.renderProgress3FetchOverlay()}
