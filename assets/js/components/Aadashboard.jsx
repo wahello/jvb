@@ -16,16 +16,14 @@ import {
 	NavbarBrand, Nav, NavItem, NavLink,
 	Button, Popover, DropdownToggle, Dropdown, DropdownMenu, DropdownItem, PopoverBody, Form, FormGroup,
 	FormText, Label, Input, Card, CardImg, CardText,
-	CardBody, CardTitle, CardSubtitle, Badge
+	CardBody, CardTitle, CardSubtitle
 } from 'reactstrap';
 import NavbarMenu from './navbar';
-import fetchProgress, { fetchAaRanges } from '../network/progress';
+import fetchProgress, { fetchAaRanges, durationInTimeZones } from '../network/progress';
 import { getUserProfile } from '../network/auth';
 import { fetchLastSync } from '../network/quick';
 import { renderProgressFetchOverlay, renderProgress2FetchOverlay, renderProgress3FetchOverlay, renderProgressSelectedDateFetchOverlay } from './dashboard_healpers';
 
-import durationInTimeZones from './Aadashboard.json'
-import { isNull } from 'util';
 
 axiosRetry(axios, { retries: 3 });
 const duration = ["week", "today", "yesterday", "year", "month", "custom_range"];
@@ -114,7 +112,7 @@ class Aadashboard extends Component {
 			isStressInfoModelOpen: false,
 			numberOfDays: null,
 			aa_ranges: {},
-			durationInTimeZones: durationInTimeZones,
+			durationInTimeZones: {}
 		};
 
 
@@ -159,13 +157,16 @@ class Aadashboard extends Component {
 		this.renderProgress2FetchOverlay = renderProgress2FetchOverlay.bind(this);
 		this.renderProgress3FetchOverlay = renderProgress3FetchOverlay.bind(this);
 		this.renderProgressSelectedDateFetchOverlay = renderProgressSelectedDateFetchOverlay.bind(this);
-
+		this.renderDurationInTimeZones = this.renderDurationInTimeZones.bind(this)
+		this.successDurationInTimeZones = this.successDurationInTimeZones.bind(this)
+		this.errorDurationInTimeZones = this.errorDurationInTimeZones.bind(this)
 	}
 	reanderAllHrr(period, date, capt, selectedRange) {
 		this.setState({
 			selected_range: period,
 			date: date,
 			capt: capt,
+
 		});
 
 		let numberOfDays;
@@ -478,6 +479,7 @@ class Aadashboard extends Component {
 		}, () => {
 			fetchProgress(this.successProgress, this.errorProgress, this.state.selectedDate);
 			fetchAaRanges(this.successAaRanges, this.errorAaRanges, this.state.selectedDate);
+			durationInTimeZones(this.successDurationInTimeZones, this.errorDurationInTimeZones, this.state.selectedDate)
 		});
 	}
 
@@ -503,6 +505,15 @@ class Aadashboard extends Component {
 		getUserProfile(this.succesCallback);
 		fetchLastSync(this.successLastSync, this.errorquick);
 		fetchAaRanges(this.successAaRanges, this.errorAaRanges, this.state.selectedDate);
+		durationInTimeZones(this.successDurationInTimeZones, this.errorDurationInTimeZones, this.state.selectedDate)
+	}
+	successDurationInTimeZones(data) {
+		this.setState({
+			durationInTimeZones: data.data
+		})
+	}
+	errorDurationInTimeZones(error) {
+		console.log(error.message)
 	}
 	successAaRanges(data) {
 		this.setState({
@@ -636,1585 +647,3213 @@ class Aadashboard extends Component {
 	}
 
 	aaColorRanges(heartrate, heartRateNotRecorded, workout_duration_hours_min_score) {
-		let background = '', color = ''
-		let userage = Number.parseInt(this.state.userage)
-
-		if (heartrate == null || heartrate == undefined) return ['', '']
+		let background = '';
+		let color = '';
+		let userage = this.state.userage;
+		if (heartrate == null || heartrate == undefined) {
+			background = '';
+			color = '';
+			return [background, color];
+		}
 		else if (heartrate == 0) {
-			if (heartRateNotRecorded == "00:00"
-				&& workout_duration_hours_min_score != ' '
-				&& workout_duration_hours_min_score != '00:00'
-				&& workout_duration_hours_min_score) {
+			if (heartRateNotRecorded == "00:00" && (workout_duration_hours_min_score != ' ' && workout_duration_hours_min_score != '00:00' &&
+				workout_duration_hours_min_score)) {
 				background = 'green';
 				color = 'white';
-			}
-			else if (heartRateNotRecorded != "00:00"
-				&& heartRateNotRecorded
-				&& workout_duration_hours_min_score != ' '
-				&& workout_duration_hours_min_score
-				&& workout_duration_hours_min_score != '00:00') {
-				// this condition is useless as nothing is changed, 
-				// but left this code here as the previous definition for this function contains this contidion
-				// this will remains background and color to empty 
-			}
-		} else {
-			let colors = {
-				white: 'white',
-				green: 'green',
-				lightgreen: '#32CD32',
-				yellow: 'yellow',
-				black: 'black',
-				orange: 'orange',
-				red: 'red',
-			}
-			let conditions = []
-			if (userage < 13) {
+				return [background, color]
 
-			}//if userage < 13
-			else if (userage >= 13 || userage <= 100) {
-				switch (userage) {
-					case 13:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 120, background: colors.yellow, color: colors.black },
-							{ lower: 121, upper: 140, background: colors.lightgreen, color: colors.black },
-							{ lower: 141, upper: 152, background: colors.green, color: colors.white },
-							{ lower: 153, upper: 165, background: colors.lightgreen, color: colors.black },
-							{ lower: 166, upper: 169, background: colors.yellow, color: colors.black },
-							{ lower: 170, upper: 174, background: colors.orange, color: colors.black },
-							{ lower: 175, upper: 178, background: colors.lightgreen, color: colors.black },
-							{ lower: 179, upper: 181, background: colors.green, color: colors.white },
-							{ lower: 182, upper: 186, background: colors.lightgreen, color: colors.black },
-							{ lower: 187, upper: 189, background: colors.yellow, color: colors.black },
-							{ lower: 190, upper: 191, background: colors.orange, color: colors.black },
-							{ lower: 192, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 14:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 120, background: colors.yellow, color: colors.black },
-							{ lower: 121, upper: 139, background: colors.lightgreen, color: colors.black },
-							{ lower: 140, upper: 152, background: colors.green, color: colors.white },
-							{ lower: 153, upper: 165, background: colors.lightgreen, color: colors.black },
-							{ lower: 166, upper: 169, background: colors.yellow, color: colors.black },
-							{ lower: 170, upper: 174, background: colors.orange, color: colors.black },
-							{ lower: 175, upper: 178, background: colors.lightgreen, color: colors.black },
-							{ lower: 179, upper: 181, background: colors.green, color: colors.white },
-							{ lower: 182, upper: 186, background: colors.lightgreen, color: colors.black },
-							{ lower: 187, upper: 189, background: colors.yellow, color: colors.black },
-							{ lower: 190, upper: 191, background: colors.orange, color: colors.black },
-							{ lower: 192, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 15:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 120, background: colors.yellow, color: colors.black },
-							{ lower: 121, upper: 138, background: colors.lightgreen, color: colors.black },
-							{ lower: 139, upper: 152, background: colors.green, color: colors.white },
-							{ lower: 153, upper: 165, background: colors.lightgreen, color: colors.black },
-							{ lower: 166, upper: 169, background: colors.yellow, color: colors.black },
-							{ lower: 170, upper: 174, background: colors.orange, color: colors.black },
-							{ lower: 175, upper: 178, background: colors.lightgreen, color: colors.black },
-							{ lower: 179, upper: 181, background: colors.green, color: colors.white },
-							{ lower: 182, upper: 186, background: colors.lightgreen, color: colors.black },
-							{ lower: 187, upper: 189, background: colors.yellow, color: colors.black },
-							{ lower: 190, upper: 191, background: colors.orange, color: colors.black },
-							{ lower: 192, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 16:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 120, background: colors.yellow, color: colors.black },
-							{ lower: 121, upper: 137, background: colors.lightgreen, color: colors.black },
-							{ lower: 138, upper: 152, background: colors.green, color: colors.white },
-							{ lower: 153, upper: 164, background: colors.lightgreen, color: colors.black },
-							{ lower: 165, upper: 168, background: colors.yellow, color: colors.black },
-							{ lower: 169, upper: 173, background: colors.orange, color: colors.black },
-							{ lower: 174, upper: 177, background: colors.lightgreen, color: colors.black },
-							{ lower: 178, upper: 180, background: colors.green, color: colors.white },
-							{ lower: 181, upper: 185, background: colors.lightgreen, color: colors.black },
-							{ lower: 186, upper: 188, background: colors.yellow, color: colors.black },
-							{ lower: 189, upper: 190, background: colors.orange, color: colors.black },
-							{ lower: 191, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 17:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 120, background: colors.yellow, color: colors.black },
-							{ lower: 121, upper: 136, background: colors.lightgreen, color: colors.black },
-							{ lower: 137, upper: 152, background: colors.green, color: colors.white },
-							{ lower: 153, upper: 163, background: colors.lightgreen, color: colors.black },
-							{ lower: 164, upper: 167, background: colors.yellow, color: colors.black },
-							{ lower: 168, upper: 172, background: colors.orange, color: colors.black },
-							{ lower: 173, upper: 176, background: colors.lightgreen, color: colors.black },
-							{ lower: 177, upper: 179, background: colors.green, color: colors.white },
-							{ lower: 180, upper: 184, background: colors.lightgreen, color: colors.black },
-							{ lower: 185, upper: 187, background: colors.yellow, color: colors.black },
-							{ lower: 188, upper: 189, background: colors.orange, color: colors.black },
-							{ lower: 190, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 18:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 120, background: colors.yellow, color: colors.black },
-							{ lower: 121, upper: 135, background: colors.lightgreen, color: colors.black },
-							{ lower: 136, upper: 152, background: colors.green, color: colors.white },
-							{ lower: 153, upper: 162, background: colors.lightgreen, color: colors.black },
-							{ lower: 163, upper: 166, background: colors.yellow, color: colors.black },
-							{ lower: 167, upper: 171, background: colors.orange, color: colors.black },
-							{ lower: 172, upper: 175, background: colors.lightgreen, color: colors.black },
-							{ lower: 176, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 19:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 120, background: colors.yellow, color: colors.black },
-							{ lower: 121, upper: 134, background: colors.lightgreen, color: colors.black },
-							{ lower: 135, upper: 152, background: colors.green, color: colors.white },
-							{ lower: 153, upper: 161, background: colors.lightgreen, color: colors.black },
-							{ lower: 162, upper: 165, background: colors.yellow, color: colors.black },
-							{ lower: 166, upper: 170, background: colors.orange, color: colors.black },
-							{ lower: 171, upper: 173, background: colors.lightgreen, color: colors.black },
-							{ lower: 174, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 20:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 120, background: colors.yellow, color: colors.black },
-							{ lower: 121, upper: 133, background: colors.lightgreen, color: colors.black },
-							{ lower: 134, upper: 152, background: colors.green, color: colors.white },
-							{ lower: 153, upper: 160, background: colors.lightgreen, color: colors.black },
-							{ lower: 161, upper: 164, background: colors.yellow, color: colors.black },
-							{ lower: 165, upper: 169, background: colors.orange, color: colors.black },
-							{ lower: 170, upper: 172, background: colors.lightgreen, color: colors.black },
-							{ lower: 173, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 21:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 120, background: colors.yellow, color: colors.black },
-							{ lower: 121, upper: 132, background: colors.lightgreen, color: colors.black },
-							{ lower: 133, upper: 152, background: colors.green, color: colors.white },
-							{ lower: 153, upper: 159, background: colors.lightgreen, color: colors.black },
-							{ lower: 160, upper: 163, background: colors.yellow, color: colors.black },
-							{ lower: 164, upper: 168, background: colors.orange, color: colors.black },
-							{ lower: 169, upper: 171, background: colors.lightgreen, color: colors.black },
-							{ lower: 172, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 22:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 120, background: colors.yellow, color: colors.black },
-							{ lower: 121, upper: 131, background: colors.lightgreen, color: colors.black },
-							{ lower: 132, upper: 152, background: colors.green, color: colors.white },
-							{ lower: 153, upper: 158, background: colors.lightgreen, color: colors.black },
-							{ lower: 159, upper: 162, background: colors.yellow, color: colors.black },
-							{ lower: 163, upper: 167, background: colors.orange, color: colors.black },
-							{ lower: 168, upper: 170, background: colors.lightgreen, color: colors.black },
-							{ lower: 171, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 23:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 120, background: colors.yellow, color: colors.black },
-							{ lower: 121, upper: 130, background: colors.lightgreen, color: colors.black },
-							{ lower: 131, upper: 152, background: colors.green, color: colors.white },
-							{ lower: 153, upper: 157, background: colors.lightgreen, color: colors.black },
-							{ lower: 158, upper: 161, background: colors.yellow, color: colors.black },
-							{ lower: 163, upper: 166, background: colors.orange, color: colors.black },
-							{ lower: 167, upper: 169, background: colors.lightgreen, color: colors.black },
-							{ lower: 171, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 24:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 120, background: colors.yellow, color: colors.black },
-							{ lower: 121, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 151, background: colors.green, color: colors.white },
-							{ lower: 152, upper: 156, background: colors.lightgreen, color: colors.black },
-							{ lower: 157, upper: 160, background: colors.yellow, color: colors.black },
-							{ lower: 161, upper: 165, background: colors.orange, color: colors.black },
-							{ lower: 166, upper: 168, background: colors.lightgreen, color: colors.black },
-							{ lower: 169, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 25:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 119, background: colors.yellow, color: colors.black },
-							{ lower: 120, upper: 128, background: colors.lightgreen, color: colors.black },
-							{ lower: 129, upper: 150, background: colors.green, color: colors.white },
-							{ lower: 151, upper: 155, background: colors.lightgreen, color: colors.black },
-							{ lower: 156, upper: 159, background: colors.yellow, color: colors.black },
-							{ lower: 160, upper: 164, background: colors.orange, color: colors.black },
-							{ lower: 165, upper: 167, background: colors.lightgreen, color: colors.black },
-							{ lower: 168, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 26:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 118, background: colors.yellow, color: colors.black },
-							{ lower: 119, upper: 127, background: colors.lightgreen, color: colors.black },
-							{ lower: 128, upper: 149, background: colors.green, color: colors.white },
-							{ lower: 150, upper: 154, background: colors.lightgreen, color: colors.black },
-							{ lower: 155, upper: 158, background: colors.yellow, color: colors.black },
-							{ lower: 159, upper: 163, background: colors.orange, color: colors.black },
-							{ lower: 164, upper: 166, background: colors.lightgreen, color: colors.black },
-							{ lower: 167, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 27:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 117, background: colors.yellow, color: colors.black },
-							{ lower: 118, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 148, background: colors.green, color: colors.white },
-							{ lower: 150, upper: 154, background: colors.lightgreen, color: colors.black },
-							{ lower: 155, upper: 158, background: colors.yellow, color: colors.black },
-							{ lower: 159, upper: 163, background: colors.orange, color: colors.black },
-							{ lower: 164, upper: 166, background: colors.lightgreen, color: colors.black },
-							{ lower: 167, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 28:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 116, background: colors.yellow, color: colors.black },
-							{ lower: 117, upper: 125, background: colors.lightgreen, color: colors.black },
-							{ lower: 126, upper: 147, background: colors.green, color: colors.white },
-							{ lower: 148, upper: 154, background: colors.lightgreen, color: colors.black },
-							{ lower: 155, upper: 158, background: colors.yellow, color: colors.black },
-							{ lower: 159, upper: 163, background: colors.orange, color: colors.black },
-							{ lower: 164, upper: 166, background: colors.lightgreen, color: colors.black },
-							{ lower: 167, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 29:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 115, background: colors.yellow, color: colors.black },
-							{ lower: 116, upper: 124, background: colors.lightgreen, color: colors.black },
-							{ lower: 125, upper: 146, background: colors.green, color: colors.white },
-							{ lower: 147, upper: 154, background: colors.lightgreen, color: colors.black },
-							{ lower: 155, upper: 158, background: colors.yellow, color: colors.black },
-							{ lower: 159, upper: 163, background: colors.orange, color: colors.black },
-							{ lower: 164, upper: 166, background: colors.lightgreen, color: colors.black },
-							{ lower: 167, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 30:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 115, background: colors.yellow, color: colors.black },
-							{ lower: 116, upper: 123, background: colors.lightgreen, color: colors.black },
-							{ lower: 124, upper: 145, background: colors.green, color: colors.white },
-							{ lower: 146, upper: 154, background: colors.lightgreen, color: colors.black },
-							{ lower: 155, upper: 158, background: colors.yellow, color: colors.black },
-							{ lower: 159, upper: 163, background: colors.orange, color: colors.black },
-							{ lower: 164, upper: 166, background: colors.lightgreen, color: colors.black },
-							{ lower: 167, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 31:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 114, background: colors.yellow, color: colors.black },
-							{ lower: 115, upper: 133, background: colors.lightgreen, color: colors.black },
-							{ lower: 134, upper: 145, background: colors.green, color: colors.white },
-							{ lower: 146, upper: 154, background: colors.lightgreen, color: colors.black },
-							{ lower: 155, upper: 159, background: colors.yellow, color: colors.black },
-							{ lower: 160, upper: 167, background: colors.orange, color: colors.black },
-							{ lower: 168, upper: 170, background: colors.lightgreen, color: colors.black },
-							{ lower: 171, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 32:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 114, background: colors.yellow, color: colors.black },
-							{ lower: 115, upper: 132, background: colors.lightgreen, color: colors.black },
-							{ lower: 133, upper: 145, background: colors.green, color: colors.white },
-							{ lower: 146, upper: 153, background: colors.lightgreen, color: colors.black },
-							{ lower: 154, upper: 158, background: colors.yellow, color: colors.black },
-							{ lower: 159, upper: 166, background: colors.orange, color: colors.black },
-							{ lower: 167, upper: 169, background: colors.lightgreen, color: colors.black },
-							{ lower: 170, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 33:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 114, background: colors.yellow, color: colors.black },
-							{ lower: 115, upper: 131, background: colors.lightgreen, color: colors.black },
-							{ lower: 132, upper: 145, background: colors.green, color: colors.white },
-							{ lower: 146, upper: 152, background: colors.lightgreen, color: colors.black },
-							{ lower: 153, upper: 157, background: colors.yellow, color: colors.black },
-							{ lower: 158, upper: 165, background: colors.orange, color: colors.black },
-							{ lower: 166, upper: 168, background: colors.lightgreen, color: colors.black },
-							{ lower: 169, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 34:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 114, background: colors.yellow, color: colors.black },
-							{ lower: 115, upper: 130, background: colors.lightgreen, color: colors.black },
-							{ lower: 131, upper: 145, background: colors.green, color: colors.white },
-							{ lower: 146, upper: 151, background: colors.lightgreen, color: colors.black },
-							{ lower: 152, upper: 156, background: colors.yellow, color: colors.black },
-							{ lower: 157, upper: 164, background: colors.orange, color: colors.black },
-							{ lower: 165, upper: 167, background: colors.lightgreen, color: colors.black },
-							{ lower: 168, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 35:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 114, background: colors.yellow, color: colors.black },
-							{ lower: 115, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 145, background: colors.green, color: colors.white },
-							{ lower: 146, upper: 150, background: colors.lightgreen, color: colors.black },
-							{ lower: 151, upper: 155, background: colors.yellow, color: colors.black },
-							{ lower: 156, upper: 163, background: colors.orange, color: colors.black },
-							{ lower: 164, upper: 166, background: colors.lightgreen, color: colors.black },
-							{ lower: 168, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 36:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 114, background: colors.yellow, color: colors.black },
-							{ lower: 115, upper: 128, background: colors.lightgreen, color: colors.black },
-							{ lower: 129, upper: 144, background: colors.green, color: colors.white },
-							{ lower: 145, upper: 149, background: colors.lightgreen, color: colors.black },
-							{ lower: 150, upper: 154, background: colors.yellow, color: colors.black },
-							{ lower: 155, upper: 162, background: colors.orange, color: colors.black },
-							{ lower: 163, upper: 165, background: colors.lightgreen, color: colors.black },
-							{ lower: 166, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 37:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 113, background: colors.yellow, color: colors.black },
-							{ lower: 114, upper: 127, background: colors.lightgreen, color: colors.black },
-							{ lower: 128, upper: 143, background: colors.green, color: colors.white },
-							{ lower: 144, upper: 148, background: colors.lightgreen, color: colors.black },
-							{ lower: 149, upper: 153, background: colors.yellow, color: colors.black },
-							{ lower: 154, upper: 161, background: colors.orange, color: colors.black },
-							{ lower: 162, upper: 164, background: colors.lightgreen, color: colors.black },
-							{ lower: 165, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 38:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 112, background: colors.yellow, color: colors.black },
-							{ lower: 113, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 142, background: colors.green, color: colors.white },
-							{ lower: 141, upper: 147, background: colors.lightgreen, color: colors.black },
-							{ lower: 148, upper: 152, background: colors.yellow, color: colors.black },
-							{ lower: 153, upper: 160, background: colors.orange, color: colors.black },
-							{ lower: 161, upper: 163, background: colors.lightgreen, color: colors.black },
-							{ lower: 164, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 39:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 111, background: colors.yellow, color: colors.black },
-							{ lower: 112, upper: 125, background: colors.lightgreen, color: colors.black },
-							{ lower: 126, upper: 141, background: colors.green, color: colors.white },
-							{ lower: 142, upper: 146, background: colors.lightgreen, color: colors.black },
-							{ lower: 147, upper: 151, background: colors.yellow, color: colors.black },
-							{ lower: 152, upper: 159, background: colors.orange, color: colors.black },
-							{ lower: 160, upper: 162, background: colors.lightgreen, color: colors.black },
-							{ lower: 163, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 40:
-						conditions = [
-							{ lower: null, upper: 109, background: colors.red, color: colors.white },
-							{ lower: 110, upper: 110, background: colors.yellow, color: colors.black },
-							{ lower: 111, upper: 124, background: colors.lightgreen, color: colors.black },
-							{ lower: 125, upper: 140, background: colors.green, color: colors.white },
-							{ lower: 141, upper: 145, background: colors.lightgreen, color: colors.black },
-							{ lower: 146, upper: 150, background: colors.yellow, color: colors.black },
-							{ lower: 151, upper: 158, background: colors.orange, color: colors.black },
-							{ lower: 159, upper: 161, background: colors.lightgreen, color: colors.black },
-							{ lower: 162, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 41:
-						conditions = [
-							{ lower: null, upper: 108, background: colors.red, color: colors.white },
-							{ lower: 109, upper: 109, background: colors.yellow, color: colors.black },
-							{ lower: 110, upper: 123, background: colors.lightgreen, color: colors.black },
-							{ lower: 124, upper: 139, background: colors.green, color: colors.white },
-							{ lower: 140, upper: 144, background: colors.lightgreen, color: colors.black },
-							{ lower: 145, upper: 149, background: colors.yellow, color: colors.black },
-							{ lower: 150, upper: 157, background: colors.orange, color: colors.black },
-							{ lower: 158, upper: 160, background: colors.lightgreen, color: colors.black },
-							{ lower: 161, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 42:
-						conditions = [
-							{ lower: null, upper: 107, background: colors.red, color: colors.white },
-							{ lower: 108, upper: 108, background: colors.yellow, color: colors.black },
-							{ lower: 109, upper: 122, background: colors.lightgreen, color: colors.black },
-							{ lower: 123, upper: 138, background: colors.green, color: colors.white },
-							{ lower: 139, upper: 143, background: colors.lightgreen, color: colors.black },
-							{ lower: 144, upper: 148, background: colors.yellow, color: colors.black },
-							{ lower: 149, upper: 156, background: colors.orange, color: colors.black },
-							{ lower: 157, upper: 159, background: colors.lightgreen, color: colors.black },
-							{ lower: 160, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 43:
-						conditions = [
-							{ lower: null, upper: 106, background: colors.red, color: colors.white },
-							{ lower: 107, upper: 107, background: colors.yellow, color: colors.black },
-							{ lower: 108, upper: 121, background: colors.lightgreen, color: colors.black },
-							{ lower: 122, upper: 137, background: colors.green, color: colors.white },
-							{ lower: 138, upper: 142, background: colors.lightgreen, color: colors.black },
-							{ lower: 143, upper: 147, background: colors.yellow, color: colors.black },
-							{ lower: 148, upper: 155, background: colors.orange, color: colors.black },
-							{ lower: 156, upper: 158, background: colors.lightgreen, color: colors.black },
-							{ lower: 159, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 44:
-						conditions = [
-							{ lower: null, upper: 105, background: colors.red, color: colors.white },
-							{ lower: 106, upper: 106, background: colors.yellow, color: colors.black },
-							{ lower: 107, upper: 120, background: colors.lightgreen, color: colors.black },
-							{ lower: 121, upper: 136, background: colors.green, color: colors.white },
-							{ lower: 137, upper: 141, background: colors.lightgreen, color: colors.black },
-							{ lower: 142, upper: 146, background: colors.yellow, color: colors.black },
-							{ lower: 147, upper: 154, background: colors.orange, color: colors.black },
-							{ lower: 155, upper: 157, background: colors.lightgreen, color: colors.black },
-							{ lower: 158, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 45:
-						conditions = [
-							{ lower: null, upper: 104, background: colors.red, color: colors.white },
-							{ lower: 105, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 119, background: colors.lightgreen, color: colors.black },
-							{ lower: 120, upper: 135, background: colors.green, color: colors.white },
-							{ lower: 138, upper: 140, background: colors.lightgreen, color: colors.black },
-							{ lower: 141, upper: 145, background: colors.yellow, color: colors.black },
-							{ lower: 146, upper: 153, background: colors.orange, color: colors.black },
-							{ lower: 154, upper: 156, background: colors.lightgreen, color: colors.black },
-							{ lower: 158, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 46:
-						conditions = [
-							{ lower: null, upper: 103, background: colors.red, color: colors.white },
-							{ lower: 104, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 118, background: colors.lightgreen, color: colors.black },
-							{ lower: 119, upper: 134, background: colors.green, color: colors.white },
-							{ lower: 135, upper: 139, background: colors.lightgreen, color: colors.black },
-							{ lower: 140, upper: 144, background: colors.yellow, color: colors.black },
-							{ lower: 145, upper: 152, background: colors.orange, color: colors.black },
-							{ lower: 153, upper: 155, background: colors.lightgreen, color: colors.black },
-							{ lower: 156, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 47:
-						conditions = [
-							{ lower: null, upper: 102, background: colors.red, color: colors.white },
-							{ lower: 103, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 117, background: colors.lightgreen, color: colors.black },
-							{ lower: 118, upper: 133, background: colors.green, color: colors.white },
-							{ lower: 134, upper: 138, background: colors.lightgreen, color: colors.black },
-							{ lower: 139, upper: 143, background: colors.yellow, color: colors.black },
-							{ lower: 144, upper: 151, background: colors.orange, color: colors.black },
-							{ lower: 152, upper: 154, background: colors.lightgreen, color: colors.black },
-							{ lower: 155, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 48:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 116, background: colors.lightgreen, color: colors.black },
-							{ lower: 117, upper: 132, background: colors.green, color: colors.white },
-							{ lower: 133, upper: 137, background: colors.lightgreen, color: colors.black },
-							{ lower: 138, upper: 142, background: colors.yellow, color: colors.black },
-							{ lower: 143, upper: 150, background: colors.orange, color: colors.black },
-							{ lower: 151, upper: 153, background: colors.lightgreen, color: colors.black },
-							{ lower: 154, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 49:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 115, background: colors.lightgreen, color: colors.black },
-							{ lower: 116, upper: 131, background: colors.green, color: colors.white },
-							{ lower: 132, upper: 136, background: colors.lightgreen, color: colors.black },
-							{ lower: 137, upper: 141, background: colors.yellow, color: colors.black },
-							{ lower: 142, upper: 149, background: colors.orange, color: colors.black },
-							{ lower: 150, upper: 152, background: colors.lightgreen, color: colors.black },
-							{ lower: 153, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 50:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 114, background: colors.lightgreen, color: colors.black },
-							{ lower: 115, upper: 130, background: colors.green, color: colors.white },
-							{ lower: 131, upper: 135, background: colors.lightgreen, color: colors.black },
-							{ lower: 136, upper: 140, background: colors.yellow, color: colors.black },
-							{ lower: 141, upper: 148, background: colors.orange, color: colors.black },
-							{ lower: 149, upper: 151, background: colors.lightgreen, color: colors.black },
-							{ lower: 152, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 51:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 113, background: colors.lightgreen, color: colors.black },
-							{ lower: 114, upper: 129, background: colors.green, color: colors.white },
-							{ lower: 130, upper: 134, background: colors.lightgreen, color: colors.black },
-							{ lower: 135, upper: 139, background: colors.yellow, color: colors.black },
-							{ lower: 140, upper: 147, background: colors.orange, color: colors.black },
-							{ lower: 148, upper: 150, background: colors.lightgreen, color: colors.black },
-							{ lower: 151, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 52:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 112, background: colors.lightgreen, color: colors.black },
-							{ lower: 113, upper: 128, background: colors.green, color: colors.white },
-							{ lower: 129, upper: 133, background: colors.lightgreen, color: colors.black },
-							{ lower: 134, upper: 138, background: colors.yellow, color: colors.black },
-							{ lower: 139, upper: 146, background: colors.orange, color: colors.black },
-							{ lower: 147, upper: 149, background: colors.lightgreen, color: colors.black },
-							{ lower: 150, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 53:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 111, background: colors.lightgreen, color: colors.black },
-							{ lower: 112, upper: 127, background: colors.green, color: colors.white },
-							{ lower: 128, upper: 132, background: colors.lightgreen, color: colors.black },
-							{ lower: 133, upper: 137, background: colors.yellow, color: colors.black },
-							{ lower: 138, upper: 145, background: colors.orange, color: colors.black },
-							{ lower: 146, upper: 148, background: colors.lightgreen, color: colors.black },
-							{ lower: 149, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 54:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 110, background: colors.lightgreen, color: colors.black },
-							{ lower: 111, upper: 126, background: colors.green, color: colors.white },
-							{ lower: 127, upper: 131, background: colors.lightgreen, color: colors.black },
-							{ lower: 132, upper: 136, background: colors.yellow, color: colors.black },
-							{ lower: 137, upper: 144, background: colors.orange, color: colors.black },
-							{ lower: 145, upper: 147, background: colors.lightgreen, color: colors.black },
-							{ lower: 148, upper: 178, background: colors.green, color: colors.white },
-							{ lower: 179, upper: 183, background: colors.lightgreen, color: colors.black },
-							{ lower: 184, upper: 186, background: colors.yellow, color: colors.black },
-							{ lower: 187, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 55:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 130, background: colors.lightgreen, color: colors.black },
-							{ lower: 131, upper: 135, background: colors.yellow, color: colors.black },
-							{ lower: 136, upper: 143, background: colors.orange, color: colors.black },
-							{ lower: 144, upper: 148, background: colors.lightgreen, color: colors.black },
-							{ lower: 147, upper: 173, background: colors.green, color: colors.white },
-							{ lower: 174, upper: 178, background: colors.lightgreen, color: colors.black },
-							{ lower: 179, upper: 183, background: colors.yellow, color: colors.black },
-							{ lower: 184, upper: 188, background: colors.orange, color: colors.black },
-							{ lower: 189, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 56:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 134, background: colors.yellow, color: colors.black },
-							{ lower: 135, upper: 142, background: colors.orange, color: colors.black },
-							{ lower: 143, upper: 147, background: colors.lightgreen, color: colors.black },
-							{ lower: 146, upper: 172, background: colors.green, color: colors.white },
-							{ lower: 173, upper: 177, background: colors.lightgreen, color: colors.black },
-							{ lower: 178, upper: 182, background: colors.yellow, color: colors.black },
-							{ lower: 183, upper: 187, background: colors.orange, color: colors.black },
-							{ lower: 188, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 57:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 128, background: colors.lightgreen, color: colors.black },
-							{ lower: 129, upper: 133, background: colors.yellow, color: colors.black },
-							{ lower: 134, upper: 141, background: colors.orange, color: colors.black },
-							{ lower: 142, upper: 146, background: colors.lightgreen, color: colors.black },
-							{ lower: 147, upper: 171, background: colors.green, color: colors.white },
-							{ lower: 172, upper: 176, background: colors.lightgreen, color: colors.black },
-							{ lower: 177, upper: 181, background: colors.yellow, color: colors.black },
-							{ lower: 182, upper: 186, background: colors.orange, color: colors.black },
-							{ lower: 187, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 58:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 127, background: colors.lightgreen, color: colors.black },
-							{ lower: 128, upper: 132, background: colors.yellow, color: colors.black },
-							{ lower: 133, upper: 140, background: colors.orange, color: colors.black },
-							{ lower: 141, upper: 145, background: colors.lightgreen, color: colors.black },
-							{ lower: 144, upper: 170, background: colors.green, color: colors.white },
-							{ lower: 171, upper: 175, background: colors.lightgreen, color: colors.black },
-							{ lower: 176, upper: 180, background: colors.yellow, color: colors.black },
-							{ lower: 181, upper: 185, background: colors.orange, color: colors.black },
-							{ lower: 186, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 59:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 131, background: colors.yellow, color: colors.black },
-							{ lower: 132, upper: 139, background: colors.orange, color: colors.black },
-							{ lower: 140, upper: 144, background: colors.lightgreen, color: colors.black },
-							{ lower: 145, upper: 169, background: colors.green, color: colors.white },
-							{ lower: 170, upper: 174, background: colors.lightgreen, color: colors.black },
-							{ lower: 175, upper: 179, background: colors.yellow, color: colors.black },
-							{ lower: 180, upper: 184, background: colors.orange, color: colors.black },
-							{ lower: 185, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 60:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 130, background: colors.yellow, color: colors.black },
-							{ lower: 131, upper: 138, background: colors.orange, color: colors.black },
-							{ lower: 139, upper: 143, background: colors.lightgreen, color: colors.black },
-							{ lower: 144, upper: 168, background: colors.green, color: colors.white },
-							{ lower: 169, upper: 173, background: colors.lightgreen, color: colors.black },
-							{ lower: 174, upper: 178, background: colors.yellow, color: colors.black },
-							{ lower: 179, upper: 183, background: colors.orange, color: colors.black },
-							{ lower: 184, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 61:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 129, background: colors.yellow, color: colors.black },
-							{ lower: 130, upper: 137, background: colors.orange, color: colors.black },
-							{ lower: 138, upper: 142, background: colors.lightgreen, color: colors.black },
-							{ lower: 143, upper: 167, background: colors.green, color: colors.white },
-							{ lower: 168, upper: 172, background: colors.lightgreen, color: colors.black },
-							{ lower: 173, upper: 177, background: colors.yellow, color: colors.black },
-							{ lower: 178, upper: 182, background: colors.orange, color: colors.black },
-							{ lower: 183, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 62:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 128, background: colors.yellow, color: colors.black },
-							{ lower: 129, upper: 136, background: colors.orange, color: colors.black },
-							{ lower: 137, upper: 141, background: colors.lightgreen, color: colors.black },
-							{ lower: 142, upper: 166, background: colors.green, color: colors.white },
-							{ lower: 167, upper: 171, background: colors.lightgreen, color: colors.black },
-							{ lower: 172, upper: 176, background: colors.yellow, color: colors.black },
-							{ lower: 177, upper: 181, background: colors.orange, color: colors.black },
-							{ lower: 182, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 63:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 127, background: colors.yellow, color: colors.black },
-							{ lower: 128, upper: 135, background: colors.orange, color: colors.black },
-							{ lower: 136, upper: 140, background: colors.lightgreen, color: colors.black },
-							{ lower: 141, upper: 165, background: colors.green, color: colors.white },
-							{ lower: 166, upper: 170, background: colors.lightgreen, color: colors.black },
-							{ lower: 171, upper: 175, background: colors.yellow, color: colors.black },
-							{ lower: 176, upper: 180, background: colors.orange, color: colors.black },
-							{ lower: 181, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 64:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 127, background: colors.yellow, color: colors.black },
-							{ lower: 128, upper: 134, background: colors.orange, color: colors.black },
-							{ lower: 135, upper: 139, background: colors.lightgreen, color: colors.black },
-							{ lower: 140, upper: 164, background: colors.green, color: colors.white },
-							{ lower: 165, upper: 169, background: colors.lightgreen, color: colors.black },
-							{ lower: 170, upper: 174, background: colors.yellow, color: colors.black },
-							{ lower: 175, upper: 179, background: colors.orange, color: colors.black },
-							{ lower: 180, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 65:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 127, background: colors.yellow, color: colors.black },
-							{ lower: 128, upper: 133, background: colors.orange, color: colors.black },
-							{ lower: 134, upper: 138, background: colors.lightgreen, color: colors.black },
-							{ lower: 139, upper: 163, background: colors.green, color: colors.white },
-							{ lower: 164, upper: 168, background: colors.lightgreen, color: colors.black },
-							{ lower: 169, upper: 173, background: colors.yellow, color: colors.black },
-							{ lower: 174, upper: 178, background: colors.orange, color: colors.black },
-							{ lower: 179, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 66:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 127, background: colors.yellow, color: colors.black },
-							{ lower: 128, upper: 132, background: colors.orange, color: colors.black },
-							{ lower: 133, upper: 137, background: colors.lightgreen, color: colors.black },
-							{ lower: 138, upper: 162, background: colors.green, color: colors.white },
-							{ lower: 163, upper: 167, background: colors.lightgreen, color: colors.black },
-							{ lower: 168, upper: 172, background: colors.yellow, color: colors.black },
-							{ lower: 173, upper: 177, background: colors.orange, color: colors.black },
-							{ lower: 178, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 67:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 127, background: colors.yellow, color: colors.black },
-							{ lower: 128, upper: 131, background: colors.orange, color: colors.black },
-							{ lower: 132, upper: 136, background: colors.lightgreen, color: colors.black },
-							{ lower: 137, upper: 161, background: colors.green, color: colors.white },
-							{ lower: 162, upper: 166, background: colors.lightgreen, color: colors.black },
-							{ lower: 167, upper: 171, background: colors.yellow, color: colors.black },
-							{ lower: 172, upper: 176, background: colors.orange, color: colors.black },
-							{ lower: 177, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 68:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 127, background: colors.yellow, color: colors.black },
-							{ lower: 128, upper: 130, background: colors.orange, color: colors.black },
-							{ lower: 131, upper: 135, background: colors.lightgreen, color: colors.black },
-							{ lower: 136, upper: 160, background: colors.green, color: colors.white },
-							{ lower: 161, upper: 165, background: colors.lightgreen, color: colors.black },
-							{ lower: 166, upper: 170, background: colors.yellow, color: colors.black },
-							{ lower: 171, upper: 175, background: colors.orange, color: colors.black },
-							{ lower: 176, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 69:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 127, background: colors.yellow, color: colors.black },
-							{ lower: 128, upper: 129, background: colors.orange, color: colors.black },
-							{ lower: 130, upper: 134, background: colors.lightgreen, color: colors.black },
-							{ lower: 135, upper: 159, background: colors.green, color: colors.white },
-							{ lower: 160, upper: 164, background: colors.lightgreen, color: colors.black },
-							{ lower: 165, upper: 169, background: colors.yellow, color: colors.black },
-							{ lower: 170, upper: 174, background: colors.orange, color: colors.black },
-							{ lower: 175, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 70:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 127, background: colors.yellow, color: colors.black },
-							{ lower: 128, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 133, background: colors.lightgreen, color: colors.black },
-							{ lower: 134, upper: 158, background: colors.green, color: colors.white },
-							{ lower: 159, upper: 163, background: colors.lightgreen, color: colors.black },
-							{ lower: 164, upper: 168, background: colors.yellow, color: colors.black },
-							{ lower: 169, upper: 173, background: colors.orange, color: colors.black },
-							{ lower: 174, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 71:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 127, background: colors.yellow, color: colors.black },
-							{ lower: 128, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 132, background: colors.lightgreen, color: colors.black },
-							{ lower: 133, upper: 157, background: colors.green, color: colors.white },
-							{ lower: 158, upper: 162, background: colors.lightgreen, color: colors.black },
-							{ lower: 163, upper: 167, background: colors.yellow, color: colors.black },
-							{ lower: 168, upper: 172, background: colors.orange, color: colors.black },
-							{ lower: 173, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 72:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 127, background: colors.yellow, color: colors.black },
-							{ lower: 128, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 131, background: colors.lightgreen, color: colors.black },
-							{ lower: 132, upper: 156, background: colors.green, color: colors.white },
-							{ lower: 157, upper: 161, background: colors.lightgreen, color: colors.black },
-							{ lower: 162, upper: 166, background: colors.yellow, color: colors.black },
-							{ lower: 167, upper: 171, background: colors.orange, color: colors.black },
-							{ lower: 172, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 73:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 127, background: colors.yellow, color: colors.black },
-							{ lower: 128, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 130, background: colors.lightgreen, color: colors.black },
-							{ lower: 131, upper: 155, background: colors.green, color: colors.white },
-							{ lower: 156, upper: 160, background: colors.lightgreen, color: colors.black },
-							{ lower: 161, upper: 165, background: colors.yellow, color: colors.black },
-							{ lower: 166, upper: 170, background: colors.orange, color: colors.black },
-							{ lower: 171, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 74:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 127, background: colors.yellow, color: colors.black },
-							{ lower: 128, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 154, background: colors.green, color: colors.white },
-							{ lower: 155, upper: 159, background: colors.lightgreen, color: colors.black },
-							{ lower: 160, upper: 164, background: colors.yellow, color: colors.black },
-							{ lower: 165, upper: 169, background: colors.orange, color: colors.black },
-							{ lower: 170, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 75:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 127, background: colors.yellow, color: colors.black },
-							{ lower: 128, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 153, background: colors.green, color: colors.white },
-							{ lower: 154, upper: 158, background: colors.lightgreen, color: colors.black },
-							{ lower: 159, upper: 163, background: colors.yellow, color: colors.black },
-							{ lower: 164, upper: 168, background: colors.orange, color: colors.black },
-							{ lower: 169, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 76:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 127, background: colors.yellow, color: colors.black },
-							{ lower: 128, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 152, background: colors.green, color: colors.white },
-							{ lower: 153, upper: 157, background: colors.lightgreen, color: colors.black },
-							{ lower: 158, upper: 162, background: colors.yellow, color: colors.black },
-							{ lower: 163, upper: 167, background: colors.orange, color: colors.black },
-							{ lower: 168, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 77:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 127, background: colors.yellow, color: colors.black },
-							{ lower: 128, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 151, background: colors.green, color: colors.white },
-							{ lower: 152, upper: 156, background: colors.lightgreen, color: colors.black },
-							{ lower: 157, upper: 161, background: colors.yellow, color: colors.black },
-							{ lower: 162, upper: 166, background: colors.orange, color: colors.black },
-							{ lower: 167, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 78:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 127, background: colors.yellow, color: colors.black },
-							{ lower: 128, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 150, background: colors.green, color: colors.white },
-							{ lower: 151, upper: 155, background: colors.lightgreen, color: colors.black },
-							{ lower: 156, upper: 160, background: colors.yellow, color: colors.black },
-							{ lower: 161, upper: 165, background: colors.orange, color: colors.black },
-							{ lower: 166, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 79:
-						conditions = [
-							{ lower: null, upper: 101, background: colors.red, color: colors.white },
-							{ lower: 102, upper: 105, background: colors.yellow, color: colors.black },
-							{ lower: 106, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 125, background: colors.green, color: colors.white },
-							{ lower: 126, upper: 126, background: colors.lightgreen, color: colors.black },
-							{ lower: 127, upper: 127, background: colors.yellow, color: colors.black },
-							{ lower: 128, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 149, background: colors.green, color: colors.white },
-							{ lower: 150, upper: 154, background: colors.lightgreen, color: colors.black },
-							{ lower: 155, upper: 159, background: colors.yellow, color: colors.black },
-							{ lower: 160, upper: 164, background: colors.orange, color: colors.black },
-							{ lower: 165, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 80:
-						conditions = [
-							{ lower: null, upper: 100, background: colors.red, color: colors.white },
-							{ lower: 101, upper: 104, background: colors.yellow, color: colors.black },
-							{ lower: 105, upper: 108, background: colors.lightgreen, color: colors.black },
-							{ lower: 109, upper: 124, background: colors.green, color: colors.white },
-							{ lower: 125, upper: 125, background: colors.lightgreen, color: colors.black },
-							{ lower: 126, upper: 126, background: colors.yellow, color: colors.black },
-							{ lower: 127, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 148, background: colors.green, color: colors.white },
-							{ lower: 149, upper: 153, background: colors.lightgreen, color: colors.black },
-							{ lower: 154, upper: 158, background: colors.yellow, color: colors.black },
-							{ lower: 159, upper: 163, background: colors.orange, color: colors.black },
-							{ lower: 164, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 81:
-						conditions = [
-							{ lower: null, upper: 100, background: colors.red, color: colors.white },
-							{ lower: 101, upper: 104, background: colors.yellow, color: colors.black },
-							{ lower: 105, upper: 108, background: colors.lightgreen, color: colors.black },
-							{ lower: 109, upper: 123, background: colors.green, color: colors.white },
-							{ lower: 124, upper: 124, background: colors.lightgreen, color: colors.black },
-							{ lower: 125, upper: 125, background: colors.yellow, color: colors.black },
-							{ lower: 126, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 147, background: colors.green, color: colors.white },
-							{ lower: 148, upper: 152, background: colors.lightgreen, color: colors.black },
-							{ lower: 153, upper: 157, background: colors.yellow, color: colors.black },
-							{ lower: 158, upper: 162, background: colors.orange, color: colors.black },
-							{ lower: 163, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 82:
-						conditions = [
-							{ lower: null, upper: 100, background: colors.red, color: colors.white },
-							{ lower: 101, upper: 104, background: colors.yellow, color: colors.black },
-							{ lower: 105, upper: 108, background: colors.lightgreen, color: colors.black },
-							{ lower: 109, upper: 122, background: colors.green, color: colors.white },
-							{ lower: 123, upper: 123, background: colors.lightgreen, color: colors.black },
-							{ lower: 124, upper: 124, background: colors.yellow, color: colors.black },
-							{ lower: 125, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 146, background: colors.green, color: colors.white },
-							{ lower: 147, upper: 151, background: colors.lightgreen, color: colors.black },
-							{ lower: 152, upper: 156, background: colors.yellow, color: colors.black },
-							{ lower: 157, upper: 161, background: colors.orange, color: colors.black },
-							{ lower: 162, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 83:
-						conditions = [
-							{ lower: null, upper: 100, background: colors.red, color: colors.white },
-							{ lower: 101, upper: 104, background: colors.yellow, color: colors.black },
-							{ lower: 105, upper: 107, background: colors.lightgreen, color: colors.black },
-							{ lower: 108, upper: 121, background: colors.green, color: colors.white },
-							{ lower: 122, upper: 122, background: colors.lightgreen, color: colors.black },
-							{ lower: 123, upper: 123, background: colors.yellow, color: colors.black },
-							{ lower: 124, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 145, background: colors.green, color: colors.white },
-							{ lower: 146, upper: 150, background: colors.lightgreen, color: colors.black },
-							{ lower: 151, upper: 155, background: colors.yellow, color: colors.black },
-							{ lower: 156, upper: 160, background: colors.orange, color: colors.black },
-							{ lower: 161, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 84:
-						conditions = [
-							{ lower: null, upper: 100, background: colors.red, color: colors.white },
-							{ lower: 101, upper: 104, background: colors.yellow, color: colors.black },
-							{ lower: 105, upper: 107, background: colors.lightgreen, color: colors.black },
-							{ lower: 108, upper: 120, background: colors.green, color: colors.white },
-							{ lower: 121, upper: 121, background: colors.lightgreen, color: colors.black },
-							{ lower: 122, upper: 122, background: colors.yellow, color: colors.black },
-							{ lower: 123, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 144, background: colors.green, color: colors.white },
-							{ lower: 145, upper: 149, background: colors.lightgreen, color: colors.black },
-							{ lower: 150, upper: 154, background: colors.yellow, color: colors.black },
-							{ lower: 155, upper: 159, background: colors.orange, color: colors.black },
-							{ lower: 160, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 85:
-						conditions = [
-							{ lower: null, upper: 100, background: colors.red, color: colors.white },
-							{ lower: 101, upper: 104, background: colors.yellow, color: colors.black },
-							{ lower: 105, upper: 107, background: colors.lightgreen, color: colors.black },
-							{ lower: 108, upper: 119, background: colors.green, color: colors.white },
-							{ lower: 120, upper: 120, background: colors.lightgreen, color: colors.black },
-							{ lower: 121, upper: 121, background: colors.yellow, color: colors.black },
-							{ lower: 122, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 143, background: colors.green, color: colors.white },
-							{ lower: 144, upper: 148, background: colors.lightgreen, color: colors.black },
-							{ lower: 149, upper: 153, background: colors.yellow, color: colors.black },
-							{ lower: 154, upper: 158, background: colors.orange, color: colors.black },
-							{ lower: 159, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 86:
-						conditions = [
-							{ lower: null, upper: 100, background: colors.red, color: colors.white },
-							{ lower: 101, upper: 104, background: colors.yellow, color: colors.black },
-							{ lower: 105, upper: 106, background: colors.lightgreen, color: colors.black },
-							{ lower: 108, upper: 118, background: colors.green, color: colors.white },
-							{ lower: 119, upper: 119, background: colors.lightgreen, color: colors.black },
-							{ lower: 120, upper: 120, background: colors.yellow, color: colors.black },
-							{ lower: 121, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 142, background: colors.green, color: colors.white },
-							{ lower: 143, upper: 147, background: colors.lightgreen, color: colors.black },
-							{ lower: 148, upper: 152, background: colors.yellow, color: colors.black },
-							{ lower: 153, upper: 157, background: colors.orange, color: colors.black },
-							{ lower: 158, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 87:
-						conditions = [
-							{ lower: null, upper: 100, background: colors.red, color: colors.white },
-							{ lower: 101, upper: 104, background: colors.yellow, color: colors.black },
-							{ lower: 105, upper: 106, background: colors.lightgreen, color: colors.black },
-							{ lower: 107, upper: 117, background: colors.green, color: colors.white },
-							{ lower: 118, upper: 118, background: colors.lightgreen, color: colors.black },
-							{ lower: 119, upper: 119, background: colors.yellow, color: colors.black },
-							{ lower: 120, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 141, background: colors.green, color: colors.white },
-							{ lower: 142, upper: 146, background: colors.lightgreen, color: colors.black },
-							{ lower: 147, upper: 151, background: colors.yellow, color: colors.black },
-							{ lower: 152, upper: 156, background: colors.orange, color: colors.black },
-							{ lower: 157, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 88:
-						conditions = [
-							{ lower: null, upper: 100, background: colors.red, color: colors.white },
-							{ lower: 101, upper: 104, background: colors.yellow, color: colors.black },
-							{ lower: 105, upper: 106, background: colors.lightgreen, color: colors.black },
-							{ lower: 107, upper: 116, background: colors.green, color: colors.white },
-							{ lower: 117, upper: 117, background: colors.lightgreen, color: colors.black },
-							{ lower: 118, upper: 118, background: colors.yellow, color: colors.black },
-							{ lower: 119, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 140, background: colors.green, color: colors.white },
-							{ lower: 141, upper: 145, background: colors.lightgreen, color: colors.black },
-							{ lower: 146, upper: 150, background: colors.yellow, color: colors.black },
-							{ lower: 151, upper: 155, background: colors.orange, color: colors.black },
-							{ lower: 156, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 89:
-						conditions = [
-							{ lower: null, upper: 100, background: colors.red, color: colors.white },
-							{ lower: 101, upper: 104, background: colors.yellow, color: colors.black },
-							{ lower: 105, upper: 105, background: colors.lightgreen, color: colors.black },
-							{ lower: 106, upper: 115, background: colors.green, color: colors.white },
-							{ lower: 116, upper: 116, background: colors.lightgreen, color: colors.black },
-							{ lower: 117, upper: 117, background: colors.yellow, color: colors.black },
-							{ lower: 118, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 139, background: colors.green, color: colors.white },
-							{ lower: 140, upper: 144, background: colors.lightgreen, color: colors.black },
-							{ lower: 145, upper: 149, background: colors.yellow, color: colors.black },
-							{ lower: 152, upper: 154, background: colors.orange, color: colors.black },
-							{ lower: 155, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 90:
-						conditions = [
-							{ lower: null, upper: 100, background: colors.red, color: colors.white },
-							{ lower: 101, upper: 104, background: colors.yellow, color: colors.black },
-							{ lower: 105, upper: 105, background: colors.lightgreen, color: colors.black },
-							{ lower: 106, upper: 114, background: colors.green, color: colors.white },
-							{ lower: 115, upper: 115, background: colors.lightgreen, color: colors.black },
-							{ lower: 116, upper: 116, background: colors.yellow, color: colors.black },
-							{ lower: 117, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 138, background: colors.green, color: colors.white },
-							{ lower: 139, upper: 143, background: colors.lightgreen, color: colors.black },
-							{ lower: 144, upper: 148, background: colors.yellow, color: colors.black },
-							{ lower: 149, upper: 153, background: colors.orange, color: colors.black },
-							{ lower: 154, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 91:
-						conditions = [
-							{ lower: null, upper: 99, background: colors.red, color: colors.white },
-							{ lower: 100, upper: 103, background: colors.yellow, color: colors.black },
-							{ lower: 104, upper: 105, background: colors.lightgreen, color: colors.black },
-							{ lower: 106, upper: 113, background: colors.green, color: colors.white },
-							{ lower: 114, upper: 114, background: colors.lightgreen, color: colors.black },
-							{ lower: 115, upper: 115, background: colors.yellow, color: colors.black },
-							{ lower: 116, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 137, background: colors.green, color: colors.white },
-							{ lower: 138, upper: 142, background: colors.lightgreen, color: colors.black },
-							{ lower: 143, upper: 147, background: colors.yellow, color: colors.black },
-							{ lower: 148, upper: 152, background: colors.orange, color: colors.black },
-							{ lower: 153, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 92:
-						conditions = [
-							{ lower: null, upper: 98, background: colors.red, color: colors.white },
-							{ lower: 99, upper: 102, background: colors.yellow, color: colors.black },
-							{ lower: 103, upper: 104, background: colors.lightgreen, color: colors.black },
-							{ lower: 105, upper: 112, background: colors.green, color: colors.white },
-							{ lower: 113, upper: 113, background: colors.lightgreen, color: colors.black },
-							{ lower: 114, upper: 114, background: colors.yellow, color: colors.black },
-							{ lower: 115, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 136, background: colors.green, color: colors.white },
-							{ lower: 137, upper: 141, background: colors.lightgreen, color: colors.black },
-							{ lower: 142, upper: 146, background: colors.yellow, color: colors.black },
-							{ lower: 147, upper: 151, background: colors.orange, color: colors.black },
-							{ lower: 152, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 93:
-						conditions = [
-							{ lower: null, upper: 97, background: colors.red, color: colors.white },
-							{ lower: 98, upper: 101, background: colors.yellow, color: colors.black },
-							{ lower: 102, upper: 104, background: colors.lightgreen, color: colors.black },
-							{ lower: 105, upper: 111, background: colors.green, color: colors.white },
-							{ lower: 112, upper: 112, background: colors.lightgreen, color: colors.black },
-							{ lower: 113, upper: 113, background: colors.yellow, color: colors.black },
-							{ lower: 114, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 135, background: colors.green, color: colors.white },
-							{ lower: 136, upper: 140, background: colors.lightgreen, color: colors.black },
-							{ lower: 141, upper: 145, background: colors.yellow, color: colors.black },
-							{ lower: 146, upper: 150, background: colors.orange, color: colors.black },
-							{ lower: 151, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 94:
-						conditions = [
-							{ lower: null, upper: 96, background: colors.red, color: colors.white },
-							{ lower: 97, upper: 100, background: colors.yellow, color: colors.black },
-							{ lower: 101, upper: 103, background: colors.lightgreen, color: colors.black },
-							{ lower: 104, upper: 110, background: colors.green, color: colors.white },
-							{ lower: 111, upper: 111, background: colors.lightgreen, color: colors.black },
-							{ lower: 112, upper: 112, background: colors.yellow, color: colors.black },
-							{ lower: 113, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 134, background: colors.green, color: colors.white },
-							{ lower: 135, upper: 139, background: colors.lightgreen, color: colors.black },
-							{ lower: 140, upper: 144, background: colors.yellow, color: colors.black },
-							{ lower: 145, upper: 149, background: colors.orange, color: colors.black },
-							{ lower: 150, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 95:
-						conditions = [
-							{ lower: null, upper: 95, background: colors.red, color: colors.white },
-							{ lower: 96, upper: 99, background: colors.yellow, color: colors.black },
-							{ lower: 100, upper: 102, background: colors.lightgreen, color: colors.black },
-							{ lower: 103, upper: 109, background: colors.green, color: colors.white },
-							{ lower: 110, upper: 110, background: colors.lightgreen, color: colors.black },
-							{ lower: 111, upper: 111, background: colors.yellow, color: colors.black },
-							{ lower: 112, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 133, background: colors.green, color: colors.white },
-							{ lower: 134, upper: 138, background: colors.lightgreen, color: colors.black },
-							{ lower: 139, upper: 143, background: colors.yellow, color: colors.black },
-							{ lower: 144, upper: 148, background: colors.orange, color: colors.black },
-							{ lower: 149, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 96:
-						conditions = [
-							{ lower: null, upper: 94, background: colors.red, color: colors.white },
-							{ lower: 95, upper: 98, background: colors.yellow, color: colors.black },
-							{ lower: 99, upper: 101, background: colors.lightgreen, color: colors.black },
-							{ lower: 102, upper: 108, background: colors.green, color: colors.white },
-							{ lower: 109, upper: 109, background: colors.lightgreen, color: colors.black },
-							{ lower: 110, upper: 110, background: colors.yellow, color: colors.black },
-							{ lower: 111, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 132, background: colors.green, color: colors.white },
-							{ lower: 133, upper: 137, background: colors.lightgreen, color: colors.black },
-							{ lower: 138, upper: 142, background: colors.yellow, color: colors.black },
-							{ lower: 143, upper: 147, background: colors.orange, color: colors.black },
-							{ lower: 148, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 97:
-						conditions = [
-							{ lower: null, upper: 93, background: colors.red, color: colors.white },
-							{ lower: 94, upper: 97, background: colors.yellow, color: colors.black },
-							{ lower: 98, upper: 100, background: colors.lightgreen, color: colors.black },
-							{ lower: 101, upper: 107, background: colors.green, color: colors.white },
-							{ lower: 108, upper: 108, background: colors.lightgreen, color: colors.black },
-							{ lower: 109, upper: 109, background: colors.yellow, color: colors.black },
-							{ lower: 110, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 131, background: colors.green, color: colors.white },
-							{ lower: 132, upper: 136, background: colors.lightgreen, color: colors.black },
-							{ lower: 137, upper: 141, background: colors.yellow, color: colors.black },
-							{ lower: 142, upper: 146, background: colors.orange, color: colors.black },
-							{ lower: 147, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 98:
-						conditions = [
-							{ lower: null, upper: 92, background: colors.red, color: colors.white },
-							{ lower: 93, upper: 96, background: colors.yellow, color: colors.black },
-							{ lower: 97, upper: 99, background: colors.lightgreen, color: colors.black },
-							{ lower: 100, upper: 106, background: colors.green, color: colors.white },
-							{ lower: 107, upper: 107, background: colors.lightgreen, color: colors.black },
-							{ lower: 108, upper: 108, background: colors.yellow, color: colors.black },
-							{ lower: 109, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 130, background: colors.green, color: colors.white },
-							{ lower: 132, upper: 135, background: colors.lightgreen, color: colors.black },
-							{ lower: 135, upper: 140, background: colors.yellow, color: colors.black },
-							{ lower: 141, upper: 145, background: colors.orange, color: colors.black },
-							{ lower: 146, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 99:
-						conditions = [
-							{ lower: null, upper: 91, background: colors.red, color: colors.white },
-							{ lower: 92, upper: 95, background: colors.yellow, color: colors.black },
-							{ lower: 96, upper: 98, background: colors.lightgreen, color: colors.black },
-							{ lower: 99, upper: 105, background: colors.green, color: colors.white },
-							{ lower: 106, upper: 106, background: colors.lightgreen, color: colors.black },
-							{ lower: 107, upper: 107, background: colors.yellow, color: colors.black },
-							{ lower: 108, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 130, background: colors.green, color: colors.white },
-							{ lower: 131, upper: 134, background: colors.lightgreen, color: colors.black },
-							{ lower: 135, upper: 139, background: colors.yellow, color: colors.black },
-							{ lower: 140, upper: 144, background: colors.orange, color: colors.black },
-							{ lower: 145, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					case 100:
-						conditions = [
-							{ lower: null, upper: 90, background: colors.red, color: colors.white },
-							{ lower: 91, upper: 94, background: colors.yellow, color: colors.black },
-							{ lower: 95, upper: 97, background: colors.lightgreen, color: colors.black },
-							{ lower: 98, upper: 104, background: colors.green, color: colors.white },
-							{ lower: 105, upper: 105, background: colors.lightgreen, color: colors.black },
-							{ lower: 106, upper: 106, background: colors.yellow, color: colors.black },
-							{ lower: 107, upper: 128, background: colors.orange, color: colors.black },
-							{ lower: 129, upper: 129, background: colors.lightgreen, color: colors.black },
-							{ lower: 130, upper: 130, background: colors.green, color: colors.white },
-							{ lower: 131, upper: 133, background: colors.lightgreen, color: colors.black },
-							{ lower: 134, upper: 138, background: colors.yellow, color: colors.black },
-							{ lower: 139, upper: 143, background: colors.orange, color: colors.black },
-							{ lower: 144, upper: null, background: colors.red, color: colors.white }
-						]
-						break;
-					default:
-						break;
+			}
+			else if ((heartRateNotRecorded != "00:00" && heartRateNotRecorded) && (workout_duration_hours_min_score != ' ' &&
+				workout_duration_hours_min_score && workout_duration_hours_min_score != '00:00')) {
+				color = ""
+				background = "";
+				return [background, color]
+			}
+		}
+		else {
+			if (userage >= 13 && userage <= 16) {
+				if (heartrate >= 153 && heartrate < 166) {
+					background = "#32CD32";
+					color = "white";
 				}
-			}//if userage >= 13 or userage <= 100
-			else if (userage > 100) {
-				conditions = [
-					{ lower: null, upper: 89, background: colors.red, color: colors.white },
-					{ lower: 90, upper: 93, background: colors.yellow, color: colors.black },
-					{ lower: 94, upper: 96, background: colors.lightgreen, color: colors.black },
-					{ lower: 97, upper: 103, background: colors.green, color: colors.white },
-					{ lower: 104, upper: 104, background: colors.lightgreen, color: colors.black },
-					{ lower: 105, upper: 105, background: colors.yellow, color: colors.black },
-					{ lower: 106, upper: 127, background: colors.orange, color: colors.black },
-					{ lower: 128, upper: 128, background: colors.lightgreen, color: colors.black },
-					{ lower: 129, upper: 129, background: colors.green, color: colors.white },
-					{ lower: 130, upper: 132, background: colors.lightgreen, color: colors.black },
-					{ lower: 133, upper: 137, background: colors.yellow, color: colors.black },
-					{ lower: 138, upper: 142, background: colors.orange, color: colors.black },
-					{ lower: 143, upper: null, background: colors.red, color: colors.white }
-				]
-			}//if userage > 100
-			//selecting the background and text color based on userage and heartrate
-			for (let rangeIndex = 0; rangeIndex < conditions.length; rangeIndex++) {
-				let currentRange = conditions[rangeIndex]
-				if (isNull(currentRange.lower)) {
-					if (heartrate <= currentRange.upper) {
-						background = currentRange.background
-						color = currentRange.color
-						break
-					}
+				else if (heartrate >= 166 && heartrate < 170) {
+					background = "Yellow";
 				}
-				else if (isNull(currentRange.upper)) {
-					if (heartrate >= currentRange.lower) {
-						background = currentRange.background
-						color = currentRange.color
-						break
-					}
-				} else if (heartrate >= currentRange.lower && heartrate <= currentRange.upper) {
-					background = currentRange.background
-					color = currentRange.color
-					break
+				else if (heartrate >= 170 && heartrate < 175) {
+					background = "Orange";
+				}
+				else if (heartrate >= 175 && heartrate < 179) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 179 && heartrate < 182) {
+					background = "green";
+					color = "white";
+				}
+				else if (heartrate >= 182 && heartrate < 187) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 187 && heartrate < 190) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 190 && heartrate < 192) {
+					background = "Orange";
+				}
+				else if (heartrate >= 192 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 13 && userage <= 25) {
+				if (heartrate >= 110 && heartrate < 121) {
+					background = "Yellow";
+				}
+			}
+
+			if (userage >= 13 && userage < 14) {
+				if (heartrate >= 121 && heartrate < 141) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 141 && heartrate <= 153) {
+					color = "white";
+					background = "green";
+				}
+			}
+
+			if (userage >= 14 && userage < 15) {
+				if (heartrate >= 121 && heartrate < 140) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 140 && heartrate < 153) {
+					color = "white";
+					background = "green";
+				}
+			}
+
+			if (userage >= 15 && userage < 16) {
+				if (heartrate >= 121 && heartrate < 139) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 139 && heartrate < 153) {
+					color = "white";
+					background = "green";
+				}
+			}
+
+			if (userage >= 18 && userage < 55) {
+				if (heartrate >= 179 && heartrate < 184) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 184 && heartrate < 187) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 187 && heartrate < 189) {
+					background = "Orange";
+				}
+				else if (heartrate >= 189 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 26 && userage < 31) {
+				if (heartrate >= 155 && heartrate < 159) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 159 && heartrate < 164) {
+					background = "Orange";
+				}
+				else if (heartrate >= 164 && heartrate < 167) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 167 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+			}
+
+			if (userage >= 48 && userage < 80) {
+				if (heartrate >= 102 && heartrate < 106) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 101 && heartrate < 102) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 63 && userage < 80) {
+				if (heartrate >= 127 && heartrate < 128) {
+					background = "Yellow";
+				}
+			}
+
+			if (userage >= 70 && userage < 80) {
+				if (heartrate >= 128 && heartrate < 129) {
+					background = "Orange";
+				}
+			}
+
+			if (userage >= 80 && userage < 91) {
+				if (heartrate >= 101 && heartrate < 105) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 100 && heartrate < 101) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 59 && userage < 80) {
+				if (heartrate >= 126 && heartrate < 127) {
+					background = "#32CD32";
+					color = "white";
+				}
+			}
+
+			if (userage >= 55 && userage < 80) {
+				if (heartrate >= 106 && heartrate < 110) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 110 && heartrate < 125) {
+					color = "white";
+					background = "green";
+				}
+			}
+
+			if (userage >= 16 && userage < 17) {
+				if (heartrate >= 121 && heartrate < 138) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 138 && heartrate < 153) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 153 && heartrate < 165) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 165 && heartrate < 169) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 169 && heartrate < 174) {
+					background = "Orange";
+				}
+				else if (heartrate >= 174 && heartrate < 178) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 178 && heartrate < 181) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 181 && heartrate < 186) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 186 && heartrate < 189) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 189 && heartrate < 191) {
+					background = "Orange";
+				}
+				else if (heartrate >= 191 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 17 && userage < 18) {
+				if (heartrate >= 121 && heartrate < 137) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 137 && heartrate < 153) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 153 && heartrate < 164) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 164 && heartrate < 168) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 168 && heartrate < 173) {
+					background = "Orange";
+				}
+				else if (heartrate >= 173 && heartrate < 177) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 177 && heartrate < 180) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 180 && heartrate < 185) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 185 && heartrate < 188) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 188 && heartrate < 190) {
+					background = "Orange";
+				}
+				else if (heartrate >= 190 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+
+			if (userage >= 18 && userage < 19) {
+				if (heartrate >= 121 && heartrate < 136) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 136 && heartrate < 153) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 153 && heartrate < 163) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 163 && heartrate < 167) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 167 && heartrate < 172) {
+					background = "Orange";
+				}
+				else if (heartrate >= 172 && heartrate < 176) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 176 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+			}
+
+			if (userage >= 19 && userage < 20) {
+				if (heartrate >= 121 && heartrate < 135) {
+					background = "#32CD32";
+				}
+				else if (heartrate >= 135 && heartrate < 153) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 153 && heartrate < 162) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 162 && heartrate < 166) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 166 && heartrate < 171) {
+
+					background = "Orange";
+				}
+				else if (heartrate >= 171 && heartrate < 174) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 174 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+			}
+
+			if (userage >= 20 && userage < 21) {
+				if (heartrate >= 121 && heartrate < 134) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 134 && heartrate < 153) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 153 && heartrate < 161) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 161 && heartrate < 165) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 165 && heartrate < 170) {
+					background = "Orange";
+				}
+				else if (heartrate >= 170 && heartrate < 173) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 173 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+			}
+
+			if (userage >= 21 && userage < 22) {
+				if (heartrate >= 121 && heartrate < 133) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 133 && heartrate < 153) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 153 && heartrate < 160) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 160 && heartrate < 164) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 164 && heartrate < 169) {
+					background = "Orange";
+				}
+				else if (heartrate >= 169 && heartrate < 172) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 172 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+			}
+
+			if (userage >= 22 && userage < 23) {
+				if (heartrate >= 121 && heartrate < 132) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 132 && heartrate < 153) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 153 && heartrate < 159) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 159 && heartrate < 163) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 163 && heartrate < 168) {
+					background = "Orange";
+				}
+				else if (heartrate >= 168 && heartrate < 171) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 171 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+			}
+
+
+			if (userage >= 23 && userage < 24) {
+				if (heartrate >= 121 && heartrate < 131) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 131 && heartrate < 153) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 153 && heartrate < 158) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 158 && heartrate < 162) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 162 && heartrate < 167) {
+					background = "Orange";
+				}
+				else if (heartrate >= 167 && heartrate < 170) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 170 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+			}
+
+
+			if (userage >= 24 && userage < 25) {
+				if (heartrate >= 121 && heartrate < 130) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 130 && heartrate < 152) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 152 && heartrate < 157) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 157 && heartrate < 161) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 161 && heartrate < 166) {
+					background = "Orange";
+				}
+				else if (heartrate >= 166 && heartrate < 169) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 169 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+			}
+
+
+			if (userage >= 25 && userage < 26) {
+				if (heartrate >= 110 && heartrate < 120) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 120 && heartrate < 129) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 129 && heartrate < 151) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 156 && heartrate < 160) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 160 && heartrate < 165) {
+					background = "Orange";
+				}
+				else if (heartrate >= 165 && heartrate < 168) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 168 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+			}
+
+
+			if (userage >= 26 && userage < 27) {
+				if (heartrate >= 110 && heartrate < 119) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 119 && heartrate < 128) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 128 && heartrate < 150) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 150 && heartrate < 155) {
+					background = "#32CD32";
+					color = "white";
+				}
+
+			}
+
+
+
+			if (userage >= 27 && userage < 28) {
+				if (heartrate >= 110 && heartrate < 118) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 118 && heartrate < 127) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 127 && heartrate < 149) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 149 && heartrate < 155) {
+					background = "#32CD32";
+					color = "white";
+				}
+
+			}
+
+
+			if (userage >= 28 && userage < 29) {
+				if (heartrate >= 110 && heartrate < 117) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 117 && heartrate < 126) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 126 && heartrate < 148) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 148 && heartrate < 155) {
+					background = "#32CD32";
+					color = "white";
+				}
+
+			}
+
+
+
+			if (userage >= 29 && userage < 30) {
+				if (heartrate >= 110 && heartrate < 116) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 116 && heartrate < 125) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 125 && heartrate < 147) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 147 && heartrate < 155) {
+					background = "#32CD32";
+					color = "white";
+				}
+
+			}
+
+
+
+			if (userage >= 30 && userage < 31) {
+				if (heartrate >= 110 && heartrate < 116) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 116 && heartrate < 124) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 124 && heartrate < 146) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 146 && heartrate < 155) {
+					background = "#32CD32";
+					color = "white";
+				}
+
+			}
+
+			if (userage >= 31 && userage < 37) {
+				if (heartrate >= 110 && heartrate < 115) {
+					background = "Yellow";
+				}
+			}
+
+
+			if (userage >= 31 && userage < 32) {
+				if (heartrate >= 115 && heartrate < 134) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 134 && heartrate < 146) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 146 && heartrate < 155) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 155 && heartrate < 160) {
+					background = "Yellow";
+				}
+
+				else if (heartrate >= 160 && heartrate < 168) {
+					background = "Orange";
+				}
+				else if (heartrate >= 168 && heartrate < 171) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 171 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+
+			if (userage >= 32 && userage < 33) {
+				if (heartrate >= 115 && heartrate < 133) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 133 && heartrate < 146) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 146 && heartrate < 154) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 154 && heartrate < 159) {
+					background = "Yellow";
+				}
+
+				else if (heartrate >= 159 && heartrate < 167) {
+					background = "Orange";
+				}
+				else if (heartrate >= 167 && heartrate < 170) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 170 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+
+			if (userage >= 33 && userage < 34) {
+				if (heartrate >= 115 && heartrate < 132) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 132 && heartrate < 146) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 146 && heartrate < 153) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 153 && heartrate < 158) {
+					background = "Yellow";
+				}
+
+				else if (heartrate >= 158 && heartrate < 166) {
+					background = "Orange";
+				}
+				else if (heartrate >= 166 && heartrate < 169) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 169 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+			if (userage >= 34 && userage < 35) {
+				if (heartrate >= 115 && heartrate < 131) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 131 && heartrate < 146) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 146 && heartrate < 152) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 152 && heartrate < 157) {
+					background = "Yellow";
+				}
+
+				else if (heartrate >= 157 && heartrate < 165) {
+					background = "Orange";
+				}
+				else if (heartrate >= 165 && heartrate < 166) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 168 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+
+			if (userage >= 35 && userage < 36) {
+				if (heartrate >= 115 && heartrate < 130) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 130 && heartrate < 146) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 146 && heartrate < 151) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 151 && heartrate < 156) {
+					background = "Yellow";
+				}
+
+				else if (heartrate >= 156 && heartrate < 164) {
+					background = "Orange";
+				}
+				else if (heartrate >= 164 && heartrate < 167) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 167 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+			if (userage >= 36 && userage < 37) {
+				if (heartrate >= 115 && heartrate < 129) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 129 && heartrate < 145) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 145 && heartrate < 150) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 150 && heartrate < 155) {
+					background = "Yellow";
+				}
+
+				else if (heartrate >= 155 && heartrate < 163) {
+					background = "Orange";
+				}
+				else if (heartrate >= 163 && heartrate < 166) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 166 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+
+			if (userage >= 37 && userage < 38) {
+				if (heartrate >= 110 && heartrate < 114) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 114 && heartrate < 128) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 128 && heartrate < 144) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 144 && heartrate < 149) {
+					background = "#32CD32";
+					color = "white";
+				}
+
+				else if (heartrate >= 149 && heartrate < 154) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 154 && heartrate < 162) {
+					background = "Orange";
+				}
+				else if (heartrate >= 162 && heartrate < 165) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 165 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+
+			if (userage >= 38 && userage < 39) {
+				if (heartrate >= 110 && heartrate < 113) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 113 && heartrate < 127) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 127 && heartrate < 143) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 143 && heartrate < 148) {
+					background = "#32CD32";
+					color = "white";
+				}
+
+				else if (heartrate >= 148 && heartrate < 153) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 153 && heartrate < 161) {
+					background = "Orange";
+				}
+				else if (heartrate >= 161 && heartrate < 164) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 164 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+
+			if (userage >= 39 && userage < 40) {
+				if (heartrate >= 110 && heartrate < 112) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 112 && heartrate < 126) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 126 && heartrate < 142) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 142 && heartrate < 147) {
+					background = "#32CD32";
+					color = "white";
+				}
+
+				else if (heartrate >= 147 && heartrate < 152) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 152 && heartrate < 160) {
+					background = "Orange";
+				}
+				else if (heartrate >= 160 && heartrate < 163) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 163 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+
+			if (userage >= 40 && userage < 41) {
+				if (heartrate >= 110 && heartrate < 112) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 112 && heartrate < 125) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 125 && heartrate < 141) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 141 && heartrate < 146) {
+					background = "#32CD32";
+					color = "white";
+				}
+
+				else if (heartrate >= 146 && heartrate < 151) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 151 && heartrate < 159) {
+					background = "Orange";
+				}
+				else if (heartrate >= 159 && heartrate < 162) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 162 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+
+			if (userage >= 41 && userage < 42) {
+				if (heartrate >= 0 && heartrate < 109) {
+					background = "Red";
+				}
+				else if (heartrate >= 109 && heartrate < 110) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 110 && heartrate < 124) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 124 && heartrate < 140) {
+					color = "white";
+					background = "green";
+				}
+
+				else if (heartrate >= 140 && heartrate < 145) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 145 && heartrate < 150) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 150 && heartrate < 158) {
+					background = "Orange";
+				}
+				else if (heartrate >= 158 && heartrate < 161) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 161 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+			}
+
+			if (userage >= 42 && userage < 43) {
+				if (heartrate >= 0 && heartrate < 108) {
+					background = "Red";
+				}
+				else if (heartrate >= 108 && heartrate < 109) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 109 && heartrate < 123) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 123 && heartrate < 139) {
+					color = "white";
+					background = "green";
+				}
+
+				else if (heartrate >= 139 && heartrate < 144) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 144 && heartrate < 149) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 149 && heartrate < 157) {
+					background = "Orange";
+				}
+				else if (heartrate >= 157 && heartrate < 160) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 160 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+			if (userage >= 43 && userage < 44) {
+				if (heartrate >= 0 && heartrate < 107) {
+					background = "Red";
+				}
+				else if (heartrate >= 107 && heartrate < 108) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 108 && heartrate < 122) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 122 && heartrate < 138) {
+					color = "white";
+					background = "green";
+				}
+
+				else if (heartrate >= 138 && heartrate < 143) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 143 && heartrate < 148) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 148 && heartrate < 156) {
+					background = "Orange";
+				}
+				else if (heartrate >= 156 && heartrate < 159) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 159 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+			if (userage >= 44 && userage < 45) {
+				if (heartrate >= 0 && heartrate < 106) {
+					background = "Red";
+				}
+				else if (heartrate >= 106 && heartrate < 107) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 107 && heartrate < 121) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 121 && heartrate < 137) {
+					color = "white";
+					background = "green";
+				}
+
+				else if (heartrate >= 137 && heartrate < 142) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 142 && heartrate < 147) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 147 && heartrate < 155) {
+					background = "Orange";
+				}
+				else if (heartrate >= 155 && heartrate < 158) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 158 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+			if (userage >= 45 && userage < 46) {
+				if (heartrate >= 0 && heartrate < 105) {
+					background = "Red";
+				}
+				else if (heartrate >= 105 && heartrate < 106) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 106 && heartrate < 120) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 120 && heartrate < 136) {
+					color = "white";
+					background = "green";
+				}
+
+				else if (heartrate >= 136 && heartrate < 141) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 141 && heartrate < 146) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 146 && heartrate < 154) {
+					background = "Orange";
+				}
+				else if (heartrate >= 154 && heartrate < 157) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 157 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+
+			if (userage >= 46 && userage < 47) {
+				if (heartrate >= 0 && heartrate < 104) {
+					background = "Red";
+				}
+				else if (heartrate >= 104 && heartrate < 106) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 106 && heartrate < 119) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 119 && heartrate < 135) {
+					color = "white";
+					background = "green";
+				}
+
+				else if (heartrate >= 135 && heartrate < 140) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 140 && heartrate < 145) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 145 && heartrate < 153) {
+					background = "Orange";
+				}
+				else if (heartrate >= 153 && heartrate < 156) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 156 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+			if (userage >= 47 && userage < 48) {
+				if (heartrate >= 0 && heartrate < 103) {
+					background = "Red";
+				}
+				else if (heartrate >= 103 && heartrate < 105) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 106 && heartrate < 118) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 118 && heartrate < 134) {
+					color = "white";
+					background = "green";
+				}
+
+				else if (heartrate >= 134 && heartrate < 139) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 140 && heartrate < 144) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 144 && heartrate < 152) {
+					background = "Orange";
+				}
+				else if (heartrate >= 152 && heartrate < 155) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 155 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+			}
+
+			if (userage >= 48 && userage < 49) {
+				if (heartrate >= 106 && heartrate < 117) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 117 && heartrate < 133) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 133 && heartrate < 138) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 138 && heartrate < 143) {
+					background = "Yellow";
+				}
+
+				else if (heartrate >= 143 && heartrate < 151) {
+					background = "Orange";
+				}
+				else if (heartrate >= 151 && heartrate < 154) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 154 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+
+			if (userage >= 49 && userage < 50) {
+				if (heartrate >= 106 && heartrate < 116) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 116 && heartrate < 132) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 132 && heartrate < 137) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 137 && heartrate < 142) {
+					background = "Yellow";
+				}
+
+				else if (heartrate >= 142 && heartrate < 150) {
+					background = "Orange";
+				}
+				else if (heartrate >= 150 && heartrate < 153) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 153 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+			if (userage >= 50 && userage < 51) {
+				if (heartrate >= 106 && heartrate < 115) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 115 && heartrate < 131) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 131 && heartrate < 136) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 136 && heartrate < 141) {
+					background = "Yellow";
+				}
+
+				else if (heartrate >= 141 && heartrate < 149) {
+					background = "Orange";
+				}
+				else if (heartrate >= 149 && heartrate < 152) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 152 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+			if (userage >= 51 && userage < 52) {
+				if (heartrate >= 106 && heartrate < 114) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 114 && heartrate < 130) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 130 && heartrate < 135) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 135 && heartrate < 140) {
+					background = "Yellow";
+				}
+
+				else if (heartrate >= 140 && heartrate < 148) {
+					background = "Orange";
+				}
+				else if (heartrate >= 148 && heartrate < 151) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 151 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+			if (userage >= 52 && userage < 53) {
+				if (heartrate >= 106 && heartrate < 113) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 113 && heartrate < 129) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 129 && heartrate < 134) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 134 && heartrate < 139) {
+					background = "Yellow";
+				}
+
+				else if (heartrate >= 139 && heartrate < 147) {
+					background = "Orange";
+				}
+				else if (heartrate >= 147 && heartrate < 150) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 150 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+			if (userage >= 53 && userage < 54) {
+				if (heartrate >= 106 && heartrate < 112) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 112 && heartrate < 128) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 128 && heartrate < 133) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 133 && heartrate < 138) {
+					background = "Yellow";
+				}
+
+				else if (heartrate >= 138 && heartrate < 146) {
+					background = "Orange";
+				}
+				else if (heartrate >= 146 && heartrate < 149) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 149 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+
+			if (userage >= 54 && userage < 55) {
+				if (heartrate >= 106 && heartrate < 111) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 111 && heartrate < 127) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 127 && heartrate < 132) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 132 && heartrate < 137) {
+					background = "Yellow";
+				}
+
+				else if (heartrate >= 137 && heartrate < 145) {
+					background = "Orange";
+				}
+				else if (heartrate >= 145 && heartrate < 148) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 148 && heartrate < 179) {
+					background = "green";
+					color = "white";
+				}
+
+			}
+
+			if (userage >= 55 && userage < 56) {
+				if (heartrate >= 126 && heartrate < 131) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 131 && heartrate < 136) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 136 && heartrate < 144) {
+					background = "Orange";
+				}
+				else if (heartrate >= 144 && heartrate < 149) {
+					background = "#32CD32";
+					color = "white";
+				}
+
+				else if (heartrate >= 149 && heartrate < 174) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 174 && heartrate < 179) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 179 && heartrate < 184) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 184 && heartrate < 189) {
+					background = "Orange";
+				}
+				else if (heartrate >= 189 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+			if (userage >= 56 && userage < 57) {
+				if (heartrate >= 126 && heartrate < 130) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 130 && heartrate < 135) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 135 && heartrate < 143) {
+					background = "Orange";
+				}
+				else if (heartrate >= 143 && heartrate < 148) {
+					background = "#32CD32";
+					color = "white";
+				}
+
+				else if (heartrate >= 148 && heartrate < 173) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 173 && heartrate < 178) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 178 && heartrate < 183) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 183 && heartrate < 188) {
+					background = "Orange";
+				}
+				else if (heartrate >= 188 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+
+			if (userage >= 57 && userage < 58) {
+				if (heartrate >= 126 && heartrate < 129) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 129 && heartrate < 134) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 134 && heartrate < 142) {
+					background = "Orange";
+				}
+				else if (heartrate >= 142 && heartrate < 147) {
+					background = "#32CD32";
+					color = "white";
+				}
+
+				else if (heartrate >= 147 && heartrate < 172) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 172 && heartrate < 177) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 177 && heartrate < 182) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 182 && heartrate < 187) {
+					background = "Orange";
+				}
+				else if (heartrate >= 187 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+			if (userage >= 58 && userage < 59) {
+				if (heartrate >= 126 && heartrate < 128) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 128 && heartrate < 133) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 133 && heartrate < 141) {
+					background = "Orange";
+				}
+				else if (heartrate >= 141 && heartrate < 146) {
+					background = "#32CD32";
+					color = "white";
+				}
+
+				else if (heartrate >= 146 && heartrate < 171) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 171 && heartrate < 176) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 176 && heartrate < 181) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 181 && heartrate < 186) {
+					background = "Orange";
+				}
+				else if (heartrate >= 186 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+			if (userage >= 59 && userage < 60) {
+				if (heartrate >= 127 && heartrate < 132) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 132 && heartrate < 140) {
+					background = "Orange";
+				}
+				else if (heartrate >= 140 && heartrate < 145) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 145 && heartrate < 170) {
+					color = "white";
+					background = "green";
+				}
+
+				else if (heartrate >= 170 && heartrate < 175) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 175 && heartrate < 180) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 180 && heartrate < 185) {
+					background = "Orange";
+				}
+				else if (heartrate >= 185 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+
+			if (userage >= 60 && userage < 61) {
+				if (heartrate >= 127 && heartrate < 131) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 131 && heartrate < 139) {
+					background = "Orange";
+				}
+				else if (heartrate >= 139 && heartrate < 144) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 144 && heartrate < 169) {
+					color = "white";
+					background = "green";
+				}
+
+				else if (heartrate >= 169 && heartrate < 174) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 174 && heartrate < 179) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 179 && heartrate < 184) {
+					background = "Orange";
+				}
+				else if (heartrate >= 184 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+			if (userage >= 61 && userage < 62) {
+				if (heartrate >= 127 && heartrate < 130) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 130 && heartrate < 138) {
+					background = "Orange";
+				}
+				else if (heartrate >= 138 && heartrate < 143) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 143 && heartrate < 168) {
+					color = "white";
+					background = "green";
+				}
+
+				else if (heartrate >= 168 && heartrate < 173) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 173 && heartrate < 178) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 178 && heartrate < 183) {
+					background = "Orange";
+				}
+				else if (heartrate >= 183 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+			if (userage >= 63 && userage < 64) {
+				if (heartrate >= 128 && heartrate < 136) {
+					background = "Orange";
+				}
+				else if (heartrate >= 136 && heartrate < 141) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 141 && heartrate < 166) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 166 && heartrate < 171) {
+					background = "#32CD32";
+					color = "white";
+				}
+
+				else if (heartrate >= 171 && heartrate < 176) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 176 && heartrate < 181) {
+					background = "Orange";
+				}
+				else if (heartrate >= 181 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+			if (userage >= 64 && userage < 65) {
+				if (heartrate >= 128 && heartrate < 135) {
+					background = "Orange";
+				}
+				else if (heartrate >= 135 && heartrate < 140) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 140 && heartrate < 165) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 165 && heartrate < 170) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 170 && heartrate < 175) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 175 && heartrate < 180) {
+					background = "Orange";
+				}
+				else if (heartrate >= 180 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 65 && userage < 66) {
+				if (heartrate >= 128 && heartrate < 134) {
+					background = "Orange";
+				}
+				else if (heartrate >= 134 && heartrate < 139) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 139 && heartrate < 164) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 164 && heartrate < 169) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 169 && heartrate < 174) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 174 && heartrate < 179) {
+					background = "Orange";
+				}
+				else if (heartrate >= 179 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+
+			if (userage >= 66 && userage < 67) {
+				if (heartrate >= 128 && heartrate < 133) {
+					background = "Orange";
+				}
+				else if (heartrate >= 133 && heartrate < 138) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 138 && heartrate < 163) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 163 && heartrate < 168) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 168 && heartrate < 173) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 173 && heartrate < 178) {
+					background = "Orange";
+				}
+				else if (heartrate >= 178 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 67 && userage < 68) {
+				if (heartrate >= 128 && heartrate < 132) {
+					background = "Orange";
+				}
+				else if (heartrate >= 132 && heartrate < 137) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 137 && heartrate < 162) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 162 && heartrate < 167) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 167 && heartrate < 172) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 172 && heartrate < 177) {
+					background = "Orange";
+				}
+				else if (heartrate >= 177 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 68 && userage < 69) {
+				if (heartrate >= 128 && heartrate < 131) {
+					background = "Orange";
+				}
+				else if (heartrate >= 131 && heartrate < 136) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 136 && heartrate < 161) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 161 && heartrate < 166) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 166 && heartrate < 171) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 171 && heartrate < 176) {
+					background = "Orange";
+				}
+				else if (heartrate >= 176 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 69 && userage < 70) {
+				if (heartrate >= 128 && heartrate < 130) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 135) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 135 && heartrate < 160) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 160 && heartrate < 165) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 165 && heartrate < 170) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 170 && heartrate < 175) {
+					background = "Orange";
+				}
+				else if (heartrate >= 175 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 70 && userage < 71) {
+				if (heartrate >= 129 && heartrate < 134) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 134 && heartrate < 159) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 159 && heartrate < 164) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 164 && heartrate < 169) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 169 && heartrate < 174) {
+					background = "Orange";
+				}
+				else if (heartrate >= 174 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+			if (userage >= 71 && userage < 72) {
+				if (heartrate >= 129 && heartrate < 133) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 133 && heartrate < 158) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 158 && heartrate < 163) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 163 && heartrate < 168) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 168 && heartrate < 173) {
+					background = "Orange";
+				}
+				else if (heartrate >= 173 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+			if (userage >= 72 && userage < 73) {
+				if (heartrate >= 129 && heartrate < 132) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 132 && heartrate < 157) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 157 && heartrate < 162) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 162 && heartrate < 167) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 167 && heartrate < 172) {
+					background = "Orange";
+				}
+				else if (heartrate >= 172 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+			if (userage >= 73 && userage < 74) {
+				if (heartrate >= 129 && heartrate < 131) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 131 && heartrate < 156) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 156 && heartrate < 161) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 161 && heartrate < 166) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 168 && heartrate < 171) {
+					background = "Orange";
+				}
+				else if (heartrate >= 171 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+			if (userage >= 75 && userage < 76) {
+				if (heartrate >= 130 && heartrate < 154) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 154 && heartrate < 159) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 159 && heartrate < 164) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 164 && heartrate < 169) {
+					background = "Orange";
+				}
+				else if (heartrate >= 169 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+			if (userage >= 76 && userage < 77) {
+				if (heartrate >= 130 && heartrate < 153) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 153 && heartrate < 158) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 158 && heartrate < 163) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 163 && heartrate < 168) {
+					background = "Orange";
+				}
+				else if (heartrate >= 168 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+			if (userage >= 77 && userage < 78) {
+				if (heartrate >= 130 && heartrate < 152) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 152 && heartrate < 157) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 157 && heartrate < 162) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 162 && heartrate < 167) {
+					background = "Orange";
+				}
+				else if (heartrate >= 167 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 78 && userage < 79) {
+				if (heartrate >= 130 && heartrate < 151) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 151 && heartrate < 156) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 156 && heartrate < 161) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 161 && heartrate < 166) {
+					background = "Orange";
+				}
+				else if (heartrate >= 166 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 79 && userage < 80) {
+				if (heartrate >= 130 && heartrate < 150) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 150 && heartrate < 155) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 155 && heartrate < 160) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 160 && heartrate < 165) {
+					background = "Orange";
+				}
+				else if (heartrate >= 165 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+			if (userage >= 80 && userage < 81) {
+				if (heartrate >= 105 && heartrate < 109) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 109 && heartrate < 125) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 125 && heartrate < 126) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 127 && heartrate < 129) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 149) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 149 && heartrate < 154) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 154 && heartrate < 159) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 159 && heartrate < 164) {
+					background = "Orange";
+				}
+				else if (heartrate >= 164 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 81 && userage < 82) {
+				if (heartrate >= 105 && heartrate < 109) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 109 && heartrate < 124) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 124 && heartrate < 125) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 125 && heartrate < 126) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 126 && heartrate < 129) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 148) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 148 && heartrate < 153) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 153 && heartrate < 158) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 158 && heartrate < 163) {
+					background = "Orange";
+				}
+				else if (heartrate >= 163 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 82 && userage < 83) {
+				if (heartrate >= 105 && heartrate < 109) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 109 && heartrate < 123) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 123 && heartrate < 124) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 124 && heartrate < 125) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 125 && heartrate < 129) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 147) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 147 && heartrate < 152) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 152 && heartrate < 157) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 157 && heartrate < 162) {
+					background = "Orange";
+				}
+				else if (heartrate >= 162 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 83 && userage < 84) {
+				if (heartrate >= 105 && heartrate < 108) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 108 && heartrate < 122) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 122 && heartrate < 123) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 123 && heartrate < 124) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 124 && heartrate < 129) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 146) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 146 && heartrate < 151) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 151 && heartrate < 156) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 156 && heartrate < 161) {
+					background = "Orange";
+				}
+				else if (heartrate >= 161 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 84 && userage < 85) {
+				if (heartrate >= 105 && heartrate < 108) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 108 && heartrate < 121) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 121 && heartrate < 122) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 122 && heartrate < 123) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 123 && heartrate < 129) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 145) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 145 && heartrate < 150) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 150 && heartrate < 155) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 155 && heartrate < 160) {
+					background = "Orange";
+				}
+				else if (heartrate >= 160 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 85 && userage < 86) {
+				if (heartrate >= 105 && heartrate < 108) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 108 && heartrate < 120) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 120 && heartrate < 121) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 121 && heartrate < 122) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 122 && heartrate < 129) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 144) {
+					background = "green";
+				}
+				else if (heartrate >= 144 && heartrate < 149) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 149 && heartrate < 154) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 154 && heartrate < 159) {
+					background = "Orange";
+				}
+				else if (heartrate >= 159 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 86 && userage < 87) {
+				if (heartrate >= 105 && heartrate < 107) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 107 && heartrate < 119) {
+					background = "green";
+				}
+				else if (heartrate >= 119 && heartrate < 120) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 120 && heartrate < 121) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 121 && heartrate < 129) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 143) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 143 && heartrate < 148) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 148 && heartrate < 153) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 153 && heartrate < 158) {
+					background = "Orange";
+				}
+				else if (heartrate >= 158 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 87 && userage < 88) {
+				if (heartrate >= 105 && heartrate < 107) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 107 && heartrate < 118) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 118 && heartrate < 119) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 119 && heartrate < 120) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 120 && heartrate < 128) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 142) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 142 && heartrate < 147) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 147 && heartrate < 152) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 152 && heartrate < 157) {
+					background = "Orange";
+				}
+				else if (heartrate >= 157 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 88 && userage < 89) {
+				if (heartrate >= 105 && heartrate < 107) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 107 && heartrate < 117) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 117 && heartrate < 118) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 118 && heartrate < 119) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 119 && heartrate < 127) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 141) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 141 && heartrate < 146) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 146 && heartrate < 151) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 151 && heartrate < 156) {
+					background = "Orange";
+				}
+				else if (heartrate >= 156 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 89 && userage < 90) {
+				if (heartrate >= 105 && heartrate < 106) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 106 && heartrate < 116) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 116 && heartrate < 117) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 117 && heartrate < 118) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 118 && heartrate < 126) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 140) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 140 && heartrate < 145) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 145 && heartrate < 150) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 150 && heartrate < 155) {
+					background = "Orange";
+				}
+				else if (heartrate >= 155 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+			if (userage >= 90 && userage < 91) {
+				if (heartrate >= 105 && heartrate < 106) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 106 && heartrate < 115) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 115 && heartrate < 116) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 116 && heartrate < 117) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 117 && heartrate < 125) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 139) {
+					background = "green";
+				}
+				else if (heartrate >= 139 && heartrate < 144) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 144 && heartrate < 149) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 149 && heartrate < 154) {
+					background = "Orange";
+				}
+				else if (heartrate >= 154 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 41 && userage < 42) {
+				if (heartrate >= 0 && heartrate < 109) {
+					background = "Red";
+				}
+				else if (heartrate >= 109 && heartrate < 110) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 110 && heartrate < 124) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 124 && heartrate < 140) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 140 && heartrate < 144) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 145 && heartrate < 150) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 150 && heartrate < 158) {
+					background = "Orange";
+				}
+				else if (heartrate >= 158 && heartrate < 161) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 161 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+
+			if (userage >= 42 && userage < 43) {
+				if (heartrate >= 0 && heartrate < 108) {
+					background = "Red";
+				}
+				else if (heartrate >= 108 && heartrate < 109) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 109 && heartrate < 123) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 123 && heartrate < 139) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 139 && heartrate < 143) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 143 && heartrate < 149) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 149 && heartrate < 157) {
+					background = "Orange";
+				}
+				else if (heartrate >= 157 && heartrate < 160) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 160 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+			if (userage >= 43 && userage < 44) {
+				if (heartrate >= 0 && heartrate < 107) {
+					background = "Red";
+				}
+				else if (heartrate >= 107 && heartrate < 108) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 108 && heartrate < 122) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 122 && heartrate < 138) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 138 && heartrate < 143) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 143 && heartrate < 148) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 148 && heartrate < 156) {
+					background = "Orange";
+				}
+				else if (heartrate >= 156 && heartrate < 159) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 159 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+			if (userage >= 44 && userage < 45) {
+				if (heartrate >= 0 && heartrate < 106) {
+					background = "Red";
+				}
+				else if (heartrate >= 106 && heartrate < 107) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 107 && heartrate < 121) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 121 && heartrate < 137) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 137 && heartrate < 142) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 142 && heartrate < 147) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 147 && heartrate < 155) {
+					background = "Orange";
+				}
+				else if (heartrate >= 155 && heartrate < 158) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 158 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+			if (userage >= 45 && userage < 46) {
+				if (heartrate >= 0 && heartrate < 105) {
+					background = "Red";
+				}
+				else if (heartrate >= 105 && heartrate < 106) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 106 && heartrate < 120) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 120 && heartrate < 136) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 136 && heartrate < 141) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 141 && heartrate < 146) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 146 && heartrate < 154) {
+					background = "Orange";
+				}
+				else if (heartrate >= 154 && heartrate < 157) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 157 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+
+			if (userage >= 46 && userage < 47) {
+				if (heartrate >= 0 && heartrate < 104) {
+					background = "Red";
+				}
+				else if (heartrate >= 104 && heartrate < 105) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 105 && heartrate < 119) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 119 && heartrate < 135) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 135 && heartrate < 140) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 140 && heartrate < 145) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 145 && heartrate < 153) {
+					background = "Orange";
+				}
+				else if (heartrate >= 153 && heartrate < 156) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 156 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+			if (userage >= 47 && userage < 48) {
+				if (heartrate >= 0 && heartrate < 103) {
+					background = "Red";
+				}
+				else if (heartrate >= 103 && heartrate < 104) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 104 && heartrate < 118) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 118 && heartrate < 134) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 134 && heartrate < 139) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 139 && heartrate < 144) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 144 && heartrate < 152) {
+					background = "Orange";
+				}
+				else if (heartrate >= 152 && heartrate < 155) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 155 && heartrate < 179) {
+					color = "white";
+					background = "green";
+				}
+
+			}
+			if (userage >= 91 && userage < 92) {
+				if (heartrate >= 0 && heartrate < 100) {
+					background = "Red";
+				}
+				else if (heartrate >= 100 && heartrate < 104) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 104 && heartrate < 106) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 106 && heartrate < 114) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 114 && heartrate < 115) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 115 && heartrate < 116) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 116 && heartrate < 129) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 138) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 138 && heartrate < 143) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 143 && heartrate < 148) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 148 && heartrate < 153) {
+					background = "Orange";
+				}
+				else if (heartrate >= 153 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+			if (userage >= 92 && userage < 93) {
+				if (heartrate >= 0 && heartrate < 99) {
+					background = "Red";
+				}
+				else if (heartrate >= 99 && heartrate < 103) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 103 && heartrate < 105) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 105 && heartrate < 113) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 113 && heartrate < 114) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 114 && heartrate < 115) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 115 && heartrate < 129) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 137) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 137 && heartrate < 142) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 142 && heartrate < 147) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 147 && heartrate < 152) {
+					background = "Orange";
+				}
+				else if (heartrate >= 152 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+			if (userage >= 93 && userage < 94) {
+				if (heartrate >= 0 && heartrate < 98) {
+					background = "Red";
+				}
+				else if (heartrate >= 98 && heartrate < 102) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 102 && heartrate < 104) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 104 && heartrate < 112) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 112 && heartrate < 113) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 113 && heartrate < 114) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 114 && heartrate < 129) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 136) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 136 && heartrate < 141) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 141 && heartrate < 146) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 146 && heartrate < 151) {
+					background = "Orange";
+				}
+				else if (heartrate >= 151 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+
+			if (userage >= 94 && userage < 95) {
+				if (heartrate >= 0 && heartrate < 97) {
+					background = "Red";
+				}
+				else if (heartrate >= 97 && heartrate < 101) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 101 && heartrate < 103) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 103 && heartrate < 111) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 111 && heartrate < 112) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 112 && heartrate < 113) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 113 && heartrate < 129) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 135) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 135 && heartrate < 140) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 140 && heartrate < 145) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 145 && heartrate < 150) {
+					background = "Orange";
+				}
+				else if (heartrate >= 150 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+			if (userage >= 95 && userage < 96) {
+				if (heartrate >= 0 && heartrate < 96) {
+					background = "Red";
+				}
+				else if (heartrate >= 96 && heartrate < 100) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 100 && heartrate < 102) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 102 && heartrate < 110) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 110 && heartrate < 111) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 111 && heartrate < 112) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 112 && heartrate < 129) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 134) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 134 && heartrate < 139) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 139 && heartrate < 144) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 144 && heartrate < 149) {
+					background = "Orange";
+				}
+				else if (heartrate >= 149 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+			if (userage >= 96 && userage < 97) {
+				if (heartrate >= 0 && heartrate < 95) {
+					background = "Red";
+				}
+				else if (heartrate >= 95 && heartrate < 99) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 99 && heartrate < 101) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 101 && heartrate < 109) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 109 && heartrate < 110) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 110 && heartrate < 111) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 111 && heartrate < 129) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 133) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 133 && heartrate < 138) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 138 && heartrate < 143) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 143 && heartrate < 148) {
+					background = "Orange";
+				}
+				else if (heartrate >= 148 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+			if (userage >= 97 && userage < 98) {
+				if (heartrate >= 0 && heartrate < 94) {
+					background = "Red";
+				}
+				else if (heartrate >= 94 && heartrate < 98) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 98 && heartrate < 100) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 100 && heartrate < 108) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 108 && heartrate < 109) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 109 && heartrate < 110) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 110 && heartrate < 129) {
+					background = "Orange";
+				}
+				else if (heartrate >= 130 && heartrate < 132) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 132 && heartrate < 137) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 137 && heartrate < 142) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 142 && heartrate < 147) {
+					background = "Orange";
+				}
+				else if (heartrate >= 147 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+			if (userage >= 98 && userage < 99) {
+				if (heartrate >= 0 && heartrate < 93) {
+					background = "Red";
+				}
+				else if (heartrate >= 93 && heartrate < 97) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 97 && heartrate < 99) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 99 && heartrate < 107) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 107 && heartrate < 108) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 108 && heartrate < 109) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 109 && heartrate < 129) {
+					background = "Orange";
+				}
+				else if (heartrate >= 131 && heartrate < 136) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 136 && heartrate < 141) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 141 && heartrate < 146) {
+					background = "Orange";
+				}
+				else if (heartrate >= 146 && heartrate < 200) {
+					background = "Red";
+				}
+
+
+			}
+
+			if (userage >= 99 && userage < 100) {
+				if (heartrate >= 0 && heartrate < 92) {
+					background = "Red";
+				}
+				else if (heartrate >= 92 && heartrate < 96) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 96 && heartrate < 98) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 98 && heartrate < 106) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 106 && heartrate < 107) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 107 && heartrate < 108) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 108 && heartrate < 129) {
+					background = "Orange";
+				}
+				else if (heartrate >= 131 && heartrate < 135) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 135 && heartrate < 140) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 140 && heartrate < 145) {
+					background = "Orange";
+				}
+				else if (heartrate >= 145 && heartrate < 200) {
+					background = "Red";
+				}
+
+
+			}
+			if (userage >= 100 && userage < 101) {
+				if (heartrate >= 0 && heartrate < 91) {
+					background = "Red";
+				}
+				else if (heartrate >= 91 && heartrate < 95) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 95 && heartrate < 97) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 97 && heartrate < 105) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 105 && heartrate < 106) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 106 && heartrate < 107) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 107 && heartrate < 129) {
+					background = "Orange";
+				}
+				else if (heartrate >= 131 && heartrate < 134) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 134 && heartrate < 139) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 139 && heartrate < 144) {
+					background = "Orange";
+				}
+				else if (heartrate >= 144 && heartrate < 200) {
+					background = "Red";
+				}
+			}
+
+			if (userage >= 100 && userage < 101) {
+				if (heartrate >= 0 && heartrate < 90) {
+					background = "Red";
+				}
+				else if (heartrate >= 90 && heartrate < 94) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 94 && heartrate < 97) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 97 && heartrate < 104) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 104 && heartrate < 105) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 105 && heartrate < 106) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 106 && heartrate < 128) {
+					background = "Orange";
+				}
+				else if (heartrate >= 128 && heartrate < 129) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 129 && heartrate < 130) {
+					color = "white";
+					background = "green";
+				}
+				else if (heartrate >= 130 && heartrate < 133) {
+					background = "#32CD32";
+					color = "white";
+				}
+				else if (heartrate >= 133 && heartrate < 138) {
+					background = "Yellow";
+				}
+				else if (heartrate >= 138 && heartrate < 143) {
+					background = "Orange";
+				}
+				else if (heartrate >= 143 && heartrate < 200) {
+					background = "Red";
+				}
+
+			}
+
+			if (userage >= 74 && userage < 101) {
+				if (heartrate >= 129 && heartrate < 130) {
+					background = "#32CD32";
+					color = "white";
+				}
+			}
+
+			if (userage >= 98 && userage < 101) {
+				if (heartrate >= 130 && heartrate < 131) {
+					color = "white";
+					background = "green";
 				}
 			}
 		}
-		return [background, color]
+		return [background, color];
 	}
+
 	aerobicTimeZone(value, durationdate) {
 		let lower_aerobic_zone;
 		let higher_aerobic_zone;
@@ -2229,22 +3868,27 @@ class Aadashboard extends Component {
 		let score = this.aaExercisestats(this.renderValue(value.hr_aerobic_duration_hour_min, durationdate), workout_duration_hours_min_score);
 		let heartRateNotRecorded = this.renderValue(value.hr_not_recorded_duration_hour_min, durationdate)
 		let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_non_strength_exercise_heart_rate, durationdate), heartRateNotRecorded, workout_duration_hours_min_score);
-
-		return (
-			<div className="col-md table_margin workout_dashboard_data" style={{ 'backgroundColor': avgheartratecolor[0], color: avgheartratecolor[1] }}>
-				<h3>Aerobic Zone</h3>
-				<p>
-					<span>{lower_aerobic_zone + ' - ' + higher_aerobic_zone}</span><br />
-					<h5>
-						{
-							score == "No workout"
-								? "N/A"
-								: score + ' ( ' + aerobicPrcnt + '% ) '
-						}
-					</h5>
-				</p>
-			</div>
-		)
+		if (score == "No workout") {
+			return (
+				<Card className="card_style" style={{ backgroundColor: '', color: '' }}>
+					<CardBody>
+						<CardTitle className="header_style">{'Time in Aerobic Zone (' + lower_aerobic_zone + ' - ' + higher_aerobic_zone + ')'}
+						</CardTitle>
+						<CardText className="value_style">{score}</CardText>
+					</CardBody>
+				</Card>
+			);
+		}
+		else {
+			return (
+				<Card className="card_style" >
+					<CardBody style={{ backgroundColor: avgheartratecolor[0], color: avgheartratecolor[1] }}>
+						<CardTitle className="header_style">{'Time in Aerobic Zone (' + lower_aerobic_zone + ' - ' + higher_aerobic_zone + ')'}</CardTitle>
+						<CardText className="value_style">{score}{' '}{'(' + aerobicPrcnt + '%' + ')'}</CardText>
+					</CardBody>
+				</Card>
+			);
+		}
 	}
 
 	anerobicTimeZone(value, durationdate) {
@@ -2257,22 +3901,26 @@ class Aadashboard extends Component {
 		let score = this.aaExercisestats(this.renderValue(value.hr_anaerobic_duration_hour_min, durationdate), workout_duration_hours_min_score);
 		let anerobicPrcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_anaerobic_duration, durationdate));
 		let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_non_strength_exercise_heart_rate, durationdate), heartRateNotRecorded, workout_duration_hours_min_score);
-
-		return (
-			<div className="col-md table_margin workout_dashboard_data" style={{ 'backgroundColor': avgheartratecolor[0], color: avgheartratecolor[1] }}>
-				<h3>Anaerobic Zone</h3>
-				<p>
-					<span>Above {anerobic_zone}</span><br />
-					<h5>
-						{
-							score == "No workout"
-								? "N/A"
-								: score + ' ( ' + anerobicPrcnt + '% ) '
-						}
-					</h5>
-				</p>
-			</div>
-		)
+		if (score == "No workout") {
+			return (
+				<Card className="card_style">
+					<CardBody>
+						<CardTitle className="header_style">{'Time in Anaerobic Zone (' + anerobic_zone + ' or above)'}</CardTitle>
+						<CardText className="value_style">{score}</CardText>
+					</CardBody>
+				</Card>
+			);
+		}
+		else {
+			return (
+				<Card className="card_style">
+					<CardBody style={{ backgroundColor: avgheartratecolor[0], color: avgheartratecolor[1] }}>
+						<CardTitle className="header_style">{'Time in Anaerobic Zone (' + anerobic_zone + ' or above)'}</CardTitle>
+						<CardText className="value_style">{score}{' '}{'(' + anerobicPrcnt + '%' + ')'}</CardText>
+					</CardBody>
+				</Card>
+			);
+		}
 	}
 
 	belowAerobicTimeZone(value, durationdate) {
@@ -2285,75 +3933,74 @@ class Aadashboard extends Component {
 		let score = this.aaExercisestats(this.renderValue(value.hr_below_aerobic_duration_hour_min, durationdate), workout_duration_hours_min_score);
 		let belowAerobicPrcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_below_aerobic_duration, durationdate))
 		let avgheartratecolor = this.aaColorRanges(this.renderValue(value.avg_non_strength_exercise_heart_rate, durationdate), heartRateNotRecorded, workout_duration_hours_min_score);
+		if (score == "No workout") {
+			return (
 
-		return (
-			<div className="col-md table_margin workout_dashboard_data" style={{ 'backgroundColor': avgheartratecolor[0], color: avgheartratecolor[1] }}>
-				<h3>Below Aerobic Zone</h3>
-				<p>
-					<span>Below {below_aerobic_zone}</span><br />
-					<h5>
-						{
-							score == "No workout"
-								? "N/A"
-								: score + ' ( ' + belowAerobicPrcnt + '% ) '
-						}
-					</h5>
-				</p>
-			</div >
-		)
+				<Card className="card_style" id="my-card">
+					<CardBody>
+						<CardTitle className="header_style">{'Time in below Aerobic Zone (below ' + below_aerobic_zone + ')'}</CardTitle>
+						<CardText className="value_style">{score}</CardText>
+					</CardBody>
+				</Card>
+
+			);
+		}
+		else {
+			return (
+				<Card className="card_style" id="my-card">
+					<CardBody style={{ backgroundColor: avgheartratecolor[0], color: avgheartratecolor[1] }}>
+						<CardTitle className="header_style">{'Time in below Aerobic Zone (below ' + below_aerobic_zone + ')'}</CardTitle>
+						<CardText className="value_style">{score}{' '}{'(' + belowAerobicPrcnt + '%' + ')'}</CardText>
+					</CardBody>
+				</Card>
+			);
+		}
 	}
 
 	heartRateNotRecordedTimeZone(value, durationdate) {
 		let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min, durationdate);
 		let score = this.aaExercisestats(this.renderValue(value.hr_not_recorded_duration_hour_min, durationdate), workout_duration_hours_min_score);
 		let hrr_not_recorded_prcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_hr_not_recorded_duration, durationdate));
-
-		return (
-			<div className="col-md table_margin workout_dashboard_data">
-				<h3>Heart Rate <br />Not-Recorded</h3>
-				<h5>
-					{
-						score == "No workout"
-							? 'N/A'
-							: score + ' ( ' + hrr_not_recorded_prcnt + '% ) '
-					}
-				</h5>
-			</div>
-		)
+		if (score == "No workout") {
+			return (
+				<Card className="card_style">
+					<CardBody>
+						<CardTitle className="header_style">Heart Rate Not Recorded</CardTitle>
+						<CardText className="value_style">{score}</CardText>
+					</CardBody>
+				</Card>
+			);
+		}
+		else {
+			return (
+				<Card className="card_style">
+					<CardBody>
+						<CardTitle className="header_style">Heart Rate Not Recorded</CardTitle>
+						<CardText className="value_style">{score}{' '}{'(' + hrr_not_recorded_prcnt + '%' + ')'}</CardText>
+					</CardBody>
+				</Card>
+			);
+		}
 	}
 
 	totalworkoutdurationTimeZone(value, durationdate) {
 		let score = this.renderValue(value.workout_duration_hours_min, durationdate);
 		if (score == undefined || score == 0 || score == "" || score == "00:00" || score == null) {
-			score = "N/A";
-		}
-		return (
-			<div className="col-md table_margin workout_dashboard_data">
-				<h3>Total Workout Duration</h3>
-				<h5>
-					{score}
-				</h5>
-			</div>
-		);
-	}
-
-	aaExercisestats(value, workout_duration_hours_min_score) {
-		if ((value == undefined || value == 0 || value == "" || value == "00:00" || value == null) && (workout_duration_hours_min_score == undefined || workout_duration_hours_min_score == 0 || workout_duration_hours_min_score == "" || workout_duration_hours_min_score == "00:00" || workout_duration_hours_min_score == null)) {
-			value = "No workout"
-		}
-		else if (workout_duration_hours_min_score && workout_duration_hours_min_score != "") {
-			value = value
-		}
-		return value;
-	}
-	aaExercisestatsPrct(value) {
-		if ((value == undefined || value == 0 || value == "" || value == "00:00" || value == null)) {
-			value = "0"
+			score = "No workout";
 		}
 		else {
-			value = value
+			score = score;
 		}
-		return value;
+		if (isNaN(score)) {
+			return (
+				<Card className="card_style">
+					<CardBody>
+						<CardTitle className="header_style">Total Workout Duration </CardTitle>
+						<CardText className="value_style">{score}</CardText>
+					</CardBody>
+				</Card>
+			);
+		}
 	}
 	secondsToHourMinute(seconds) {
 		if (isNaN(seconds) || seconds < 0) return "N/A"
@@ -2382,12 +4029,15 @@ class Aadashboard extends Component {
 		let count = 0;
 		let columns = []
 		let timezonesData = this.state.durationInTimeZones[this.state.selected_range]
+		if (timezonesData == undefined) return null
+		timezonesData = timezonesData[0]
 		let sequences = Object.keys(timezonesData)
+		// console.log(sequences)
 		let lastSequence = sequences[sequences.length - 1]
 		let lastTimeZone = timezonesData[lastSequence]
+		console.log(lastTimeZone)
 		sequences.map((timezone) => {
 			let currentTimeZone = timezonesData[timezone]
-			// console.log(currentTimeZone)
 			if (count % 4 == 0) {
 				rows.push(<tr>{columns}</tr>)
 				columns = []
@@ -2395,24 +4045,44 @@ class Aadashboard extends Component {
 			count++
 			columns.push(
 				<td className="value_style" style={{ 'backgroundColor': currentTimeZone["color"], 'color': currentTimeZone['color'] == "green" ? 'white' : 'black' }}>
-					{timezone}<br />&nbsp;
-					{this.secondsToHourMinute(currentTimeZone['duration'])}&nbsp;({currentTimeZone['percentage']}%)
+					{currentTimeZone['range']}<br />&nbsp;
+					{this.secondsToHourMinute(currentTimeZone['duration'])}&nbsp;({currentTimeZone['percent']}%)
 				</td>)
 		})
 		let table = <div className="content-justify-center p-2" style={{ 'overflow': 'hidden' }}>
 			<h2 className="bg-info text-white">Duration In Zones (hh:mm)(%time in zone)</h2>
 			<table className="table table-responsive timezone_duration" > <tbody>{rows}</tbody></table>
-			<h3 className="bg-danger text-white">>>&nbsp;{lastSequence}
-				&nbsp;&nbsp;{this.secondsToHourMinute(lastTimeZone['duration'])}&nbsp;({lastTimeZone['percentage']}%)
+			<h3 className="bg-danger text-white">>>&nbsp;{lastTimeZone['range']}&nbsp;{this.secondsToHourMinute(lastTimeZone['duration'])}&nbsp;({lastTimeZone['percent']}%)
 			</h3>
 		</div>
 		return table
+
+	}
+
+	aaExercisestats(value, workout_duration_hours_min_score) {
+		if ((value == undefined || value == 0 || value == "" || value == "00:00" || value == null) && (workout_duration_hours_min_score == undefined || workout_duration_hours_min_score == 0 || workout_duration_hours_min_score == "" || workout_duration_hours_min_score == "00:00" || workout_duration_hours_min_score == null)) {
+			value = "No workout"
+		}
+		else if (workout_duration_hours_min_score && workout_duration_hours_min_score != "") {
+			value = value
+		}
+		return value;
+	}
+	aaExercisestatsPrct(value) {
+		if ((value == undefined || value == 0 || value == "" || value == "00:00" || value == null)) {
+			value = "0"
+		}
+		else {
+			value = value
+		}
+		return value;
 	}
 
 	render() {
 		return (
 			<div>
 				<NavbarMenu title={"AA Dashboard"} />
+
 				{this.state.active_view &&
 					<div className="nav3" id='bottom-nav'>
 						<div className="nav1" style={{ position: this.state.scrollingLock ? "fixed" : "relative" }}>
@@ -2430,10 +4100,13 @@ class Aadashboard extends Component {
 										style={{ color: "white", marginLeft: "20px" }}
 										name="calendar"
 										size="1x"
+
 									/>
+
 									<span style={{ marginLeft: "20px", color: "white", paddingTop: "7px" }}>
 										{moment(this.state.selectedDate).format('MMM D, YYYY ')}
 									</span>
+
 								</span>
 								<span onClick={this.toggleDate4} id="daterange4" className="date_range1" style={{ color: "white" }}>
 									<span className="date_range_btn">
@@ -2519,6 +4192,9 @@ class Aadashboard extends Component {
 						</div>
 					</div>
 				}
+
+
+
 
 				<span className="cla_center" style={{ textAlign: "center" }}>{this.renderLastSync(this.state.last_synced)}</span>
 
@@ -2620,6 +4296,7 @@ class Aadashboard extends Component {
 					toggle={this.toggleDate3}>
 					<PopoverBody>
 						<div >
+
 							<Form>
 								<div style={{ paddingBottom: "12px" }} className="justify-content-center">
 									<Label>Start Date</Label>&nbsp;<b style={{ fontWeight: "bold" }}>:</b>&nbsp;
@@ -2627,15 +4304,19 @@ class Aadashboard extends Component {
 										name="cr3_start_date"
 										value={this.state.cr3_start_date}
 										onChange={this.handleChange} style={{ height: "35px", borderRadius: "7px" }} />
+
 								</div>
 								<div id="date" className="justify-content-center">
+
 									<Label>End date</Label>&nbsp;<b style={{ fontWeight: "bold" }}>:</b>&nbsp;
                                   <Input type="date"
 										name="cr3_end_date"
 										value={this.state.cr3_end_date}
 										onChange={this.handleChange} style={{ height: "35px", borderRadius: "7px" }} />
+
 								</div>
 								<div id="date" style={{ marginTop: "12px" }} className="justify-content-center">
+
 									<button
 										id="nav-btn"
 										style={{ backgroundColor: "#ed9507" }}
@@ -2643,10 +4324,12 @@ class Aadashboard extends Component {
 										className="btn btn-block-lg"
 										onClick={this.onSubmitDate3} style={{ width: "175px" }}>SUBMIT</button>
 								</div>
+
 							</Form>
 						</div>
 					</PopoverBody>
 				</Popover>
+
 				<Popover
 					placement="bottom"
 					isOpen={this.state.dateRange4}
@@ -2654,6 +4337,7 @@ class Aadashboard extends Component {
 					toggle={this.toggleDate4}>
 					<PopoverBody>
 						<div >
+
 							<Form>
 								<div style={{ paddingBottom: "12px" }} className="justify-content-center">
 									<Label>Start Date</Label>&nbsp;<b style={{ fontWeight: "bold" }}>:</b>&nbsp;
@@ -2661,8 +4345,10 @@ class Aadashboard extends Component {
 										name="cr1_start_date"
 										value={this.state.cr1_start_date}
 										onChange={this.handleChange} style={{ height: "35px", borderRadius: "7px" }} />
+
 								</div>
 								<div id="date" className="justify-content-center">
+
 									<Label>End date</Label>&nbsp;<b style={{ fontWeight: "bold" }}>:</b>&nbsp;
                                   <Input type="date"
 										name="cr1_end_date"
@@ -2684,6 +4370,9 @@ class Aadashboard extends Component {
 						</div>
 					</PopoverBody>
 				</Popover>
+
+
+
 				{this.state.active_view &&
 					<div className="row gd_padding">
 						<div className="row padropStyles">
@@ -2696,16 +4385,38 @@ class Aadashboard extends Component {
 								</DropdownMenu>
 							</Dropdown>
 							<span className="weekdate" style={{ marginLeft: "350px", marginRight: "auto" }}><span className='weekdate'>{this.state.capt}</span><span>{" (" + this.state.date + ")"}{this.state.numberOfDays && <span>{" - " + "Total Days: " + this.state.numberOfDays}</span>}</span></span>
+
 						</div>
 					</div>
+
+
 				}
+
 				<div className="row justify-content-center md_padding">
-					{this.belowAerobicTimeZone(this.state.summary.exercise, this.state.selected_range)}
-					{this.aerobicTimeZone(this.state.summary.exercise, this.state.selected_range)}
-					{this.anerobicTimeZone(this.state.summary.exercise, this.state.selected_range)}
-					{this.heartRateNotRecordedTimeZone(this.state.summary.exercise, this.state.selected_range)}
-					{this.totalworkoutdurationTimeZone(this.state.summary.exercise, this.state.selected_range)}
+					<div className="col-md-6 table_margin">
+						<span>{this.aerobicTimeZone(this.state.summary.exercise, this.state.selected_range)}</span>
+					</div>
+					<div className="col-md-6 table_margin">
+						<span>{this.anerobicTimeZone(this.state.summary.exercise, this.state.selected_range)}</span>
+					</div>
 				</div>
+
+
+
+				<div className="row justify-content-center md_padding">
+					<div className="col-md-6 table_margin">
+						<span>{this.belowAerobicTimeZone(this.state.summary.exercise, this.state.selected_range)}</span>
+					</div>
+					<div className="col-md-6 table_margin">
+						<span>{this.heartRateNotRecordedTimeZone(this.state.summary.exercise, this.state.selected_range)}</span>
+					</div>
+				</div>
+				<div className="row justify-content-center md_padding">
+					<div className="col-md-6 table_margin">
+						<span>{this.totalworkoutdurationTimeZone(this.state.summary.exercise, this.state.selected_range)}</span>
+					</div>
+				</div>
+
 				<div style={{ "textAlign": "center" }} className="row mt-5 mb-5 justify-content-center">{/* Duration in Time zones table */}
 					{this.renderDurationInTimeZones()}
 				</div >
@@ -2713,7 +4424,7 @@ class Aadashboard extends Component {
 				{this.renderProgress2FetchOverlay()}
 				{this.renderProgress3FetchOverlay()}
 				{this.renderProgressSelectedDateFetchOverlay()}
-			</div >
+			</div>
 		);
 	}
 }
