@@ -478,23 +478,21 @@ class Hrr_Dashboard extends Component{
 	               	hr_background = 'white';
 	            }
 	            else if(score >=20 && score <=29){
-	                background = '#92d050';
-	                color = 'black';
-	                hr_background = '';
+	                background = '#32CD32';
+	                color = 'white';
 	            }
-			
 	            else if(score >= 14 && score <=19){
-	                background = '#ffff00';
+	                background = 'yellow';
 	                color = 'black';
 	                hr_background = 'black';
 				}
 				else if(score >= 12 && score <=13){
-	                background = '#e16b09';
+	                background = 'orange';
 	                color = 'black';
 	                hr_background = 'black';
 				}
 				   else if(score < 12){
-	                background = '#ff0000';
+	                background = 'red';
 	                color = 'black';
 	                hr_background = 'black';
 	            }
