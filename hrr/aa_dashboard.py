@@ -107,9 +107,13 @@ def generate_aa_new_table(heartrate,time_difference,current_user_aa_ranges):
 		to_hr = int(ranges.split('-')[1])+1
 		if heartrate in range(from_hr,to_hr):
 			values['duration'] = time_difference + values.get('duration',0)
+
 		new_data = {from_hr:values}
 		new_format.update(new_data)
-
+	for key,value in new_format.items():
+		is_duration = value.get('duration')
+		if not is_duration:
+			value['duration'] = 0
 	return new_format
 
 

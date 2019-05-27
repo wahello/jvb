@@ -579,14 +579,16 @@ def avg_all_dashboard_data(all_data):
 		print(week_data,"week data")
 	if month_data and len(month_data) >= 2:
 		for index,value in enumerate(month_data):
-			value = ast.literal_eval(value)
 			if index > 0:
 				for key,data in value.items():
-					pass
+					month_data[0][key]['duration'] = data.get(
+						'duration',0) + month_data[0][key]['duration']
+	# print(all_data['month'],"month")
+	print(month_data[0],"month_data")
 
 	if week_data and len(week_data) >= 2:
 		pass
-
+ 
 def create_aa_dashboard_format(data,start_dt=None,custom_range=None):
 	all_data = {
 				"today":[],
@@ -604,7 +606,7 @@ def create_aa_dashboard_format(data,start_dt=None,custom_range=None):
 	month_date = yesterday_date - timedelta(days=29)
 	# print(month_date,"month_date")
 	for single_data in data:
-		print(type(single_data.data),"single data")
+		# print(type(single_data.data),"single data")
 		if custom_range:
 			pass
 		elif start_dt and not custom_range:
@@ -614,9 +616,9 @@ def create_aa_dashboard_format(data,start_dt=None,custom_range=None):
 			if yesterday_date == start_date:
 				all_data["yesterday"].append(single_data.data)
 			if start_date <= yesterday_date and start_date >= week_date:
-				all_data["week"].append(single_data.data)
+				all_data["week"].append(ast.literal_eval(single_data.data))
 			if start_date <= yesterday_date and start_date >= month_date:
-				all_data["month"].append(single_data.data)
+				all_data["month"].append(ast.literal_eval(single_data.data))
 			if start_date <= yesterday_date:
 				all_data["year"].append(single_data.data)
 	avg_all_dashboard_data(all_data)
