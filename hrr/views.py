@@ -573,15 +573,17 @@ class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
 
 def get_total_duration(value):
 	total_duration = 0
-	for key,values in value[0].items():
-		total_duration = values.get('duration') + total_duration
+	if value:
+		for key,values in value[0].items():
+			total_duration = values.get('duration') + total_duration
 
 	return total_duration
 
 def add_percent_field(all_data,key,total_duration):
-	data = all_data[key][0]
-	for keys,value in data.items():
-		value['percent'] = round((value.get('duration')/total_duration) * 100)
+	if all_data[key]:
+		data = all_data[key][0]
+		for keys,value in data.items():
+			value['percent'] = round((value.get('duration')/total_duration) * 100)
 	return all_data
 
 def add_percent_aa_dashboard(all_data):
