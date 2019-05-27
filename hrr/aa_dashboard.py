@@ -94,6 +94,7 @@ def get_fitfiles(user,start_date,start,end,start_date_timestamp=None,end_date_ti
 		fitfiles_obj=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 	return fitfiles_obj
 
+
 def generate_aa_new_table(heartrate,time_difference,current_user_aa_ranges):
 	'''This function will generaate the new table for AA dashboard
 	Args: heart rate(int)
@@ -114,6 +115,7 @@ def generate_aa_new_table(heartrate,time_difference,current_user_aa_ranges):
 		is_duration = value.get('duration')
 		if not is_duration:
 			value['duration'] = 0
+
 	return new_format
 
 

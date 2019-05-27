@@ -570,8 +570,38 @@ class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
 		else:
 			queryset = TwentyfourHourTimeHeartZones.objects.all()
 		return queryset
-# def conver_to_list_of_dict(all_data):
 
+def get_total_duration(value):
+	total_duration = 0
+	for key,values in value[0].items():
+		total_duration = values.get('duration') + total_duration
+
+	return total_duration
+
+def add_percent_field(all_data,key,total_duration):
+	data = all_data[key][0]
+	for keys,value in data.items():
+		value['percent'] = (value.get('duration')/total_duration) * 100
+	return all_data
+
+def add_percent_aa_dashboard(all_data):
+	for key,value in all_data.items():
+		if key == 'today':
+			total_duration = get_total_duration(value)
+			all_data = add_percent_field(all_data,key,total_duration)
+		if key == 'yesterday':
+			total_duration = get_total_duration(value)
+			all_data = add_percent_field(all_data,key,total_duration)
+		if key == 'week':
+			total_duration = get_total_duration(value)
+			all_data = add_percent_field(all_data,key,total_duration)
+		if key == 'month':
+			total_duration = get_total_duration(value)
+			all_data = add_percent_field(all_data,key,total_duration)
+		if key == 'year':	
+			total_duration = get_total_duration(value)
+			all_data = add_percent_field(all_data,key,total_duration)
+	return all_data
 
 def avg_all_dashboard_data(all_data):
 	week_data = all_data['week']
@@ -600,6 +630,8 @@ def avg_all_dashboard_data(all_data):
 	all_data['week'] = week_data[0:1]
 	all_data['month'] = month_data[0:1]
 	all_data['year'] = year_data[0:1]
+	all_data = add_percent_aa_dashboard(all_data)
+
 	return all_data
 
 def create_aa_dashboard_format(data,start_dt=None,custom_range=None):
