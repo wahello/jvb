@@ -469,20 +469,30 @@ class Hrr_Dashboard extends Component{
 		let background = "";
 		let color = "";
 		let hr_background = "";
+
 		if(score || score == 0){
 		var score = parseFloat(score); 
-	             if(score >= 20){
+	             if(score >= 30){
 	               	background = 'green';
 	               	color = 'white';
 	               	hr_background = 'white';
 	            }
-	            else if(score >= 12 && score < 20){
-	                background = '#FFFF01';
+	            else if(score >=20 && score <=29){
+	                background = '#32CD32';
+	                color = 'white';
+	            }
+	            else if(score >= 14 && score <=19){
+	                background = 'yellow';
 	                color = 'black';
 	                hr_background = 'black';
-	            }
-	            else if(score >= 0 && score < 12){
-	                background = '#FF0101';
+				}
+				else if(score >= 12 && score <=13){
+	                background = 'orange';
+	                color = 'black';
+	                hr_background = 'black';
+				}
+				   else if(score < 12){
+	                background = 'red';
 	                color = 'black';
 	                hr_background = 'black';
 	            }
@@ -493,7 +503,7 @@ class Hrr_Dashboard extends Component{
 	            color = '#5e5e5e';
 	            hr_background = '#E5E5E5';
         }
-		var model = <Card className = "card_style" 
+		var model = <Card className = "card_style" 	
 							id = "my-card-mcs"
 							 style = {{background:background, color:color}}>
 				        	<CardBody>
