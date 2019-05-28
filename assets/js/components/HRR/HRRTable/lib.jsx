@@ -22,9 +22,11 @@ export const convertSecToString = (duration) => {
 
 export const renderTimestampToString = (utcTimeStamp) => {
 	let timeString = "";
+	let timestring1 = "";
 	if(utcTimeStamp != null && !isNaN(utcTimeStamp)){
 		// moment by default render utc timestamp it in local time
-		timeString = moment(utcTimeStamp).format("hh:mm:ss a");
+		timestring1 =moment.unix(utcTimeStamp);
+		timeString = moment.parseZone(timestring1).format("hh:mm:ss a");
 	}
 	return timeString;
 }
