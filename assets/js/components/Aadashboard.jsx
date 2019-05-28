@@ -4008,7 +4008,7 @@ class Aadashboard extends Component {
 		seconds %= 3600;
 		let minutes = Math.floor(seconds / 60);
 		seconds = seconds % 60;
-		return hours + ":" + minutes
+		return (hours<10?"0":"")+hours + ":" + (minutes<10?"0":"")+minutes
 	}
 	renderDurationInTimeZones() {
 		let rows = []

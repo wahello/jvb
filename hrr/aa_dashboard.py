@@ -87,9 +87,12 @@ def get_fitfiles(user,start_date,start,end,start_date_timestamp=None,end_date_ti
 	'''
 		get the today fitfiles or 3 days fitfiles
 	'''
+
 	activity_files_qs=UserGarminDataActivity.objects.filter(
 		user=user,start_time_in_seconds__range=[start_date_timestamp,end_date_timestamp])
+	print(user,start_date)
 	fitfiles_obj = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=start_date)
+	print(fitfiles_obj)
 	if not fitfiles_obj or len(activity_files_qs) != len(fitfiles_obj):
 		fitfiles_obj=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
 	return fitfiles_obj
@@ -179,6 +182,7 @@ def aa_dashboard_ranges(user,start_date):
 	start = start_date
 	end = start_date + timedelta(days=3)
 	fitfiles_obj = get_fitfiles(user,start_date,start,end,start_date_timestamp,end_date_timestamp)
+	print(fitfiles_obj,start_date)
 	if activities_dic and fitfiles_obj:
 		for tmp in fitfiles_obj:
 			meta = tmp.meta_data_fitfile
@@ -197,7 +201,8 @@ def aa_dashboard_ranges(user,start_date):
 				workout.append(tmp)
 			elif str(data_id) in hrr_summary_id:
 				hrr.append(tmp)
-
+	print(workout,"workout")
+	print(hrr,"hrr")
 	aa_ranges_all_users = aa_ranges.all_age_aa_ranges()
 	# print(aa_ranges_all_users,"user age")
 	current_user_aa_ranges = aa_ranges_all_users.get(str(user_age))
@@ -209,7 +214,8 @@ def aa_dashboard_ranges(user,start_date):
 									heartrate,time_difference,current_user_aa_ranges)
 	else:
 		aa_dashboard_table = {}
-	
+
+	print(aa_dashboard_table,user,start_date)
 	return aa_dashboard_table
 
 def aadashboard_update_instance(user,start_date,data):
