@@ -1,0 +1,317 @@
+{
+    "today": {
+      "102-105": {
+        "classification": "Aerobic",
+        "duration": 264.0,
+        "color": "yellow"
+      },
+      "184-186": {
+        "classification": "Anerobic",
+        "color": "yellow"
+      },
+      "150-152": {
+        "classification": "Anerobic",
+        "duration": 75.0,
+        "color": "lightgreen"
+      },
+      "189-240": {
+        "classification": "Anerobic",
+        "color": "red"
+      },
+      "132-136": {
+        "classification": "Aerobic",
+        "duration": 1107.0,
+        "color": "lightgreen"
+      },
+      "106-115": {
+        "classification": "Aerobic",
+        "duration": 660.0,
+        "color": "lightgreen"
+      },
+      "179-183": {
+        "classification": "Anerobic",
+        "color": "lightgreen"
+      },
+      "153-178": {
+        "classification": "Anerobic",
+        "duration": 5.0,
+        "color": "thickgreen"
+      },
+      "0-101": {
+        "classification": "Below_Aerobic",
+        "duration": 315.0,
+        "color": "red"
+      },
+      "116-131": {
+        "classification": "Aerobic",
+        "duration": 3086.0,
+        "color": "thickgreen"
+      },
+      "187-188": {
+        "classification": "Anerobic",
+        "color": "orange"
+      },
+      "142-149": {
+        "classification": "Anerobic",
+        "duration": 345.0,
+        "color": "orange"
+      },
+      "137-141": {
+        "classification": "Aerobic",
+        "duration": 714.0,
+        "color": "yellow"
+      }
+    },
+    "yesterday": {
+      "102-105": {
+        "classification": "Aerobic",
+        "duration": 264.0,
+        "color": "yellow"
+      },
+      "184-186": {
+        "classification": "Anerobic",
+        "color": "yellow"
+      },
+      "150-152": {
+        "classification": "Anerobic",
+        "duration": 75.0,
+        "color": "lightgreen"
+      },
+      "189-240": {
+        "classification": "Anerobic",
+        "color": "red"
+      },
+      "132-136": {
+        "classification": "Aerobic",
+        "duration": 1107.0,
+        "color": "lightgreen"
+      },
+      "106-115": {
+        "classification": "Aerobic",
+        "duration": 660.0,
+        "color": "lightgreen"
+      },
+      "179-183": {
+        "classification": "Anerobic",
+        "color": "lightgreen"
+      },
+      "153-178": {
+        "classification": "Anerobic",
+        "duration": 5.0,
+        "color": "thickgreen"
+      },
+      "0-101": {
+        "classification": "Below_Aerobic",
+        "duration": 315.0,
+        "color": "red"
+      },
+      "116-131": {
+        "classification": "Aerobic",
+        "duration": 3086.0,
+        "color": "thickgreen"
+      },
+      "187-188": {
+        "classification": "Anerobic",
+        "color": "orange"
+      },
+      "142-149": {
+        "classification": "Anerobic",
+        "duration": 345.0,
+        "color": "orange"
+      },
+      "137-141": {
+        "classification": "Aerobic",
+        "duration": 714.0,
+        "color": "yellow"
+      }
+    },
+    "week": {
+      "102-105": {
+        "classification": "Aerobic",
+        "duration": 264.0,
+        "color": "yellow"
+      },
+      "184-186": {
+        "classification": "Anerobic",
+        "color": "yellow"
+      },
+      "150-152": {
+        "classification": "Anerobic",
+        "duration": 75.0,
+        "color": "lightgreen"
+      },
+      "189-240": {
+        "classification": "Anerobic",
+        "color": "red"
+      },
+      "132-136": {
+        "classification": "Aerobic",
+        "duration": 1107.0,
+        "color": "lightgreen"
+      },
+      "106-115": {
+        "classification": "Aerobic",
+        "duration": 660.0,
+        "color": "lightgreen"
+      },
+      "179-183": {
+        "classification": "Anerobic",
+        "color": "lightgreen"
+      },
+      "153-178": {
+        "classification": "Anerobic",
+        "duration": 5.0,
+        "color": "thickgreen"
+      },
+      "0-101": {
+        "classification": "Below_Aerobic",
+        "duration": 315.0,
+        "color": "red"
+      },
+      "116-131": {
+        "classification": "Aerobic",
+        "duration": 3086.0,
+        "color": "thickgreen"
+      },
+      "187-188": {
+        "classification": "Anerobic",
+        "color": "orange"
+      },
+      "142-149": {
+        "classification": "Anerobic",
+        "duration": 345.0,
+        "color": "orange"
+      },
+      "137-141": {
+        "classification": "Aerobic",
+        "duration": 714.0,
+        "color": "yellow"
+      }
+    },
+    "month": {
+      "102-105": {
+        "classification": "Aerobic",
+        "duration": 264.0,
+        "color": "yellow"
+      },
+      "184-186": {
+        "classification": "Anerobic",
+        "color": "yellow"
+      },
+      "150-152": {
+        "classification": "Anerobic",
+        "duration": 75.0,
+        "color": "lightgreen"
+      },
+      "189-240": {
+        "classification": "Anerobic",
+        "color": "red"
+      },
+      "132-136": {
+        "classification": "Aerobic",
+        "duration": 1107.0,
+        "color": "lightgreen"
+      },
+      "106-115": {
+        "classification": "Aerobic",
+        "duration": 660.0,
+        "color": "lightgreen"
+      },
+      "179-183": {
+        "classification": "Anerobic",
+        "color": "lightgreen"
+      },
+      "153-178": {
+        "classification": "Anerobic",
+        "duration": 5.0,
+        "color": "thickgreen"
+      },
+      "0-101": {
+        "classification": "Below_Aerobic",
+        "duration": 315.0,
+        "color": "red"
+      },
+      "116-131": {
+        "classification": "Aerobic",
+        "duration": 3086.0,
+        "color": "thickgreen"
+      },
+      "187-188": {
+        "classification": "Anerobic",
+        "color": "orange"
+      },
+      "142-149": {
+        "classification": "Anerobic",
+        "duration": 345.0,
+        "color": "orange"
+      },
+      "137-141": {
+        "classification": "Aerobic",
+        "duration": 714.0,
+        "color": "yellow"
+      }
+    },
+    "year": {
+      "102-105": {
+        "classification": "Aerobic",
+        "duration": 264.0,
+        "color": "yellow"
+      },
+      "184-186": {
+        "classification": "Anerobic",
+        "color": "yellow"
+      },
+      "150-152": {
+        "classification": "Anerobic",
+        "duration": 75.0,
+        "color": "lightgreen"
+      },
+      "189-240": {
+        "classification": "Anerobic",
+        "color": "red"
+      },
+      "132-136": {
+        "classification": "Aerobic",
+        "duration": 1107.0,
+        "color": "lightgreen"
+      },
+      "106-115": {
+        "classification": "Aerobic",
+        "duration": 660.0,
+        "color": "lightgreen"
+      },
+      "179-183": {
+        "classification": "Anerobic",
+        "color": "lightgreen"
+      },
+      "153-178": {
+        "classification": "Anerobic",
+        "duration": 5.0,
+        "color": "thickgreen"
+      },
+      "0-101": {
+        "classification": "Below_Aerobic",
+        "duration": 315.0,
+        "color": "red"
+      },
+      "116-131": {
+        "classification": "Aerobic",
+        "duration": 3086.0,
+        "color": "thickgreen"
+      },
+      "187-188": {
+        "classification": "Anerobic",
+        "color": "orange"
+      },
+      "142-149": {
+        "classification": "Anerobic",
+        "duration": 345.0,
+        "color": "orange"
+      },
+      "137-141": {
+        "classification": "Aerobic",
+        "duration": 714.0,
+        "color": "yellow"
+      }
+    }
+  }

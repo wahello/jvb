@@ -42,7 +42,8 @@ from hrr.models import Hrr,\
 						AaWorkoutCalculations,\
 						AA, \
 						TwentyfourHourAA, \
-						TwentyfourHourTimeHeartZones
+						TwentyfourHourTimeHeartZones,\
+						AAdashboard
 import pprint
 from hrr import fitbit_aa
 from hrr.calculation_helper import week_date,\
@@ -568,6 +569,133 @@ class UserAA_twentyfour_hour_low_high_values(generics.ListCreateAPIView):
 							  user=user).values()
 		else:
 			queryset = TwentyfourHourTimeHeartZones.objects.all()
+		return queryset
+
+def get_total_duration(value):
+	total_duration = 0
+	if value:
+		for key,values in value[0].items():
+			total_duration = values.get('duration') + total_duration
+
+	return total_duration
+
+def add_percent_field(all_data,key,total_duration):
+	if all_data[key]:
+		data = all_data[key][0]
+		for keys,value in data.items():
+			value['percent'] = round((value.get('duration')/total_duration) * 100)
+	return all_data
+
+def add_percent_aa_dashboard(all_data):
+	for key,value in all_data.items():
+		if key == 'today':
+			total_duration = get_total_duration(value)
+			all_data = add_percent_field(all_data,key,total_duration)
+		if key == 'yesterday':
+			total_duration = get_total_duration(value)
+			all_data = add_percent_field(all_data,key,total_duration)
+		if key == 'week':
+			total_duration = get_total_duration(value)
+			all_data = add_percent_field(all_data,key,total_duration)
+		if key == 'month':
+			total_duration = get_total_duration(value)
+			all_data = add_percent_field(all_data,key,total_duration)
+		if key == 'year':	
+			total_duration = get_total_duration(value)
+			all_data = add_percent_field(all_data,key,total_duration)
+	return all_data
+
+def avg_all_dashboard_data(all_data):
+	week_data = all_data['week']
+	month_data = all_data['month']
+	year_data = all_data['year']
+	if week_data and len(week_data) >= 2:
+		for index,value in enumerate(week_data):
+			if index > 0:
+				for key,data in value.items():
+					week_data[0][key]['duration'] = data.get(
+						'duration',0) + week_data[0][key]['duration']
+	if month_data and len(month_data) >= 2:
+		for index,value in enumerate(month_data):
+			if index > 0:
+				for key,data in value.items():
+					month_data[0][key]['duration'] = data.get(
+						'duration',0) + month_data[0][key]['duration']
+	if year_data and len(year_data) >= 2:
+		for index,value in enumerate(year_data):
+			if index > 0:
+				for key,data in value.items():
+					year_data[0][key]['duration'] = data.get(
+						'duration',0) + year_data[0][key]['duration']
+
+	# conver_to_list_of_dict(all_data)
+	all_data['week'] = week_data[0:1]
+	all_data['month'] = month_data[0:1]
+	all_data['year'] = year_data[0:1]
+	all_data = add_percent_aa_dashboard(all_data)
+
+	return all_data
+
+def create_aa_dashboard_format(data,start_dt=None,custom_range=None):
+	all_data = {
+				"today":[],
+				"yesterday":[],
+				"week":[],
+				"month":[],
+				"year":[],
+				}
+	# print(start_dt,"start_dt")
+	start_dt_date_obj = datetime.strptime(start_dt,'%Y-%m-%d').date()
+	yesterday_date = start_dt_date_obj - timedelta(days=1)
+	# print(yesterday_date,"yesterday_date")
+	week_date = yesterday_date - timedelta(days=6)
+	# print(week_date,"week_date")
+	month_date = yesterday_date - timedelta(days=29)
+	# print(month_date,"month_date")
+	for single_data in data:
+		# print(type(single_data.data),"single data")
+		if custom_range:
+			pass
+		elif start_dt and not custom_range:
+			start_date = single_data.created_at
+			if start_dt_date_obj == start_date:
+				all_data["today"].append(ast.literal_eval(single_data.data))
+			if yesterday_date == start_date:
+				all_data["yesterday"].append(ast.literal_eval(single_data.data))
+			if start_date <= yesterday_date and start_date >= week_date:
+				all_data["week"].append(ast.literal_eval(single_data.data))
+			if start_date <= yesterday_date and start_date >= month_date:
+				all_data["month"].append(ast.literal_eval(single_data.data))
+			if start_date <= yesterday_date:
+				all_data["year"].append(ast.literal_eval(single_data.data))
+	return avg_all_dashboard_data(all_data)
+	# print(all_data,"all_data")
+
+class UserAAdashboadTable(generics.ListCreateAPIView):
+	'''This class create the AA dashboard ranges table'''
+
+	def get(self,request,format="json"):
+		user_get = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		custom_range = self.request.query_params.get('custom_range', None)
+		querset = self.get_queryset()
+		aa_dashboard_data = create_aa_dashboard_format(
+			querset,start_dt,custom_range)
+		return Response(aa_dashboard_data, status=status.HTTP_200_OK)
+
+	def get_queryset(self):
+		user = self.request.user
+		start_dt = self.request.query_params.get('start_date', None)
+		custom_range = self.request.query_params.get('custom_range', None)
+		if custom_range:
+			queryset = AAdashboard.objects.filter(
+				created_at__range=custom_range,user=user)
+		elif start_dt and not custom_range:
+			current_time  = datetime.now()
+			current_year = current_time.year
+			from_date = '{}-01-01'.format(str(current_year))
+			queryset = AAdashboard.objects.filter(
+				created_at__range=[from_date,start_dt],user=user)
 		return queryset
 
 def aa_ranges_api(request):
@@ -2745,6 +2873,34 @@ def store_aa_low_high_end_calculations(user,from_date,to_date):
 		print("Fitbit AA chat3 data calculation got started")
 		store_fitbit_aa3(user,from_date,to_date)
 		print("Fitbit AA chat3 data calculation finished")
+
+# def store_garmin_aa_dashboard(user,from_date,to_date):
+# 	from_date_obj = datetime.strptime(from_date, "%Y-%m-%d").date()
+# 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
+# 	current_date = to_date_obj
+# 	while (current_date >= from_date_obj):
+# 		data = aa_low_high_end_data(user,current_date)
+# 		# data = json.dumps(data)
+# 		if data:
+# 			try:
+# 				time_hr_zone_obj = TimeHeartZones.objects.get(
+# 					user=user, created_at=current_date)
+# 				if time_hr_zone_obj:
+# 					update_heartzone_instance(user, current_date,data)
+# 			except TimeHeartZones.DoesNotExist:
+# 				create_heartzone_instance(user, data, current_date)
+# 		current_date -= timedelta(days=1)
+# 	return None
+
+# def store_aa_dashboard(user,from_date,to_date):
+# 	device_type = quicklook.calculations.calculation_driver.which_device(user)
+# 	if device_type == "garmin":
+# 		store_garmin_aa_dashboard(user,from_date,to_date)
+# 	elif device_type == 'fitbit':
+# 		print("Fitbit AA chat3 data calculation got started")
+# 		store_fitbit_aa3(user,from_date,to_date)
+		# print("Fitbit AA chat3 data calculation finished")
+
 def hrr_data(user,start_date):
 	Did_heartrate_reach_99 = ''
 	time_99 = 0.0
