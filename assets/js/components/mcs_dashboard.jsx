@@ -403,7 +403,7 @@ class MCS_Dashboard extends Component{
     render(){
         return(
 			<div className="container-fluid">
-			   <NavbarMenu title = {<span className = "last_sync">Movement Consistency Score (MCS) Dashboard
+			   <NavbarMenu title = {<span className = "last_sync">Movement Consistency Score (MCS) Dashboard (Hourly Steps)
                     </span>} />
                
                     <div className=" row cla_center">
