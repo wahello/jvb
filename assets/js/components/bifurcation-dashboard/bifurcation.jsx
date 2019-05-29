@@ -1409,7 +1409,7 @@ renderMcs(mcvalue,dur){
                 </tr>
                 <tr>
                 <td>{mcvalue_a}</td>
-                <td>{mcvalue_f}</td>
+                <td>{mcvalue_b}</td>
                 <td>{mcvalue_c}</td>
                 <td>{mcvalue_d}</td>
                 <td>{mcvalue_f}</td>
