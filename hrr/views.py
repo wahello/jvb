@@ -703,14 +703,14 @@ def aa_ranges_api(request):
 	user_age = user.profile.age()
 	aa_ranges =fitbit_aa.belowaerobic_aerobic_anaerobic(user,user_age)
 	try:
-		aa_ranges = AACustomRanges.objects.filter(user=user).last()
+		aa_ranges_obj = AACustomRanges.objects.filter(user=user).last()
 	except ValueError:
 		user = User.objects.filter(username=user)
-		aa_ranges = AACustomRanges.objects.filter(user=user).last()
+		aa_ranges_obj = AACustomRanges.objects.filter(user=user).last()
 	except:
 		logging.exception("message")
-		aa_ranges = None
-	if aa_ranges:
+		aa_ranges_obj = None
+	if aa_ranges_obj:
 		show_color = True
 	else:
 		show_color = False
