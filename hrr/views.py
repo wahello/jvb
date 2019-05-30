@@ -702,7 +702,21 @@ def aa_ranges_api(request):
 	user = request.user
 	user_age = user.profile.age()
 	aa_ranges =fitbit_aa.belowaerobic_aerobic_anaerobic(user,user_age)
-	return JsonResponse({"0":aa_ranges})
+	try:
+		aa_ranges = AACustomRanges.objects.filter(user=user).last()
+	except ValueError:
+		user = User.objects.filter(username=user)
+		aa_ranges = AACustomRanges.objects.filter(user=user).last()
+	except:
+		logging.exception("message")
+		aa_ranges = None
+	if aa_ranges:
+		show_color = True
+	else:
+		show_color = False
+	data = {"aa_ranges":aa_ranges,
+			"show_color":show_color}
+	return JsonResponse(data)
 
 def calculate_garmin_twentyfour_hour_AA3(user,start_date,user_input_activities=None):
 	hr_dataset = get_garmin_hr_data(user,start_date)
