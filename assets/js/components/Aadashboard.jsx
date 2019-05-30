@@ -112,6 +112,7 @@ class Aadashboard extends Component {
 			isStressInfoModelOpen: false,
 			numberOfDays: null,
 			aa_ranges: {},
+			custom_aa_ranges_added: true,
 			durationInTimeZones: {}
 		};
 
@@ -517,7 +518,8 @@ class Aadashboard extends Component {
 	}
 	successAaRanges(data) {
 		this.setState({
-			aa_ranges: data.data,
+			aa_ranges: data.data.aa_ranges,
+			custom_aa_ranges_added: data.data.show_color
 		})
 	}
 	errorAaRanges(error) {
@@ -650,7 +652,8 @@ class Aadashboard extends Component {
 		let background = '';
 		let color = '';
 		let userage = this.state.userage;
-		if (heartrate == null || heartrate == undefined) {
+		let custom_aa_ranges_added = this.state.custom_aa_ranges_added
+		if (custom_aa_ranges_added || heartrate == null || heartrate == undefined) {
 			background = '';
 			color = '';
 			return [background, color];
@@ -3855,14 +3858,8 @@ class Aadashboard extends Component {
 	}
 
 	aerobicTimeZone(value, durationdate) {
-		let lower_aerobic_zone;
-		let higher_aerobic_zone;
-
-		for (let [key, ranges] of Object.entries(this.state.aa_ranges)) {
-			lower_aerobic_zone = ranges[1];
-			higher_aerobic_zone = ranges[2] - 1;
-		}
-		let aa_ranges = this.state.aa_ranges['0'];
+		let lower_aerobic_zone = this.state.aa_ranges[1]
+		let higher_aerobic_zone = this.state.aa_ranges[2] - 1
 		let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min, durationdate);
 		let aerobicPrcnt = this.aaExercisestatsPrct(this.renderValue(value.prcnt_aerobic_duration, durationdate));
 		let score = this.aaExercisestats(this.renderValue(value.hr_aerobic_duration_hour_min, durationdate), workout_duration_hours_min_score);
@@ -3892,10 +3889,7 @@ class Aadashboard extends Component {
 	}
 
 	anerobicTimeZone(value, durationdate) {
-		let anerobic_zone;
-		for (let [key, ranges] of Object.entries(this.state.aa_ranges)) {
-			anerobic_zone = ranges[2];
-		}
+		let anerobic_zone = this.state.aa_ranges[2]
 		let heartRateNotRecorded = this.renderValue(value.hr_not_recorded_duration_hour_min, durationdate)
 		let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min, durationdate);
 		let score = this.aaExercisestats(this.renderValue(value.hr_anaerobic_duration_hour_min, durationdate), workout_duration_hours_min_score);
@@ -3924,10 +3918,7 @@ class Aadashboard extends Component {
 	}
 
 	belowAerobicTimeZone(value, durationdate) {
-		let below_aerobic_zone;
-		for (let [key, ranges] of Object.entries(this.state.aa_ranges)) {
-			below_aerobic_zone = ranges[0];
-		}
+		let below_aerobic_zone = this.state.aa_ranges[0]
 		let workout_duration_hours_min_score = this.renderValue(value.workout_duration_hours_min, durationdate);
 		let heartRateNotRecorded = this.renderValue(value.hr_not_recorded_duration_hour_min, durationdate)
 		let score = this.aaExercisestats(this.renderValue(value.hr_below_aerobic_duration_hour_min, durationdate), workout_duration_hours_min_score);
@@ -4008,7 +3999,7 @@ class Aadashboard extends Component {
 		seconds %= 3600;
 		let minutes = Math.floor(seconds / 60);
 		seconds = seconds % 60;
-		return (hours<10?"0":"")+hours + ":" + (minutes<10?"0":"")+minutes
+		return (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes
 	}
 	renderDurationInTimeZones() {
 		let rows = []
@@ -4031,31 +4022,31 @@ class Aadashboard extends Component {
 		let timezonesData = this.state.durationInTimeZones[this.state.selected_range]
 		if (timezonesData == undefined) return null
 		timezonesData = timezonesData[0]
-  if ( timezonesData !=null && timezonesData !=undefined)
-		{let sequences = Object.keys(timezonesData)
-		let lastSequence = sequences[sequences.length - 1]
-		let lastTimeZone = timezonesData[lastSequence]
-		sequences.map((timezone) => {
-			let currentTimeZone = timezonesData[timezone]
-			if (count % 4 == 0) {
-				rows.push(<tr>{columns}</tr>)
-				columns = []
-			}
-			count++
-			columns.push(
-				<td className="value_style" style={{ 'backgroundColor': currentTimeZone["color"], 'color': currentTimeZone['color'] == "green" ? 'white' : 'black' }}>
-					{currentTimeZone['range']}<br />&nbsp;
+		if (timezonesData != null && timezonesData != undefined) {
+			let sequences = Object.keys(timezonesData)
+			let lastSequence = sequences[sequences.length - 1]
+			let lastTimeZone = timezonesData[lastSequence]
+			sequences.map((timezone) => {
+				let currentTimeZone = timezonesData[timezone]
+				if (count % 4 == 0) {
+					rows.push(<tr>{columns}</tr>)
+					columns = []
+				}
+				count++
+				columns.push(
+					<td className="value_style" style={{ 'backgroundColor': currentTimeZone["color"], 'color': currentTimeZone['color'] == "green" ? 'white' : 'black' }}>
+						{currentTimeZone['range']}<br />&nbsp;
 					{this.secondsToHourMinute(currentTimeZone['duration'])}&nbsp;({currentTimeZone['percent']}%)
 				</td>)
-		})
-		let table = <div className="content-justify-center p-2" style={{ 'overflow': 'hidden' }}>
-			<h2 className="bg-info text-white">Duration In Zones (hh:mm)(%time in zone)</h2>
-			<table className="table table-responsive timezone_duration" > <tbody>{rows}</tbody></table>
-			<h3 className="bg-danger text-white">>>&nbsp;{lastTimeZone['range']}&nbsp;{this.secondsToHourMinute(lastTimeZone['duration'])}&nbsp;({lastTimeZone['percent']}%)
+			})
+			let table = <div className="content-justify-center p-2" style={{ 'overflow': 'hidden' }}>
+				<h2 className="bg-info text-white">Duration In Zones (hh:mm)( % Time in Zone )</h2>
+				<table className="table table-responsive timezone_duration" > <tbody>{rows}</tbody></table>
+				<h3 className="bg-danger text-white">>>&nbsp;{lastTimeZone['range']}&nbsp;{this.secondsToHourMinute(lastTimeZone['duration'])}&nbsp;({lastTimeZone['percent']}%)
 			</h3>
-		</div>
-		return table
-  }
+			</div>
+			return table
+		}
 
 	}
 
@@ -4419,8 +4410,8 @@ class Aadashboard extends Component {
 
 				<div style={{ "textAlign": "center" }} className="row mt-5 mb-5 justify-content-center">{/* Duration in Time zones table */}
 					{this.renderDurationInTimeZones()}
-		
-        </div>
+
+				</div>
 				{this.renderProgressFetchOverlay()}
 				{this.renderProgress2FetchOverlay()}
 				{this.renderProgress3FetchOverlay()}
