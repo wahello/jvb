@@ -1311,7 +1311,7 @@ def aa_data(user,start_date):
 		aerobic_list = []
 		for a, b in zip(all_activities_heartrate_list,all_activities_timestamp_list):
 			# print(a,"aaaaaaaaa")
-			if a > anaerobic_value:
+			if a >= anaerobic_value:
 				anaerobic_range_list.extend([b])
 			elif a < below_aerobic_value:
 				below_aerobic_list.extend([b])
@@ -3099,11 +3099,6 @@ def hrr_data(user,start_date):
 			if b and min(min_heartrate) < b[0]:
 				b = [min(min_heartrate)]
 
-		if min(hrr_final_heartrate) <= 99:
-			Did_heartrate_reach_99 = 'yes'
-		else:
-			Did_heartrate_reach_99 = 'no'
-
 		HRR_activity_start_time = hrr_timestamp[0]-(offset)
 		HRR_start_beat = hrr_final_heartrate[0]
 		try:
@@ -3202,6 +3197,11 @@ def hrr_data(user,start_date):
 			time_99 = -1
 			pure_time_99 = -1
 			pure_1min_heart_beats = None
+
+		if min(hrr_final_heartrate) <= 99:
+			Did_heartrate_reach_99 = 'yes'
+		else:
+			Did_heartrate_reach_99 = 'no'
 
 	else:
 		Did_you_measure_HRR = 'no'
