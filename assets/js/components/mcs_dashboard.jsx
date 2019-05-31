@@ -1,3 +1,4 @@
+
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -402,7 +403,7 @@ class MCS_Dashboard extends Component{
     render(){
         return(
 			<div className="container-fluid">
-			   <NavbarMenu title = {<span className = "last_sync">Movement Consistency Score (MCS) Dashboard
+			   <NavbarMenu title = {<span className = "last_sync">Movement Consistency Score (MCS) Dashboard (Hourly Steps)
                     </span>} />
                
                     <div className=" row cla_center">
@@ -566,6 +567,7 @@ class MCS_Dashboard extends Component{
 				          	<p className="mcs_content" style={{marginLeft:"15px"}}>Strength Hours = Hours user recorded strength exercises</p>
 			                <p className="mcs_content" style={{marginLeft:"15px"}}>Exercise Hours = (1) Any hour a user recorded an exercise activity on his/her wearable device AND/OR (2) Any hour a user added a manual activity on the user inputs page after question 1.NOTE: All exercise hours are considered ACTIVE hours</p>
 			                <p className="mcs_content" style={{marginLeft:"15px"}}>Time Zone Change = Represents time period when a user changed time zones and are not considered “inactive” hours</p>
+			                <p className="mcs_content" style={{marginLeft:"15px"}}>Note: When a user changes timezone, the hourly total above may not agree to the total steps, due to how Garmin provides hourly steps data. However, total steps reflects all steps achieved when switching timezone.</p>
 		       				<p className="mcs_content" style={{marginLeft:"15px"}}>Nap Hours = Any portion of an hour user taking nap</p>
 		       		</div>
 		       		</div>

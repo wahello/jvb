@@ -24,6 +24,7 @@ const attrVerboseName = {
     pace: 'Pace (minutes:seconds) (Running)',
     avg_heartrate: 'Average Heartrate',
     avg_exercise_heartrate:'Overall Average Exercise Heart Rate',
+    avg_non_strength_heartrate: 'Avg HR Non Strength Activities',
     elevation_gain: 'Elevation Gain(feet)',
     elevation_loss: 'Elevation Loss(feet)',  
     effort_level: 'Effort Level',
@@ -199,7 +200,7 @@ renderTableColumns(dateWiseData,category,classes=""){
                     all_data.push(value);
                 }
             }
-            else if(key == "avg_exercise_heartrate"){
+            else if(key == "avg_exercise_heartrate" || key == "avg_non_strength_heartrate"){
                 if(value == "" || value == undefined || value == 0){
                     all_data.push("")
                 }

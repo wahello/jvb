@@ -205,3 +205,95 @@ export function renderHrrSummaryDashboardDataFetchOverlay(){
 		);
 	}
 }
+// .....................................................................................................................
+
+export function renderBifurcationProgressFetchOverlay(){
+	if(this.state.fetching_ql1){
+		let cr1_start_date = moment(this.state.bf1_start_date);
+		let cr1_end_date = moment(this.state.bf1_end_date);
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"   
+						/>
+					</div>
+					<br/>
+					<p>Fetching Progress Data from {cr1_start_date.format('MMMM D, YYYY')} to {cr1_end_date.format('MMMM D, YYYY')}  </p>
+				</div>
+			</div>
+		);
+	}
+}
+
+export function renderBifurcationProgress2FetchOverlay(){
+	if(this.state.fetching_ql2){
+		let cr2_start_date = moment(this.state.bf2_start_date);
+		let cr2_end_date = moment(this.state.bf2_end_date);
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"   
+						/>
+					</div>
+					<br/>
+					<p>Fetching Progress Data from {cr2_start_date.format('MMMM D, YYYY')} to {cr2_end_date.format('MMMM D, YYYY')}  </p>
+				</div>
+			</div>
+		);
+	}
+}
+
+export function renderBifurcationProgress3FetchOverlay(){
+	if(this.state.fetching_ql3){
+		let cr3_start_date = moment(this.state.bf3_start_date);
+		let cr3_end_date = moment(this.state.bf3_end_date);
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"   
+						/>
+					</div>
+					<br/>
+					<p>Fetching Progress Data from {cr3_start_date.format('MMMM D, YYYY')} to {cr3_end_date.format('MMMM D, YYYY')}  </p>
+				</div>
+			</div>
+		);
+	}
+}
+export function renderBifurcationProgressSelectedDateFetchOverlay(){
+	if(this.state.fetching_ql4){
+		let selectedDate = moment(this.state.selectedDate);
+		
+		return(
+			<div className="overlay d-flex justify-content-center align-items-center">
+				<div className="overlay-content">
+					<div className="d-flex">
+						<FontAwesome 
+							name='spinner' 
+							size='3x'
+							pulse spin
+							className="mx-auto"   
+						/>
+					</div>
+					<br/>
+					<p>Fetching Progress Data For {selectedDate.format('MMMM D, YYYY')}  </p>
+				</div>
+			</div>
+		);
+	}
+}

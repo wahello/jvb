@@ -171,7 +171,11 @@ class LeaderboardCategories(object):
 				"(Excludes Active Minutes When Sleeping and Exercising)"),
 			"exercise_duration": "Exercise Duration",
 			"exercise_steps":"Exercise Steps",
-			"movement":"Movement"
+			"movement":"Movement",
+			"aerobic_duration": "Heartrate in Aerobic Range Duration (hh:mm)",
+			"vo2_max":"Vo2 Max",
+			"user_daily_inputs": "User Daily Inputs",
+			"overall":"Overall"
 		}
 
 		# default score value for each leader board category
@@ -196,7 +200,10 @@ class LeaderboardCategories(object):
 			'active_min_exclude_sleep':self.DEFAULT_MINIMUM_SCORE,
 			'active_min_exclude_sleep_exercise':self.DEFAULT_MINIMUM_SCORE,
 			'exercise_duration': self.DEFAULT_MINIMUM_SCORE,
-			'exercise_steps':self.DEFAULT_MINIMUM_SCORE
+			'exercise_steps':self.DEFAULT_MINIMUM_SCORE,
+			'aerobic_duration':self.DEFAULT_MINIMUM_SCORE,
+			'vo2_max':self.DEFAULT_MINIMUM_SCORE,
+			'user_daily_inputs':self.DEFAULT_MINIMUM_SCORE
 		}
 
 		# Verbose name for score of certain category
@@ -223,8 +230,16 @@ class LeaderboardCategories(object):
 			'active_min_exclude_sleep_exercise':'Time Moving / Active '\
 				+'(when not sleeping and exercising)',
 			'exercise_duration': "Exercise Duration",
-			'exercise_steps':"Exercise Steps"
+			'exercise_steps':"Exercise Steps",
+			'aerobic_duration':"Heartrate in Aerobic Range Duration (hh:mm)",
+			'vo2_max':"Vo2 Max",
+			'user_daily_inputs': "# of Days Reported User Inputs"
 		}
+
+		# leaderboard categories which are dependent on one or more
+		# other leaderboards
+		self.COMPOSITE_LEADERBOARD = ('overall_hrr','movement','overall')
+
 		self.category_score_priority = self.__get_catg_score_priority()
 
 	def __get_catg_score_priority(self):
@@ -240,7 +255,7 @@ class LeaderboardCategories(object):
 		categories = self.categories.keys()
 		catg_score_priority = {}
 		lowest_first_categories = ['mc','resting_hr','awake_time','alcohol',
-			'time_99','pure_time_99',"overall_hrr"]
+			'time_99','pure_time_99',"overall_hrr","movement", "overall"]
 		for category in categories:
 			if category in lowest_first_categories:
 				catg_score_priority[category] = 'lowest_first'
@@ -320,9 +335,11 @@ class RankedScore(object):
 		'''
 		Setter for property other_scores
 		'''
-		if other_scores and self.category == 'avg_sleep':
+		duration_category = ["avg_sleep"]
+		if other_scores and self.category in duration_category:
 			if other_scores['sleep_duration']['value'] == None:
 				other_scores['sleep_duration']['value'] = self.DEFAULT_SLEEP_DURATION
+
 		self.__other_scores = other_scores
 
 	@property
@@ -338,7 +355,7 @@ class RankedScore(object):
 		'''
 		Setter for property rank
 
-		If rank is not None or less than 1 then raise ValueError
+		If rank is not None and less than 1 then raise ValueError
 		'''
 		if (rank is None or (not rank < 1 and type(rank) is int)):
 			self.__rank = rank
@@ -351,7 +368,7 @@ class RankedScore(object):
 		Args:
 			privacy: Toggle between whether to show username or not.
 				If it is "private", then show 'Anonymous'. If it's 
-				"public" diaplay username of score's user. Default to 
+				"public" display username of score's user. Default to 
 				"private"
 
 		Return:
@@ -374,11 +391,13 @@ class RankedScore(object):
 			# Change default score to 'N/A'
 			score = "N/A"
 		elif self.category in ["awake_time","deep_sleep",
-			"time_99","pure_time_99","exercise_duration"]:
+			"time_99","pure_time_99","exercise_duration",
+			"aerobic_duration"]:
 			score = _hours_to_hours_min(score)
 
 		other_scores = self.other_scores
-		if other_scores and self.category == 'avg_sleep':
+		duration_category = ["avg_sleep"]
+		if other_scores and self.category in duration_category:
 			if other_scores['sleep_duration']['value'] == self.DEFAULT_SLEEP_DURATION:
 				other_scores['sleep_duration']['value'] = 'N/A'
 
@@ -388,7 +407,7 @@ class RankedScore(object):
 			#if user is staff user, show username
 			username = self.user.username
 		else:
-			username = "Anonymous",
+			username = "Anonymous"
 
 		data = {
 			'username':username,
@@ -561,16 +580,20 @@ class SleepLeaderboard(Leaderboard):
 			)
 		return ranked_scores
 
-class HrrOverallLeaderboard(Leaderboard):
+class CompositeLeaderboard(Leaderboard):
 	'''
 	Class for preparing Overall HRR Leaderboard
 	'''
-	def __init__(self,user,category_wise_hrr_data,
-			score_priority="lowest_first",privacy="private"):
+	def __init__(self,user,
+			category_wise_lb,
+			excluded_catg = [],
+			score_priority="lowest_first",
+			privacy="private"):
 		self.category_meta = LeaderboardCategories()
 		self.user = user
 		self.priorities = ["lowest_last","lowest_first"]
-		self.category_wise_hrr_data = category_wise_hrr_data
+		self.category_wise_lb = deepcopy(category_wise_lb)
+		self.excluded_catg = excluded_catg
 		self.scores = self.__prepare_scores()
 		self._score_priority = score_priority
 		self.ranked_scores = self.rank_scores()
@@ -578,33 +601,24 @@ class HrrOverallLeaderboard(Leaderboard):
 
 	def __prepare_scores(self):
 		'''
-		Genarate a dictionary which contain individual HRR
+		Genarate a dictionary which contain individual lb
 		data and total rank point for individual users.
 		'''
-		catg_lb = {}
 		overall_scores = {}
-		catg_score_priority = self.category_meta.category_score_priority
-		for catg,data in self.category_wise_hrr_data.items():
-			if catg in ["pure_time_99","time_99"]:
-				catg_lb[catg] = TimeTo99Leaderboard(
-					self.user,data,catg,catg_score_priority[catg],privacy="public"
-				).get_leaderboard()
-			else:
-				catg_lb[catg] = Leaderboard(
-					self.user,data,catg,catg_score_priority[catg],privacy="public"
-				).get_leaderboard()
-
-		for catg,lb in catg_lb.items():
+		for catg,lb in self.category_wise_lb.items():
 			for score in lb['all_rank']:
+				user_id = score['user_id']
 				username = score['username']
-				if not overall_scores.get(username):
-					overall_scores[score['username']] = {
+				if not overall_scores.get(user_id):
+					overall_scores[score['user_id']] = {
 						"username":username,
-						"total_hrr_rank_point":0,
+						"user_id":user_id,
+						"total_rank_point":0,
 						"rank":None
 					}
-				overall_scores[username][catg] = score
-				overall_scores[username]["total_hrr_rank_point"] += score['rank']
+				overall_scores[user_id][catg] = score
+				if catg not in self.excluded_catg:
+					overall_scores[user_id]["total_rank_point"] += score['rank']
 		return overall_scores
 
 	def rank_scores(self):
@@ -620,15 +634,15 @@ class HrrOverallLeaderboard(Leaderboard):
 		previous_score = None
 		sorted_scores = sorted(
 			self.scores.values(),
-			key=itemgetter('total_hrr_rank_point'),
+			key=itemgetter('total_rank_point'),
 			reverse=to_reverse)
 		for i,score in enumerate(sorted_scores):
 			if (previous_score is not None 
-				and (previous_score != score['total_hrr_rank_point'])):
+				and (previous_score != score['total_rank_point'])):
 				rank_to_award = i+1
 			score['rank'] = rank_to_award
 			ranked_scores.append(score)
-			previous_score = score['total_hrr_rank_point']
+			previous_score = score['total_rank_point']
 		return ranked_scores
 
 	def get_leaderboard(self,format = 'dict'):
@@ -649,7 +663,7 @@ class HrrOverallLeaderboard(Leaderboard):
 			user_rank = None
 			dict_scores = []
 			for score in self.ranked_scores:
-				if score["username"] == self.user.username:
+				if score["user_id"] == self.user.id:
 					user_rank = score
 					dict_scores.append(score)
 				elif self.privacy == "public" or self.user.is_staff:
@@ -702,100 +716,6 @@ class TimeTo99Leaderboard(Leaderboard):
 
 		return points
 
-class MovementLeaderboard(Leaderboard):
-	def __init__(self,user,movement_data,
-		score_priority="lowest_first",privacy="private"):
-		self.category_meta = LeaderboardCategories()
-		self.user = user
-		self.movement_data = movement_data
-		self.scores = self.__prepare_scores()
-		self._score_priority = score_priority
-		self.ranked_scores = self.ranked_scores()
-		self.privacy = privacy
-
-	def __prepare_scores(self):
-		catg_lb = {}
-		overall_scores = {}
-		catg_score_priority = self.category_meta.category_score_priority
-		for catg,data in self.movement_data.items():
-			catg_lb[catg] = Leaderboard(
-				self.user,data,catg,catg_score_priority[catg],privacy="public"
-			).get_leaderboard()
-
-		for catg,lb in catg_lb.items():
-			for score in lb['all_rank']:
-				username = score['username']
-				if not overall_scores.get(username):
-					overall_scores[username] = {
-						"username":username,
-						"total_movement_rank_point":0,
-						"rank":None
-					}
-				overall_scores[username][catg] = score
-				if(catg not in ['exercise_steps','total_steps']):
-					# Rank of exercise steps and total steps do not
-					# contribute to the overall movement rank 
-					overall_scores[username]["total_movement_rank_point"] += score['rank']
-		return overall_scores
-
-	def ranked_scores(self):
-		'''
-		Rank the scores of any category (except sleep)
-		'''
-		if self._score_priority == 'lowest_first':
-			to_reverse = False
-		elif self._score_priority == 'lowest_last':
-			to_reverse = True
-		ranked_scores = []
-		rank_to_award = 1
-		previous_score = None
-		sorted_scores = sorted(
-			self.scores.values(),
-			key=itemgetter('total_movement_rank_point'),
-			reverse=to_reverse)
-		for i,score in enumerate(sorted_scores):
-			if (previous_score is not None 
-				and (previous_score != score['total_movement_rank_point'])):
-				rank_to_award = i+1
-			score['rank'] = rank_to_award
-			ranked_scores.append(score)
-			previous_score = score['total_movement_rank_point']
-		return ranked_scores
-
-	def get_leaderboard(self,format = 'dict'):
-		'''
-		Return the ranked scores.
-		By default, ranked scores will be converted into detailed 
-		dictionary. Format can be extended and implementation have to
-		be added for new format. 
-
-		Args:
-			format(string): Return data in specified format. Default to dict
-		'''
-		lb = {
-			"user_rank":None,
-			"all_rank":None
-		}
-		if format == 'dict':
-			user_rank = None
-			dict_scores = []
-			for score in self.ranked_scores:
-				if score["username"] == self.user.username:
-					user_rank = score
-					dict_scores.append(score)
-				elif self.privacy == "public" or self.user.is_staff:
-					dict_scores.append(score)
-				else:
-					score['username'] = 'Anonymous'
-					dict_scores.append(score)
-			# Ranked score of currently logged user
-			lb['user_rank'] = user_rank 
-			# Ranked score of all user
-			lb['all_rank'] = dict_scores
-			return lb
-		else:
-			return self.ranked_scores
-
 class LeaderboardOverview(object):
 	'''
 	Class for providing complete leader board for every category
@@ -820,6 +740,7 @@ class LeaderboardOverview(object):
 						"duration":"today,yesterday,year"
 					 }
 		'''
+		query_params = self._clean_query_params(query_params)
 		self.category_meta = LeaderboardCategories()
 		# current logged user
 		self.user = user
@@ -827,10 +748,12 @@ class LeaderboardOverview(object):
 		self.current_date = self._str_to_dt(query_params.get('date',None))
 		# Possible leader board categories
 		self.categories = self.category_meta.categories
+		self.requested_categories = deepcopy(self.category_meta.categories)
 		self.duration_type = ['today','yesterday','week','month','year']
 		# list of tuple, carrying pair of custom ranges
 		self.custom_ranges = self._get_custom_range_info(query_params)
 		self.duration_date = None
+		self.lb = {}
 
 		if not self.current_date:
 			self.duration_type = []
@@ -839,9 +762,9 @@ class LeaderboardOverview(object):
 		if categories:
 			categories = [item.strip() for item in categories.strip().split(',')]
 			allowed = set(categories)
-			existing = set(self.categories.keys())
+			existing = set(self.requested_categories.keys())
 			for item in existing-allowed:
-				self.categories.pop(item)
+				self.requested_categories.pop(item)
 
 		duration = query_params.get('duration',None)
 		if duration and self.current_date:
@@ -852,6 +775,14 @@ class LeaderboardOverview(object):
 				self.duration_type.pop(self.duration_type.index(d))
 
 		self.category_wise_data = self._get_category_wise_data(query_params)
+
+	def _clean_query_params(self, query_params):
+		VALID_KEYS = ['date','duration', 'custom_ranges','category']
+		cleaned = {}
+		for key,value in query_params.items():
+			if key in VALID_KEYS:
+				cleaned[key] = value
+		return cleaned
 
 	def _str_to_dt(self,dt_str):
 		'''
@@ -923,10 +854,10 @@ class LeaderboardOverview(object):
 			}
 		'''
 		user_model = get_user_model()
+		all_categories = self.categories.keys()
 		category_wise_data = {catg:{dtype:[] 
 			for dtype in self.duration_type} 
-			for catg in self.categories.keys()}
-
+			for catg in all_categories}
 		for user in user_model.objects.all():
 			data = ProgressReport(user,query_params).get_progress_report()
 			if not self.duration_date:
@@ -970,7 +901,15 @@ class LeaderboardOverview(object):
 						)
 					elif catg == 'alcohol':
 						score = data['alcohol']['avg_drink_per_week'][dtype]
-						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
+						other_scores = {
+							"alcohol_drink_per_day":{
+								"value":data['alcohol']['avg_drink_per_day'][dtype],
+								"verbose_name":"Alcohol Drink Per Day"
+							}
+						}
+						category_wise_data[catg][dtype].append(
+							RankedScore(self.user,user,catg,score,other_scores=other_scores)
+						)
 					elif catg == 'total_steps':
 						score = data['non_exercise']['total_steps'][dtype]
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
@@ -1071,7 +1010,80 @@ class LeaderboardOverview(object):
 					elif catg == 'exercise_steps':
 						score = data['non_exercise']['exercise_steps'][dtype]
 						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
-
+					elif catg == 'aerobic_duration':
+						score = data['exercise']['hr_aerobic_duration_hour_min'][dtype]
+						score = _str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
+						other_scores = {
+							'prcnt_aerobic_duration':{
+								'value':data['exercise']['prcnt_aerobic_duration'][dtype],
+								'verbose_name':"% Heartrate in Aerobic Range"
+							},
+							'anaerobic_duration':{
+								'value':data['exercise']['hr_anaerobic_duration_hour_min'][dtype],
+								'verbose_name':"Heartrate in Anaerobic Range Duration (hh:mm)"
+							},
+							'prcnt_anaerobic_duration':{
+								'value':data['exercise']['prcnt_anaerobic_duration'][dtype],
+								'verbose_name':"% Heartrate in Anaerobic Range"
+							},
+							'below_aerobic_duration':{
+								'value':data['exercise']['hr_below_aerobic_duration_hour_min'][dtype],
+								'verbose_name':"Heartrate in Below Aerobic Range Duration (hh:mm)"
+							},
+							'prcnt_below_aerobic_duration':{
+								'value':data['exercise']['prcnt_below_aerobic_duration'][dtype],
+								'verbose_name':"% Heartrate in Below Aaerobic Range"
+							},
+							'hr_not_recorded_duration':{
+								'value':data['exercise']['hr_not_recorded_duration_hour_min'][dtype],
+								'verbose_name':"Heartrate Not Recorded Duration (hh:mm)"
+							},
+							'prcnt_hr_not_recorded_duration':{
+								'value':data['exercise']['prcnt_hr_not_recorded_duration'][dtype],
+								'verbose_name':"% Heartrate Not Recorded"
+							}
+						}
+						category_wise_data[catg][dtype].append(RankedScore(
+							self.user,user,catg,score,other_scores=other_scores)
+						)
+					elif catg == 'vo2_max':
+						score = data['exercise']['vo2_max'][dtype]
+						category_wise_data[catg][dtype].append(RankedScore(self.user,user,catg,score))
+					elif catg == 'user_daily_inputs':
+						score = data['other']['number_of_days_reported_inputs'][dtype]
+						other_scores = {
+							'prcnt_days_reported_inputs':{
+								'value': data['other']['prcnt_of_days_reported_inputs'][dtype],
+								'verbose_name': '% of Days Reported Inputs'
+							},
+							'days_sick':{
+								'value': data['sick']['number_of_days_sick'][dtype],
+								'verbose_name':'# of Days Sick'
+							},
+							'prcnt_days_sick':{
+								'value': data['sick']['prcnt_of_days_sick'][dtype],
+								'verbose_name': '% of Days Sick'
+							},
+							'days_travel':{
+								'value':data['travel']['number_days_travel_away_from_home'][dtype],
+								'verbose_name': '# of Days Travel'
+							},
+							'prcnt_days_travel':{
+								'value': data['travel']['prcnt_days_travel_away_from_home'][dtype],
+								'verbose_name': '% of Days Travel'
+							},
+							'days_medium_high_stress':{
+								'value': data['stress']['number_of_days_high_medium_stress'][dtype],
+								'verbose_name': '# of Days Medium/High Stress'
+							},
+							'prcnt_days_medium_high_stress':{
+								'value': data['stress']['prcnt_of_days_high_medium_stress'][dtype],
+								'verbose_name': '# of Days Medium/High Stress'
+							}
+						}
+						category_wise_data[catg][dtype].append(RankedScore(
+							self.user,user,catg,score,other_scores=other_scores)
+						)
 
 				if self.custom_ranges:
 					if not category_wise_data[catg].get('custom_range',None):
@@ -1118,8 +1130,14 @@ class LeaderboardOverview(object):
 							)
 						elif catg == 'alcohol':
 							score = data['alcohol']['avg_drink_per_week']['custom_range'][str_range]['data']
+							other_scores = {
+								"alcohol_drink_per_day":{
+									"value":data['alcohol']['avg_drink_per_day']['custom_range'][str_range]['data'],
+									"verbose_name":"Alcohol Drink Per Day"
+								}
+							}
 							category_wise_data[catg]['custom_range'][str_range].append(
-								RankedScore(self.user,user,catg,score))
+								RankedScore(self.user,user,catg,score,other_scores=other_scores))
 						elif catg == 'total_steps':
 							score = data['non_exercise']['total_steps']['custom_range'][str_range]['data']
 							category_wise_data[catg]['custom_range'][str_range].append(
@@ -1147,7 +1165,7 @@ class LeaderboardOverview(object):
 							if score and score != "Not Provided":
 								score = _str_to_hours_min_sec(score,time_format="minute",time_pattern="mm:ss") if score else score
 							other_scores = {
-								"activity_end_hr":data['other']['hrr_activity_end_hr'][dtype]
+								"activity_end_hr":data['other']['hrr_activity_end_hr']['custom_range'][str_range]['data']
 							}
 							category_wise_data[catg]['custom_range'][str_range].append(
 								RankedScore(self.user,user,catg,score,other_scores=other_scores))
@@ -1156,7 +1174,7 @@ class LeaderboardOverview(object):
 							if score and score != "Not Provided":
 								score = _str_to_hours_min_sec(score,time_format="minute",time_pattern="mm:ss") if score else score
 							other_scores = {
-								"activity_end_hr":data['other']['hrr_activity_end_hr'][dtype]
+								"activity_end_hr":data['other']['hrr_activity_end_hr']['custom_range'][str_range]['data']
 							}
 							category_wise_data[catg]['custom_range'][str_range].append(
 								RankedScore(self.user,user,catg,score,other_scores=other_scores))
@@ -1228,6 +1246,83 @@ class LeaderboardOverview(object):
 							score = data['non_exercise']['exercise_steps']['custom_range'][str_range]['data']
 							category_wise_data[catg]['custom_range'][str_range].append(
 								RankedScore(self.user,user,catg,score))
+						elif catg == 'aerobic_duration':
+							score = data['exercise']['hr_aerobic_duration_hour_min']['custom_range'][str_range]['data']
+							score = _str_to_hours_min_sec(score,time_pattern="hh:mm") if score else score
+							other_scores = {
+								'prcnt_aerobic_duration':{
+									'value':data['exercise']['prcnt_aerobic_duration']['custom_range'][str_range]['data'],
+									'verbose_name':"% Heartrate in Aerobic Range"
+								},
+								'anaerobic_duration':{
+									'value':data['exercise']['hr_anaerobic_duration_hour_min']['custom_range'][str_range]['data'],
+									'verbose_name':"Heartrate in Anaerobic Range Duration (hh:mm)"
+								},
+								'prcnt_anaerobic_duration':{
+									'value':data['exercise']['prcnt_anaerobic_duration']['custom_range'][str_range]['data'],
+									'verbose_name':"% Heartrate in Anaerobic Range"
+								},
+								'below_aerobic_duration':{
+									'value':data['exercise']['hr_below_aerobic_duration_hour_min']['custom_range'][str_range]['data'],
+									'verbose_name':"Heartrate in Below Aerobic Range Duration (hh:mm)"
+								},
+								'prcnt_below_aerobic_duration':{
+									'value':data['exercise']['prcnt_below_aerobic_duration']['custom_range'][str_range]['data'],
+									'verbose_name':"% Heartrate in Below Aaerobic Range"
+								},
+								'hr_not_recorded_duration':{
+									'value':data['exercise']['hr_not_recorded_duration_hour_min']['custom_range'][str_range]['data'],
+									'verbose_name':"Heartrate Not Recorded Duration (hh:mm)"
+								},
+								'prcnt_hr_not_recorded_duration':{
+									'value':data['exercise']['prcnt_hr_not_recorded_duration']['custom_range'][str_range]['data'],
+									'verbose_name':"% Heartrate Not Recorded"
+								}
+							}
+							category_wise_data[catg]['custom_range'][str_range].append(RankedScore(
+								self.user,user,catg,score,other_scores=other_scores)
+							)
+						elif catg == 'vo2_max':
+							score = data['exercise']['vo2_max']['custom_range'][str_range]['data']
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score)
+							)
+						elif catg == 'user_daily_inputs':
+							score = data['other']['number_of_days_reported_inputs']['custom_range'][str_range]['data']
+							other_scores = {
+								'prcnt_days_reported_inputs':{
+									'value': data['other']['prcnt_of_days_reported_inputs']['custom_range'][str_range]['data'],
+									'verbose_name': '% of Days Reported Inputs'
+								},
+								'days_sick':{
+									'value': data['sick']['number_of_days_sick']['custom_range'][str_range]['data'],
+									'verbose_name':'# of Days Sick'
+								},
+								'prcnt_days_sick':{
+									'value': data['sick']['prcnt_of_days_sick']['custom_range'][str_range]['data'],
+									'verbose_name': '% of Days Sick'
+								},
+								'days_travel':{
+									'value':data['travel']['number_days_travel_away_from_home']['custom_range'][str_range]['data'],
+									'verbose_name': '# of Days Travel'
+								},
+								'prcnt_days_travel':{
+									'value': data['travel']['prcnt_days_travel_away_from_home']['custom_range'][str_range]['data'],
+									'verbose_name': '% of Days Travel'
+								},
+								'days_medium_high_stress':{
+									'value': data['stress']['number_of_days_high_medium_stress']['custom_range'][str_range]['data'],
+									'verbose_name': '# of Days Medium/High Stress'
+								},
+								'prcnt_days_medium_high_stress':{
+									'value': data['stress']['prcnt_of_days_high_medium_stress']['custom_range'][str_range]['data'],
+									'verbose_name': '% of Days Medium/High Stress'
+								}
+							}
+							category_wise_data[catg]['custom_range'][str_range].append(
+								RankedScore(self.user,user,catg,score,other_scores=other_scores)
+							)
+
 		return category_wise_data
 
 	def _get_category_leaderboard(self,category,format):
@@ -1242,28 +1337,53 @@ class LeaderboardOverview(object):
 		duration_lb = {}
 		for dtype in self.duration_type:
 			if category == 'overall_hrr':
-				hrr_data = {
-					'time_99':self.category_wise_data['time_99'][dtype],
-					'pure_time_99':self.category_wise_data['pure_time_99'][dtype],
-					'beat_lowered':self.category_wise_data['beat_lowered'][dtype],
-					'pure_beat_lowered':self.category_wise_data['pure_beat_lowered'][dtype]
+				hrr_lb_data = {
+					'time_99':self.lb['time_99'][dtype],
+					'pure_time_99':self.lb['pure_time_99'][dtype],
+					'beat_lowered':self.lb['beat_lowered'][dtype],
+					'pure_beat_lowered':self.lb['pure_beat_lowered'][dtype]
 				}
-				duration_lb[dtype] = HrrOverallLeaderboard(
-					self.user,hrr_data
+				duration_lb[dtype] = CompositeLeaderboard(
+					self.user,hrr_lb_data
 				).get_leaderboard(format=format)
+
 			elif category == 'movement':
 				movement_data = {
-					'nes':self.category_wise_data['nes'][dtype],
-					'exercise_steps':self.category_wise_data['exercise_steps'][dtype],
-					'total_steps':self.category_wise_data['total_steps'][dtype],
-					'mc':self.category_wise_data['mc'][dtype],
-					'exercise_duration':self.category_wise_data['exercise_duration'][dtype],
-					'active_min_total':self.category_wise_data['active_min_total'][dtype],
-					'active_min_exclude_sleep_exercise':self.category_wise_data[
-						'active_min_exclude_sleep_exercise'][dtype]
+					'nes':self.lb['nes'][dtype],
+					'exercise_steps':self.lb['exercise_steps'][dtype],
+					'total_steps':self.lb['total_steps'][dtype],
+					'mc':self.lb['mc'][dtype],
+					'exercise_duration':self.lb['exercise_duration'][dtype],
+					'active_min_total':self.lb['active_min_total'][dtype],
+					'active_min_exclude_sleep_exercise':self.lb[
+						'active_min_exclude_sleep_exercise'][dtype],
+					'aerobic_duration':self.lb['aerobic_duration'][dtype]
 				}
-				duration_lb[dtype] = MovementLeaderboard(
-					self.user, movement_data
+				excluded_catg = ['exercise_steps','total_steps','aerobic_duration']
+				duration_lb[dtype] = CompositeLeaderboard(
+					self.user, movement_data, excluded_catg
+				).get_leaderboard(format=format)
+
+			elif category == 'overall':
+				overall_lb_data = {
+					'oh_gpa':self.lb['oh_gpa'][dtype],
+					'avg_sleep':self.lb['avg_sleep'][dtype],
+					'resting_hr':self.lb['resting_hr'][dtype],
+					'nes':self.lb['nes'][dtype],
+					'mc':self.lb['mc'][dtype],
+					'ec':self.lb['ec'][dtype],
+					'exercise_duration':self.lb['exercise_duration'][dtype],
+					'aerobic_duration':self.lb['aerobic_duration'][dtype],
+					'vo2_max': self.lb['vo2_max'][dtype],
+					'prcnt_uf': self.lb['prcnt_uf'][dtype],
+					'alcohol': self.lb['alcohol'][dtype],
+					'user_daily_inputs': self.lb['user_daily_inputs'][dtype]
+				}
+				excluded_catg = ["avg_sleep", "resting_hr", "nes", "mc", "ec",
+								 "exercise_duration","aerobic_duration", "vo2_max",
+								 "prcnt_uf", "alcohol", "user_daily_inputs"]
+				duration_lb[dtype] = CompositeLeaderboard(
+					self.user, overall_lb_data, excluded_catg
 				).get_leaderboard(format=format)
 				
 			elif category == 'avg_sleep':
@@ -1293,29 +1413,55 @@ class LeaderboardOverview(object):
 			for r in self.custom_ranges:
 				str_range = r[0].strftime("%Y-%m-%d")+" to "+r[1].strftime("%Y-%m-%d")
 				if category == 'overall_hrr':
-					hrr_data = {
-						'time_99':self.category_wise_data['time_99']['custom_range'][str_range],
-						'pure_time_99':self.category_wise_data['pure_time_99']['custom_range'][str_range],
-						'beat_lowered':self.category_wise_data['beat_lowered']['custom_range'][str_range],
-						'pure_beat_lowered':self.category_wise_data['pure_beat_lowered']['custom_range'][str_range]
+					hrr_lb_data = {
+						'time_99':self.lb['time_99']['custom_range'][str_range],
+						'pure_time_99':self.lb['pure_time_99']['custom_range'][str_range],
+						'beat_lowered':self.lb['beat_lowered']['custom_range'][str_range],
+						'pure_beat_lowered':self.lb['pure_beat_lowered']['custom_range'][str_range]
 					}
-					custom_range_lb[str_range] = HrrOverallLeaderboard(
-						self.user,hrr_data
+					custom_range_lb[str_range] = CompositeLeaderboard(
+						self.user,hrr_lb_data
 					).get_leaderboard(format=format)
+
 				elif category == 'movement':
 					movement_data = {
-						'nes':self.category_wise_data['nes']['custom_range'][str_range],
-						'exercise_steps':self.category_wise_data['exercise_steps']['custom_range'][str_range],
-						'total_steps':self.category_wise_data['total_steps']['custom_range'][str_range],
-						'mc':self.category_wise_data['mc']['custom_range'][str_range],
-						'exercise_duration':self.category_wise_data['exercise_duration']['custom_range'][str_range],
-						'active_min_total':self.category_wise_data['active_min_total']['custom_range'][str_range],
-						'active_min_exclude_sleep_exercise':self.category_wise_data[
-							'active_min_exclude_sleep_exercise']['custom_range'][str_range]
+						'nes':self.lb['nes']['custom_range'][str_range],
+						'exercise_steps':self.lb['exercise_steps']['custom_range'][str_range],
+						'total_steps':self.lb['total_steps']['custom_range'][str_range],
+						'mc':self.lb['mc']['custom_range'][str_range],
+						'exercise_duration':self.lb['exercise_duration']['custom_range'][str_range],
+						'active_min_total':self.lb['active_min_total']['custom_range'][str_range],
+						'active_min_exclude_sleep_exercise':self.lb[
+							'active_min_exclude_sleep_exercise']['custom_range'][str_range],
+						'aerobic_duration': self.lb['aerobic_duration']["custom_range"][str_range]
 					}
-					custom_range_lb[str_range] = MovementLeaderboard(
-						self.user, movement_data
+					excluded_catg = ['exercise_steps','total_steps','aerobic_duration']
+					custom_range_lb[str_range] = CompositeLeaderboard(
+						self.user, movement_data, excluded_catg
 					).get_leaderboard(format=format)
+
+				elif category == 'overall':
+					overall_lb_data = {
+						'oh_gpa':self.lb['oh_gpa']['custom_range'][str_range],
+						'avg_sleep':self.lb['avg_sleep']['custom_range'][str_range],
+						'resting_hr':self.lb['resting_hr']['custom_range'][str_range],
+						'nes':self.lb['nes']['custom_range'][str_range],
+						'mc':self.lb['mc']['custom_range'][str_range],
+						'ec':self.lb['ec']['custom_range'][str_range],
+						'exercise_duration':self.lb['exercise_duration']['custom_range'][str_range],
+						'aerobic_duration':self.lb['aerobic_duration']['custom_range'][str_range],
+						'vo2_max': self.lb['vo2_max']['custom_range'][str_range],
+						'prcnt_uf': self.lb['prcnt_uf']['custom_range'][str_range],
+						'alcohol': self.lb['alcohol']['custom_range'][str_range],
+						'user_daily_inputs': self.lb['user_daily_inputs']['custom_range'][str_range]
+					}
+					excluded_catg = ["avg_sleep", "resting_hr", "nes", "mc", "ec",
+									 "exercise_duration","aerobic_duration", "vo2_max",
+									 "prcnt_uf", "alcohol", "user_daily_inputs"]
+					custom_range_lb[str_range] = CompositeLeaderboard(
+						self.user, overall_lb_data, excluded_catg
+					).get_leaderboard(format=format)
+
 				elif category == 'avg_sleep':
 					custom_range_lb[str_range] = SleepLeaderboard(
 						self.user,
@@ -1334,17 +1480,22 @@ class LeaderboardOverview(object):
 
 		return duration_lb
 
-	def get_leaderboard(self,format='dict',category=None):
+	def get_leaderboard(self,format='dict'):
 		'''
 		Prepare overall leader board 
 		'''
-		lb = {}
-		if not category:
-			#full leader board
-			for catg in self.category_wise_data.keys():
-				lb[catg] = self._get_category_leaderboard(catg,format)
-		else:
-			lb[category] = self._get_category_leaderboard(category,format)
-		lb["duration_date"] = self.duration_date
+		requested_lb = {}
+		
+		#full leader board
+		for catg in self.categories.keys():
+			if catg not in self.category_meta.COMPOSITE_LEADERBOARD:
+				self.lb[catg] = self._get_category_leaderboard(catg,format)
 
-		return lb					
+		for catg in self.category_meta.COMPOSITE_LEADERBOARD:
+				self.lb[catg] = self._get_category_leaderboard(catg,format)
+
+		for catg in self.requested_categories.keys():
+			requested_lb[catg] = self.lb[catg]
+		requested_lb["duration_date"] = self.duration_date
+
+		return requested_lb					

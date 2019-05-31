@@ -9,6 +9,7 @@ from datetime import datetime, timedelta , date, time, timezone
 from decimal import Decimal, ROUND_HALF_UP
 from operator import itemgetter
 
+from django.contrib.auth.models import User
 from django.db.models import Q
 from django.shortcuts import render
 from django.core.mail import EmailMessage
@@ -33,7 +34,8 @@ from hrr.models import (AaCalculations,
 					TimeHeartZones,
 					AaWorkoutCalculations,
 					AA, TwentyfourHourAA, 
-					TwentyfourHourTimeHeartZones)
+					TwentyfourHourTimeHeartZones,
+					AACustomRanges)
 
 from hrr.calculation_helper import get_usernput_activities
 import quicklook.calculations.converter
@@ -162,39 +164,55 @@ def get_hrr_timediff(hr_dataset,start_date,end_date):
 		index += 1
 	return {'time_diff': hr_time_diff, 'hr_values': hr}
 
-def fitbit_aa_chart_one(user_get,start_date):
+def get_exercise_act(act_cal,user_input_activities=None):
+	exercise_act = []
+	if user_input_activities:
+		ui_keys = list(user_input_activities.keys())
+	else:
+		ui_keys = []
+	for key,activity in act_cal.items():
+		if ((activity.get("steps_type") == "exercise" or 
+			activity.get("activityType") == "HEART_RATE_RECOVERY") and 
+			activity.get("summaryId") not in ui_keys):
+			exercise_act.append(key)
+	return exercise_act
+
+def fitbit_aa_chart_one(user_get,start_date,user_input_activities=None):
 	'''
 	Calculate the A/A Aeroboc and Anarobic zones data
 	'''
-
+	act_cal = user_input.views.garmin_views._get_fitbit_activities_data(
+		user_get,start_date)
+	exercise_act = get_exercise_act(act_cal,user_input_activities)
+	if user_input_activities:
+		user_input_activities,deleted_activities,ui_exercise_act = get_filtered_activities(user_input_activities)
+		exercise_act = list(set(exercise_act+ui_exercise_act))
 	activity_qs = UserFitbitDataActivities.objects.filter(created_at=start_date,
 									user=user_get).values()
 	activities_start_end_time = []
 	if activity_qs:
 		activity_data = ast.literal_eval(activity_qs[0]['activities_data'].replace(
 			"'activity_fitbit': {...}","'activity_fitbit': {}"))
-		#duration_in_milli_seconds = activity_queryset_data['activities'][0]['originalDuration']
-		#duration_in_hr_min_sec = convertMillis(duration_in_milli_seconds)
 		for key,activity_list in activity_data.items():
-			for index,single_activity in enumerate(activity_list): 
-			# print(single_activity,"single_activity")
-			# print(index,"index")
-				act_duration = activity_data['activities'][index]['originalDuration']
-				act_start = activity_data['activities'][index]['originalStartTime']
-				act_id = activity_data['activities'][index]['logId']
-				activity_start_data,offset = quicklook.calculations.converter.fitbit_to_garmin_converter.get_epoch_offset_from_timestamp(
-												act_start)
-				act_start_timestamp = activity_start_data + offset
-				act_end_timestamp = act_start_timestamp + (act_duration/1000)
+			for index,single_activity in enumerate(activity_list):
+				if single_activity:
+					act_duration = activity_data['activities'][index]['originalDuration']
+					act_start = activity_data['activities'][index]['originalStartTime']
+					act_id = activity_data['activities'][index]['logId']
+					if str(act_id) in exercise_act:
+						activity_start_data,offset = quicklook.calculations.converter.fitbit_to_garmin_converter.get_epoch_offset_from_timestamp(
+														act_start)
+						act_start_timestamp = activity_start_data + offset
+						act_end_timestamp = act_start_timestamp + (act_duration/1000)
 
-				act_start_srt = get_time_from_timestamp(act_start_timestamp)
-				act_end_srt = get_time_from_timestamp(act_end_timestamp)
-				act_start_end_dict = {}
-				act_start_end_dict[str(act_id)] = {}
-				act_start_end_dict[str(act_id)]["act_start"] = act_start_srt
-				act_start_end_dict[str(act_id)]["act_end"] = act_end_srt
-				act_start_end_dict[str(act_id)]["log_id"] = str(act_id)
-				activities_start_end_time.append(act_start_end_dict)
+						act_start_srt = get_time_from_timestamp(act_start_timestamp)
+						act_end_srt = get_time_from_timestamp(act_end_timestamp)
+						act_start_end_dict = {}
+						act_start_end_dict[str(act_id)] = {}
+						act_start_end_dict[str(act_id)]["act_start"] = act_start_srt
+						act_start_end_dict[str(act_id)]["act_end"] = act_end_srt
+						act_start_end_dict[str(act_id)]["log_id"] = str(act_id)
+						activities_start_end_time.append(act_start_end_dict)
 		
 	# print(activities_start_end_time,"activities_start_end_time")
 	return activities_start_end_time
@@ -211,10 +229,14 @@ def get_fitbit_hr_data(user_get,start_date):
 			qs = ast.literal_eval(qs.replace(
 				"'heartrate_fitbit': {...}","'heartrate_fitbit': {}"))
 			heartrate_data = qs
-		hr_dataset = heartrate_data.get('activities-heart-intraday').get('dataset')
+		if heartrate_data:
+			try:
+				hr_dataset = heartrate_data.get('activities-heart-intraday').get('dataset')
+			except:
+				pass
 	return hr_dataset
 
-def fitbit_hr_diff_calculation(user_get,start_date):
+def fitbit_hr_diff_calculation(user_get,start_date,user_input_activities=None):
 	'''
 		Return list of activities, each activity is dict
 	'''
@@ -226,7 +248,7 @@ def fitbit_hr_diff_calculation(user_get,start_date):
 	# 	heartrate_data = ast.literal_eval(qs)
 	# 	hr_dataset = heartrate_data.get('activities-heart-intraday').get('dataset')
 	hr_dataset = get_fitbit_hr_data(user_get,start_date)
-	activities_start_end_time_list = fitbit_aa_chart_one(user_get,start_date)
+	activities_start_end_time_list = fitbit_aa_chart_one(user_get,start_date,user_input_activities)
 	for index,single_activity in enumerate(activities_start_end_time_list):
 		single_activity_id = list(single_activity.keys())
 		start_date = single_activity[single_activity_id[0]]["act_start"]
@@ -234,7 +256,6 @@ def fitbit_hr_diff_calculation(user_get,start_date):
 		log_id = single_activity[single_activity_id[0]]["log_id"]
 		single_activity_hr_time = get_hr_timediff(hr_dataset,start_date,end_date,log_id)
 		activity_hr_time.append(single_activity_hr_time)
-
 	return activity_hr_time
 
 def fitbit_hrr_diff_calculation(user_get,start_date):
@@ -249,22 +270,134 @@ def fitbit_hrr_diff_calculation(user_get,start_date):
 	return day_hr_time
 
 def all_activities_hr_and_time_diff(hr_time_diff):
-
 	all_activities_heartrate_list = []
 	all_activities_timestamp_list = []
 	for index,single_activity in enumerate(hr_time_diff):
 		single_activity_id = list(single_activity.keys())
-		all_activities_timestamp_list.extend(single_activity[single_activity_id[0]]["time_diff"])
-		all_activities_heartrate_list.extend(single_activity[single_activity_id[0]]["hr_values"])
+		if single_activity_id:
+			all_activities_timestamp_list.extend(single_activity[single_activity_id[0]]["time_diff"])
+			all_activities_heartrate_list.extend(single_activity[single_activity_id[0]]["hr_values"])
 	return all_activities_heartrate_list,all_activities_timestamp_list
+def belowaerobic_aerobic_anaerobic(user,user_age):
+	aa_ranges_list = []
+	try:
+		aa_ranges = AACustomRanges.objects.filter(user=user).last()
+	except ValueError:
+		user = User.objects.filter(username=user)
+		aa_ranges = AACustomRanges.objects.filter(user=user).last()
+	except:
+		logging.exception("message")
+		aa_ranges = None
+	if not aa_ranges:
+		aerobic_anaerobic = [[110,110,166],[110,110,166],[110,110,166],[110,110,165],[110,110,164],[110,110,163],
+					[110,110,162],[110,110,161],[110,110,160],[110,110,159],[110,110,158],[110,110,157],[110,110,156],
+					[110,110,155],[110,110,155],[110,110,155],[110,110,155],[110,110,155],[110,110,155],[110,110,154],
+					[110,110,153],[110,110,152],[110,110,151],[110,110,150],[110,110,149],[110,110,148],[110,110,147],
+					[110,110,146],[109,109,145],[108,108,144],[107,107,143],[106,106,142],[105,105,141],[104,104,140],
+					[103,103,139],[102,102,138],[102,102,137],[102,102,136],[102,102,135],[102,102,134],[102,102,133],
+					[102,102,132],[102,102,131],[102,102,130],[102,102,129],[102,102,128],[102,102,127],[102,102,127],
+					[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],
+					[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],
+					[102,102,127],[102,102,127],[102,102,127],[102,102,127],[102,102,127],[101,101,126],[101,101,125],
+					[101,101,124],[101,101,123],[101,101,122],[101,101,121],[101,101,120],[101,101,119],[101,101,118],
+					[101,101,117],[101,101,116],[100,100,115],[99,99,114],[98,98,113],[97,97,112],[96,96,111],[95,95,110],
+					[94,94,109],[93,93,108],[92,92,107],[91,91,106],[91,90,105]]
+		
+		index_value = user_age-13
+		if user_age < 13:
+			index_value = 0
+		elif user_age > 100:
+			index_value = -1
+		return aerobic_anaerobic[index_value]
+	else:
+		aa_ranges_list.append(int(aa_ranges.below_aerobic_range))
+		aa_ranges_list.append(int(aa_ranges.aerobic_range.split('-')[0]))
+		aa_ranges_list.append(int(aa_ranges.anaerobic_range))
+		return aa_ranges_list
 
-def cal_aa1_data(user_get,all_activities_heartrate_list,all_activities_timestamp_list):
-	user_age = user_get.profile.age()
-	below_aerobic_value = 180-user_age-30
-	anaerobic_value = 180-user_age+5
-	aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
-	anaerobic_range = '{} or above'.format(anaerobic_value+1)
+
+def  Update_AA_ranges_by_ages(user):
+	user_age = user.profile.age()
+	aa_ranges = belowaerobic_aerobic_anaerobic(user,user_age)
+	below_aerobic_value = aa_ranges[0]
+	anaerobic_value = aa_ranges[2]
+	if user_age > 100:
+		aerobic_range = '{}-{}'.format(below_aerobic_value-1,anaerobic_value-1)
+	else:
+		aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value-1)
+	anaerobic_range = '{} or above'.format(anaerobic_value)
 	below_aerobic_range = 'below {}'.format(below_aerobic_value)
+	return below_aerobic_value,anaerobic_value,aerobic_range,anaerobic_range,below_aerobic_range 
+
+def get_hr_not_recorded_duration(user_input_activities):
+	hr_not_recorded = 0
+	if user_input_activities:
+		for key,activity in user_input_activities.items():
+			if not activity.get("averageHeartRateInBeatsPerMinute"):
+				hr_not_recorded =+ activity.get("durationInSeconds",0)
+	return hr_not_recorded
+
+def user_manually_created_act(fitbit_act,user_input_activities):
+	ui_keys = list(user_input_activities.keys())
+	fit_files_keys = []
+	only_ui_keys = []
+	if fitbit_act:
+		fitbit_act_copy = fitbit_act.copy()
+		for i,activity in enumerate(fitbit_act_copy):
+			act_key = list(activity.keys())
+			fit_files_keys.append(act_key[0])
+		for i,id_ui in enumerate(ui_keys):
+			if id_ui not in fit_files_keys:
+				only_ui_keys.append(id_ui)
+		return only_ui_keys
+	else:
+		return ui_keys
+
+def get_hr_recorded_act(user_input_activities,
+						ui_keys,
+						below_aerobic_value,
+						anaerobic_value):
+	ba_value = 0
+	ae_value = 0
+	an_value = 0
+	for key,activity in user_input_activities.items():
+		if key in ui_keys:
+			if activity.get('averageHeartRateInBeatsPerMinute'):
+				hr = activity.get('averageHeartRateInBeatsPerMinute')
+				if hr <= below_aerobic_value:
+					ba_value = ba_value + activity.get("durationInSeconds",0)
+				elif hr >= below_aerobic_value: 
+					an_value = an_value + activity.get("durationInSeconds",0)
+				else:
+					ae_value = ae_value + activity.get("durationInSeconds",0)
+	return ba_value,ae_value,an_value
+
+def cal_aa1_data(
+	user,all_activities_heartrate_list,
+	all_activities_timestamp_list
+	,user_input_activities=None,
+	fitbit_act=None):
+
+	total_time = None
+	time_in_aerobic = None
+	time_in_anaerobic = None
+	time_in_below_aerobic = None
+	aerobic_range = None
+	anaerobic_range = None
+	below_aerobic_range = None
+	hr_not_recorded = None
+	percent_hrr_not_recorded = None
+	percent_aerobic = None
+	percent_below_aerobic = None
+	percent_anaerobic = None
+	total_percent = None
+
+	update = Update_AA_ranges_by_ages(user)
+	below_aerobic_value = update[0]
+	anaerobic_value = update[1]
+	aerobic_range = update[2]
+	anaerobic_range = update [3]
+	below_aerobic_range = update [4]
 
 	anaerobic_range_list = []
 	below_aerobic_list = []
@@ -278,14 +411,31 @@ def cal_aa1_data(user_get,all_activities_heartrate_list,all_activities_timestamp
 		else:
 			aerobic_list.extend([b])
 
+	if user_input_activities:
+		ui_keys = user_manually_created_act(fitbit_act,user_input_activities)
+		ba_value,ae_value,an_value = get_hr_recorded_act(
+									  user_input_activities,
+									  ui_keys,
+									  below_aerobic_value,
+									  anaerobic_value)
+	else:
+		ba_value = 0
+		ae_value = 0
+		an_value = 0
+	aerobic_list.extend([ae_value])
+	below_aerobic_list.extend([ba_value])
+	anaerobic_range_list.extend([an_value])
+
 	time_in_aerobic = sum(aerobic_list)
 	time_in_below_aerobic = sum(below_aerobic_list)
 	time_in_anaerobic = sum(anaerobic_range_list)
 
-	# if hrr_not_recorded_list:
-	# 	total_time =  hrr_not_recorded_seconds+time_in_aerobic+time_in_below_aerobic+time_in_anaerobic 
-	# else:
-	total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
+	hr_not_recorded = get_hr_not_recorded_duration(user_input_activities)
+
+	if hr_not_recorded:
+		total_time =  hr_not_recorded+time_in_aerobic+time_in_below_aerobic+time_in_anaerobic 
+	else:
+		total_time = time_in_aerobic+time_in_below_aerobic+time_in_anaerobic
 	try:
 		percent_anaerobic = (time_in_anaerobic/total_time)*100
 		percent_anaerobic = int(Decimal(percent_anaerobic).quantize(0,ROUND_HALF_UP))
@@ -296,59 +446,60 @@ def cal_aa1_data(user_get,all_activities_heartrate_list,all_activities_timestamp
 		percent_aerobic = (time_in_aerobic/total_time)*100
 		percent_aerobic = int(Decimal(percent_aerobic).quantize(0,ROUND_HALF_UP))
 		
-		# if hrr_not_recorded_list:
-		# 	percent_hrr_not_recorded = (hrr_not_recorded_seconds/total_time)*100
-		# 	percent_hrr_not_recorded = (int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP)))
+		if hr_not_recorded:
+			percent_hrr_not_recorded = (hr_not_recorded/total_time)*100
+			percent_hrr_not_recorded = (int(Decimal(percent_hrr_not_recorded).quantize(0,ROUND_HALF_UP)))
 		
 		total_percent = 100
 	except ZeroDivisionError:
-		percent_anaerobic=''
-		percent_below_aerobic=''
-		percent_aerobic=''
-		percent_hrr_not_recorded=''
-		total_percent=''
-	# if hrr_not_recorded_list and workout:
-	# 		data = {"total_time":total_time,
-	# 				"aerobic_zone":time_in_aerobic,
-	# 				"anaerobic_zone":time_in_anaerobic,
-	# 				"below_aerobic_zone":time_in_below_aerobic,
-	# 				"aerobic_range":aerobic_range,
-	# 				"anaerobic_range":anaerobic_range,
-	# 				"below_aerobic_range":below_aerobic_range,
-	# 				"hrr_not_recorded":hrr_not_recorded_seconds,
-	# 				"percent_hrr_not_recorded":percent_hrr_not_recorded,
-	# 				"percent_aerobic":percent_aerobic,
-	# 				"percent_below_aerobic":percent_below_aerobic,
-	# 				"percent_anaerobic":percent_anaerobic,
-	# 				"total_percent":total_percent}
-	if all_activities_heartrate_list:
-		data = {"total_time":total_time,
-				"aerobic_zone":time_in_aerobic,
-				"anaerobic_zone":time_in_anaerobic,
-				"below_aerobic_zone":time_in_below_aerobic,
-				"aerobic_range":aerobic_range,
-				"anaerobic_range":anaerobic_range,
-				"below_aerobic_range":below_aerobic_range,
-				"hrr_not_recorded":None,
-				"percent_hrr_not_recorded":None,
-				"percent_aerobic":percent_aerobic,
-				"percent_below_aerobic":percent_below_aerobic,
-				"percent_anaerobic":percent_anaerobic,
-				"total_percent":total_percent}
-	else:
-		data = {"total_time":None,
-				"aerobic_zone":None,
-				"anaerobic_zone":None,
-				"below_aerobic_zone":None,
-				"aerobic_range":'',
-				"anaerobic_range":'',
-				"below_aerobic_range":'',
-				"hrr_not_recorded":None,
-				"percent_hrr_not_recorded":None,
-				"percent_aerobic":None,
-				"percent_below_aerobic":None,
-				"percent_anaerobic":None,
-				"total_percent":None}
+		percent_anaerobic= None
+		percent_below_aerobic= None
+		percent_aerobic= None
+		percent_hrr_not_recorded= None
+		total_percent= None
+	# if not all_activities_heartrate_list and hr_not_recorded:
+	# 	data = {"total_time": hr_not_recorded,
+	# 			"aerobic_zone":None,
+	# 			"anaerobic_zone":None,
+	# 			"below_aerobic_zone":None,
+	# 			"aerobic_range":aerobic_range,
+	# 			"anaerobic_range":anaerobic_range,
+	# 			"below_aerobic_range":below_aerobic_range,
+	# 			"hrr_not_recorded": hr_not_recorded,
+	# 			"percent_hrr_not_recorded": 100,
+	# 			"percent_aerobic":None,
+	# 			"percent_below_aerobic":None,
+	# 			"percent_anaerobic":None,
+	# 			"total_percent": 100}
+ 
+	# elif all_activities_heartrate_list:
+	# 	data = {"total_time":total_time,
+	# 			"aerobic_zone":time_in_aerobic,
+	# 			"anaerobic_zone":time_in_anaerobic,
+	# 			"below_aerobic_zone":time_in_below_aerobic,
+	# 			"aerobic_range":aerobic_range,
+	# 			"anaerobic_range":anaerobic_range,
+	# 			"below_aerobic_range":below_aerobic_range,
+	# 			"hrr_not_recorded":None,
+	# 			"percent_hrr_not_recorded":None,
+	# 			"percent_aerobic":percent_aerobic,
+	# 			"percent_below_aerobic":percent_below_aerobic,
+	# 			"percent_anaerobic":percent_anaerobic,
+	# 			"total_percent":total_percent}
+	# else:
+	data = {"total_time":total_time,
+			"aerobic_zone":time_in_aerobic,
+			"anaerobic_zone":time_in_anaerobic,
+			"below_aerobic_zone":time_in_below_aerobic,
+			"aerobic_range":aerobic_range,
+			"anaerobic_range":anaerobic_range,
+			"below_aerobic_range":below_aerobic_range,
+			"hrr_not_recorded":hr_not_recorded,
+			"percent_hrr_not_recorded":percent_hrr_not_recorded,
+			"percent_aerobic":percent_aerobic,
+			"percent_below_aerobic":percent_below_aerobic,
+			"percent_anaerobic":percent_anaerobic,
+			"total_percent":total_percent}
 
 	# if user_created_activity_list:
 	# 	added_data = add_created_activity1(
@@ -363,50 +514,116 @@ def cal_aa1_data(user_get,all_activities_heartrate_list,all_activities_timestamp
 	# print(data)
 	return data
 
-def delete_activity(user_input_activities):
+def get_filtered_activities(user_input_activities):
+	deleted_activities = []
+	ui_exercise_act = []
 	user_input_activities_copy = user_input_activities.copy()
 	for key,single_activity in user_input_activities_copy.items():
-		if single_activity.get("duplicate") or single_activity.get("deleted"):
+		if single_activity.get("duplicate") or single_activity.get("deleted") or single_activity.get("steps_type") == 'non_exercise':
+			deleted_activities.append(key)
 			user_input_activities.pop(key,None)
-	return user_input_activities
+		if single_activity.get("steps_type") == 'exercise':
+			ui_exercise_act.append(key)
+	return user_input_activities,deleted_activities,ui_exercise_act
+
+def deleted_fitbit_activity(hr_time_diff,deleted_activities):
+	hr_time_diff_copy = hr_time_diff.copy()
+	for i,activity in enumerate(hr_time_diff_copy):
+		act_key = list(activity.keys())
+		if act_key[0] in deleted_activities:
+			activity.pop(act_key[0],None)
+	return hr_time_diff_copy
+
+def find_act_hrr(user_input_activities,activity_hr_time):
+	hr_not_recorded_ids = []
+	activity_hr_time_copy = activity_hr_time.copy()
+	for key,single_activity in user_input_activities.items():
+		if not single_activity.get("averageHeartRateInBeatsPerMinute"):
+			hr_not_recorded_ids.append(key)
+			for i,activity in enumerate(activity_hr_time_copy):
+				act_key = list(activity.keys())
+				activity.pop(act_key[0],None)
+	return activity_hr_time_copy,hr_not_recorded_ids
+
+
+def delete_aa(user_get,start_date,user_input_activities,type):
+	#start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+	if type=='chart1':
+		try:
+			aa_object=AA.objects.filter(user=user_get,created_at__icontains=start_date).delete()
+		except ValueError:
+			print("ValueError")
+	elif type=='chart2':
+		try:
+			aa_object=AaWorkoutCalculations.objects.filter(user_aa_workout=user_get,created_at__icontains=start_date).delete()
+		except ValueError:
+			print("ValueError")
+	elif type=='chart3':
+		try:
+			aa_object=TimeHeartZones.objects.filter(user=user_get,created_at__icontains=start_date).delete()
+		except ValueError:
+			print("ValueError")
+	elif type=='chart4':
+		try:
+			aa_object=AaCalculations.objects.filter(user_aa=user_get,created_at__icontains=start_date).delete()
+		except ValueError:
+			print("ValueError")
+
+
 
 def fitbit_aa_chart_one_new(user_get,start_date,user_input_activities=None):
-	hr_time_diff = fitbit_hr_diff_calculation(user_get,start_date)
-	all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(hr_time_diff)
-	# print(sum(all_activities_timestamp_list),"all_activities_timestamp_list")
-	
 	if user_input_activities:
-		user_input_activities = delete_activity(user_input_activities)
-	data = cal_aa1_data(
-		user_get,all_activities_heartrate_list,all_activities_timestamp_list)
+		delete_aa(user_get,start_date,user_input_activities,type='chart1')
+		user_input_activities,deleted_activities,ui_exercise_act = get_filtered_activities(user_input_activities)
+	else:
+		user_input_activities = []
+		deleted_activities = []
+	hr_time_diff = fitbit_hr_diff_calculation(user_get,start_date,user_input_activities)
+	hr_time_diff = deleted_fitbit_activity(hr_time_diff,deleted_activities)
+	if hr_time_diff and hr_time_diff[0]:
+		all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(hr_time_diff)		
+	else:
+		all_activities_heartrate_list = []
+		all_activities_timestamp_list = []
 	AA_data = AA.objects.filter(user=user_get,created_at=start_date)
-	cal_aa1_data(
-		user_get,all_activities_heartrate_list,all_activities_timestamp_list)
 	if not user_input_activities and not AA_data:
 		data = cal_aa1_data(
-		user_get,all_activities_heartrate_list,all_activities_timestamp_list)
+		user_get,all_activities_heartrate_list,all_activities_timestamp_list,user_input_activities)
 		return data
 	elif  not user_input_activities and AA_data:
 		data = cal_aa1_data(
-		user_get,all_activities_heartrate_list,all_activities_timestamp_list)
+		user_get,all_activities_heartrate_list,all_activities_timestamp_list,user_input_activities)
 		return data
 	elif ((user_input_activities and not AA_data) or
 			(user_input_activities and AA_data)):
 		ui_act_ids = list(user_input_activities.keys())
-		fibit_act = fitbit_aa_chart_one(user_get,start_date)
-		if len(ui_act_ids) == len(fibit_act):
+		fibit_act = fitbit_aa_chart_one(user_get,start_date,user_input_activities)
+		fitbit_act = deleted_fitbit_activity(fibit_act,deleted_activities)
+		if fitbit_act and fitbit_act[0]:
+			fitbit_act_len = len(fitbit_act)
+		else:
+			fitbit_act_len = 0
+		if len(ui_act_ids) == fitbit_act_len:
 			data = cal_aa1_data(
-		user_get,all_activities_heartrate_list,all_activities_timestamp_list)
+		user_get,all_activities_heartrate_list,all_activities_timestamp_list,user_input_activities,fitbit_act)
 			return data
 		else:
+			fibit_act = fitbit_aa_chart_one(user_get,start_date,user_input_activities)
 			activity_hr_time = get_user_created_activity(user_get,start_date,user_input_activities,fibit_act)
-			# user_added_data = get_aa2_daily_data(user,activity_hr_time)
-			# data = get_aa2_daily_data(user,hr_time_diff)
-			act_hr_list,act_time_list = all_activities_hr_and_time_diff(activity_hr_time)
+			activity_hr_time,hr_not_recorded_ids = find_act_hrr(user_input_activities,activity_hr_time)
+			if activity_hr_time and activity_hr_time[0]:
+				act_hr_list,act_time_list = all_activities_hr_and_time_diff(activity_hr_time)
+			else:
+				act_hr_list = []
+				act_time_list = []
 			all_activities_heartrate_list.extend(act_hr_list)
 			all_activities_timestamp_list.extend(act_time_list)
 			final_data = cal_aa1_data(
-				user_get,all_activities_heartrate_list,all_activities_timestamp_list)
+				user_get,all_activities_heartrate_list,
+				all_activities_timestamp_list,
+				user_input_activities,
+				fitbit_act)
+	
 			return final_data
 	else:
 		return {}
@@ -443,7 +660,7 @@ def fitbit_aa_twentyfour_hour_chart_one(user_get,start_date,hr_time_diff, user_i
 	all_activities_timestamp_list = hr_time_diff['time_diff']
 	# print(sum(all_activities_timestamp_list),"all_activities_timestamp_list")
 	if user_input_activities:
-		user_input_activities = delete_activity(user_input_activities)
+		user_input_activities,deleted_activities,ui_exercise_act = get_filtered_activities(user_input_activities)
 	data = cal_aa1_data(
 		user_get,all_activities_heartrate_list,all_activities_timestamp_list)
 	AA_data = TwentyfourHourAA.objects.filter(user=user_get,created_at=start_date)
@@ -478,8 +695,20 @@ def fitbit_aa_twentyfour_hour_chart_one(user_get,start_date,hr_time_diff, user_i
 	else:
 		return {}
 
+def convert_ui_format(fitbit_activity_data,user_get,start_date):
+	new_activities = {}
+	act_cal = user_input.views.garmin_views._get_fitbit_activities_data(
+		user_get,start_date)
+	fitbit_activity_data = fitbit_activity_data[0]
+	for i,activity in enumerate(fitbit_activity_data):
+		for key,value in act_cal.items():
+			if value.get("steps_type") == "exercise" and activity.get("summaryId") == key:
+				new_activities[key] = {}
+				new_activities[key] = activity
+	return new_activities
 
-def combine_ui_fitbit_activities(user_input_activities,fitbit_activity_data):
+
+def combine_ui_fitbit_activities(user_input_activities,fitbit_activity_data,user_get,start_date):
 	"""This function will combine both userinput activities and fitbit activities
 
 	Args:
@@ -493,29 +722,43 @@ def combine_ui_fitbit_activities(user_input_activities,fitbit_activity_data):
 	if user_input_activities:
 		ui_activity_keys = list(user_input_activities.keys())
 	else:
-		ui_activity_keys = None	
-	for index,single_activity in enumerate(fitbit_activity_data[0]):
-		if single_activity.get('summaryId') in ui_activity_keys:
-			user_input_activities[single_activity.get(
-				'summaryId')]['maxHeartRateInBeatsPerMinute'] = single_activity.get(
-				"maxHeartRateInBeatsPerMinute",0)
-			user_input_activities[single_activity.get(
-				'summaryId')]['distanceInMeters'] = single_activity.get(
-				"distanceInMeters",0)
-		else:
-			user_input_activities['summaryId'] = single_activity.get('summaryId')
-			user_input_activities['activityType'] = single_activity.get('summaryId')
-			user_input_activities['averageHeartRateInBeatsPerMinute'] = single_activity.get('summaryId')
-			user_input_activities['durationInSeconds'] = single_activity.get('summaryId')
-			user_input_activities['steps'] = single_activity.get('summaryId')
-			user_input_activities['maxHeartRateInBeatsPerMinute'] = single_activity.get(
+		ui_activity_keys = []	
+	if fitbit_activity_data:
+		for index,single_activity in enumerate(fitbit_activity_data[0]):
+			if single_activity.get('summaryId') in ui_activity_keys:
+				user_input_activities[single_activity.get(
+					'summaryId')]['maxHeartRateInBeatsPerMinute'] = single_activity.get(
+					"maxHeartRateInBeatsPerMinute",0)
+				user_input_activities[single_activity.get(
+					'summaryId')]['distanceInMeters'] = single_activity.get(
+					"distanceInMeters",0)
+			elif user_input_activities:
+				key = single_activity.get('summaryId')
+				user_input_activities[key] = {}
+				user_input_activities[key]['summaryId'] = single_activity.get('summaryId')
+				user_input_activities[key]['activityType'] = single_activity.get('activityType')
+				user_input_activities[key]['averageHeartRateInBeatsPerMinute'] = single_activity.get('averageHeartRateInBeatsPerMinute')
+				user_input_activities[key]['durationInSeconds'] = single_activity.get('durationInSeconds')
+				user_input_activities[key]['steps'] = single_activity.get('steps')
+				user_input_activities[key]['maxHeartRateInBeatsPerMinute'] = single_activity.get(
 												'maxHeartRateInBeatsPerMinute')
-			user_input_activities['distanceInMeters'] = single_activity.get('distanceInMeters')
-	return user_input_activities
+				user_input_activities[key]['distanceInMeters'] = single_activity.get('distanceInMeters')
+			else:
+				new_activities = convert_ui_format(fitbit_activity_data,user_get,start_date)	
+				return new_activities
+		return user_input_activities
+	else:
+		return user_input_activities
 
 def calculate_AA2_workout(user,start_date,user_input_activities=None):
 	fibit_activities_qs = UserFitbitDataActivities.objects.filter(
 		user=user,created_at=start_date)
+	if user_input_activities:
+		delete_aa(user,start_date,user_input_activities,type='chart2')
+		user_input_activities,deleted_activities,ui_exercise_act = get_filtered_activities(user_input_activities)
+	else:
+		deleted_activities = []
+		ui_exercise_act = []
 	trans_activity_data = []
 	if fibit_activities_qs:
 		for i in range(0,len(fibit_activities_qs)):
@@ -524,19 +767,28 @@ def calculate_AA2_workout(user,start_date,user_input_activities=None):
 				"'activity_fitbit': {...}","'activity_fitbit': {}"))
 			todays_activity_data = todays_activity_data.get('activities')
 			if todays_activity_data:
+				logid = str(todays_activity_data[0]['logId'])
+			else:
+				logid = ""
+			if todays_activity_data and logid not in deleted_activities:
 				trans_activity_data.append(list(map(
 					fitbit_to_garmin_activities,todays_activity_data)))
 	
-	modified_activities = combine_ui_fitbit_activities(user_input_activities,trans_activity_data)
+	modified_activities = combine_ui_fitbit_activities(user_input_activities,trans_activity_data,user,start_date)
 	time_duration = []
 	heart_rate = []
 	max_hrr = []
 	data1={}
 	steps = []
 	hrr_not_recorded_list = []
-	if trans_activity_data and trans_activity_data[0]:
-		start_date_timestamp = trans_activity_data[0][0]['startTimeInSeconds']
-		start_date_timestamp = start_date_timestamp +  trans_activity_data[0][0].get("startTimeOffsetInSeconds",0)
+	if trans_activity_data and trans_activity_data[0] or modified_activities:
+		try:
+			start_date_timestamp = trans_activity_data[0][0]['startTimeInSeconds']
+			start_date_timestamp = start_date_timestamp +  trans_activity_data[0][0].get("startTimeOffsetInSeconds",0)
+		except IndexError:
+			modified_activities_values = list(modified_activities.values())
+			start_date_timestamp = modified_activities_values[0]['startTimeInSeconds']
+			start_date_timestamp = start_date_timestamp +  modified_activities_values[0].get("startTimeOffsetInSeconds",0)
 		start_date = datetime.utcfromtimestamp(start_date_timestamp)
 		date = start_date.strftime('%d-%b-%y')
 		# print(trans_activity_data,"trans_activity_data")
@@ -573,6 +825,7 @@ def calculate_AA2_workout(user,start_date,user_input_activities=None):
 				hrr_not_recorded = workout.get('durationInSeconds',0)
 				hrr_not_recorded_list.append(hrr_not_recorded)
 				data['hrr_not_recorded'] = hrr_not_recorded
+		
 		for tm in hrr_not_recorded_list:
 			try:
 				prcnt_hrr_not_recorded = (tm/sum(time_duration))*100
@@ -632,36 +885,35 @@ def get_aa2_daily_data(user,hr_time_diff):
 	avg_hr = []
 	max_hr = []
 	user_age = user.profile.age()
-	if hr_time_diff:
+	#print(hr_time_diff,"hr_time_diff")
+	if hr_time_diff and hr_time_diff[0]:
 		for single_activity in hr_time_diff:
-			log_ids.extend(list(single_activity.keys()))
-			# all_activities_heartrate_list,all_activities_timestamp_list = list_single_activity_hr(single_activity)
-			# print(all_activities_heartrate_list,"all_activities_heartrate_list")
-			# print(type(all_activities_heartrate_list))
-			single_activity_id = list(single_activity.keys())
-			# print(single_activity[single_activity_id[0]]['time_diff'],"single_activity[single_activity_id[0]]['time_diff']")
-			time_diff = single_activity[single_activity_id[0]]['time_diff']
-			hr_values = single_activity[single_activity_id[0]]['hr_values']
-			try:
-				avg_hr.append(sum(hr_values)/len(hr_values))
-			except:
-				pass
-			try:
-				max_hr.append(max(hr_values))
-			except:
-				pass
-			all_activities_hr.append(hr_values)
-			all_activities_time.append(time_diff)
+			if single_activity:
+				log_ids.extend(list(single_activity.keys()))
+				single_activity_id = list(single_activity.keys())
+				time_diff = single_activity[single_activity_id[0]]['time_diff']
+				hr_values = single_activity[single_activity_id[0]]['hr_values']
+				try:
+					avg_hr.append(sum(hr_values)/len(hr_values))
+				except:
+					pass
+				try:
+					max_hr.append(max(hr_values))
+				except:
+					pass
+				all_activities_hr.append(hr_values)
+				all_activities_time.append(time_diff)
 		# print(all_activities_heartrate_list,"activities_heartrate_list")
 		# print(all_activities_timestamp_list,"all_activities_timestamp_list")
 		all_activities_heartrate = [single_list for single_list in all_activities_hr if single_list]
 		all_activities_timestamp = [single_list for single_list in all_activities_time if single_list]
 		
-		below_aerobic_value = 180-user_age-30
-		anaerobic_value = 180-user_age+5
-		aerobic_range = '{}-{}'.format(below_aerobic_value,anaerobic_value)
-		anaerobic_range = '{} or above'.format(anaerobic_value+1)
-		below_aerobic_range = 'below {}'.format(below_aerobic_value)
+		update = Update_AA_ranges_by_ages(user)
+		below_aerobic_value = update[0]
+		anaerobic_value = update[1]
+		aerobic_range = update[2]
+		anaerobic_range = update [3]
+		below_aerobic_range = update [4]
 		
 		def individual_activity(heart,time):
 			anaerobic_range_list = []
@@ -777,12 +1029,9 @@ def get_fitbit_act_ids(fibit_act):
 	return fitbit_ids
 
 def get_user_created_activity(user,start_date,user_input_activities,fibit_act):
-	# print(user_input_activities,"user_input_activities")
 	fitbit_ids = get_fitbit_act_ids(fibit_act)
 	ui_act_ids = list(user_input_activities.keys())
 	manually_added_act_ids = list(set(ui_act_ids)-set(fitbit_ids))
-	# print(manually_added_act_ids,"kkkkkkkkkkkkkkkkkkkkkkk")
-	# userdata = user_input_activities[manually_added_act_ids[0]]
 	activity_hr_time = []
 	for single_id in manually_added_act_ids:
 		start_time_seconds=user_input_activities[single_id].get("startTimeInSeconds")
@@ -792,12 +1041,11 @@ def get_user_created_activity(user,start_date,user_input_activities,fibit_act):
 		if start_time_seconds:
 			start_time_str,end_tine_str = get_start_end_time_act(start_time_seconds,offset,duration)
 			hr_dataset = get_fitbit_hr_data(user,start_date)
-
 			single_activity_hr_time = get_hr_timediff(
 				hr_dataset,start_time_str,end_tine_str,summaryid)
 			activity_hr_time.append(single_activity_hr_time)
 		return activity_hr_time
-
+	return activity_hr_time
 def total_percent(modified_data_total):
 	'''
 		Add percent to all the fields in Totals
@@ -832,19 +1080,40 @@ def add_totals(modified_data):
 	for key,value in modified_data.items():
 		if not modified_data_total.get('Totals'):
 			modified_data_total['Totals'] = {}
+		if value.get('total_duration',0.0):
+			total_duration = value.get('total_duration',0.0)
+		else:
+			total_duration = 0
+		if value.get('duration_in_anaerobic_range',0.0):
+			duration_in_anaerobic_range = value.get('duration_in_anaerobic_range',0.0)
+		else:
+			duration_in_anaerobic_range = 0
+		if value.get('duration_in_aerobic_range',0.0):
+			duration_in_aerobic_range = value.get('duration_in_aerobic_range',0.0)
+		else:
+			duration_in_aerobic_range = 0
+		if value.get('duration_below_aerobic_range',0.0):
+			duration_below_aerobic_range = value.get('duration_below_aerobic_range',0.0)
+		else:
+			duration_below_aerobic_range = 0
+		if value.get('duration_hrr_not_recorded',0.0):
+			duration_hrr_not_recorded = value.get('duration_hrr_not_recorded',0.0)
+		else:
+			duration_hrr_not_recorded = 0
+
 		modified_data_total['Totals']['total_duration'] = (
-		value.get('total_duration',0.0) + modified_data_total['Totals'].get('total_duration',0.0))
+		total_duration + modified_data_total['Totals'].get('total_duration',0.0))
 		modified_data_total['Totals']['duration_in_anaerobic_range'] = (
-		value.get('duration_in_anaerobic_range',0.0) + modified_data_total['Totals'].get(
+		duration_in_anaerobic_range + modified_data_total['Totals'].get(
 		'duration_in_anaerobic_range',0.0))
 		modified_data_total['Totals']['duration_in_aerobic_range'] = (
-		value.get('duration_in_aerobic_range',0.0) + modified_data_total['Totals'].get(
+		duration_in_aerobic_range + modified_data_total['Totals'].get(
 		'duration_in_aerobic_range',0.0))
 		modified_data_total['Totals']['duration_below_aerobic_range'] = (
-		value.get('duration_below_aerobic_range',0.0) + modified_data_total['Totals'].get(
+		duration_below_aerobic_range + modified_data_total['Totals'].get(
 		'duration_below_aerobic_range',0.0))
 		modified_data_total['Totals']['duration_hrr_not_recorded'] = (
-		value.get('duration_hrr_not_recorded',0.0) + modified_data_total['Totals'].get(
+		duration_hrr_not_recorded + modified_data_total['Totals'].get(
 		'duration_hrr_not_recorded',0.0))
 	percent_added = total_percent(modified_data_total)
 	return(percent_added)
@@ -859,14 +1128,128 @@ def generate_totals(user_added_data,data):
 		return final_data
 	elif user_added_data and not data:
 		return user_added_data
+	elif not user_added_data and data:
+		return data
+
+def only_hrr_act(activity_hr_time,hr_time_diff,user_input_activities):
+	data = {}
+	if (not hr_time_diff and
+		not activity_hr_time[0] and 	
+		user_input_activities):
+		hr_not_recorded = get_hr_not_recorded_duration(user_input_activities)
+		for key,activity in user_input_activities.items():
+			if not activity.get("averageHeartRateInBeatsPerMinute"):
+				data[key] = {}
+				try:
+					if activity.get("durationInSeconds"):
+						percent_hrr_not_recorded = activity.get("durationInSeconds")*100/hr_not_recorded
+					else:
+						percent_hrr_not_recorded = 100
+				except:
+					logging.exception("message")
+					percent_hrr_not_recorded = 0
+				data[key] = {"avg_heart_rate":None,
+							  "max_heart_rate":None,
+							  "total_duration": 0,
+							  "duration_in_aerobic_range":0,
+							  "duration_in_anaerobic_range":0,
+							  "duration_below_aerobic_range":0,
+							  "percent_aerobic":0,
+							  "percent_below_aerobic":0,
+							  "percent_anaerobic":0,
+							  "duration_hrr_not_recorded":activity.get("durationInSeconds"),
+							  "percent_hrr_not_recorded":percent_hrr_not_recorded,
+						}
+			else:
+				return None
+		data['Totals'] = {"avg_heart_rate":None,
+						  "max_heart_rate":None,
+						  "total_duration": hr_not_recorded,
+						  "duration_in_aerobic_range":0,
+						  "duration_in_anaerobic_range":0,
+						  "duration_below_aerobic_range":0,
+						  "percent_aerobic":0,
+						  "percent_below_aerobic":0,
+						  "percent_anaerobic":0,
+						  "duration_hrr_not_recorded":hr_not_recorded,
+						  "percent_hrr_not_recorded":100,
+					}
+	return data
+
+def add_to_final_data(user,final_data,user_input_activities,hr_not_recorded_ids):
+	if not final_data:
+		final_data = {}
+	hr_not_recorded = get_hr_not_recorded_duration(user_input_activities)
+	try:
+		total_duration = final_data['Totals']['total_duration']
+	except KeyError:
+		total_duration = 0
+	for key,activity in user_input_activities.items():
+			if key in hr_not_recorded_ids:
+				if (not activity.get('averageHeartRateInBeatsPerMinute')
+				   and activity.get('steps_type') == 'exercise'
+				   and activity.get('duplicate') == False):
+					total = total_duration+hr_not_recorded
+					percent_hrr_not_recorded = (activity.get("durationInSeconds")/total)*100
+					final_data[key] = {}
+					final_data[key] = {"avg_heart_rate":None,
+								  "max_heart_rate":None,
+								  "total_duration": activity.get("durationInSeconds"),
+								  "duration_in_aerobic_range":None,
+								  "duration_in_anaerobic_range":None,
+								  "duration_below_aerobic_range":None,
+								  "percent_aerobic":None,
+								  "percent_below_aerobic":None,
+								  "percent_anaerobic":None,
+								  "duration_hrr_not_recorded":activity.get("durationInSeconds"),
+								  "percent_hrr_not_recorded":percent_hrr_not_recorded,
+							}
+				else:
+
+					below_aerobic,aerobic,anarobic = belowaerobic_aerobic_anaerobic(
+														user,user.profile.age())
+					hr = activity.get('averageHeartRateInBeatsPerMinute')
+					duration_in_anaerobic_range = None
+					duration_below_aerobic_range = None
+					duration_in_aerobic_range = None
+					if hr >= anarobic:
+						duration_in_anaerobic_range = activity.get("durationInSeconds")
+					elif hr <= below_aerobic:
+						duration_below_aerobic_range = activity.get("durationInSeconds")
+					else:
+						duration_in_aerobic_range = activity.get("durationInSeconds")
+					final_data[key] = {}
+					final_data[key] = {"avg_heart_rate":None,
+								  "max_heart_rate":None,
+								  "total_duration": activity.get("durationInSeconds"),
+								  "duration_in_aerobic_range":duration_in_aerobic_range,
+								  "duration_in_anaerobic_range":duration_in_anaerobic_range,
+								  "duration_below_aerobic_range":duration_below_aerobic_range,
+								  "percent_aerobic":None,
+								  "percent_below_aerobic":None,
+								  "percent_anaerobic":None,
+								  "duration_hrr_not_recorded":None,
+								  "percent_hrr_not_recorded":None,
+							}
+
+	try:
+		final_data.pop("Totals")	
+	except KeyError:
+		pass
+	return add_totals(final_data)
+
 
 def calculate_AA2_daily(user,start_date,user_input_activities=None):
-	# print(user_input_activities,"user_input_activities")
-	hr_time_diff = fitbit_hr_diff_calculation(user,start_date)
-	# all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(user_get,start_date)
-	AA_data = AaCalculations.objects.filter(user_aa=user,created_at=start_date)
 	if user_input_activities:
-		user_input_activities = delete_activity(user_input_activities)
+		delete_aa(user,start_date,user_input_activities,type='chart4')
+		user_input_activities,deleted_activities,ui_exercise_act = get_filtered_activities(user_input_activities)
+	else:
+		deleted_activities =[]
+		ui_exercise_act = []
+	hr_time_diff = fitbit_hr_diff_calculation(user,start_date,user_input_activities)
+	hr_time_diff = deleted_fitbit_activity(hr_time_diff,deleted_activities)
+	AA_data = AaCalculations.objects.filter(user_aa=user,created_at=start_date)
+	
 	if not user_input_activities and not AA_data:
 		data = get_aa2_daily_data(user,hr_time_diff)
 		return data
@@ -876,16 +1259,31 @@ def calculate_AA2_daily(user,start_date,user_input_activities=None):
 	elif ((user_input_activities and not AA_data) or
 			(user_input_activities and AA_data)):
 		ui_act_ids = list(user_input_activities.keys())
-		fibit_act = fitbit_aa_chart_one(user,start_date)
-		if len(ui_act_ids) == len(fibit_act):
+		fibit_act = fitbit_aa_chart_one(user,start_date,user_input_activities)
+		fitbit_act = deleted_fitbit_activity(fibit_act,deleted_activities)
+		if fitbit_act and fitbit_act[0]:
+			fitbit_act = len(fitbit_act)
+		else:
+			fitbit_act = 0
+		if len(ui_act_ids) == fitbit_act:
 			data = get_aa2_daily_data(user,hr_time_diff)
 			return data
 		else:
+			fibit_act = fitbit_aa_chart_one(user,start_date,user_input_activities)
 			activity_hr_time = get_user_created_activity(user,start_date,user_input_activities,fibit_act)
-			user_added_data = get_aa2_daily_data(user,activity_hr_time)
-			data = get_aa2_daily_data(user,hr_time_diff)
-			final_data = generate_totals(user_added_data,data)
-			return final_data
+			activity_hr_time,hr_not_recorded_ids = find_act_hrr(user_input_activities,activity_hr_time)
+			only_hr_not_reocrded_data = only_hrr_act(activity_hr_time,hr_time_diff,user_input_activities)
+			
+			if only_hr_not_reocrded_data:
+				return only_hr_not_reocrded_data
+			else:
+				user_added_data = get_aa2_daily_data(user,activity_hr_time)
+				data = get_aa2_daily_data(user,hr_time_diff)
+				final_data = generate_totals(user_added_data,data)
+				if hr_not_recorded_ids:
+					final_data2 = add_to_final_data(user,final_data,user_input_activities,hr_not_recorded_ids)
+					return final_data2
+				return final_data
 
 	else:
 		return {}
@@ -901,8 +1299,12 @@ def get_aa3_data(user,hr_list,timediff_list):
 				"prcnt_total_duration_in_zone":"",
 				}
 
-	below_aerobic_value = 180-user_age-30
-	anaerobic_value = 180-user_age+5
+	update = Update_AA_ranges_by_ages(user)
+	below_aerobic_value = update[0]
+	anaerobic_value = update[1]
+
+	# below_aerobic_value = 180-user_age-30
+	# anaerobic_value = 180-user_age+5
 	above_220 = 220
 	data2 = {}
 	classification_dic = {}
@@ -914,9 +1316,20 @@ def get_aa3_data(user,hr_list,timediff_list):
 						38,43,48,53,58,63,68,78,88]
 
 	low_end_heart = [180-user_age+tmp for tmp in low_end_values]
+	low_end_heart_all = [ x for x in low_end_heart if x >= 0]
+	#Storing differentiated values from length of low_end_heart and length of low_end_heart_all
+	removed_hr_vales = len(low_end_heart) - len(low_end_heart_all)
+	
+
 	high_end_heart = [180-user_age+tmp for tmp in high_end_values]
+	
+	high_end_heart_all = [ x for x in high_end_heart if x >= 0]
+	#Adding removed hr vales to a high_end_heart_all list
+	high_end_heart = high_end_heart_all[removed_hr_vales:]
+	
 
 	for a,b in zip(low_end_heart,high_end_heart):
+		
 		if a and b > anaerobic_value:
 			classification_dic[a] = 'anaerobic_zone'
 		elif (a or a == 0) and b < below_aerobic_value:
@@ -987,9 +1400,25 @@ def get_aa3_data(user,hr_list,timediff_list):
 
 	return data2
 
-def calculate_AA_chart3(user,start_date,user_input_activities,AA_data, all_activities_heartrate_list,all_activities_timestamp_list):
-	if user_input_activities:
-		user_input_activities = delete_activity(user_input_activities)
+def add_hr_to_third_chart(hr_not_recorded_ids,user_input_activities,final_data):
+	if not final_data:
+		final_data = {}
+		final_data["heartrate_not_recorded"] = {}
+		final_data["total"] = {}
+	hr_not_recorded = get_hr_not_recorded_duration(user_input_activities)
+	final_data["heartrate_not_recorded"]["time_in_zone"] = hr_not_recorded
+	final_data["total"]["total_percent"] = "100%"
+	final_data["total"]["total_duration"] = final_data["total"]["total_duration"] + hr_not_recorded
+	try:
+		final_data["heartrate_not_recorded"]["prcnt_total_duration_in_zone"] = hr_not_recorded*100/final_data["total"]["total_duration"]
+	except:
+		final_data["heartrate_not_recorded"]["prcnt_total_duration_in_zone"] = 100
+	return final_data
+
+def calculate_AA_chart3(
+	user,start_date,user_input_activities,AA_data,
+	all_activities_heartrate_list,all_activities_timestamp_list,
+	deleted_activities=None):
 	if not user_input_activities and not AA_data:
 		data = get_aa3_data(
 		user,all_activities_heartrate_list,all_activities_timestamp_list)
@@ -1001,59 +1430,54 @@ def calculate_AA_chart3(user,start_date,user_input_activities,AA_data, all_activ
 	elif ((user_input_activities and not AA_data) or
 			(user_input_activities and AA_data)):
 		ui_act_ids = list(user_input_activities.keys())
-		fibit_act = fitbit_aa_chart_one(user,start_date)
-		if len(ui_act_ids) == len(fibit_act):
+		fibit_act = fitbit_aa_chart_one(user,start_date,user_input_activities)
+		fitbit_act = deleted_fitbit_activity(fibit_act,deleted_activities)
+		if fitbit_act and fitbit_act[0]:
+			fitbit_act = len(fitbit_act)
+		else:
+			fitbit_act = 0
+		if len(ui_act_ids) == fitbit_act:
 			data = get_aa3_data(
 		user,all_activities_heartrate_list,all_activities_timestamp_list)
 			return data
 		else:
-			activity_hr_time = get_user_created_activity(user,start_date,user_input_activities,fibit_act)
+			fitbit_act = fitbit_aa_chart_one(user,start_date,user_input_activities)
+			activity_hr_time = get_user_created_activity(user,start_date,user_input_activities,fitbit_act)
+			activity_hr_time,hr_not_recorded_ids = find_act_hrr(user_input_activities,activity_hr_time)
 			act_hr_list,act_time_list = all_activities_hr_and_time_diff(activity_hr_time)
 			all_activities_heartrate_list.extend(act_hr_list)
 			all_activities_timestamp_list.extend(act_time_list)
 			final_data = get_aa3_data(
 				user,all_activities_heartrate_list,all_activities_timestamp_list)
+			if hr_not_recorded_ids:
+				final_data2 = add_hr_to_third_chart(
+					hr_not_recorded_ids,user_input_activities,final_data)
+				return final_data2
 			return final_data
 	return {}
 
 
-def calculate_AA3(user,start_date,user_input_activities, ):
-	hr_time_diff = fitbit_hr_diff_calculation(user,start_date)
-	all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(hr_time_diff)
+def calculate_AA3(user,start_date,user_input_activities=None):
+	if user_input_activities:
+		delete_aa(user,start_date,user_input_activities,type='chart3')
+		user_input_activities,deleted_activities,ui_exercise_act = get_filtered_activities(user_input_activities)
+	else:
+		deleted_activities = []
+		ui_exercise_act = []
+	hr_time_diff = fitbit_hr_diff_calculation(user,start_date,user_input_activities)
+	hr_time_diff = deleted_fitbit_activity(hr_time_diff,deleted_activities)
+	if hr_time_diff and hr_time_diff[0]:
+		all_activities_heartrate_list,all_activities_timestamp_list = all_activities_hr_and_time_diff(hr_time_diff)
+	else:
+		all_activities_heartrate_list = []
+		all_activities_timestamp_list = []
 	AA_data = TimeHeartZones.objects.filter(user=user,created_at=start_date)
 	
 	response = calculate_AA_chart3(user,start_date,user_input_activities,AA_data,\
 						all_activities_heartrate_list,
-						all_activities_timestamp_list)
+						all_activities_timestamp_list,deleted_activities)
 	
 	return response
-	# if user_input_activities:
-	# 	user_input_activities = delete_activity(user_input_activities)
-	# if not user_input_activities and not AA_data:
-	# 	data = get_aa3_data(
-	# 	user,all_activities_heartrate_list,all_activities_timestamp_list)
-	# 	return data
-	# elif  not user_input_activities and AA_data:
-	# 	data = get_aa3_data(
-	# 	user,all_activities_heartrate_list,all_activities_timestamp_list)
-	# 	return data
-	# elif ((user_input_activities and not AA_data) or
-	# 		(user_input_activities and AA_data)):
-	# 	ui_act_ids = list(user_input_activities.keys())
-	# 	fibit_act = fitbit_aa_chart_one(user,start_date)
-	# 	if len(ui_act_ids) == len(fibit_act):
-	# 		data = get_aa3_data(
-	# 	user,all_activities_heartrate_list,all_activities_timestamp_list)
-	# 		return data
-	# 	else:
-	# 		activity_hr_time = get_user_created_activity(user,start_date,user_input_activities,fibit_act)
-	# 		act_hr_list,act_time_list = all_activities_hr_and_time_diff(activity_hr_time)
-	# 		all_activities_heartrate_list.extend(act_hr_list)
-	# 		all_activities_timestamp_list.extend(act_time_list)
-	# 		final_data = get_aa3_data(
-	# 			user,all_activities_heartrate_list,all_activities_timestamp_list)
-	# 		return final_data
-	# return {}
 	
 def calculate_twentyfour_hour_AA3(user,start_date,user_input_activities):
 	hr_time_diff = fitbit_hrr_diff_calculation(user,start_date)

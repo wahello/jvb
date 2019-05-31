@@ -191,7 +191,10 @@ class MovementLeaderboard extends Component{
 		  		rangeType:'today'
 		  	},
 		},()=>{
-			fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate);
+			fetchLeaderBoard(this.successOverallMovementRank,
+							 this.errorOverallMovementRank,
+							 this.state.selectedDate,
+							 null,null,'movement');
 			fetchMcsSnapshot(this.successMcsSnapshot,this.errorMcsSnapshot,this.state.selectedDate);
 
 		});
@@ -200,7 +203,10 @@ class MovementLeaderboard extends Component{
 		this.setState({
 			fetching_hrr4:true,
 		});
-		fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate);
+		fetchLeaderBoard(this.successOverallMovementRank,
+						 this.errorOverallMovementRank,
+						 this.state.selectedDate,
+						 null,null,'movement');
 		fetchMcsSnapshot(this.successMcsSnapshot,this.errorMcsSnapshot,this.state.selectedDate);
 	}
 	toggle(){
@@ -227,7 +233,10 @@ class MovementLeaderboard extends Component{
         custom_ranges.push(this.state.lb1_start_date);
         custom_ranges.push(this.state.lb1_end_date);
         let crange1 = this.state.lb1_start_date + " " + "to" + " " + this.state.lb1_end_date ;
-      fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,custom_ranges,crange1);
+      fetchLeaderBoard(this.successOverallMovementRank,
+      				   this.errorOverallMovementRank,
+      				   this.state.selectedDate,
+      				   custom_ranges,crange1,'movement');
     });
   }
    onSubmitDate2(event){
@@ -250,7 +259,10 @@ class MovementLeaderboard extends Component{
         custom_ranges.push(this.state.lb2_start_date);
         custom_ranges.push(this.state.lb2_end_date);
         let crange2 = this.state.lb2_start_date + " " + "to" + " " + this.state.lb2_end_date ;
-      fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,custom_ranges,crange2);
+      fetchLeaderBoard(this.successOverallMovementRank,
+      				   this.errorOverallMovementRank,
+      				   this.state.selectedDate,
+      				   custom_ranges,crange2,'movement');
     });
   }
  onSubmitDate3(event){
@@ -272,7 +284,10 @@ class MovementLeaderboard extends Component{
         custom_ranges.push(this.state.lb3_start_date);
         custom_ranges.push(this.state.lb3_end_date);
         let crange3 = this.state.lb3_start_date + " " + "to" + " " + this.state.lb3_end_date ;
-      fetchLeaderBoard(this.successOverallMovementRank,this.errorOverallMovementRank,this.state.selectedDate,custom_ranges,crange3);
+      fetchLeaderBoard(this.successOverallMovementRank,
+      				   this.errorOverallMovementRank,
+      				   this.state.selectedDate,
+      				   custom_ranges,crange3,'movement');
     });
   }
   handleChange(event){
@@ -526,6 +541,13 @@ class MovementLeaderboard extends Component{
 			          			Note: All time periods/durations are in hours:minutes (hh:mm)
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          				** Represents duration (hh:mm) that the exercise range was in each of our 4 heart rate zones:
+			          				<li>Aerobic (AE): Aerobic Duration (% of total time)</li> 
+			          				<li>Anaerobic (AN): Anaerobic Duration (% of total time)</li>
+			          				<li>Below Aerobic (BA): Below Aerobic Duration (% of total time)</li>
+			          				<li>Not Recorded (NR): HR Not Recorded Duration(% of total time)</li>
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			The Movement Leaderboard provides a robust view of your movement across a number of categories that we use to assess movement.  In our experience, people that do well across all 5 of these categories consistently over time are healthier and feel better than those that don’t.  Users can choose various time periods or select any custom range by touching “Select Range” or entering a time period in one of the “Custom Date Range” buttons.  If viewing on a mobile device, turn your mobile device to the side (landscape mode) to see all columns.  You can also see how other people are doing on this page.  We include this so that each of us are motivated/inspired to do a little better!
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
@@ -545,7 +567,7 @@ class MovementLeaderboard extends Component{
 			          			MCS Score:  total inactive hours (sum of hours each day a user does not achieve 300 steps in any hour) per day when not sleeping, napping, and exercising
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
-			          			Exercise Duration / Average HR:  total exercise duration each day.  Users can characterize an activity as “exercise” or “non exercise” on the activity summary for each activity below question 1. on the user inputs page. Note: users are only given credit for exercise or non exercise for each activity (not both). Also includes the average heartrate of all exercise activities.
+			          			Exercise Duration / Average HR:  total exercise duration each day.  Users can characterize an activity as “exercise” or “non exercise” on the activity summary for each activity below question 1. on the user inputs page. Note: users are only given credit for exercise or non exercise for each activity (not both). Also includes the average heartrate of all exercise activities. NM = Heart Rate Not Measured.
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			Entire 24 Hours:  the number of active minutes for the full 24 hours.  Active minutes are provided by wearable devices and a minute is considered “active” if it has 1 or more steps in that minute

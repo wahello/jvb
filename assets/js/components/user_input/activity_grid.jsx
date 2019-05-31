@@ -1,4 +1,3 @@
-
 import React, {Component} from 'react'
 import _ from 'lodash';
 import {Button,FormGroup, Label, Input, FormText, className, Modal,
@@ -10,7 +9,9 @@ import 'moment-timezone';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; 
 import { ToastContainer, toast } from 'react-toastify';
-import {getUserProfile} from '../../network/auth';
+import { getUserProfile } from '../../network/auth';
+import { getManualActInfo } from '../../network/userInput';
+
 
 const activites = { "":"Select",
 "OTHER":"OTHER",
@@ -22,6 +23,7 @@ const activites = { "":"Select",
 "BASKETBALL":"BASKETBALL",
 "BIKETORUNTRANSITION":"BIKE TO RUN TRANSITION",
 "BOATING":"BOATING",
+"BATTERY CHARGING":"BATTERY CHARGING",
 "CASUAL_WALKING":"CASUAL WALKING",
 "CONDITIONING_CLASS":"CONDITIONING CLASS",
 "CROSS_COUNTRY_SKIING":"CROSS COUNTRY SKIING",
@@ -34,6 +36,7 @@ const activites = { "":"Select",
 "ELLIPTICAL":"ELLIPTICAL",
 "FITNESS_EQUIPMENT":"FITNESS EQUIPMENT",
 "FLYING":"FLYING",
+"FOAM ROLLING":"FOAM ROLLING",
 "GARDENING":"GARDENING",
 "GOLF":"GOLF",
 "GYM CLASS":"GYM CLASS",
@@ -49,6 +52,7 @@ const activites = { "":"Select",
 "KICKBALL":"KICKBALL",
 "KNEE WALKER SCOOTERING":"KNEE WALKER SCOOTERING",
 "LAP_SWIMMING":"LAP SWIMMING",
+"MASSAGE":"MASSAGE",
 "MOUNTAIN_BIKING":"MOUNTAIN BIKING",
 "MOTORCYCLING":"MOTOR CYCLING",
 "MOUNTAINEERING":"MOUNTAINEERING",
@@ -66,12 +70,14 @@ const activites = { "":"Select",
 "ROWING":"ROWING",
 "RUNNING":"RUNNING",
 "RUNTOBIKETRANSITION":"RUN TO BIKE TRANSITION",
+"RECOVERY ACTIVITY":"RECOVERY ACTIVITY",
 "SAILING":"SAILING",
 "SCOOTERING":"SCOOTERING",
 "SKATE_SKIING":"SKATE SKIING",
 "SKATING":"SKATING",
 "SNOWMOBILING":"SNOW MOBILING",
 "SNOW_SHOE":"SNOW SHOE",
+"SNOW_SHOVELING":"SNOW SHOVELING",
 "SOCCER":"SOCCER",
 "SPEED_WALKING":"SPEED WALKING",
 "SQUASH":"SQUASH",
@@ -79,6 +85,7 @@ const activites = { "":"Select",
 "STAND_UP_PADDLEBOARDING":"STAND UP PADDLE BOARDING",
 "STREET_RUNNING":"STREET RUNNING",
 "STRENGTH_TRAINING":"STRENGTH TRAINING",
+"STRETCHING":"STRETCHING",
 "SWIMMING":"SWIMMING",
 "SWIMTOBIKETRANSITION":"SWIM TO BIKE TRANSITION",
 "TENNIS":"TENNIS",
@@ -88,6 +95,7 @@ const activites = { "":"Select",
 "TRANSITION":"TRANSITION",
 "TREADMILL_RUNNING":"TREADMILL RUNNING",
 "UNCATEGORIZED":"UNCATEGORIZED",
+"VOLLEYBALL":"VOLLEYBALL",
 "WALKING":"WALKING",
 "WHITEWATER_RAFTING_KAYAKING":"WHITE WATER RAFTING KAYAKING",
 "WIND_KITE_SURFING":"WIND KITE SURFING",
@@ -150,6 +158,9 @@ this.successProfile=this.successProfile.bind(this);
 this.calculateZone = this.calculateZone.bind(this);
 this.editToggleHandler_weather = this.editToggleHandler_weather.bind(this);
 this.handleChange_weather = this.handleChange_weather.bind(this);
+this.getManualActivityInfo = this.getManualActivityInfo.bind(this);
+this.manualActivityInfoSuccess = this.manualActivityInfoSuccess.bind(this);
+this.manualActivityInfoError = this.manualActivityInfoError.bind(this);
 
 this.state ={
     selected_date:selected_date,
@@ -209,7 +220,9 @@ this.state ={
     isActivityStepsTypeOpen:false ,
     age:"",
     selectedDate:new Date() ,
-    avg_hr: ''
+    avg_hr: '',
+    loadingManualActInfo : false,
+    aa_ranges: {}
 }
 }
 
@@ -271,8 +284,68 @@ componentWillReceiveProps(nextProps) {
     }
 }
 
+manualActivityInfoSuccess(data){
+    this.setState({
+                      loadingManualActInfo : false, 
+                      modal_activity_heart_rate: data.data.avg_heartrate,
+                      modal_exercise_steps_status: data.data.activity_category,
+                      modal_exercise_steps: data.data.steps
+          });
+     
+  }
 
+manualActivityInfoError(error){
+        this.setState({
+          loadingManualActInfo : false
+     },
+       () =>  { console.log(error.message) }
+  );        
+}
 
+getManualActivityInfo(activity_display_name,activity_start_date, activity_start_hour,
+    activity_start_min,activity_start_sec, activity_start_am_pm,
+    activity_end_date,activity_end_hour, activity_end_min, 
+    activity_end_sec,activity_end_am_pm) {
+    if (activity_display_name && activity_start_date && activity_start_hour,
+        activity_start_min && activity_start_sec && activity_start_am_pm &&
+        activity_end_date && activity_end_hour && activity_end_min && 
+        activity_end_sec && activity_end_am_pm) {
+        let activityStartTimeMObject = this.getDTMomentObj( activity_start_date,
+                                                            activity_start_hour,
+                                                            activity_start_min,
+                                                            activity_start_sec,
+                                                            activity_start_am_pm );
+        let activityEndTimeMObject = this.getDTMomentObj( activity_end_date,
+                                                          activity_end_hour,
+                                                          activity_end_min,
+                                                          activity_end_sec,
+                                                          activity_end_am_pm );
+        let timezone = moment.tz.guess();
+        let date = this.state.selected_date;
+        let act_start_epoch = activityStartTimeMObject.unix();
+        let act_end_epoch = activityEndTimeMObject.unix();
+        let utc_offset = (moment.tz(moment.utc(),timezone).utcOffset())*60;
+        this.setState({
+            loadingManualActInfo : true
+          },
+            () => getManualActInfo(date,act_start_epoch,
+                                   act_end_epoch,activity_display_name,utc_offset,
+                                   this.manualActivityInfoSuccess,this.manualActivityInfoError)
+        );
+    }        
+}
+
+Spinner(){
+  return( 
+    <FontAwesome 
+      name='spinner' 
+      size='1x'
+      pulse spin
+      className="mx-auto"
+    />
+  ); 
+}
+  
 addingCommaToSteps(value){
     value += '';
     var x = value.split('.');
@@ -285,12 +358,9 @@ addingCommaToSteps(value){
     return x1 + x2;
 }
 successProfile(data){
-    // let today_date = new Date();
-    // let date_of_birth = moment(data.data.date_of_birth);
-    // let today_date1 = moment(moment(today_date).format('YYYY-MM-DD'));
-    // let age = Math.abs(today_date1.diff(date_of_birth, 'years'));
     this.setState({
-        age:data.data.user_age
+        age:data.data.user_age,
+        aa_ranges:data.data.aa_ranges
     })
 }
 
@@ -367,10 +437,8 @@ toggle_delete(event){
       getselectedid: selectedActivityId
 
     });
-    
-
-     
   }
+
   toggle_starttime(event){
     const target = event.target;
     const selectedActivityId = target.getAttribute('data-name');
@@ -848,12 +916,13 @@ editToggleHandlerDuration(event){
 }
 
 calculateZone(){
-    let age = this.state.age;
-    let aerobic_zone = 180-age-29;
-    let anaerobic_zone = 180-age+5;
-
+    // let age = this.state.age;
+    // let aerobic_zone = 180-age-29;
+    // let anaerobic_zone = 180-age+5;
+    let aerobic_zone = this.state.aa_ranges.aerobic_range_start
+    let anaerobic_zone = this.state.aa_ranges.anaerobic_range_start
     return {
-        aerobic_zone: aerobic_zone ,
+        aerobic_zone: aerobic_zone,
         anaerobic_zone: anaerobic_zone
     };
 }   
@@ -1279,7 +1348,14 @@ handleChange(event){
             [name]: value,
             modal_activity_type:"",
             modal_exercise_steps_status:steps_type
-        });
+        },
+          () => this.getManualActivityInfo(this.state.activity_display_name,this.state.activity_start_date,
+                                       this.state.activity_start_hour,this.state.activity_start_min,
+                                       this.state.activity_start_sec,this.state.activity_start_am_pm,
+                                       this.state.activity_end_date,this.state.activity_end_hour,
+                                       this.state.activity_end_min,this.state.activity_end_sec,
+                                       this.state.activity_end_am_pm)
+        );
     }
     else if(name == "activity_display_name"){
         let actType = value;
@@ -1289,13 +1365,19 @@ handleChange(event){
             [name]: value,
             modal_activity_type:value,
             modal_exercise_steps_status:steps_type
-        });
+        },
+          () => this.getManualActivityInfo(this.state.activity_display_name,this.state.activity_start_date,
+                                       this.state.activity_start_hour,this.state.activity_start_min,
+                                       this.state.activity_start_sec,this.state.activity_start_am_pm,
+                                       this.state.activity_end_date,this.state.activity_end_hour,
+                                       this.state.activity_end_min,this.state.activity_end_sec,
+                                       this.state.activity_end_am_pm)
+          );
     }
     else if(name == "modal_activity_heart_rate"){
         let actType = this.state.modal_activity_type;
         let actAvgHeartRate = parseInt(value);
         let steps_type = this.getActivityCategory(actType,actAvgHeartRate);
-
         this.setState({
             [name]: parseInt(value),
              modal_exercise_steps_status:steps_type
@@ -1481,6 +1563,7 @@ CreateNewActivity(data){
     },()=>{
         this.props.updateParentActivities(this.state.activites,oldActivities);
     });
+
 }
 activitySelectOptions(){
     let option = [];
@@ -1554,7 +1637,6 @@ handleChangeActivityDate(date){
 }
 
 getTotalActivityDuration(){
-
     let activityStartTimeDate = this.state.activity_start_date;
     let activityStartTimeHour = this.state.activity_start_hour;
     let activityStartTimeMin = this.state.activity_start_min;
@@ -1612,6 +1694,12 @@ handleChangeModelActivityStartTimeDate(date){
     this.setState({
         activity_start_date:date
     },()=>{
+            this.getManualActivityInfo( this.state.activity_display_name,this.state.activity_start_date,
+                                        this.state.activity_start_hour,this.state.activity_start_min,
+                                        this.state.activity_start_sec,this.state.activity_start_am_pm,
+                                        this.state.activity_end_date,this.state.activity_end_hour,
+                                        this.state.activity_end_min,this.state.activity_end_sec,
+                                        this.state.activity_end_am_pm);
             let duration = this.getTotalActivityDuration();
             let isActivityTimeValid = this.props.dateTimeValidation(
                 this.state.activitystarttime_calender,
@@ -1642,6 +1730,12 @@ handleChangeModelActivityEndTimeDate(date){
     this.setState({
         activity_end_date:date
     },()=>{
+             this.getManualActivityInfo( this.state.activity_display_name,this.state.activity_start_date,
+                                         this.state.activity_start_hour,this.state.activity_start_min,
+                                         this.state.activity_start_sec,this.state.activity_start_am_pm,
+                                         this.state.activity_end_date,this.state.activity_end_hour,
+                                         this.state.activity_end_min,this.state.activity_end_sec,
+                                         this.state.activity_end_am_pm);                              
             let duration = this.getTotalActivityDuration();
             let isActivityTimeValid = this.props.dateTimeValidation(
                 this.state.activitystarttime_calender,
@@ -1684,6 +1778,12 @@ handleChangeModalActivityTime(event){
                 this.state.modalendtime_activity_hour,
                 this.state.modalendtime_activity_min,
                 this.state.modalendtime_activity_ampm);
+            this.getManualActivityInfo( this.state.activity_display_name,this.state.activity_start_date,
+                                        this.state.activity_start_hour,this.state.activity_start_min,
+                                        this.state.activity_start_sec,this.state.activity_start_am_pm,
+                                        this.state.activity_end_date,this.state.activity_end_hour,
+                                        this.state.activity_end_min,this.state.activity_end_sec,
+                                        this.state.activity_end_am_pm);
             if(duration && isActivityTimeValid){  
                 this.setState({
                     modal_activity_hour:duration.split(":")[0],
@@ -1698,6 +1798,7 @@ handleChangeModalActivityTime(event){
             }
     });
 }
+
  
 toggleInfo_duplicate(){
     this.setState({
@@ -1751,6 +1852,7 @@ renderTable(){
         "startTimeInSeconds","endTimeInSeconds","durationInSeconds","steps","steps_type","duplicate","indoor_temperature","temperature","dewPoint","humidity","wind","temperature_feels_like","weather_condition","comments"];
         /*const WEATHER_FIELDS = ['humidity','temperature_feels_like','weather_condition','dewPoint','temperature'];*/
     let activityRows = [];
+
     for (let [key,value] of Object.entries(this.state.activites)){
         let activityData = [];
         let summaryId; 
@@ -1799,7 +1901,8 @@ renderTable(){
                         }
                         <Modal 
                            isOpen={this.state.modal_delete && summaryId == this.state.selectedId_delete}
-                           toggle={this.toggle_delete} >
+                           toggle={this.toggle_delete}
+                             >
                             <ModalBody toggle={this.toggle_delete}>
                                 <div className=" display_flex" >
                                     <div className=" align_width1">
@@ -2025,12 +2128,14 @@ renderTable(){
 
 
 renderEditActivityModal(){
+  let spinner = this.state.loadingManualActInfo? <span>{this.Spinner()}</span> : "";
       if (this.state.activityEditModal){
                  let modal = <Modal
                           placement="bottom"
                           target="progressActivity"                              
                           isOpen={this.state.activityEditModal}
-                          toggle={this.handleChangeModal}>
+                          toggle={this.handleChangeModal} 
+                          >
                           <ModalHeader toggle={this.toggleModal}>
                             {this.state.selectedActivityId?'Edit Activity':'Create Manual Activity'}
                           </ModalHeader>
@@ -2045,9 +2150,11 @@ renderEditActivityModal(){
                             name="activity_display_name"
                             value={this.state.activity_display_name}                                       
                             onChange={this.handleChange}>
-                                    {this.activitySelectOptions()}                                                                                                                                                                
-                                </Input>
-                        </div>
+                                     {this.activitySelectOptions()}  
+                                                                                                                                                                      
+                           </Input>
+                                  
+                              </div>
                        </FormGroup>
 
                        {this.state.activity_display_name == "OTHER" &&
@@ -2061,27 +2168,12 @@ renderEditActivityModal(){
                           name="modal_activity_type"
                           value={this.state.modal_activity_type}                                 
                           onChange={this.handleChange}>   
-                        </Input>
+                        </Input> 
                             </div> 
                             </FormGroup>
-                        }
-                        <FormGroup>
-                      <Label className="padding1">2. Activity Heart Rate</Label>
-                       <div className="input1 ">
-                        <Input 
-                          type="select" 
-                          className="form-control"
-                          style={{height:"37px"}}
-                          name = "modal_activity_heart_rate" 
-                          value={this.state.modal_activity_heart_rate}                               
-                          onChange={this.handleChange}>
-                          <option key="hours" value="">Select</option>
-                        {this.createSleepDropdown_heartrate(60,220)}     
-                        </Input>
-                            </div> 
-                            </FormGroup>                               
+                        }                            
                          <FormGroup>
-                            <Label className="padding1">3. Enter the Time Your Workout Started</Label>
+                            <Label className="padding1">2. Enter the Time Your Workout Started</Label>
                      <div className=" display_flex margin_lft0" >
                       <div className="align_width align_width1">
                         <div className="input " style = {{marginLeft:"15px"}}> 
@@ -2105,7 +2197,7 @@ renderEditActivityModal(){
                               value={this.state.activity_start_hour}
                               onChange={this.handleChangeModalActivityTime}>
                                <option key="hours" value="">Hours</option>
-                              {this.createSleepDropdown(0,12)}                        
+                              {this.createSleepDropdown(0,12)}                    
                             </Input>
 
                         </div>
@@ -2119,7 +2211,7 @@ renderEditActivityModal(){
                       value={this.state.activity_start_min}
                       onChange={this.handleChangeModalActivityTime}>
                        <option key="mins" value="">Minutes</option>
-                      {this.createSleepDropdown(0,59,true)}                        
+                      {this.createSleepDropdown(0,59,true)}                     
                       </Input>                       
                       </div>
                       </div>
@@ -2132,7 +2224,7 @@ renderEditActivityModal(){
                       value={this.state.activity_start_sec}
                       onChange={this.handleChangeModalActivityTime}>
                        <option key="mins" value="">Seconds</option>
-                      {this.createSleepDropdown(0,59,true)}                        
+                      {this.createSleepDropdown(0,59,true)}                       
                       </Input>                        
                       </div>
                       </div>
@@ -2145,14 +2237,14 @@ renderEditActivityModal(){
                       onChange={this.handleChangeModalActivityTime}>
                       <option value="">AM/PM</option>
                                       <option value="am">AM</option>
-                                      <option value="pm">PM</option>                      
+                                      <option value="pm">PM</option>                       
                       </Input>                    
                       </div>
                       </div>
                       </div>
                          </FormGroup>
                               <FormGroup>
-                            <Label className="padding1">4. Enter the Time Your Workout Ended</Label>
+                            <Label className="padding1">3. Enter the Time Your Workout Ended</Label>
                      <div className=" display_flex margin_lft0" >
                      <div className="align_width align_width1">
                         <div className="input " style = {{marginLeft:"15px"}}> 
@@ -2175,7 +2267,7 @@ renderEditActivityModal(){
                       value={this.state.activity_end_hour}
                       onChange={this.handleChangeModalActivityTime}>
                        <option key="hours" value="">Hours</option>
-                      {this.createSleepDropdown(0,12)}                        
+                      {this.createSleepDropdown(0,12)}                       
                       </Input>
                       </div>
                       </div>
@@ -2188,7 +2280,7 @@ renderEditActivityModal(){
                       value={this.state.activity_end_min}
                       onChange={this.handleChangeModalActivityTime}>
                        <option key="mins" value="">Minutes</option>
-                      {this.createSleepDropdown(0,59,true)}                        
+                      {this.createSleepDropdown(0,59,true)}                       
                       </Input>                     
                       </div>
                       </div>
@@ -2201,7 +2293,7 @@ renderEditActivityModal(){
                       value={this.state.activity_end_sec}
                       onChange={this.handleChangeModalActivityTime}>
                        <option key="mins" value="">Seconds</option>
-                      {this.createSleepDropdown(0,59,true)}                        
+                      {this.createSleepDropdown(0,59,true)}                     
                       </Input>                        
                       </div>
                       </div>
@@ -2214,12 +2306,29 @@ renderEditActivityModal(){
                       onChange={this.handleChangeModalActivityTime}>
                       <option value="">AM/PM</option>
                                       <option value="am">AM</option>
-                                      <option value="pm">PM</option>                      
+                                      <option value="pm">PM</option>                        
                       </Input>                     
                       </div>
                       </div>
                       </div>
                          </FormGroup>
+                         <FormGroup>
+                      <Label className="padding1" style={{padding:'10px',color:'#808080'}}>4. Activity Heart Rate</Label>
+                      {spinner}
+                       <div className="input1 ">
+                        <Input 
+                          type="select" 
+                          className="form-control"
+                          style={{height:"37px"}}
+                          name = "modal_activity_heart_rate" 
+                          value={this.state.modal_activity_heart_rate}                               
+                          onChange={this.handleChange}>
+                          <option key="hours" value="">Select</option>
+                        {this.createSleepDropdown_heartrate(40,220)}     
+                        </Input>
+                           
+                            </div> 
+                            </FormGroup>   
                        <FormGroup>
                      <Label className="padding1">5. Exercise Duration (hh:mm:ss)</Label>
                      <div className=" display_flex margin_lft0" >
@@ -2265,7 +2374,8 @@ renderEditActivityModal(){
                       </div>
                       </FormGroup>
                        <FormGroup>                            
-                        <Label className="padding1">6. Exercise Steps</Label>
+                        <Label className="padding1" style={{padding:'10px',color:'#808080'}}>6. Exercise Steps</Label>
+                        {spinner}
                         <div className="input ">
                            <Input 
                             type="number" 
@@ -2274,10 +2384,12 @@ renderEditActivityModal(){
                             value={this.state.modal_exercise_steps}                                       
                             onChange={this.handleChange}>                                                                                                                                                             
                             </Input>
+                  
                         </div>
                        </FormGroup>
                        <FormGroup>
-                       <Label className="padding1">7. Change Exercise Steps to Non Exercise Steps</Label>
+                       <Label className="padding1" style={{padding:'10px',color:'#808080'}}>7. Change Exercise Steps to Non Exercise Steps</Label>
+                       {spinner}
                         <div className="input">                           
                               <Label className="btn radio1">
                                 <Input type="radio" 
@@ -2292,6 +2404,7 @@ renderEditActivityModal(){
                                 checked={this.state.modal_exercise_steps_status === 'non_exercise'}
                                 onChange={this.handleChange}/> Non Exercise Steps
                               </Label>
+
                         </div>
                        </FormGroup>
                        <FormGroup>
@@ -2435,7 +2548,7 @@ renderEditActivityModal(){
                        </FormGroup>
                         {/*********************/}
                        <FormGroup>
-                      <Label className="padding1">9. Exercise Comments</Label>
+                      <Label className="padding1">16. Exercise Comments</Label>
                        <div className="input1 ">
                         <Textarea 
                           className="form-control"
@@ -2457,8 +2570,6 @@ renderEditActivityModal(){
                 return modal;
           }
     }
-
-
     
 componentDidMount(){
     getUserProfile(this.successProfile);
@@ -2466,10 +2577,10 @@ componentDidMount(){
 
 
 render(){
-
 return(
 <div className = "container_fluid">
 <div className="row justify-content-center">
+
 <div id = "activity_table">
 <div  className="table-responsive input1 tablecenter1">
                                              
@@ -2557,7 +2668,8 @@ return(
         placement="right" 
         isOpen={this.state.infoButton_duplicate}
         target="infoModalWindow" 
-        toggle={this.toggleInfo_duplicate}>
+        toggle={this.toggleInfo_duplicate}
+        >
          <ModalHeader toggle={this.toggleInfo_duplicate}>
        <span>
         <a href="#" onClick={()=>this.infoPrint("duplicate_info_modal_text")} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
@@ -2578,7 +2690,8 @@ return(
         placement="right" 
         isOpen={this.state.infoButton_delete}
         target="deleteInfoModalWindow" 
-        toggle={this.toggleInfo_delete}>
+        toggle={this.toggleInfo_delete}
+        >
          <ModalHeader toggle={this.toggleInfo_delete}>
        <span>
         <a href="#" onClick={() => this.infoPrint("delete_info_modal_text")} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
@@ -2599,7 +2712,8 @@ return(
         placement="right" 
         isOpen={this.state.isActivityStepsTypeOpen}
         target="activityStepsTypeModalWindow" 
-        toggle={this.activityStepsTypeModalToggle}>
+        toggle={this.activityStepsTypeModalToggle}
+        >
         
           <ModalBody className="modalcontent" id="activity_steps_type_modal_text">
             <div>
@@ -2620,7 +2734,8 @@ return(
         placement="right" 
         isOpen={this.state.infoButton_activitySteps}
         target="activityStepsInfoModalWindow" 
-        toggle={this.toggleInfo_activitySteps}>
+        toggle={this.toggleInfo_activitySteps}
+        >
          <ModalHeader toggle={this.toggleInfo_activitySteps}>
        <span>
         <a href="#" onClick={() => this.infoPrint("activitySteps_info_modal_body")} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
@@ -2655,7 +2770,8 @@ return(
         placement="right" 
         isOpen={this.state.infoButton_stepsType}
         target="stepsTypeInfoModalWindow" 
-        toggle={this.toggleInfo_stepsType}>
+        toggle={this.toggleInfo_stepsType}
+        >
          <ModalHeader toggle={this.toggleInfo_stepsType}>
        <span>
         <a href="#" onClick={() => this.infoPrint("steps_type_info_modal_body")} style={{paddingLeft:"35px",fontSize:"15px",color:"black"}}><i className="fa fa-print" aria-hidden="true">Print</i></a>
@@ -2830,7 +2946,6 @@ return(
 }
 
 {this.renderEditActivityModal()}
-
 </div>
 </div>
 </div>

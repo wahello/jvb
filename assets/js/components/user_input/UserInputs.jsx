@@ -35,6 +35,7 @@ class UserInputs extends React.Component{
 
     getInitialState(){
       const initialState = {
+        haveUIData: false,
         garminRequestCancelSource:[],
         selected_date:new Date(),
         fetched_user_input_created_at:'',
@@ -93,6 +94,8 @@ class UserInputs extends React.Component{
         processed_food_list:'',
         alchol_consumed:'',
         alcohol_drink_consumed_list:'',
+        no_plants_consumed:'',
+        list_of_pants_consumed:'',
         stress:'',
         sick:'',
         sickness:'',
@@ -102,7 +105,7 @@ class UserInputs extends React.Component{
         calories:'',
         calories_item:'',
 
-        measured_hr:'',
+        measured_hr:'', 
         hr_down_99:'',
         time_to_99_min:'',
         time_to_99_sec:'',
@@ -448,36 +451,38 @@ shouldFetchWeatherData(activities){
         }
 
         let sleep_bedtime_info = this._extractDateTimeInfo(null);
-        if(have_strong_input && data.data.strong_input.sleep_bedtime && canUpdateForm)
+        if(have_strong_input && data.data.strong_input.sleep_bedtime && !was_cloning)
           sleep_bedtime_info = this._extractDateTimeInfo(data.data.strong_input.sleep_bedtime);
 
         let sleep_awake_time_info = this._extractDateTimeInfo(null);
-        if(have_strong_input && data.data.strong_input.sleep_awake_time && canUpdateForm)
+        if(have_strong_input && data.data.strong_input.sleep_awake_time && !was_cloning)
           sleep_awake_time_info = this._extractDateTimeInfo(data.data.strong_input.sleep_awake_time);
 
         let nap_start_time_info = this._extractDurationInfo(null);
-        if(have_optional_input && data.data.optional_input.nap_start_time && canUpdateForm)
+        if(have_optional_input && data.data.optional_input.nap_start_time && !was_cloning)
           nap_start_time_info = this._extractDurationInfo(data.data.optional_input.nap_start_time);
 
         let nap_end_time_info = this._extractDurationInfo(null);
-        if(have_optional_input && data.data.optional_input.nap_end_time && canUpdateForm)
+        if(have_optional_input && data.data.optional_input.nap_end_time && !was_cloning)
           nap_end_time_info = this._extractDurationInfo(data.data.optional_input.nap_end_time);
 
         let strength_start_info = this._extractDurationInfo(null);
-        if(have_strong_input && canUpdateForm && data.data.strong_input.strength_workout_start) 
+        if(have_strong_input && !was_cloning && data.data.strong_input.strength_workout_start) 
           strength_start_info = this._extractDurationInfo(data.data.strong_input.strength_workout_start);
 
         let strength_end_info = this._extractDurationInfo(null);
-        if(have_strong_input && canUpdateForm && data.data.strong_input.strength_workout_end)
+        if(have_strong_input && !was_cloning && data.data.strong_input.strength_workout_end)
           strength_end_info = this._extractDurationInfo(data.data.strong_input.strength_workout_end); 
 
-        let activities = {};
-        if(have_strong_input && canUpdateForm && data.data.strong_input.activities){
+        let activities = this.state.activities;
+        if(have_strong_input && !was_cloning && data.data.strong_input.activities){
           activities = JSON.parse(data.data.strong_input.activities);
           activities = _.mapValues(activities,this.transformActivity);
         }
         let number_of_activities = Object.keys(activities).length;
+
         this.setState({
+          haveUIData: true,
           fetched_user_input_created_at:data.data.created_at,
           update_form:canUpdateForm,
           diet_to_show: other_diet ? 'other':data.data.optional_input.type_of_diet_eaten,
@@ -514,6 +519,9 @@ shouldFetchWeatherData(activities){
           processed_food_list:have_strong_input?data.data.strong_input.list_of_processed_food_consumed_yesterday:'',
           alchol_consumed:have_strong_input?data.data.strong_input.number_of_alcohol_consumed_yesterday:'',
           alcohol_drink_consumed_list:have_strong_input?data.data.strong_input.alcohol_drink_consumed_list:'',
+          no_plants_consumed:have_strong_input?data.data.strong_input.no_plants_consumed:'',
+          list_of_pants_consumed:have_strong_input?data.data.strong_input.list_of_pants_consumed:'',
+          
           stress:have_encouraged_input?data.data.encouraged_input.stress_level_yesterday:'',
           sick:have_optional_input?data.data.optional_input.sick:'',
           sickness:have_optional_input?data.data.optional_input.sickness:'',
@@ -523,29 +531,29 @@ shouldFetchWeatherData(activities){
           calories:have_optional_input? data.data.optional_input.calories_consumed_during_workout: '',
           calories_item:have_optional_input?data.data.optional_input.food_ate_during_workout:'',
 
-          indoor_temperature:(have_strong_input&&canUpdateForm)?data.data.strong_input.indoor_temperature:'',
-          outdoor_temperature:(have_strong_input&&canUpdateForm)?data.data.strong_input.outdoor_temperature:'',
-          temperature_feels_like:(have_strong_input&&canUpdateForm)?data.data.strong_input.temperature_feels_like:'',
-          wind:(have_strong_input&&canUpdateForm)?data.data.strong_input.wind:'',
-          dewpoint:(have_strong_input&&canUpdateForm)?data.data.strong_input.dewpoint:'',
-          humidity:(have_strong_input&&canUpdateForm)?data.data.strong_input.humidity:'',
-          weather_comment:(have_strong_input&&canUpdateForm)?data.data.strong_input.weather_comment:'',
+          indoor_temperature:(have_strong_input && !was_cloning)?data.data.strong_input.indoor_temperature:'',
+          outdoor_temperature:(have_strong_input && !was_cloning)?data.data.strong_input.outdoor_temperature:'',
+          temperature_feels_like:(have_strong_input && !was_cloning)?data.data.strong_input.temperature_feels_like:'',
+          wind:(have_strong_input && !was_cloning)?data.data.strong_input.wind:'',
+          dewpoint:(have_strong_input && !was_cloning)?data.data.strong_input.dewpoint:'',
+          humidity:(have_strong_input && !was_cloning)?data.data.strong_input.humidity:'',
+          weather_comment:(have_strong_input && !was_cloning)?data.data.strong_input.weather_comment:'',
           activities:activities,
 
 
-          measured_hr:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.measured_hr:'',
-          hr_down_99:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.hr_down_99:'',
-          time_to_99_min:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.time_to_99.split(':')[0]:'',
-          time_to_99_sec:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.time_to_99.split(':')[1]:'',
-          hr_level:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.hr_level:'',
-          lowest_hr_first_minute:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.lowest_hr_first_minute:'',
-          lowest_hr_during_hrr:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.lowest_hr_during_hrr:'',
-          time_to_lowest_point_min:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.time_to_lowest_point.split(':')[0]:'',
-          time_to_lowest_point_sec:(have_encouraged_input&&canUpdateForm)?data.data.encouraged_input.time_to_lowest_point.split(':')[1]:'',
+          measured_hr:(have_encouraged_input && !was_cloning)?data.data.encouraged_input.measured_hr:'',
+          hr_down_99:(have_encouraged_input && !was_cloning)?data.data.encouraged_input.hr_down_99:'',
+          time_to_99_min:(have_encouraged_input && !was_cloning)?data.data.encouraged_input.time_to_99.split(':')[0]:'',
+          time_to_99_sec:(have_encouraged_input && !was_cloning)?data.data.encouraged_input.time_to_99.split(':')[1]:'',
+          hr_level:(have_encouraged_input && !was_cloning)?data.data.encouraged_input.hr_level:'',
+          lowest_hr_first_minute:(have_encouraged_input && !was_cloning)?data.data.encouraged_input.lowest_hr_first_minute:'',
+          lowest_hr_during_hrr:(have_encouraged_input && !was_cloning)?data.data.encouraged_input.lowest_hr_during_hrr:'',
+          time_to_lowest_point_min:(have_encouraged_input && !was_cloning)?data.data.encouraged_input.time_to_lowest_point.split(':')[0]:'',
+          time_to_lowest_point_sec:(have_encouraged_input && !was_cloning)?data.data.encouraged_input.time_to_lowest_point.split(':')[1]:'',
 
 
-          sleep_hours_last_night:(have_strong_input&&canUpdateForm)?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0]:'',
-          sleep_mins_last_night:(have_strong_input&&canUpdateForm)?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1]:'',
+          sleep_hours_last_night:(have_strong_input && !was_cloning)?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[0]:'',
+          sleep_mins_last_night:(have_strong_input && !was_cloning)?data.data.strong_input.sleep_time_excluding_awake_time.split(':')[1]:'',
          
           sleep_bedtime_date:sleep_bedtime_info.calendarDate,
           sleep_hours_bed_time:sleep_bedtime_info.hour,
@@ -557,8 +565,8 @@ shouldFetchWeatherData(activities){
           sleep_mins_awake_time:sleep_awake_time_info.min,
           sleep_awake_time_am_pm:sleep_awake_time_info.meridiem,
          
-          awake_hours:(have_strong_input&&canUpdateForm)?data.data.strong_input.awake_time.split(':')[0]:'',
-          awake_mins:(have_strong_input&&canUpdateForm)?data.data.strong_input.awake_time.split(':')[1]:'',
+          awake_hours:(have_strong_input && !was_cloning)?data.data.strong_input.awake_time.split(':')[0]:'',
+          awake_mins:(have_strong_input && !was_cloning)?data.data.strong_input.awake_time.split(':')[1]:'',
 
           sleep_comment:have_strong_input?data.data.strong_input.sleep_comment:'',
           prescription_sleep_aids:have_strong_input?data.data.strong_input.prescription_or_non_prescription_sleep_aids_last_night:'',
@@ -570,7 +578,7 @@ shouldFetchWeatherData(activities){
           controlled_uncontrolled_substance:have_strong_input?data.data.strong_input.controlled_uncontrolled_substance:'',
           stand:have_optional_input?data.data.optional_input.stand_for_three_hours:'',
           food_consumed:have_optional_input?data.data.optional_input.list_of_processed_food_consumed_yesterday:'',
-          weight:(have_optional_input&&canUpdateForm)?data.data.optional_input.weight:'',
+          weight:(have_optional_input && !was_cloning)?data.data.optional_input.weight:'',
           waist:have_optional_input?data.data.optional_input.waist_size:'',
           clothes_size:have_optional_input?data.data.optional_input.clothes_size:'',
           heart_variability:have_optional_input?data.data.optional_input.heart_rate_variability:'',
@@ -580,7 +588,7 @@ shouldFetchWeatherData(activities){
           travel:have_optional_input?data.data.optional_input.travel:'',
           travel_destination:have_optional_input?data.data.optional_input.travel_destination:'',
           travel_purpose:have_optional_input?data.data.optional_input.travel_purpose:'',
-          general_comment:(have_optional_input&&canUpdateForm)?data.data.optional_input.general_comment:'',
+          general_comment:(have_optional_input && !was_cloning)?data.data.optional_input.general_comment:'',
           
           took_nap:have_optional_input?data.data.optional_input.took_nap:'',
           //nap_start_time_date:nap_start_time_info.calendarDate,
@@ -591,8 +599,8 @@ shouldFetchWeatherData(activities){
           nap_end_time_hour:nap_end_time_info.hour,
           nap_end_time_min:nap_end_time_info.min,
           nap_end_time_am_pm:nap_end_time_info.meridiem,
-          nap_duration_hour:(have_optional_input&&canUpdateForm)?data.data.optional_input.nap_duration.split(':')[0]:'',
-          nap_duration_min:(have_optional_input&&canUpdateForm)?data.data.optional_input.nap_duration.split(':')[1]:'',
+          nap_duration_hour:(have_optional_input && !was_cloning)?data.data.optional_input.nap_duration.split(':')[0]:'',
+          nap_duration_min:(have_optional_input && !was_cloning)?data.data.optional_input.nap_duration.split(':')[1]:'',
           nap_comment:have_optional_input ? data.data.optional_input.nap_comment: '',
           number_of_activities:number_of_activities,
         },()=>{
@@ -1183,8 +1191,8 @@ getTotalSleep(){
       selected_date:tomorrow.toDate(), 
       fetching_data:true,
     },function(){
-        const clone = true;
-        userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,this.onFetchFailure,clone);
+        const canUpdateForm = true;
+        userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,this.onFetchFailure,canUpdateForm);
 
       }.bind(this));
   }
@@ -1199,8 +1207,8 @@ getTotalSleep(){
       selected_date:tomorrow.toDate(),
        fetching_data:true,
     },function(){
-        const clone = true;
-        userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,this.onFetchFailure,clone);
+        const canUpdateForm = true;
+        userDailyInputFetch(this.state.selected_date,this.onFetchSuccess,this.onFetchFailure,canUpdateForm);
       }.bind(this));
   }
 
@@ -1216,8 +1224,8 @@ getTotalSleep(){
         fetching_data:true,
         calendarOpen:!this.state.calendarOpen,
       },function(){
-        const clone = true;
-        userDailyInputFetch(date,this.onFetchSuccess,this.onFetchFailure,clone);
+        const canUpdateForm = true;
+        userDailyInputFetch(date,this.onFetchSuccess,this.onFetchFailure,canUpdateForm);
       }.bind(this));
     }
 
@@ -1226,11 +1234,16 @@ getTotalSleep(){
       const yesterday = new Date(today.getFullYear(),
                                 today.getMonth(),
                                 today.getDate()-1);
-      const clone = false;
+
+      // If user has already submitted the user input form
+      // on current day and user hit the copy yesterday button
+      // then user should see "Update" button otherwise
+      // user see the "Submit" button.
+      const canUpdateForm = this.state.haveUIData;
       this.setState({
         cloning_data:true
       },function(){
-        userDailyInputFetch(yesterday,this.onFetchSuccess,this.onFetchFailure,clone);
+        userDailyInputFetch(yesterday,this.onFetchSuccess,this.onFetchFailure,canUpdateForm);
       }.bind(this))
     }
 
@@ -2902,7 +2915,7 @@ handleScroll() {
                               </ModalBody>
                            </Modal> 
 
-                        { ((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
+                       {/*  { ((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                             <FormGroup>  
                               {this.state.editable &&
                                 <div className="input1">
@@ -3142,13 +3155,13 @@ handleScroll() {
                             }
                           </FormGroup>   
                        }
-                       </Collapse>
+                       </Collapse>*/}  
                            
                             
                       
-                        { ((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
+                      {/*}  { ((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                           <FormGroup>   
-                              <Label className="padding">1.12 Did you measure your heart rate recovery (HRR) after today’s aerobic workout (touch the
+                              <Label className="padding">1.11 Did you measure your heart rate recovery (HRR) after today’s aerobic workout (touch the
                               information button for instructions about how to record this)?
                                <span id="hrr"
                              onClick={this.toggleHrr} 
@@ -3233,7 +3246,7 @@ handleScroll() {
                               exercise recommendations to help you achieve your goals.
                                </div>                             
                               </ModalBody>
-                           </Modal> 
+                           </Modal> */}
                          
                          { ((this.state.workout === "yes" || this.state.workout === '') && this.state.report_type == 'full') &&
                             this.state.workout_type !== "strength" &&
@@ -3270,7 +3283,7 @@ handleScroll() {
                             this.state.workout_input_type !== "strength" && this.state.report_type == 'full' &&
                              
                           <FormGroup>      
-                            <Label className="padding">1.13 Approximately How Many Calories Did You Consume During Your Workout?</Label>
+                            <Label className="padding">1.11 Approximately How Many Calories Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
                               <div className="input1">
                                  <Input type="text" name="calories" 
@@ -3292,7 +3305,7 @@ handleScroll() {
                             this.state.workout_type !== "strength" &&
                             this.state.workout_input_type !== "strength" && this.state.report_type == 'full' &&
                           <FormGroup>      
-                            <Label className="padding">1.14 What Specifically Did You Consume During Your Workout?</Label>
+                            <Label className="padding">1.12 What Specifically Did You Consume During Your Workout?</Label>
                             {this.state.editable &&
                               <div className="input1">
                                  <Textarea  name="calories_item"
@@ -3864,7 +3877,7 @@ handleScroll() {
                                   onChange={this.handleChangeProcessedFood}>
                                   <option key="select" value="">select</option>
                                   {this.createDropdown(0,100,5)}
-                                  </Input>
+                                 </Input>
                                 </div>
                               }
                               {

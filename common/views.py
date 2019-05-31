@@ -1,6 +1,8 @@
+from django.contrib.auth.models import User
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
@@ -12,8 +14,8 @@ from fitbit.models import UserFitbitLastSynced,FitbitConnectToken
 from users.models import GarminToken
 from quicklook.calculations.calculation_driver import which_device
 from .models import UserDataBackfillRequest
-from .serializers import UserBackfillRequestSerializer
-
+from .serializers import UserBackfillRequestSerializer,AACustomRangesSerializer
+from apple.models import AppleUser
 
 class UserLastSyncedItemview(generics.RetrieveUpdateDestroyAPIView):
 	permission_classes = (IsAuthenticated,)
@@ -52,7 +54,7 @@ class UserLastSyncedItemview(generics.RetrieveUpdateDestroyAPIView):
 		else:
 			return Response({})
 
-class HaveTokens(APIView):
+class 	HaveTokens(APIView):
 	'''
 	Check availability of garmin connect, garmin health token
 	and fitbit tokens for current user
@@ -63,7 +65,8 @@ class HaveTokens(APIView):
 			"linked_devices":False,
 			"have_garmin_health_token":False,
 			"have_garmin_connect_token":False,
-			"have_fitbit_token":False
+			"have_fitbit_token":False,
+			"have_apple_token": False
 		}
 
 		if GarminToken.objects.filter(user=request.user).exists():
@@ -74,6 +77,9 @@ class HaveTokens(APIView):
 			have_tokens['linked_devices'] = True
 		if FitbitConnectToken.objects.filter(user=request.user).exists():
 			have_tokens['have_fitbit_token'] = True
+			have_tokens['linked_devices'] = True
+		if AppleUser.objects.filter(user=request.user).exists():
+			have_tokens['have_apple_token'] = True
 			have_tokens['linked_devices'] = True
 
 		return Response(have_tokens,status=status.HTTP_200_OK)
@@ -96,3 +102,24 @@ class UserBackfillRequestView(generics.ListCreateAPIView):
 			serializer.save()
 			return Response(serializer.data,status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AACustomRangesView(generics.ListCreateAPIView):
+
+	permission_classes = (IsAuthenticated,)
+	serializer_class = AACustomRangesSerializer
+
+	def post(self,request,*args,**kwargs):
+		serializer = AACustomRangesSerializer(data=request.data,
+			context={'user_id':request.user.id})
+		if serializer.is_valid():
+			serializer.save()
+			return Response(serializer.data,status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+def get_user_id(request):
+	user = request.user
+	print(user,"user")
+	user = User.objects.get(username=user)
+	return JsonResponse({'user_id':user.id})
+

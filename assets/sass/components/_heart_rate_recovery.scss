@@ -1,3 +1,8 @@
+.hrr-container {
+	position: relative;
+	height: 100vh;
+}
+
 .hr_table_style{
     margin-top:50px;
 	padding-top: 30px;
@@ -14,6 +19,18 @@
 	padding:0px 50px;
 	margin-top:20px;
 }
+
+.no_hrr_message{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.hrr_chart_footnote {
+	margin-left: 32px;
+}
+
 @media (max-width: 1023px){
 	.hr_table_padd{
 		padding:0px 25px;
@@ -24,3 +41,24 @@
 	right: 40px;
 	padding-top: 3px;
 }
+@media screen and (max-width: 580px ) and (min-width:320px) and (orientation : portrait){
+ .updated_hrr{
+	 font-size: 12px;
+	 margin-left: 25px !important; 
+	margin-top: 12px;
+ }	
+ .yes_no{
+	 font-size: 12px;
+ }
+ .in_button{
+	 font-size: 12px;
+	 margin-left: -129px !important;
+	 margin-top: 12px;	
+ }
+ .ex_button{
+	font-size: 12px;
+	margin-left: 6px !important;	
+   margin-top: 12px;
+}
+
+ }

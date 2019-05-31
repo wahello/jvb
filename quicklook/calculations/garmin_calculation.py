@@ -39,6 +39,9 @@ from quicklook.models import UserQuickLook,\
 from quicklook.serializers import UserQuickLookSerializer
 import user_input.views.garmin_views
 from user_input.utils.daily_activity import get_daily_activities_in_base_format
+from hrr.fitbit_aa import belowaerobic_aerobic_anaerobic
+from weather.views import get_weather_response_as_required,\
+	has_weather_data
 
 def str_to_datetime(str_date):
 	y,m,d = map(int,str_date.split('-'))
@@ -237,6 +240,9 @@ def get_blank_model_fields(model):
 			'avg_heartrate':json.dumps({}),
 			'activities_duration':json.dumps({}),
 			'avg_exercise_heartrate':0,
+			'avg_non_strength_heartrate':0,
+			'total_exercise_activities':0,
+			'total_strength_activities':0,
 			'elevation_gain':0,
 			'elevation_loss':0,
 			'effort_level':0,
@@ -326,6 +332,8 @@ def get_blank_model_fields(model):
 			'non_processed_food': '',
 			'processed_food':'',
 			'diet_type':'',
+			'no_plants_consumed_ql':'',
+			'list_of_pants_consumed_ql':'',
 		}
 		return fields
 
@@ -401,60 +409,6 @@ def get_weekly_user_input_data(qobj_lst,to_date,from_date):
 
 	return weekly_data
 
-
-def extract_weather_data(data):
-	'''
-		Extract weather information like - Temperature, Dew point
-		Humidity, Apparent Temperature, Wind
-	'''
-	DATA = {
-		"temperature":None,
-		"dewPoint":None,
-		"humidity":None,
-		"apparentTemperature":None,
-		"windSpeed":None
-	}
-
-	if data and data.get('daily',None):
-		data = data['daily']['data'][0]
-		if data.get('temperatureMin',None) and data.get('temperatureMax',None):
-			DATA['temperature'] = round((data['temperatureMin'] + data['temperatureMax'])/2, 2)
-
-		DATA['dewPoint'] = data.get('dewPoint',None)
-
-		if data.get('humidity',None):
-			DATA['humidity'] = round(data['humidity'] * 100,2)
-
-		if data.get('apparentTemperatureMin',None) and data.get('apparentTemperatureMax',None):
-			DATA['apparentTemperature'] = round((data['apparentTemperatureMin']+
-										  data['apparentTemperatureMax'])/2, 2)
-			
-		DATA['windSpeed'] = data.get('windSpeed',None)
-
-	return DATA
-
-def fetch_weather_data(latitude,longitude,date):
-	'''
-		Fetch Weather daily data for certain date
-		from www.darksky.net api  
-
-		Expect date in UNIX timestamp format 
-
-		Latitude of NYC =  40.730610
-		Longitude of NYC = -73.935242 
-	'''
-	KEY = '52871e89c8acb84e7c8b8bc8ac5ba307'
-	EXCLUDE = ['currently','minutely','hourly','alerts','flags']
-	UNIT = 'si'
-	URL =  'https://api.darksky.net/forecast/{}/{},{},{}?exclude={}&units={}'.format(
-				KEY, latitude, longitude, date,",".join(EXCLUDE),UNIT)
-
-	try:
-		r = requests.get(URL)
-		return r.json()
-	except:
-		return {}
-
 def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 	today_sleep_data = None, user_input_bedtime = None, user_input_awake_time = None,
 	user_input_timezone = None,str_dt = True,bed_time_today=None):
@@ -475,6 +429,17 @@ def get_sleep_stats(sleep_calendar_date, yesterday_sleep_data = None,
 
 		Returns:
 			dict: deep, light and rem sleep duration in seconds
+
+		NOTE: Now garmin provides "calendar_date" key which
+			represents the date to which summary belong. So
+			for newer summaries, we really don't need this
+			fuction since most of the code here is for
+			determining the date of sleep summary.We may
+			still need this for older summaries though.
+			It would be better to write a clean function
+			for newer summaries, which would be less line
+			of code and use this as an alternative for
+			summaries which do no have 'calendar_date'
 		'''
 		durations = {'deep':0,'light':0,'awake':0,"rem":0}
 		sleep_level_maps = data.get('sleepLevelsMap')
@@ -872,24 +837,27 @@ def activity_step_from_epoch(act_start, act_end, epochs):
 			+ epoch.get('startTimeOffsetInSeconds'))
 		epoch_end = (epoch_start + timedelta(
 			seconds=epoch.get('durationInSeconds')))
-		if(epoch_start >= act_start and epoch_end <= act_end):
+		if((epoch_start >= act_start and epoch_end <= act_end)
+			or(act_start >= epoch_start and act_start <= epoch_end)
+			or(act_end >= epoch_start and act_end <= epoch_end)):
 			steps += epoch_steps
 	return steps
 
-def get_zones_cutoff(age):
+def get_zones_cutoff(user,age):
 	'''
 	calculate the aerobic and anaerobic zone
 	start heartbeat
 	'''
 	if age:
-
+		aa_ranges = belowaerobic_aerobic_anaerobic(user,age)
 		return {
-			"aerobic_zone":180-age-29,
-			"anaerobic_zone":180-age+5
+			"aerobic_zone":aa_ranges[1],
+			"anaerobic_zone":aa_ranges[2]
 		}
 	return None
 
-def get_activity_exercise_non_exercise_category(activity,user_age):
+def get_activity_exercise_non_exercise_category(activity_type,
+		avg_hr,user_age,steps_type=None,user=None):
 	'''
 	Determine the category of provided activity summary. Possible
 	categories are "exercise" and "non-exercise"
@@ -897,14 +865,13 @@ def get_activity_exercise_non_exercise_category(activity,user_age):
 	EXERCISE = 'exercise'
 	NON_EXERCISE = 'non_exercise'
 	HEART_RATE_RECOVERY = 'heart_rate_recovery'
-	zones = get_zones_cutoff(user_age)
-	if activity.get("steps_type"):
-		return activity.get("steps_type")
+	zones = get_zones_cutoff(user,user_age)
+	if steps_type:
+		return steps_type
 
-	if activity.get('activityType','').lower() == HEART_RATE_RECOVERY:
+	if activity_type.lower() == HEART_RATE_RECOVERY:
 		return NON_EXERCISE
-	elif 'walk' in activity.get('activityType','').lower():
-		avg_hr = activity.get("averageHeartRateInBeatsPerMinute",0)
+	elif 'walk' in activity_type.lower():
 		# If average heart rate in beats per minute is not submitted by user
 		# then it would be by default empty string. In that case default it to 0 
 		if not avg_hr:
@@ -1013,11 +980,26 @@ def get_filtered_activity_stats(activities_json,user_age,
 	# merge user created manual activities which are not provided by garmin
 	if userinput_activities:
 		for activity in userinput_activities.values():
+			guessed_steps = 0
+			if epoch_summaries:
+				# Try to guess the activity steps from epoch summaries
+				# if epoch summaries are present
+				act_start_end_time = _get_activities_start_end_time([activity])[0]
+				guessed_steps = activity_step_from_epoch(
+					act_start_end_time.start,
+					act_start_end_time.end,
+					epoch_summaries
+				)
 			# Manually created activities will have extra key 'created_manually'
 			# which represents that it is manually created activity 
 			activity['created_manually'] = True
 			activity['durationInSeconds'] = validate_activity_duration(
 												activity.get('durationInSeconds',0))
+
+			# If system detects that there are steps during activity duration
+			# then that means those guessed steps are double counted and should
+			# not be added in the total steps.
+			activity['guessed_steps'] = guessed_steps
 		filtered_activities += userinput_activities.values()
 
 	act_renamed_to_hrr = []
@@ -1038,8 +1020,11 @@ def get_filtered_activity_stats(activities_json,user_age,
 			
 		if act['summaryId'] in act_renamed_to_hrr and not is_edited_by_user:
 			act['activityType'] = 'HEART_RATE_RECOVERY'
-		act_category = get_activity_exercise_non_exercise_category(act,
-				user_age)
+		act_type = act.get('activityType','')
+		act_avg_hr = act.get("averageHeartRateInBeatsPerMinute",0)
+		act_step_type = act.get('steps_type')
+		act_category = get_activity_exercise_non_exercise_category(act_type,
+			act_avg_hr,user_age,act_step_type,kwargs.get('user'))
 		act['steps_type'] = act_category
 
 	deleted_activities = []
@@ -1147,6 +1132,17 @@ def do_user_has_exercise_activity(combined_user_activities,user_age):
 
 	return have_activities
 
+def is_strength_activity(activity_name):
+	STRENGTH_ACTIVITIES = ("barre_class", "gardening", "pilates",
+						   "piyo-pilates/yoga","yoga","weights",
+						   "snow_shoveling")
+
+	if activity_name and (activity_name.lower() in STRENGTH_ACTIVITIES
+	   					  or "strength" in activity_name.lower()
+	   					  or "skiing" in activity_name.lower()):
+		return True
+	return False
+
 def get_activity_stats(combined_user_activities,user_age):
 
 	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
@@ -1163,7 +1159,9 @@ def get_activity_stats(combined_user_activities,user_age):
 		"activities_duration":json.dumps({}),
 		"hr90_duration_15min":False, # exercised for at least 15 min with atleast avg hr 90
 		"latitude":None,
-		"longitude":None
+		"longitude":None,
+		"total_exercise_activities":0,
+		"total_strength_activities":0
 	}
 	
 	activities_hr = {}
@@ -1189,6 +1187,13 @@ def get_activity_stats(combined_user_activities,user_age):
 			act_duration = obj.get('durationInSeconds',0)
 			obj_act = obj.get('activityType')
 			obj_avg_hr = obj.get('averageHeartRateInBeatsPerMinute')
+
+			if is_strength_activity(obj_act):
+				activity_stats['total_strength_activities'] += 1
+				
+			if obj_act not in IGNORE_ACTIVITY:
+				activity_stats['total_exercise_activities'] += 1
+
 			workout_type_total_duration = workout_wise_total_duration.get(obj_act)
 			if not obj_avg_hr:
 				obj_avg_hr = 0
@@ -1759,7 +1764,9 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,
 			# ex 6:00 PM, not 6:32 PM
 			hour_start_zero_min = stretch_time(hour_start,"start")
 
-			if (yesterday_bedtime and
+			if(_is_epoch_falls_in_activity_duration(activities_start_end_time, hour_start)):
+				status = "exercise"
+			elif (yesterday_bedtime and
 				today_awake_time and
 				hour_start >= stretch_time(yesterday_bedtime,"start") and
 				hour_start_zero_min <= today_awake_time):
@@ -1773,8 +1780,6 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,
 				hour_start >= stretch_time(user_input_strength_start_time,"start") and
 				hour_start <= stretch_time(user_input_strength_end_time,"end")):
 				status = "strength"
-			elif(_is_epoch_falls_in_activity_duration(activities_start_end_time, hour_start)):
-				status = "exercise"
 			else:
 				status = "active" if data.get('steps') + steps_in_interval >= 300 else "inactive"
 
@@ -1823,6 +1828,8 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,
 		_update_status_to_timezone_change(
 			movement_consistency,timezone_change_interval,calendar_date)
 
+		# update the status of the inervals for which there was no
+		# epoch summaries
 		for interval,values in list(movement_consistency.items()):
 			am_or_pm = am_or_pm = interval.split('to')[0].strip().split(' ')[1]
 			hour = interval.split('to')[0].strip().split(' ')[0].split(':')[0]
@@ -1854,7 +1861,10 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,
 						movement_consistency[interval]['status'] = 'inactive'
 						movement_consistency[interval]['steps'] = 0
 						
-				if today_bedtime and hour_start >= stretch_time(today_bedtime,"start"):
+				if(_is_epoch_falls_in_activity_duration(activities_start_end_time,hour_start)):
+					movement_consistency[interval]['status'] = 'exercise'
+
+				elif today_bedtime and hour_start >= stretch_time(today_bedtime,"start"):
 					# if interval is beyond the today's bedtime then it will be marked as "sleeping"
 					movement_consistency[interval]['status'] = 'sleeping'
 					
@@ -1866,10 +1876,13 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,
 					and hour_start >= stretch_time(nap_start_time,"start") 
 					and hour_start <= stretch_time(nap_end_time,"end")):
 						movement_consistency[interval]['status'] = 'nap'
-				elif(_is_epoch_falls_in_activity_duration(activities_start_end_time,hour_start)):
-					movement_consistency[interval]['status'] = 'exercise'
 
 			elif(not yesterday_bedtime and not today_awake_time):
+				# If there is no sleep information then try to guess
+				# the hour when user wake up. The first hour (any time before
+				# 9 am) where difference in steps for previous and current
+				# hour is more then 150, that current hour will be the
+				# hour when user wake up.
 				nine_am = datetime.combine(calendar_date.date(),time(9))
 				if (movement_consistency[interval]['steps'] and hour_start < nine_am):
 					if not have_steps_before_9_am:
@@ -1950,7 +1963,7 @@ def cal_movement_consistency_summary(user,calendar_date,epochs_json,
 
 def cal_exercise_steps_total_steps(total_daily_steps,combined_user_activities,age):
 	'''
-		Calculate exercise steps and total steps
+		Calculate exercise, non-exercise and total steps
 	'''	
 	IGNORE_ACTIVITY = ["HEART_RATE_RECOVERY"]
 
@@ -1960,6 +1973,7 @@ def cal_exercise_steps_total_steps(total_daily_steps,combined_user_activities,ag
 	garmin_non_exec_steps = 0
 	manual_exec_steps = 0
 	manual_non_exec_steps = 0
+	double_counted_steps = 0
 
 	if len(combined_user_activities):
 		for obj in combined_user_activities:
@@ -1981,15 +1995,26 @@ def cal_exercise_steps_total_steps(total_daily_steps,combined_user_activities,ag
 				else:
 					garmin_non_exec_steps += steps
 
+			# If system detects that there are steps during activity duration
+			# then that means those guessed steps are double counted and should
+			# not be added in the total steps.
+			if obj.get('guessed_steps') and obj.get('created_manually',False):
+				guessed_steps = obj.get('guessed_steps',0)
+				if steps >= guessed_steps:
+					double_counted_steps += guessed_steps
+				else:
+					# If manually entered steps are less than guessed
+					# steps then only deduct the manually entered steps
+					double_counted_steps += steps
 	
 	garmin_total_steps = total_daily_steps
-
 	if (garmin_total_steps 
-		and garmin_total_steps >= (garmin_exec_steps+garmin_non_exec_steps)):
+		and garmin_total_steps >= (garmin_exec_steps+garmin_non_exec_steps+double_counted_steps)):
 		garmin_non_activity_steps = (garmin_total_steps 
 			- garmin_exec_steps 
-			- garmin_non_exec_steps)
-	
+			- garmin_non_exec_steps
+			- double_counted_steps)
+
 	total_exercise_steps = garmin_exec_steps + manual_exec_steps
 	total_non_exec_steps = (garmin_non_exec_steps 
 		+ manual_non_exec_steps 
@@ -2441,6 +2466,76 @@ def cal_avg_exercise_heartrate_grade(avg_heartrate,workout_easy_hard,age):
 		return (grade, point, avg_heartrate)
 	return (None, None, avg_heartrate)
 
+def cal_resting_hr_grade(resting_hr):
+	if resting_hr >= 30 and resting_hr <= 60:
+		return 'A'
+	elif resting_hr >= 61 and resting_hr <= 68:
+		return 'B'
+	elif resting_hr >= 69 and resting_hr <= 74:
+		return 'C'
+	elif resting_hr >= 75 and resting_hr <= 79:
+		return 'D'
+	elif resting_hr >= 80 or resting_hr < 30:
+		return 'F'
+	else:
+		return 'F'
+
+def cal_active_duration_grade_start_end_range(exercise_active_duration_in_sec=None):
+	grade_ranges = {
+		'A':["03:06","03:06"], #[lower End, higher End]
+		'B':["02:13","03:05"],
+		'C':["01:45","02:12"],
+		'D':["01:01","01:44"],
+		'F':["00:00","01:00"]
+	}
+	if exercise_active_duration_in_sec:
+		EXERCISE_ACTIVE_TIME_CAP_IN_SEC = 3600
+		time_to_deduct = EXERCISE_ACTIVE_TIME_CAP_IN_SEC
+		if exercise_active_duration_in_sec < EXERCISE_ACTIVE_TIME_CAP_IN_SEC:
+			time_to_deduct = exercise_active_duration_in_sec
+		for grade,trange in grade_ranges.items():
+			low_end = _str_to_hours_min_sec(trange[0],"second","hh:mm")
+			high_end = _str_to_hours_min_sec(trange[1],"second","hh:mm")
+			if low_end:
+				grade_ranges[grade][0] = sec_to_hours_min_sec(low_end - time_to_deduct,False)
+			grade_ranges[grade][1]  = sec_to_hours_min_sec(high_end - time_to_deduct, False)
+	return grade_ranges
+
+def get_active_duration_grade(total_duration_in_sec,
+							  exercise_duration_in_sec=None):
+	start_end_range = cal_active_duration_grade_start_end_range(exercise_duration_in_sec)
+	# convert ranges to seconds
+	for grade, ranges in start_end_range.items():
+		start = round(_str_to_hours_min_sec(ranges[0],"seconds","hh:mm"))
+		end = round(_str_to_hours_min_sec(ranges[1],"seconds","hh:mm"))
+		start_end_range[grade][0] = start
+		start_end_range[grade][1] = end
+
+	if total_duration_in_sec >= start_end_range['A'][0]:
+		return 'A'
+	elif total_duration_in_sec >= start_end_range['B'][0]\
+		 and total_duration_in_sec <= start_end_range['B'][1]:
+		return 'B'
+	elif total_duration_in_sec >= start_end_range['C'][0]\
+		 and total_duration_in_sec <= start_end_range['C'][1]:
+		return 'C'
+	elif total_duration_in_sec >= start_end_range['D'][0]\
+		 and total_duration_in_sec <= start_end_range['D'][1]:
+		return 'D'
+	else:
+		return 'F'
+
+def get_garmin_stress_grade(stress):
+	if stress >= 0 and stress <= 25:
+		return 'A'
+	elif stress >= 26 and stress <= 50:
+		return 'B'
+	elif stress >= 51 and stress <= 75:
+		return 'C'
+	else:
+		#there is no 'D' grade for this!
+		return 'F'
+
 def get_avg_sleep_grade(sleep_calendar_date,yesterday_sleep_data,today_sleep_data,
 	user_input_bedtime, user_input_awake_time,user_input_sleep_duration,
 	user_input_timezone,sleep_aid,age):
@@ -2514,27 +2609,25 @@ def get_workout_effort_grade(todays_daily_strong):
 	return cal_workout_effort_level_grade(workout_easy_hard, workout_effort_level)
 
 def get_average_exercise_heartrate_grade(combined_user_activities,
-		todays_daily_strong, age):
+		todays_daily_strong, age, non_strength_only = False):
 	
 	total_duration = 0
-	IGNORE_ACTIVITY = ['STRENGTH_TRAINING','OTHER','HEART_RATE_RECOVERY']
+	IGNORE_ACTIVITY = ['HEART_RATE_RECOVERY']
 	final_activities = []
 	# If same summary is edited manually then give it more preference.
 	
 	for i,act in enumerate(combined_user_activities):
-
 		if not act.get('averageHeartRateInBeatsPerMinute',None):
-			pass
-		elif 'swimming' in act.get('activityType','').lower():
 			pass
 		elif act.get('activityType','') in IGNORE_ACTIVITY:
 			pass
 		elif act.get('durationInSeconds',0) < 600: #less than 10 min (600 seconds)
 			pass
+		elif non_strength_only and is_strength_activity(act.get('activityType','')):
+			pass
 		else:
 			final_activities.append(act)
 			total_duration += act.get('durationInSeconds',0)
-
 	if final_activities:
 		avg_hr = 0
 		for act in final_activities:
@@ -2582,14 +2675,68 @@ def get_overall_grade(grades):
 		   penalty) / 6,2)
 	return cal_overall_grade(gpa)
 
-def get_weather_data(todays_daily_strong,todays_date_epoch,
-	activity_stat):
+def get_avg_weather_data_from_activities(combined_activities):
+	default_data = {
+		"temperature":None,
+		"dewPoint":None,
+		"humidity":None,
+		"apparentTemperature":None,
+		"windSpeed":None
+	}
+
+	temperature = 0
+	dewpoint = 0
+	humidity = 0
+	apparent_temperature = 0
+	wind_speed = 0
+	act_with_weather = 0
+
+	if combined_activities:
+		for activity in combined_activities:
+			if has_weather_data(activity):
+				act_with_weather += 1
+				if activity.get('temperature',0):
+					temperature += float(activity.get('temperature',0))
+				if activity.get('dewPoint',0):
+					dewpoint += float(activity.get('dewPoint',0))
+				if activity.get('humidity',0):
+					humidity += float(activity.get('humidity',0))
+				if activity.get('temperature_feels_like',0):
+					apparent_temperature += float(activity.get('temperature_feels_like',0))
+				if activity.get('wind',0):
+					wind_speed += float(activity.get('wind',0))
+			else:
+				# get weather data for individual activities from API
+				lat = activity.get('startingLatitudeInDegree')
+				lon = activity.get('startingLongitudeInDegree')
+				start_time = activity['startTimeInSeconds']
+				if lat and lon and start_time:
+					weather_data = get_weather_response_as_required(lat, lon, start_time)
+					weather_data.pop('weather_condition')
+					data_without_units = {key:weather_data[key]['value'] for key in weather_data}
+					if has_weather_data(data_without_units):
+						act_with_weather += 1
+						temperature += data_without_units.get('temperature',0)
+						dewpoint += data_without_units.get('dewPoint',0)
+						humidity += data_without_units.get('humidity',0)
+						apparent_temperature += data_without_units.get('temperature_feels_like',0)
+						wind_speed += data_without_units.get('wind',0)
+		if act_with_weather:
+			default_data["temperature"] = round(temperature/act_with_weather,2)
+			default_data["dewPoint"] = round(dewpoint/act_with_weather,2)
+			default_data["humidity"] = round(humidity/act_with_weather,2)
+			default_data["apparentTemperature"] = round(apparent_temperature/act_with_weather,2)
+			default_data["windSpeed"] = round(wind_speed/act_with_weather,2)
+
+	return default_data
+
+def get_weather_data(todays_daily_strong, combined_activities):
 	manual_weather = False
 	if(safe_get(todays_daily_strong,'indoor_temperature','') or
 	   safe_get(todays_daily_strong,'outdoor_temperature','') or
 	   safe_get(todays_daily_strong,'dewpoint','') or
 	   safe_get(todays_daily_strong,'humidity','') or
-	   safe_get(todays_daily_strong,'apparent_temperature','') or
+	   safe_get(todays_daily_strong,'temperature_feels_like','') or
 	   safe_get(todays_daily_strong,'wind_speed','')):
 		manual_weather = True
 
@@ -2609,20 +2756,8 @@ def get_weather_data(todays_daily_strong,todays_date_epoch,
 		}
 		return DATA
 	else:
-		latitude = activity_stat['latitude']
-		longitude = activity_stat['longitude']
-		if latitude and longitude:
-			DATA = extract_weather_data(fetch_weather_data(latitude,longitude,todays_date_epoch))
-			return DATA
-		else:
-			DATA = {
-				"temperature":None,
-				"dewPoint":None,
-				"humidity":None,
-				"apparentTemperature":None,
-				"windSpeed":None
-			}
-			return DATA
+		avg_weather_data = get_avg_weather_data_from_activities(combined_activities)
+		return avg_weather_data
 
 def did_workout_today(have_activities,user_did_workout):
 	if user_did_workout:
@@ -2857,7 +2992,7 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 				userinput_activities,user = user, calendar_date = current_date,
 				epoch_summaries = epochs_json,provide_all=True)
 		activity_stats = get_activity_stats(combined_user_exercise_activities,user_age)
-		weather_data = get_weather_data(todays_daily_strong,start_epoch,activity_stats)
+		weather_data = get_weather_data(todays_daily_strong,combined_user_exec_non_exec_activities)
 
 		# Exercise Calculation
 		exercise_calculated_data['did_workout'] = did_workout_today(
@@ -2874,6 +3009,8 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		exercise_calculated_data['avg_heartrate'] = activity_stats['avg_heartrate']
 		exercise_calculated_data['workout_duration'] = sec_to_hours_min_sec(activity_stats['total_duration'])
 		exercise_calculated_data['activities_duration'] = activity_stats['activities_duration']
+		exercise_calculated_data['total_exercise_activities'] = activity_stats['total_exercise_activities']
+		exercise_calculated_data['total_strength_activities'] = activity_stats['total_strength_activities']
 
 		# Meters to foot and rounding half up
 		exercise_calculated_data['elevation_gain'] = int(round(safe_sum(combined_user_exercise_activities,
@@ -2983,6 +3120,10 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		food_calculated_data['processed_food'] = safe_get(todays_daily_strong,
 								 "list_of_processed_food_consumed_yesterday", "")
 		food_calculated_data['diet_type'] = safe_get(daily_optional,"type_of_diet_eaten","")
+		food_calculated_data['no_plants_consumed_ql'] = safe_get(
+										todays_daily_strong,"no_plants_consumed",0)
+		food_calculated_data['list_of_pants_consumed_ql'] = safe_get(
+								todays_daily_strong,"list_of_pants_consumed","")
 
 		# Alcohol
 		alcohol_today = safe_get(todays_daily_strong,"number_of_alcohol_consumed_yesterday","")
@@ -3008,6 +3149,13 @@ def create_garmin_quick_look(user,from_date=None,to_date=None):
 		grades_calculated_data['avg_exercise_hr_gpa'] = avg_exercise_hr_grade_pts[1]\
 			if avg_exercise_hr_grade_pts[1] else 0
 		exercise_calculated_data['avg_exercise_heartrate'] = avg_exercise_hr_grade_pts[2]\
+			if avg_exercise_hr_grade_pts[2] else 0
+
+		#Average non strength exercise heartrate calculation
+		avg_non_strength_hr_grade_pts = get_average_exercise_heartrate_grade(
+			combined_user_exercise_activities,todays_daily_strong,user_age,
+			non_strength_only=True)
+		exercise_calculated_data['avg_non_strength_heartrate'] = avg_non_strength_hr_grade_pts[2]\
 			if avg_exercise_hr_grade_pts[2] else 0
 
 		# Overall workout grade calculation

@@ -504,6 +504,7 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 				get_filtered_activity_stats(
 					todays_activity_data,user_age,
 					userinput_activities = userinput_activities,
+					epoch_summaries = todays_epoch_data,
 					provide_all=True)
 
 		ui_bedtime = None
@@ -569,6 +570,8 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 				ui_prcnt_unprocessed_food_consumed_yesterday = int(prcnt_non_processed_food)
 			ui_non_processed_food = todays_user_input.strong_input.list_of_unprocessed_food_consumed_yesterday
 			ui_processed_food = todays_user_input.strong_input.list_of_processed_food_consumed_yesterday
+			ui_no_plants_consumed = todays_user_input.strong_input.no_plants_consumed
+			ui_list_of_pants_consumed = todays_user_input.strong_input.list_of_pants_consumed
 			ui_diet_type = todays_user_input.optional_input.type_of_diet_eaten
 			ui_alcohol_day = todays_user_input.strong_input.number_of_alcohol_consumed_yesterday
 			ui_sleep_aid_penalty = todays_user_input.strong_input.prescription_or_non_prescription_sleep_aids_last_night
@@ -601,6 +604,8 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		food_calculated_data['non_processed_food'] = ui_non_processed_food
 		food_calculated_data['processed_food'] = ui_processed_food
 		food_calculated_data['diet_type'] =  ui_diet_type
+		food_calculated_data['no_plants_consumed_ql'] = ui_no_plants_consumed
+		food_calculated_data['list_of_pants_consumed_ql'] = ui_list_of_pants_consumed
 
 		# Grades
 		todays_daily_strong = []
@@ -701,6 +706,8 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		exercise_calculated_data['did_workout'] = quicklook.calculations.garmin_calculation.\
 			did_workout_today(have_activities=activity_stats['have_activity']
 				,user_did_workout=ui_did_workout)
+		exercise_calculated_data['total_exercise_activities'] = activity_stats['total_exercise_activities']
+		exercise_calculated_data['total_strength_activities'] = activity_stats['total_strength_activities']
 		
 		# Steps calculation
 		daily_total_steps = fitbit_steps_data(todays_steps_data)
@@ -807,6 +814,14 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		grades_calculated_data['avg_exercise_hr_gpa'] = avg_exercise_hr_grade_pts[1]\
 			if avg_exercise_hr_grade_pts[1] else 0
 		exercise_calculated_data['avg_exercise_heartrate'] = avg_exercise_hr_grade_pts[2]\
+			if avg_exercise_hr_grade_pts[2] else 0
+
+		#Average non strength exercise heartrate calculation
+		avg_non_strength_hr_grade_pts = quicklook.calculations.\
+			garmin_calculation.get_average_exercise_heartrate_grade(
+			combined_user_exercise_activities,todays_daily_strong,user_age,
+			non_strength_only=True)
+		exercise_calculated_data['avg_non_strength_heartrate'] = avg_non_strength_hr_grade_pts[2]\
 			if avg_exercise_hr_grade_pts[2] else 0
 
 		# If quick look for provided date exist then update it otherwise

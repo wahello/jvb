@@ -245,6 +245,7 @@ class Quicklook extends Component{
 		        pace: data.exercise_reporting_ql.pace,
 		        avg_heartrate: data.exercise_reporting_ql.avg_heartrate,
 		        avg_exercise_heartrate:data.exercise_reporting_ql.avg_exercise_heartrate,
+		        avg_non_strength_heartrate: data.exercise_reporting_ql.avg_non_strength_heartrate,
 		        elevation_gain: data.exercise_reporting_ql.elevation_gain,
 		        elevation_loss: data.exercise_reporting_ql.elevation_loss,
 		        effort_level: data.exercise_reporting_ql.effort_level,
@@ -696,7 +697,7 @@ handleScroll() {
     var sync = "";
     if(value){
       time = moment(value).format("MMM DD, YYYY @ hh:mm a");
-      sync = <div style = {{fontSize:"15px",fontWeight:"bold",fontFamily:'Proxima-Nova',color:"black"}}>Wearable Device Last Synced on {time}</div>;
+      sync = <div className="wearable_device" style = {{fontSize:"15px",fontWeight:"bold",fontFamily:'Proxima-Nova',color:"black"}}>Wearable Device Last Synced on {time}</div>;
     }
     return sync;
 }
@@ -846,10 +847,9 @@ rawDataExportReportOverlay(){
                                       {moment(this.state.selected_date).format('MMMM D, YYYY')}
                                       </span> */}
                                   </span>
-
+                                  
                                   </span>
-
-                                   <span  onClick={this.toggleDate} id="daterange" style={{color:"white"}}>
+                                  <span  className="calendar_date" onClick={this.toggleDate} id="daterange" style={{color:"white"}}>
 									         {moment(this.state.start_date).format('MMM D, YYYY')} - {moment(this.state.end_date).format('MMM D, YYYY')}
 									        </span>
 									        <span className="date_range_btn">
@@ -868,9 +868,10 @@ rawDataExportReportOverlay(){
                                             </div>
                                            </a>
                                           </abbr>
-                                          </span> 
+                                          </span>
+                                    
 </div>
-
+								
                                <Collapse className="navbar-toggleable-xs"  isOpen={this.state.isOpen} navbar>
 
 

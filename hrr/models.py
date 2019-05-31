@@ -31,6 +31,9 @@ class Hrr(models.Model):
 	no_file_beats_recovered = models.FloatField(blank=True,null=True)
 
 	offset = models.FloatField(blank=True,null=True)
+
+	include_hrr = models.BooleanField(default=True)
+	use_updated_hrr = models.BooleanField(default=False)
  
 	def __str__(self):
 		return str((self.user_hrr))
@@ -151,6 +154,31 @@ class TwentyfourHourAA(models.Model):
 		]
 
 class TwentyfourHourTimeHeartZones(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	created_at = models.DateField()
+	updated_at = models.DateTimeField(auto_now=True)
+	data = models.TextField(blank=True,null=True)
+
+	def __str__(self):
+		return str((self.user))
+
+	class Meta:
+		unique_together = ("user", "created_at")
+		indexes = [
+			models.Index(fields=['user', '-created_at']),
+			models.Index(fields=['created_at']),
+		]
+
+class AACustomRanges(models.Model):
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	aerobic_range = models.CharField(null=True,blank=True,max_length=255)
+	anaerobic_range = models.CharField(null=True,blank=True,max_length=255)
+	below_aerobic_range = models.CharField(null=True,blank=True,max_length=255)
+
+	def __str__(self):
+		return str((self.user))
+
+class AAdashboard(models.Model):
 	user = models.ForeignKey(User, on_delete=models.CASCADE)
 	created_at = models.DateField()
 	updated_at = models.DateTimeField(auto_now=True)

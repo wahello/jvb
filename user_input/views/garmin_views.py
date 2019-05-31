@@ -10,6 +10,8 @@ from rest_framework.permissions import IsAuthenticated
 
 import quicklook.calculations.garmin_calculation
 import quicklook.calculations.fitbit_calculation
+import quicklook.calculations.apple_calculation
+
 import quicklook.calculations.calculation_driver
 
 from garmin.models import (UserGarminDataSleep,
@@ -19,6 +21,8 @@ from garmin.models import (UserGarminDataSleep,
 	UserGarminDataEpoch)
 
 from fitbit.models import UserFitbitDataSleep,UserFitbitDataActivities
+
+from apple.models import UserAppleDataActivities
 
 from garmin.models import GarminFitFiles
 from hrr.calculation_helper import fitfile_parse
@@ -143,13 +147,13 @@ def _get_activities(user,target_date):
 	epoch_summaries = quicklook.calculations.garmin_calculation\
 		.get_garmin_model_data(UserGarminDataEpoch,user,
 			current_date_epoch,current_date_epoch+86400,
-			order_by = '-id')
+			order_by = '-id', filter_dup = True)
 	epoch_summaries = [ast.literal_eval(dic) for dic in epoch_summaries]
 	combined_activities = quicklook.calculations.garmin_calculation\
 	.get_filtered_activity_stats(
 		activity_data,user_age,manually_updated_act_data,
 		include_duplicate=True,include_deleted=True,
-		include_non_exercise = True,epoch_summaries = epoch_summaries
+		include_non_exercise = True,epoch_summaries = epoch_summaries,user=user
 	)
 
 	for single_activity in combined_activities:
@@ -202,19 +206,72 @@ def _get_fitbit_activities_data(user,target_date):
 				quicklook.calculations.converter.\
 				fitbit_to_garmin_converter.fitbit_to_garmin_activities(act)
 			for act in activity_data]
-
 		combined_user_activities = quicklook.calculations.garmin_calculation.\
 				get_filtered_activity_stats(
 					activity_data,user.profile.age(),
 					include_duplicate = True,include_deleted=True,
-					include_non_exercise = True)
-
+					include_non_exercise = True,user=user)
 		activity_data = [
 			_create_activity_stat(user,act,current_date)[act['summaryId']]
 			for act in combined_user_activities
 		]
 
 	activity_data = {act.get('summaryId'):act for act in activity_data}
+	return activity_data
+
+def _get_apple_activities_data(user,target_date):
+	activity_data= {}
+	try:
+		current_date = quicklook.calculations.garmin_calculation.str_to_datetime(target_date)
+	except AttributeError:
+		current_date = target_date
+	try:
+		activity_data = quicklook.calculations.apple_calculation.get_apple_model_data(
+			UserAppleDataActivities,user,current_date.date(),current_date.date())
+
+	except AttributeError:
+		activity_data = quicklook.calculations.apple_calculation.get_apple_model_data(
+			UserAppleDataActivities,user,current_date,current_date)
+	# if activity_data:
+	# 	activity_data = ast.literal_eval(activity_data[0].replace(
+	# 		"'activity_fitbit': {...}","'activity_fitbit': {}"))
+	# 	activity_data = activity_data['activities']
+	activity_data = ast.literal_eval(activity_data[0])
+	# print(activity_data,"activity_data")
+	# activity_data_copy = activity_data.copy()
+	# activty_data_list = []
+	# for index,activity in enumerate(activity_data_copy):
+	# 	start_time = activity.get('Start date')
+	# 	print(activity,"activity")
+	# 	print(start_time,"start_time")
+	# 	if not activty_data_list:
+	# 		print("not in list")
+	# 		activty_data_list.append(activity)
+	# 	print(activty_data_list,"activty_data_list")
+	# 	for index_2, activity_2 in enumerate(activty_data_list):
+	# 		# print(index_2,"index_2")
+	# 		# print(activity_2,"activity_2")
+	# 		st_time = activity_2.get('Start date')
+	# 		if st_time != start_time:
+	# 			# print(activity_2,"step 5")
+	# 			activty_data_list.append(activity_2)
+	# print("Step 6")
+	# activity_data = activty_data_list		 
+	if activity_data:
+		activity_data = [quicklook.calculations.converter.\
+				apple_to_garmin_converter.apple_to_garmin_activities(activity_data)] 
+		for act_data in activity_data:
+			activity_data = act_data
+			combined_user_activities = quicklook.calculations.garmin_calculation.\
+					get_filtered_activity_stats(
+						activity_data,user.profile.age(),
+						include_duplicate = True,include_deleted=True,
+						include_non_exercise = True)
+			activity_data = [
+				_create_activity_stat(user,act_data,current_date)[act_data['summaryId']]
+				for act_data in combined_user_activities
+			]
+	activity_data = {act_data.get('summaryId'):act_data for act_data in activity_data}
 	return activity_data
 
 class GarminData(APIView):
@@ -259,6 +316,8 @@ class GarminData(APIView):
 			return self._get_garmin_sleep(target_date)
 		elif device_type == 'fitbit':
 			return self._get_fitbit_sleep(target_date)
+		elif device_type == 'apple':
+			return self._get_fitbit_sleep(target_date)
 
 	def _get_weight(self, target_date):
 		weight = {
@@ -297,6 +356,16 @@ class GarminData(APIView):
 				hrr_determined_activities = fitbit_activities
 				logging.exception("message")
 			return hrr_determined_activities
+		elif device_type == 'apple':
+			apple_activities = _get_apple_activities_data(user,target_date)
+			return apple_activities
+			# try:
+			# 	hrr_determined_activities = determine_hhr_activity(
+			# 		user,target_date,apple_activities)
+			# except:
+			# 	hrr_determined_activities = apple_activities
+			# 	logging.exception("message")
+			# return hrr_determined_activities
 
 	def get(self, request, format = "json"):
 		target_date = request.query_params.get('date',None)
@@ -306,7 +375,6 @@ class GarminData(APIView):
 			have_activities = quicklook.calculations.garmin_calculation.\
 				do_user_has_exercise_activity(activites.values(),request.user.profile.age())
 			# have_activities = True if activites else False
-			# print(activites,"activities")
 			weight = self._get_weight(target_date)
 			data = {
 				"sleep_stats":sleep_stats,
@@ -316,3 +384,5 @@ class GarminData(APIView):
 			}
 			return Response(data)
 		return Response({})
+
+	

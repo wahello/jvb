@@ -27,17 +27,42 @@ export default function fetchProgress(successProgress,errorProgress,
   });
 
 }
-
-export function fetchUserRank(successRank,errorProgress,selectedDate,
-  custom_ranges=undefined,renderAfterSuccess=undefined){ 
+export function fetchAaRanges(successAaRanges,errorAaRanges,selectedDate){   
   selectedDate = moment(selectedDate);
+  const URL=`/hrr/aa_ranges`;
+  const config={
+   method:"get",
+   params:{
+      date: selectedDate.format('YYYY-MM-DD')
+ },
+   url:URL,
+   withCredentials: true
+  };
+  axios(config).then((response)=>{
+   successAaRanges(response);
+  }).catch(function(error){
+    errorAaRanges(error);
+  });
+
+}
+export function fetchUserRank(successRank,errorProgress,selectedDate,
+  custom_ranges=undefined,renderAfterSuccess=undefined,lbcategories=undefined){ 
+  selectedDate = moment(selectedDate);
+  // see 'categories' in 'leaderboard_helper_classes.py' for full list 
+  let defaultLeaderboardToRequest = ['oh_gpa','nes','mc','avg_sleep','ec','prcnt_uf',
+                                 'alcohol','total_steps','floor_climbed','resting_hr',
+                                 'deep_sleep','awake_time','time_99',"pure_time_99",
+                                 'beat_lowered','pure_beat_lowered','overall_hrr',
+                                 'active_min_total','active_min_exclude_sleep',
+                                 'active_min_exclude_sleep_exercise'];
+
   const URL=`/leaderboard/`;
-  // const URL = `https://app.jvbwellness.com/leaderboard`;
   const config={
    method:"get",
    params:{
    date: selectedDate.format('YYYY-MM-DD'),
-   custom_ranges:(custom_ranges && custom_ranges.length) ? custom_ranges.toString(): null
+   custom_ranges:(custom_ranges && custom_ranges.length) ? custom_ranges.toString(): null,
+   category: (lbcategories && lbcategories.length) ? lbcategories.toString():defaultLeaderboardToRequest.toString()
  },
    url:URL,
    withCredentials: true,
@@ -67,4 +92,22 @@ export function progressAnalyzerUpdateTime(successUpdateTime,errorUpdateTime){
     errorUpdateTime(error);
   });
 
+}
+
+export function durationInTimeZones(successDurationInTimeZones,errorDurationInTimeZones,selectedDate) {
+  const URL = "hrr/aa_dashboard/table"
+  selectedDate = moment(selectedDate);
+  const config = {
+    method: "get",
+    params: {
+      start_date: selectedDate.format('YYYY-MM-DD')
+    },
+    url: URL,
+    withCredentials: true
+  };
+  axios(config).then((response) => {
+    successDurationInTimeZones(response)
+  }).catch(function (error) {
+    errorDurationInTimeZones(error)
+  })
 }

@@ -116,6 +116,7 @@ class DailyUserInputStrong(models.Model):
         ('20','20'),('20+','More than 20')
     )
     YN_CHOICE = (
+        ('',''),
         ('','-'),
         (YES,'Yes'),
         (NO,'No'),
@@ -198,6 +199,9 @@ class DailyUserInputStrong(models.Model):
 
     list_of_processed_food_consumed_yesterday = models.TextField(blank=True)
 
+    no_plants_consumed = models.CharField(max_length=5,null=True,blank=True)
+    list_of_pants_consumed = models.TextField(null=True,blank=True)
+    
     number_of_alcohol_consumed_yesterday = models.CharField(
         max_length=5,choices=NUMBER_ALCOHOL_CHOICE,
         blank = True,null = True)
@@ -266,8 +270,11 @@ class DailyUserInputEncouraged(models.Model):
     )
 
     YN_CHOICE = (
+    ('',''),
     ('','-'),
     (YES,'Yes'),
+    (YES,'yes'),
+    (NO,'no'),
     (NO,'No'),
     )
 

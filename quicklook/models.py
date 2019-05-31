@@ -133,8 +133,13 @@ class ExerciseAndReporting(models.Model):
 	# pace = models.TimeField()
 
 	avg_heartrate = models.TextField(blank=True)
-	activities_duration = models.TextField(blank=True) 
+	activities_duration = models.TextField(blank=True)
+
 	avg_exercise_heartrate = models.FloatField(blank=True,null=True)
+	avg_non_strength_heartrate = models.FloatField(blank=True,null=True)
+	total_exercise_activities = models.PositiveIntegerField(blank=True,null=True)
+	total_strength_activities = models.PositiveIntegerField(blank=True,null=True)
+
 	elevation_gain = models.IntegerField(blank=True,null=True)
 	elevation_loss = models.IntegerField(blank=True,null=True)
 	effort_level = models.PositiveIntegerField(blank=True,null=True)
@@ -249,7 +254,8 @@ class Food(models.Model):
 
 	non_processed_food = models.TextField(blank=True)
 	processed_food = models.TextField(blank=True)
-
+	no_plants_consumed_ql = models.CharField(max_length=5,blank=True,null=True)
+	list_of_pants_consumed_ql = models.TextField(blank=True,null=True)
 	# choices are not provided, will be choice field in the future
 	diet_type = models.TextField(blank=True)
 

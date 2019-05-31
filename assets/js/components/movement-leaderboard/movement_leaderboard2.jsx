@@ -15,6 +15,9 @@ let objectLength = 0;
 
 function minuteToHM(value) {
 	var time;
+	if( isNaN(value) || value == null ){
+      return "00:00";
+	} 
 	if(value){
 		if(value == "N/A"){
 			time = "00:00";
@@ -29,7 +32,7 @@ function minuteToHM(value) {
 			time = hours+':'+minutes;
 		}
 	}
-	else if(value == 0 || value == null){
+	else if(value == 0 || value == null ){
 		time = "00:00";
 	}
 	return time;
@@ -52,11 +55,11 @@ function strToMin(value){
 
 function getGradeStartEndRange(exerciseActiveDuration=null){
 	let gradeRanges = {
-		'A':["04:06","04:06"], //[lower End, higher End]
-		'B':["03:13","04:05"],
-		'C':["02:45","03:12"],
-		'D':["02:01","02:44"],
-		'F':["00:00","02:00"]
+		'A':["03:06","03:06"], //[lower End, higher End]
+		'B':["02:13","03:05"],
+		'C':["01:45","02:12"],
+		'D':["01:01","01:44"],
+		'F':["00:00","01:00"]
 	}
 
 	if(exerciseActiveDuration){
@@ -203,7 +206,7 @@ class MovementLeaderboard2 extends Component{
 					background = "#32CD32";
 			        color = "white";
 			    }
-				else if(avgValueInSecPer7Days >= strToSecond("05:00")){
+				else if(avgValueInSecPer7Days > strToSecond("04:59")){
 					background = "green";
 			        color = "white";
 			    }
@@ -419,13 +422,15 @@ class MovementLeaderboard2 extends Component{
 	    	</td> 
 	    )
 	}
+
 	renderTable(Movement_data,Movement_username,MCS_data,selectedRange){
 		let operationCount = 0;
 		let td_rows = [];
 		let keys = ["rank","username","nes","exercise_steps","total_steps","mc",
-					"exercise_duration","active_min_total","active_min_sleep",
-					"active_min_exercise", "active_min_exclude_sleep_exercise",
-					"total_movement_rank_point"];
+					"exercise_duration","aerobic_duration","active_min_total",
+					"active_min_sleep","active_min_exclude_sleep_exercise",
+					"total_rank_point"];
+
 		objectLength = Object.keys(Movement_data).length;
 		for(let[key,value] of Object.entries(Movement_data)){
 			let td_values = [];
@@ -458,6 +463,48 @@ class MovementLeaderboard2 extends Component{
 				else if(key1 == "mc"){
 					td_values.push(this.renderGetColors(value[key1].score.value,value[key1].rank));
 				}
+                else if(key1 == "aerobic_duration"){
+                  let aerobic_prcnt = value[key1].other_scores.prcnt_aerobic_duration.value;
+                  let anaerobic_prcnt = value[key1].other_scores.prcnt_anaerobic_duration.value;
+                  let below_aerobic_prcnt =  value[key1].other_scores.prcnt_below_aerobic_duration.value;
+                  let heartrate_not_recorded_prcnt = value[key1].other_scores.prcnt_hr_not_recorded_duration.value; 
+                  if(aerobic_prcnt == null){
+                  	aerobic_prcnt = 0
+                  }
+                  if( anaerobic_prcnt == null ){
+                     anaerobic_prcnt = 0;
+                  }
+                  if( below_aerobic_prcnt == null ){
+                     below_aerobic_prcnt = 0;
+                  }
+                  if( heartrate_not_recorded_prcnt == null ){
+                         heartrate_not_recorded_prcnt = 0;
+                  }	
+                  if(value[key1].score.value != null && value[key1].other_scores.anaerobic_duration.value != null &&
+                      value[key1].other_scores.below_aerobic_duration.value != null && value[key1].other_scores.hr_not_recorded_duration.value != null){
+                      td_values.push(
+	                          <td className ="overall_rank_value" >
+	                      	 <table className="heartrate_zone_table" style={{marginLeft:"auto",marginRight:"auto",backgroundColor:'#FFF'}}>
+	                     	<tr><td>
+	                        {value[key1].score.value+('\n')+"("+aerobic_prcnt+"%"+")"}
+	                        </td>
+	                         <td>
+	                        {value[key1].other_scores.anaerobic_duration.value+('\n')+"("+anaerobic_prcnt+"%"+")"}
+	                        </td></tr>
+	                        <tr><td>
+	                        {value[key1].other_scores.below_aerobic_duration.value+('\n')+"("+ below_aerobic_prcnt+"%"+")"}
+	                        </td>
+	                        <td>
+	                        {value[key1].other_scores.hr_not_recorded_duration.value+('\n')+"("+heartrate_not_recorded_prcnt+"%"+")"}
+	                        </td></tr>
+	                        </table>
+	                         </td>);
+                          }
+                     else{
+                             td_values.push(<td>{"-"}</td>);		                        
+                  	     
+                         }
+                }
 				else if(key1 == "exercise_duration"){
 					td_values.push(this.getStylesForExerciseduration(
 						value[key1].score.value, value[key1].rank,
@@ -465,19 +512,16 @@ class MovementLeaderboard2 extends Component{
 						selectedRange
 					));	
 				}
+				
 				else if(key1 == "active_min_total"){
 					td_values.push(getStylesForActiveMinute(value[key1].score.value,value[key1].rank));
 				}
 				  else if(key1 == "active_min_sleep"){
-				  	if(value["active_min_total"].other_scores != null) {
-						td_values.push(<td className ="overall_rank_value"><span>{minuteToHM(value["active_min_total"].other_scores.active_min_sleep.value)}</span></td>);
+				  	if( value["active_min_total"].other_scores != null ) {
+						td_values.push(<td className ="overall_rank_value"><span>{minuteToHM(value["active_min_total"].other_scores.active_min_sleep.value)
+							              +(' ')+'/'+(' ')+minuteToHM(value["active_min_total"].other_scores.active_min_exercise.value)}</span></td>);
 					}
 				}
-			     else if(key1 == "active_min_exercise"){
-			     	if(value["active_min_total"].other_scores != null) {
-						td_values.push(<td className ="overall_rank_value"><span>{minuteToHM(value["active_min_total"].other_scores.active_min_exercise.value)}</span></td>);
-					}	
-			     }
                 else if(key1 == "active_min_exclude_sleep_exercise"){
 					td_values.push(
 						getStylesForActiveMinute(
@@ -487,7 +531,7 @@ class MovementLeaderboard2 extends Component{
 						)
 					);	
 				}
-				else if (key1 == "total_movement_rank_point"){
+				else if (key1 == "total_rank_point"){
 					td_values.push(<td className ="overall_rank_value"><span>{value[key1]}</span></td>);
 				}
 
@@ -568,9 +612,15 @@ class MovementLeaderboard2 extends Component{
 									<th>Total <br />Steps *</th>
 									<th>MCS Score<br />(Rank)</th>
 									<th>Exercise Duration (Rank) / Avg HR</th>
+									<th>
+									   Aerobic /<br/>Anaerobic **<br/>
+									   <table>
+									   <tr><td>AE</td><td>AN</td></tr>
+									   <tr><td>BA</td><td>NR</td></tr> 
+									   </table>
+									</th>
 									<th>Entire 24 Hour Day <br/> (Rank)</th>
-									<th>During Sleep Hours</th>
-									<th>During Exercise Hours</th>
+									<th>During Sleep Hours / During Exercise Hours</th>
 									<th>24 Hour Day Excluding Sleep and Exercise <br/> (Rank)</th>
 									<th>Overall Movement Rank Points</th>
 									<th>MCS<br/>
@@ -590,7 +640,7 @@ class MovementLeaderboard2 extends Component{
 
 	render(){
 		return(
-				<div className = "container-fluid">		   
+				<div >		   
 					<div className = "mov_dashboard_table" ref="mov_dashboard_table">
 						{
 							this.renderTable(
@@ -605,6 +655,13 @@ class MovementLeaderboard2 extends Component{
 						<div className = "col-sm-12">
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			Note: All time periods/durations are in hours:minutes (hh:mm)
+			          			</p>
+			          			<p className="footer_content" style={{marginLeft:"15px"}}>
+			          				** Represents duration (hh:mm) that the exercise range was in each of our 4 heart rate zones:
+			          				<li>Aerobic (AE): Aerobic Duration (% of total time)</li> 
+			          				<li>Anaerobic (AN): Anaerobic Duration (% of total time)</li>
+			          				<li>Below Aerobic (BA): Below Aerobic Duration (% of total time)</li>
+			          				<li>Not Recorded (NR): HR Not Recorded Duration(% of total time)</li>
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			The Movement Leaderboard provides a robust view of your movement across a number of categories that we use to assess movement.  In our experience, people that do well across all 5 of these categories consistently over time are healthier and feel better than those that don’t.  Users can choose various time periods or select any custom range by touching “Select Range” or entering a time period in one of the “Custom Date Range” buttons.  If viewing on a mobile device, turn your mobile device to the side (landscape mode) to see all columns.  You can also see how other people are doing on this page.  We include this so that each of us are motivated/inspired to do a little better!
@@ -626,7 +683,7 @@ class MovementLeaderboard2 extends Component{
 			          			MCS Score:  total inactive hours (sum of hours each day a user does not achieve 300 steps in any hour) per day when not sleeping, napping, and exercising
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
-			          			Exercise Duration / Average HR:  total exercise duration each day.  Users can characterize an activity as “exercise” or “non exercise” on the activity summary for each activity below question 1. on the user inputs page. Note: users are only given credit for exercise or non exercise for each activity (not both). Also includes the average heartrate of all exercise activities.
+			          			Exercise Duration / Average HR:  total exercise duration each day.  Users can characterize an activity as “exercise” or “non exercise” on the activity summary for each activity below question 1. on the user inputs page. Note: users are only given credit for exercise or non exercise for each activity (not both). Also includes the average heartrate of all exercise activities. NM = Heart Rate Not Measured.
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			Entire 24 Hours:  the number of active minutes for the full 24 hours.  Active minutes are provided by wearable devices and a minute is considered “active” if it has 1 or more steps in that minute
@@ -636,7 +693,6 @@ class MovementLeaderboard2 extends Component{
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			MCS: represents your movement for all 24 hours of the day (these colors come directly from the Movement Consistency Dashboard, check it out for more details and see below for the color key).   We include this summary so you can quickly see your 24 summary, as well as how others are doing to motivate/inspire you to do better!
-
 			          			</p>
 			          			<p className="footer_content" style={{marginLeft:"15px"}}>
 			          			<div className="rd_mch_color_legend color_legend_green"></div>
