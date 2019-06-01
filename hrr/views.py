@@ -3105,6 +3105,10 @@ def hrr_data(user,start_date):
 			lowest_hrr_1min = b[0]
 		except IndexError:
 			lowest_hrr_1min = 99
+		if min(hrr_final_heartrate) <= 99:
+			Did_heartrate_reach_99 = 'yes'
+		else:
+			Did_heartrate_reach_99 = 'no'
 		if Did_heartrate_reach_99 == 'yes':
 			time_99 = sum(time_toreach_99[:-1])
 		else:

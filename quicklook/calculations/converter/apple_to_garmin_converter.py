@@ -37,7 +37,6 @@ def apple_steps_minutly_to_quartly(summary_date,steps):
 
 		quaterly_data_list = [quaterly for hour in quarterly_data.values()
 								   	   for quaterly in hour.values()]
-
 	return quaterly_data_list
 
 def get_epoch_offset_from_timestamp(timestamp, timezone):

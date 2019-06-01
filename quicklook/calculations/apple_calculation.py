@@ -345,6 +345,75 @@ def calculate_apple_steps(user,start_date):
 
 	return total_apple_steps
 
+def inactive_hours(movement_consistency):
+	active_hours = 0
+	inactive_hours = 0
+	total_steps = 0
+	sleeping_hours = 0
+	strength_hours = 0
+	exercise_hours = 0
+	no_data_hours = 0
+	nap_hours = 0
+	timezone_change_hours = 0
+	for interval,values in list(movement_consistency.items()):
+		try:
+			if movement_consistency[interval]['status'] == 'active': 
+					active_hours += 1 
+			elif movement_consistency[interval]['status'] == 'inactive':
+				inactive_hours += 1
+			elif movement_consistency[interval]['status'] == 'sleeping':
+				sleeping_hours += 1
+			elif movement_consistency[interval]['status'] == 'strength':
+				strength_hours += 1
+			elif movement_consistency[interval]['status'] == 'exercise':
+				exercise_hours += 1
+			elif movement_consistency[interval]['status'] == 'no data yet':
+				no_data_hours += 1
+			elif movement_consistency[interval]['status'] == 'time zone change':
+				timezone_change_hours += 1
+			elif movement_consistency[interval]['status'] == 'nap':
+				nap_hours += 1
+			total_steps += values['steps']
+		except:
+			pass
+			
+	
+	movement_consistency['active_hours'] = active_hours
+	movement_consistency['inactive_hours'] = inactive_hours
+	movement_consistency['sleeping_hours'] = sleeping_hours
+	movement_consistency['strength_hours'] = strength_hours
+	movement_consistency['exercise_hours'] = exercise_hours
+	movement_consistency['nap_hours'] = nap_hours
+	movement_consistency['no_data_hours'] = no_data_hours
+	movement_consistency['timezone_change_hours'] = timezone_change_hours
+	movement_consistency['total_steps'] = total_steps
+
+	return movement_consistency
+
+def modify_mc(movement_consistency,todays_steps_data):
+	'''This function will make mc accurate '''
+	if todays_steps_data and movement_consistency:
+		date_24hr = todays_steps_data[-1]["End date"]
+		date_12hr = datetime.strptime(date_24hr, "%Y-%m-%d %H:%M:%S").strftime(
+																"%Y-%m-%d %I:%M:%S %p")
+	# movement_consistency = ast.literal_eval(movement_consistency)
+	for key,value in movement_consistency.items():
+		# print(key[-2:],"key")
+		# print(date_12hr[-2:],"12 hr")
+		# print(key[0:2],"key hour")
+		# print(date_12hr[12:13],"12 hr hour")
+		if (key[-2:] == date_12hr[-2:] and 
+			int(date_12hr[12:13]) < int(key[0:2]) and 
+			value['steps'] == 0 and 
+			value['status'] == 'inactive'):
+			value['status'] = 'no data yet'
+		if ((date_12hr[-2:] == 'AM' and key[-2:] == 'PM') and 
+			(value['status'] == 'inactive')):
+			value['status'] = 'no data yet'
+	movement_consistency = inactive_hours(movement_consistency)
+	return movement_consistency
+			
+
 def create_apple_quick_look(user,from_date=None,to_date=None):
 	'''
 		calculate and create quicklook instance for given date range
@@ -400,7 +469,6 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 			UserAppleDataSteps,user,current_date.date(),current_date.date())
 		if todays_steps_data:
 			todays_steps_data = ast.literal_eval(todays_steps_data[0])
-			# print(todays_steps_data,"todays_steps_data")
 			if todays_steps_data:
 				intraday_steps = todays_steps_data
 				interval_duration = 60
@@ -410,7 +478,6 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 				for step in quarterly_dataset:
 					todays_epoch_data.append(fitbit_to_garmin_epoch(
 						step,current_date.date(),interval_duration))
-
 		try:
 			user_inputs_qs = UserDailyInput.objects.select_related(
 				'strong_input','encouraged_input','optional_input').filter(
@@ -757,8 +824,9 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 		  		nap_start_time = None,#nap_start_time,
 		  		nap_end_time = None,#nap_end_time
 			)
-
 		if movement_consistency:
+			movement_consistency = modify_mc(movement_consistency,todays_steps_data)
+			# movement_consistency = ast.literal_eval(movement_consistency)
 			steps_calculated_data['movement_consistency'] = json.dumps(movement_consistency)
 			inactive_hours = movement_consistency.get("inactive_hours")
 			grade = quicklook.calculations.garmin_calculation\
