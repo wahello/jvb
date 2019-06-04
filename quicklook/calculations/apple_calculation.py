@@ -396,21 +396,25 @@ def modify_mc(movement_consistency,todays_steps_data):
 		date_24hr = todays_steps_data[-1]["End date"]
 		date_12hr = datetime.strptime(date_24hr, "%Y-%m-%d %H:%M:%S").strftime(
 																"%Y-%m-%d %I:%M:%S %p")
-	# movement_consistency = ast.literal_eval(movement_consistency)
-	for key,value in movement_consistency.items():
-		# print(key[-2:],"key")
-		# print(date_12hr[-2:],"12 hr")
-		# print(key[0:2],"key hour")
-		# print(date_12hr[12:13],"12 hr hour")
-		if (key[-2:] == date_12hr[-2:] and 
-			int(date_12hr[12:13]) < int(key[0:2]) and 
-			value['steps'] == 0 and 
-			value['status'] == 'inactive'):
-			value['status'] = 'no data yet'
-		if ((date_12hr[-2:] == 'AM' and key[-2:] == 'PM') and 
-			(value['status'] == 'inactive')):
-			value['status'] = 'no data yet'
-	movement_consistency = inactive_hours(movement_consistency)
+		date_12hr_date_obj = datetime.strptime(date_24hr, "%Y-%m-%d %H:%M:%S")
+
+		date_12hr_obj = date_12hr_date_obj.hour-12
+		# movement_consistency = ast.literal_eval(movement_consistency)
+		for key,value in movement_consistency.items():
+			# print(key[-2:],"key")
+			# print(date_12hr[-2:],"12 hr")
+			# print(key[0:2],"key hour")
+			if (key[-2:] == date_12hr[-2:] and 
+				int(date_12hr_obj) < int(key[0:2]) and 
+				value['steps'] == 0 and 
+				value['status'] == 'inactive'):
+				# print(int(date_12hr[12:13]),"mmm")
+				# print(int(key[0:2]),"ccc")
+				value['status'] = 'no data yet'
+			if ((date_12hr[-2:] == 'AM' and key[-2:] == 'PM') and 
+				(value['status'] == 'inactive')):
+				value['status'] = 'no data yet'
+		movement_consistency = inactive_hours(movement_consistency)
 	return movement_consistency
 			
 
@@ -427,6 +431,7 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 	# date range for which quicklook is calculated
 	# print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 	from_dt = quicklook.calculations.garmin_calculation.str_to_datetime(from_date)
+	from_dt = from_dt - timedelta(days=1)
 	to_dt = quicklook.calculations.garmin_calculation.str_to_datetime(to_date)
 	current_date = from_dt
 	SERIALIZED_DATA = []
@@ -817,7 +822,7 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 				todays_epoch_data,
 				yesterday_bedtime = None,#yesterday_bedtime,
 				today_awake_time = None,#today_awake_time,
-				combined_user_activities = None,#combined_user_exercise_activities,
+				combined_user_activities = combined_user_exercise_activities,#combined_user_exercise_activities,
 				today_bedtime = None,#today_bedtime,
 				user_input_strength_start_time = None,#strength_start_time,
 		  		user_input_strength_end_time = None,#strength_end_time,
