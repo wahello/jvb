@@ -524,7 +524,7 @@ class Bifurcation extends React.Component{
   }
 
   successProgress(data,renderAfterSuccess=undefined){
-    let weeklydates = data.data.duration_date["week"]
+    let weeklydates = data.data.duration_date["week"];
     let week = this.headerDates(weeklydates);
     // let week_start = moment(data.data.duration_date["week"].split('to')[0]).format("MMM DD, YYYY")
     // let week_end = moment(data.data.duration_date["week"].split('to')[1]).format("MMM DD, YYYY")
@@ -3145,7 +3145,7 @@ restingHrColors(rhrscore){
                        {this.renderDateRangeDropdown(this.state.summary,this.state.duration_date)}
                       </DropdownMenu>
                     </Dropdown>
-                    <span className="paweekdate"><span>{this.state.capt}</span><span>{"(" + this.state.date + ")"}</span></span>
+                    <span className="paweekdate"><span>{this.state.capt}</span><span>{" (" + this.state.date + ")"}</span></span>
                   </div>
             </div>
           }
