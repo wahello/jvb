@@ -71,3 +71,15 @@ class AppleUser(models.Model):
 
 	def __str__(self):
 		return "%s"%(self.user.username)
+
+class UserAppleLastSynced(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        related_name='last_synced_apple'
+    )
+    last_synced_apple = models.DateTimeField()
+    offset = models.IntegerField()
+
+    def __str__(self):
+        sync_time_str = self.last_synced_apple.strftime("%Y-%m-%d %H:%M:%S")
+        return "{}-{}".format(self.user.username,sync_time_str)

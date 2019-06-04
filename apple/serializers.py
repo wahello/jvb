@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from apple.models import (UserAppleDataSteps,
 						  UserAppleDataActivities,
-						  AppleUser)
+						  AppleUser,
+						  UserAppleLastSynced)
 
 class UserAppleDataStepsSerializer(serializers.ModelSerializer):
 	"""	This class is for serializing the Apple steps
@@ -30,4 +31,10 @@ class AppleUserSerializer(serializers.ModelSerializer):
 	class Meta:
 		model  = AppleUser
 		fields = ('user','status')
+
+class UserAppleLastSyncedSerializer(serializers.ModelSerializer):
+	user = serializers.PrimaryKeyRelatedField(read_only=True)
+	class Meta:
+		model = UserAppleLastSynced
+		fields = ('__all__')
 

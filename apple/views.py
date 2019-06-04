@@ -1,15 +1,20 @@
 import ast
 from datetime import datetime,timedelta
 import logging
+
 from django.shortcuts import render
 from django.http import Http404,HttpResponse
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User
+
 from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+
 from apple.serializers import (UserAppleDataStepsSerializer,
 								UserAppleDataActivitiesSerializer,
 								AppleUserSerializer)
@@ -17,7 +22,7 @@ from apple.models import (UserAppleDataSteps,
 							ApplePingNotification,
 							UserAppleDataActivities,
 							AppleUser)
-from django.contrib.auth.models import User
+
 
 def process_notification(user,summary_type,state):
 	""" This function will create instance of ping notification
@@ -196,5 +201,12 @@ class AplpleUserView(generics.CreateAPIView):
 			return Response("Something went wrong",status=status.HTTP_400_BAD_REQUEST)
 		return Response("User agreed to allow to get apple data",status=status.HTTP_201_CREATED)
 
-
-
+def apple_last_sync(user_id):
+	user = get_object_or_404(User, pk=user_id)
+	current_date = datetime.now()
+	try:
+		user_instance = UserAppleLastSynced.objects.get(user=user)
+		user_instance.last_synced_apple = current_date
+	except:
+		UserAppleLastSynced.objects.create(
+						user=user,offset=0,last_synced_apple=current_date)

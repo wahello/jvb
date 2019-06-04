@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from garmin.serializers import UserLastSyncedSerializer
 from fitbit.serializers import UserFitbitLastSyncedSerializer
+from apple.serializers import UserAppleLastSyncedSerializer
+
 import json
 from garmin.models import UserLastSynced,GarminConnectToken
 from fitbit.models import UserFitbitLastSynced,FitbitConnectToken
@@ -15,7 +17,7 @@ from users.models import GarminToken
 from quicklook.calculations.calculation_driver import which_device
 from .models import UserDataBackfillRequest
 from .serializers import UserBackfillRequestSerializer,AACustomRangesSerializer
-from apple.models import AppleUser
+from apple.models import AppleUser,UserAppleLastSynced
 
 class UserLastSyncedItemview(generics.RetrieveUpdateDestroyAPIView):
 	permission_classes = (IsAuthenticated,)
@@ -50,6 +52,22 @@ class UserLastSyncedItemview(generics.RetrieveUpdateDestroyAPIView):
 					return Response({})
 			except UserFitbitLastSynced.DoesNotExist as e:
 				return Response({})
+		elif  device_type == 'apple':
+			queryset = UserAppleLastSynced.objects.all()
+			try:
+				last_synced_obj = queryset.get(user=self.request.user)
+				if last_synced_obj:
+					serializer = UserAppleLastSyncedSerializer(last_synced_obj)
+					new_data = {}
+					new_data["last_synced"] = serializer.data["last_synced_apple"]
+					new_data.update(serializer.data)
+					new_data.pop("last_synced_apple")
+					return Response(new_data,status=status.HTTP_200_OK)
+				else:
+					return Response({})
+			except UserFitbitLastSynced.DoesNotExist as e:
+				return Response({})
+
 
 		else:
 			return Response({})
