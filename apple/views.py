@@ -138,6 +138,23 @@ def merge_user_data(user, start_date):
 	# print(data,"kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk")
 	return data
 
+def remove_duplicate_activities(data):
+	'''This function will remove the duplicate activites in the give list'''
+	activity_data_copy = data.copy()
+	activty_data_list = []
+	activity_start_time = []
+	for index,activity in enumerate(activity_data_copy):
+		start_time = activity.get('Start date')
+		if index == 0:
+			activty_data_list.append(activity)
+			activity_start_time.append(start_time)
+		if start_time not in activity_start_time:
+			activty_data_list.append(activity)
+			activity_start_time.append(start_time)
+
+	data = activty_data_list
+	return data		
+
 def update_activities_data(user_instance,data):
 	"""This function will update user's activities data given by user
 	Args:
@@ -146,6 +163,8 @@ def update_activities_data(user_instance,data):
 		data
 	"""
 	if data:
+		data = ast.literal_eval(data)
+		data = remove_duplicate_activities(data)
 		user_instance.data = data
 		user_instance.save()
 		return Response("Actvities Data Updated in Database Successfully",status=status.HTTP_201_CREATED)
@@ -171,6 +190,8 @@ class UserAppleDataActivitiesView(generics.CreateAPIView):
 			instance=process_notification(user,summary_type,state)
 			# serializer= UserAppleDataActivitiesSerializer(data= request.data, partial=True)
 			if updated_data:
+				updated_data = ast.literal_eval(updated_data)
+				updated_data = remove_duplicate_activities(updated_data)
 				UserAppleDataActivities.objects.create(
 					user_id=user,belong_to=obj_date_str,data=updated_data)
 				update_notification(instance)

@@ -237,29 +237,19 @@ def _get_apple_activities_data(user,target_date):
 	# 		"'activity_fitbit': {...}","'activity_fitbit': {}"))
 	# 	activity_data = activity_data['activities']
 	activity_data = ast.literal_eval(activity_data[0])
-	# print(activity_data,"activity_data")
-	activity_data_copy = activity_data.copy()
-	activty_data_list = []
-	activity_start_time = []
-	for index,activity in enumerate(activity_data_copy):
-		start_time = activity.get('Start date')
-		# for index_2, activity_2 in enumerate(activty_data_list):
-		# 	# print(index_2,"index_2")
-		# 	print(activity_2,"activity_2")
-		# 	st_time = activity_2.get('Start date')
-		# 	if st_time not in activity_start_time:
-		# 		# print(activity_2,"step 5")
-		# 		activty_data_list.append(activity_2)
-				# break
-		if index == 0:
-			print("not in list")
-			activty_data_list.append(activity)
-			activity_start_time.append(start_time)
-		if start_time not in activity_start_time:
-			activty_data_list.append(activity)
-			activity_start_time.append(start_time)
+	# activity_data_copy = activity_data.copy()
+	# activty_data_list = []
+	# activity_start_time = []
+	# for index,activity in enumerate(activity_data_copy):
+	# 	start_time = activity.get('Start date')
+	# 	if index == 0:
+	# 		activty_data_list.append(activity)
+	# 		activity_start_time.append(start_time)
+	# 	if start_time not in activity_start_time:
+	# 		activty_data_list.append(activity)
+	# 		activity_start_time.append(start_time)
 
-	activity_data = activty_data_list		 
+	# activity_data = activty_data_list		 
 	if activity_data:
 		activity_data = [quicklook.calculations.converter.\
 				apple_to_garmin_converter.apple_to_garmin_activities(activity_data)] 
