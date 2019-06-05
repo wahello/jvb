@@ -49,6 +49,7 @@ def create_or_update_activities(sender,instance,created,**kwargs):
 			from_date_str = from_date
 		'''generate_quicklook function goto quicklook/task.py'''
 		generate_quicklook.delay(user_id,from_date_str,from_date_str)
+		
 	else:
 		# print("updated activities")
 		request = kwargs.get('request')
