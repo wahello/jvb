@@ -228,6 +228,7 @@ def apple_last_sync(user_id):
 	try:
 		user_instance = UserAppleLastSynced.objects.get(user=user)
 		user_instance.last_synced_apple = current_date
+		user_instance.save()
 	except:
 		UserAppleLastSynced.objects.create(
 						user=user,offset=0,last_synced_apple=current_date)
