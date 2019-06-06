@@ -431,7 +431,6 @@ def create_apple_quick_look(user,from_date=None,to_date=None):
 	# date range for which quicklook is calculated
 	# print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 	from_dt = quicklook.calculations.garmin_calculation.str_to_datetime(from_date)
-	from_dt = from_dt - timedelta(days=1)
 	to_dt = quicklook.calculations.garmin_calculation.str_to_datetime(to_date)
 	current_date = from_dt
 	SERIALIZED_DATA = []
