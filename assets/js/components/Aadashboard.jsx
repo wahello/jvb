@@ -92,7 +92,8 @@ class Aadashboard extends Component {
 					"prcnt_anaerobic_duration": this.getInitialDur(),
 					"prcnt_below_aerobic_duration": this.getInitialDur(),
 					"prcnt_hr_not_recorded_duration": this.getInitialDur(),
-					"workout_duration_hours_min": this.getInitialDur()
+					"workout_duration_hours_min": this.getInitialDur(),
+					"total_workout_duration_over_range": this.getInitialDur()
 				}
 			},
 			"duration_date": this.getInitialDur(),
@@ -3975,7 +3976,7 @@ class Aadashboard extends Component {
 	}
 
 	totalworkoutdurationTimeZone(value, durationdate) {
-		let score = this.renderValue(value.workout_duration_hours_min, durationdate);
+		let score = this.renderValue(value.total_workout_duration_over_range, durationdate);
 		if (score == undefined || score == 0 || score == "" || score == "00:00" || score == null) {
 			score = "No workout";
 		}
@@ -3995,6 +3996,7 @@ class Aadashboard extends Component {
 	}
 	secondsToHourMinute(seconds) {
 		if (isNaN(seconds) || seconds < 0) return "N/A"
+
 		let hours = Math.floor(seconds / 3600);
 		seconds %= 3600;
 		let minutes = Math.floor(seconds / 60);
@@ -4007,7 +4009,6 @@ class Aadashboard extends Component {
 		// Object.keys(durationInTimeZones).map(workoutType => {
 		// 	let columns = []
 		// 	durationInTimeZones[workoutType].map((sequence) => {
-		// 		console.log(sequence)
 		// 		columns.push(
 		// 			<td className="value_style" style={{ 'backgroundColor': sequence["color"] }}>
 		// 				{duration['range']}<br />&nbsp;
@@ -4015,12 +4016,12 @@ class Aadashboard extends Component {
 		// 				</td>)
 		// 	})
 		// 	rows.push()
-		// 	// console.log(durationInTimeZones[workoutType])
 		// })
 		let count = 0;
 		let columns = []
 		let timezonesData = this.state.durationInTimeZones[this.state.selected_range]
 		if (timezonesData == undefined) return null
+		let custom_aa_ranges_added = this.state.custom_aa_ranges_added
 		timezonesData = timezonesData[0]
 		if (timezonesData != null && timezonesData != undefined) {
 			let sequences = Object.keys(timezonesData)
@@ -4028,21 +4029,26 @@ class Aadashboard extends Component {
 			let lastTimeZone = timezonesData[lastSequence]
 			sequences.map((timezone) => {
 				let currentTimeZone = timezonesData[timezone]
+				let backgroundColor = custom_aa_ranges_added ? "white" : currentTimeZone['color']
+				let textColor = (custom_aa_ranges_added || currentTimeZone['color'] != "green") ? "black" : "white"
 				if (count % 4 == 0) {
 					rows.push(<tr>{columns}</tr>)
 					columns = []
 				}
 				count++
 				columns.push(
-					<td className="value_style" style={{ 'backgroundColor': currentTimeZone["color"], 'color': currentTimeZone['color'] == "green" ? 'white' : 'black' }}>
+					<td className="value_style" style={{ 'backgroundColor': backgroundColor, 'color': textColor }}>
 						{currentTimeZone['range']}<br />&nbsp;
 					{this.secondsToHourMinute(currentTimeZone['duration'])}&nbsp;({currentTimeZone['percent']}%)
 				</td>)
 			})
-			let table = <div className="content-justify-center p-2" style={{ 'overflow': 'hidden' }}>
-				<h2 className="bg-info text-white">Duration In Zones (hh:mm)( % Time in Zone )</h2>
+			let table = <div className="p-1 content-justify-center" style={{ 'overflow': 'hidden' }}>
+				<h2 className="bg-info text-white row justify-content-center">
+					<span>Duration In Zones (hh:mm)</span>
+					<span>(% Time in Zone)</span>
+				</h2>
 				<table className="table table-responsive timezone_duration" > <tbody>{rows}</tbody></table>
-				<h3 className="bg-danger text-white">>>&nbsp;{lastTimeZone['range']}&nbsp;{this.secondsToHourMinute(lastTimeZone['duration'])}&nbsp;({lastTimeZone['percent']}%)
+				<h3 className="bg-danger text-white">Greater than&nbsp;{lastTimeZone['range']}&nbsp;{this.secondsToHourMinute(lastTimeZone['duration'])}&nbsp;({lastTimeZone['percent']}%)
 			</h3>
 			</div>
 			return table
@@ -4091,13 +4097,10 @@ class Aadashboard extends Component {
 										style={{ color: "white", marginLeft: "20px" }}
 										name="calendar"
 										size="1x"
-
 									/>
-
 									<span style={{ marginLeft: "20px", color: "white", paddingTop: "7px" }}>
 										{moment(this.state.selectedDate).format('MMM D, YYYY ')}
 									</span>
-
 								</span>
 								<span onClick={this.toggleDate4} id="daterange4" className="date_range1" style={{ color: "white" }}>
 									<span className="date_range_btn">
@@ -4356,7 +4359,6 @@ class Aadashboard extends Component {
 										className="btn btn-block-lg"
 										onClick={this.onSubmitDate4} style={{ width: "175px" }}>SUBMIT</button>
 								</div>
-
 							</Form>
 						</div>
 					</PopoverBody>
