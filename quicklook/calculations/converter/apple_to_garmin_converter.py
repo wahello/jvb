@@ -116,8 +116,8 @@ def apple_to_garmin_activities(active_summary):
 			garmin_activites['startTimeOffsetInSeconds'] = start_time_offset_in_sec
 			garmin_activites['activityType'] = each['WorkoutType']
 			garmin_activites['activeKilocalories'] = each['totalEnergyBurned']
-			garmin_activites['averageHeartRateInBeatsPerMinute'] = round(float(each.get('AverageHearthRate')))
-			
+			if each.get('AverageHearthRate'):
+				garmin_activites['averageHeartRateInBeatsPerMinute'] = round(float(each.get('AverageHearthRate')))
 			garmin_activites['steps'] = round(float(each.get('steps',0)))
 			result_reponse.append(garmin_activites)
 
