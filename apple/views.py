@@ -173,7 +173,7 @@ def update_activities_data(user_instance,data):
 			data = remove_duplicate_activities(data)
 			user_instance.data = data
 			user_instance.save()
-		except 'ValueError':
+		except:
 			user_instance.data = data
 			user_instance.save()
 		return Response("Actvities Data Updated in Database Successfully",status=status.HTTP_201_CREATED)
@@ -201,7 +201,7 @@ class UserAppleDataActivitiesView(generics.CreateAPIView):
 			if updated_data:
 				try:
 					updated_data = ast.literal_eval(updated_data)
-				except 'ValueError':
+				except:
 					updated_data = updated_data
 				updated_data = remove_duplicate_activities(updated_data)
 				UserAppleDataActivities.objects.create(
