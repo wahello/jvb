@@ -168,10 +168,14 @@ def update_activities_data(user_instance,data):
 		data
 	"""
 	if data:
-		data = ast.literal_eval(data)
-		data = remove_duplicate_activities(data)
-		user_instance.data = data
-		user_instance.save()
+		try:
+			data = ast.literal_eval(data)
+			data = remove_duplicate_activities(data)
+			user_instance.data = data
+			user_instance.save()
+		except 'ValueError':
+			user_instance.data = data
+			user_instance.save()
 		return Response("Actvities Data Updated in Database Successfully",status=status.HTTP_201_CREATED)
 
 class UserAppleDataActivitiesView(generics.CreateAPIView):
@@ -195,7 +199,10 @@ class UserAppleDataActivitiesView(generics.CreateAPIView):
 			instance=process_notification(user,summary_type,state)
 			# serializer= UserAppleDataActivitiesSerializer(data= request.data, partial=True)
 			if updated_data:
-				updated_data = ast.literal_eval(updated_data)
+				try:
+					updated_data = ast.literal_eval(updated_data)
+				except 'ValueError':
+					updated_data = updated_data
 				updated_data = remove_duplicate_activities(updated_data)
 				UserAppleDataActivities.objects.create(
 					user_id=user,belong_to=obj_date_str,data=updated_data)
