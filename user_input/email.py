@@ -182,7 +182,7 @@ JVB Health & Wellness"""
 def notify_users_to_sync_watch():
 
 	RECEPIENTS_USERNAME = ["johnb",'pw',"BrookPorter",
-		"Justin","lalancaster","MikeC","atul","jvbhealth","Jvbtest",
+		"Justin","lalancaster","MikeC","jvbhealth","Jvbtest",
 		"missbgymnast","squishyturtle24","Vickykolovou","samle"]
 	# RECEPIENTS_USERNAME = ['venky','pavan','norm','mani','narendra']
 	EMAIL_TIMING = [time(9),time(21)]
@@ -199,7 +199,7 @@ def notify_users_to_sync_watch():
 			"user_offset":user_lsync.offset
 		}
 		try:
-			garmin_last_sync = UserLastSynced.objects.filter(user = user)	
+			garmin_last_sync = UserLastSynced.objects.filter(user = user)
 			fitbit_last_sync = UserFitbitLastSynced.objects.filter(user = user)
 			if garmin_last_sync and fitbit_last_sync and garmin_last_sync[0].last_synced > fitbit_last_sync[0].last_synced_fitbit:
 				last_synced_obj = [garmin_last_sync[0],"garmin"] 
