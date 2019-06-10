@@ -8,7 +8,7 @@ from alerts.email import notify_user_movement_consistency_steps
 # elif activity_hour == offset_localtime.hour and key[6:8] == 'PM'
 
 def determine_user_steps():
-	selected_users = ['jvbhealth','dileep','atul']
+	selected_users = ['jvbhealth','dileep']
 	# selected_users = ['venky','norm','pavan','dileep']
 	RECEPIENT_USERS = User.objects.filter(username__in=selected_users)
 	notify_time = []
