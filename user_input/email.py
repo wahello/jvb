@@ -100,10 +100,12 @@ def get_users_having_local_time(email_timing,filter_username=None):
 
 # remind selected users to submit UserDailyInput
 def notify_user_to_submit_userinputs():
-	RECEPIENTS_USERNAME = ["johnb",'pw',"Michelle","Brenda","BrookPorter",
-		"cherylcasone","knitter61","lafmaf123","davelee","Justin","lalancaster",
-		"MikeC","missbgymnast","squishyturtle24","yossi.leon@gmail.com",
-		"atul","jvbhealth","Jvbtest","Vickykolovou","samle"]
+	# RECEPIENTS_USERNAME = ["johnb",'pw',"Michelle","Brenda","BrookPorter",
+	# 	"cherylcasone","knitter61","lafmaf123","davelee","Justin","lalancaster",
+	# 	"MikeC","missbgymnast","squishyturtle24","yossi.leon@gmail.com",
+	# 	"atul","jvbhealth","Jvbtest","Vickykolovou","samle"]
+	RECEPIENTS_USERNAME = ["missbgymnast","squishyturtle24","jvbhealth",
+	"Dileep",]
 	# RECEPIENTS_USERNAME = ["dileep",'narendra','venky']
 
 	# Local time at which email notification should be sent to the user
@@ -181,9 +183,11 @@ JVB Health & Wellness"""
 # Reminding Users to Synchronize watch
 def notify_users_to_sync_watch():
 
-	RECEPIENTS_USERNAME = ["johnb",'pw',"BrookPorter",
-		"Justin","lalancaster","MikeC","jvbhealth","Jvbtest",
-		"missbgymnast","squishyturtle24","Vickykolovou","samle"]
+	# RECEPIENTS_USERNAME = ["johnb",'pw',"BrookPorter",
+	# 	"Justin","lalancaster","MikeC","jvbhealth","Jvbtest",
+	# 	"missbgymnast","squishyturtle24","Vickykolovou","samle"]
+	RECEPIENTS_USERNAME = ["missbgymnast","squishyturtle24","jvbhealth",
+	"Dileep",]
 	# RECEPIENTS_USERNAME = ['venky','pavan','norm','mani','narendra']
 	EMAIL_TIMING = [time(9),time(21)]
 	RECEPIENTS_WITH_OFFSET = get_users_having_local_time(
