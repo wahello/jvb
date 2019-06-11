@@ -3113,6 +3113,10 @@ def hrr_data(user,start_date):
 			time_99 = sum(time_toreach_99[:-1])
 		else:
 			time_99 = None
+		if Did_heartrate_reach_99 == 'no':
+			time_99_not_reached = sum(time_toreach_99)
+		else:
+			time_99_not_reached = None
 		if workout:
 			no_workouts = len(workout)
 		else:
@@ -3187,7 +3191,7 @@ def hrr_data(user,start_date):
 				if time_99:
 					time_99 = (int(daily_key_copy) - int(daily_key)) + time_99
 				else:
-					time_99 = (int(daily_key_copy) - int(daily_key))
+					time_99 = (int(daily_key_copy) - int(daily_key)) + time_99_not_reached
 				pure_time_99 = time_99 + diff_actity_hrr
 			else:
 				time_99 = None
