@@ -535,6 +535,8 @@ def create_fitbit_quick_look(user,from_date=None,to_date=None):
 		ui_smoking_penalty = ""
 		ui_did_workout = ""
 		ui_prcnt_breath_through_nose = 0
+		ui_no_plants_consumed = 0
+		ui_list_of_pants_consumed = ""
 
 		# calling the resting hearate from fitbit models
 		resting_heartrate = fitbit_heartrate_data(user,current_date)

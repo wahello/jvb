@@ -679,6 +679,7 @@ class UserAAdashboadTable(generics.ListCreateAPIView):
 		start_dt = self.request.query_params.get('start_date', None)
 		custom_range = self.request.query_params.get('custom_range', None)
 		querset = self.get_queryset()
+		print(querset,"GGGGGGGGGGGGGGgggggg")
 		aa_dashboard_data = create_aa_dashboard_format(
 			querset,start_dt,custom_range)
 		return Response(aa_dashboard_data, status=status.HTTP_200_OK)
@@ -694,8 +695,8 @@ class UserAAdashboadTable(generics.ListCreateAPIView):
 			current_time  = datetime.now()
 			current_year = current_time.year
 			from_date = '{}-01-01'.format(str(current_year))
-			queryset = AAdashboard.objects.filter(
-				created_at__range=[from_date,start_dt],user=user)
+			print(start_dt,from_date,user,"FFFFFFFFFFFf")
+			queryset = AAdashboard.objects.filter(created_at__range=[from_date,start_dt],user=user)
 		return queryset
 
 def aa_ranges_api(request):

@@ -20,16 +20,20 @@ from garmin.models import GarminFitFiles,\
 						UserGarminDataActivity,\
 						UserGarminDataManuallyUpdated
 
+from fitbit.models import UserFitbitDataActivities
+
 from quicklook.calculations.garmin_calculation import get_filtered_activity_stats
+from quicklook.calculations.converter.fitbit_to_garmin_converter import get_epoch_offset_from_timestamp
 from user_input.utils.daily_activity import get_daily_activities_in_base_format
 from user_input.views.garmin_views import _get_activities
 from fitparse import FitFile
 import fitbit
 import quicklook
-from hrr.models import Hrr,AAdashboard
+from hrr.models import Hrr,AAdashboard, AA
 import pprint
-from hrr import aa_ranges
+from hrr import aa_ranges, fitbit_aa
 from hrr.calculation_helper import fitfile_parse
+from hrr.views import aa_create_instance
 
 def get_garmin_activities(user,start_date_timestamp,end_date_timestamp):
 	'''
@@ -51,6 +55,26 @@ def get_garmin_activities(user,start_date_timestamp,end_date_timestamp):
 		garmin_list = []
 		garmin_dic = {}
 	return garmin_list,garmin_dic
+
+def get_fitbit_activities(user,start_date):
+	'''
+		Get Garmin activities from Garmn models
+	'''
+	try:
+		activity_files_qs=UserFitbitDataActivities.objects.filter(user= user,date_of_activities__icontains=str(start_date)[:10])
+		fitbit_list = []
+		fitbit_dic = {}
+		if activity_files_qs:
+			fitbit_activity_files = [pr.activities_data for pr in activity_files_qs]
+			for i,k in enumerate(fitbit_activity_files):
+				act_files=ast.literal_eval(fitbit_activity_files[i])
+				act_id=act_files['activities'][0].get('logId',None)
+				fitbit_dic[act_id]=act_files
+				fitbit_list.append(act_files)
+	except (ValueError, SyntaxError):
+		garmin_list = []
+		garmin_dic = {}
+	return fitbit_list,fitbit_dic
 
 def get_garmin_manully_activities(user,start_date_timestamp,end_date_timestamp):
 	'''
@@ -93,6 +117,17 @@ def get_fitfiles(user,start_date,start,end,start_date_timestamp=None,end_date_ti
 	fitfiles_obj = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=start_date)
 	if not fitfiles_obj or len(activity_files_qs) != len(fitfiles_obj):
 		fitfiles_obj=GarminFitFiles.objects.filter(user=user,created_at__range=[start,end])
+	return fitfiles_obj
+
+def get_fitfiles_fitbit(user,start_date):
+	'''
+		get the today fitfiles or 3 days fitfiles
+	'''
+
+	activity_files_qs=activity_files_qs=UserFitbitDataActivities.objects.filter(user= user,date_of_activities__icontains=str(start_date)[:10])
+	fitfiles_obj = GarminFitFiles.objects.filter(user=user,fit_file_belong_date=start_date)
+	if not fitfiles_obj or len(activity_files_qs) != len(fitfiles_obj):
+		fitfiles_obj=GarminFitFiles.objects.filter(user=user,created_at__icontains=str(start_date)[:10])
 	return fitfiles_obj
 
 
@@ -180,10 +215,13 @@ def aa_dashboard_ranges(user,start_date):
 	start = start_date
 	end = start_date + timedelta(days=3)
 	fitfiles_obj = get_fitfiles(user,start_date,start,end,start_date_timestamp,end_date_timestamp)
+	print(fitfiles_obj,"GARMINFILESSSSS")
 	if activities_dic and fitfiles_obj:
 		for tmp in fitfiles_obj:
+			
 			meta = tmp.meta_data_fitfile
 			meta = ast.literal_eval(meta)
+			print(meta,"GARMINFILESSSSS")
 			data_id = meta['activityIds'][0]
 			if str(data_id) in workout_summary_id and str(data_id):
 				workout.append(tmp)
@@ -214,6 +252,116 @@ def aa_dashboard_ranges(user,start_date):
 	
 	return aa_dashboard_table
 
+def aa_dashboard_ranges_fitbit(user,start_date):
+	'''
+		This function calculates the A/A third chart data
+	''' 
+	heart_rate_zone_low_end = ""
+	heart_rate_zone_high_end = ""
+	time_in_zone_for_last_7_days = ""
+	prcnt_total_duration_in_zone = ""
+	# start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+	start_date_str = start_date.strftime('%Y-%m-%d')
+	
+	start_date_timestamp = start_date
+	start_date_timestamp = start_date_timestamp.timetuple()
+	start_date_timestamp = time.mktime(start_date_timestamp)
+	end_date_timestamp = start_date_timestamp + 86400
+	activity_files_qs=UserFitbitDataActivities.objects.filter(user= user,date_of_activities__icontains=str(start_date)[:10])
+
+	if activity_files_qs:
+		activity_files = [pr.activities_data for pr in activity_files_qs]
+		one_activity_file_dict =  ast.literal_eval(activity_files[0])
+		
+		activity_data = one_activity_file_dict['activities']
+		offset =  get_epoch_offset_from_timestamp(activity_data[0].get('startTime', None))
+		
+		
+
+	fitbit_list,fitbit_dic = get_fitbit_activities(
+		user,start_date)
+	
+	
+	manually_edited_dic = {}
+	activities_dic = get_usernput_activities(
+		user,start_date)
+
+	if fitbit_list:
+		fitbit_list = [quicklook.calculations.converter.fitbit_to_garmin_converter.fitbit_to_garmin_activities(act) for act in activity_data]
+
+	user_age = user.profile.age()
+	filtered_activities_files = get_filtered_activity_stats(activities_json=fitbit_list,
+													user_age=user_age,
+													manually_updated_json=manually_edited_dic,
+													userinput_activities=activities_dic,
+													user=user,calendar_date=start_date)
+
+	filtered_activities_only = get_filtered_activity_stats(activities_json=fitbit_list,
+													user_age=user_age,
+													manually_updated_json=manually_edited_dic,
+													user=user,calendar_date=start_date)
+	activities = []
+	hrr_summary_id = []
+	workout_summary_id = []
+	id_act = 0
+	workout_data = []
+
+	for i,k in enumerate(filtered_activities_files):
+		
+		#print(filtered_activities_files[1]['activities'][0].get('activityName'))
+		if filtered_activities_files[i].get('activityType') == 'HEART_RATE_RECOVERY':
+			id_act = int(filtered_activities_files[i].get('summaryId'))
+			activities.append(filtered_activities_files[i])
+			hrr_summary_id.append(filtered_activities_files[i].get('summaryId'))
+		else:
+			if filtered_activities_files[i]["duplicate"] == False:
+				workout_data.append(filtered_activities_files[i])
+				workout_summary_id.append(filtered_activities_files[i].get('summaryId'))
+
+	workout = []
+	hrr = []
+	start = start_date
+	end = start_date + timedelta(days=3)
+	fitfiles_obj = get_fitfiles_fitbit(user,start_date)
+	print(fitfiles_obj,"5555555555555555555")
+	print(activities_dic,"666666666666666666")
+	if activities_dic and fitfiles_obj:
+		for tmp in fitfiles_obj:
+			print(tmp,"33333333333333333333333")
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = meta['activityIds'][0]
+			if str(data_id) in workout_summary_id and str(data_id):
+				workout.append(tmp)
+			elif str(data_id) in hrr_summary_id	:
+				hrr.append(tmp)
+	elif fitfiles_obj:
+		for tmp in fitfiles_obj:
+			print(tmp,"33333333333333333333333")
+			meta = tmp.meta_data_fitfile
+			meta = ast.literal_eval(meta)
+			data_id = meta['activityIds'][0]
+			if str(data_id) in workout_summary_id:
+				workout.append(tmp)
+			elif str(data_id) in hrr_summary_id:
+				hrr.append(tmp)
+
+	aa_ranges_all_users = aa_ranges.all_age_aa_ranges()
+	# print(aa_ranges_all_users,"user age")
+	current_user_aa_ranges = aa_ranges_all_users.get(str(user_age))
+	
+	if workout:
+		workout_data = fitfile_parse(workout,offset,start_date_str)
+		workout_final_heartrate,workout_final_timestamp,workout_timestamp = workout_data
+		for heartrate,time_difference in zip(workout_final_heartrate,workout_final_timestamp):
+			aa_dashboard_table = generate_aa_new_table(
+									heartrate,time_difference,current_user_aa_ranges)
+	else:
+		aa_dashboard_table = {}
+
+	
+	return aa_dashboard_table
+
 def aadashboard_update_instance(user,start_date,data):
 	AAdashboard.objects.filter(user=user,created_at=start_date).update(data=data)
 
@@ -228,7 +376,13 @@ def store_garmin_aa_dashboard(user,from_date,to_date):
 	current_date = to_date_obj
 	aa_dashboard = AAdashboard.objects.filter(user=user,created_at=from_date_obj)
 	while (current_date >= from_date_obj):
-		data = aa_dashboard_ranges(user,current_date)
+
+		device_type = quicklook.calculations.calculation_driver.which_device(user)
+		if device_type == "garmin":
+			data = aa_dashboard_ranges(user,current_date)
+		elif device_type == "fitbit":
+			data = aa_dashboard_ranges_fitbit(user,current_date)
+			
 		if data:
 			print("AA dashboard calculations creating")
 			try:
@@ -246,6 +400,7 @@ def store_garmin_aa_dashboard(user,from_date,to_date):
 # 	to_date_obj = datetime.strptime(to_date, "%Y-%m-%d").date()
 # 	current_date = to_date_obj
 # 	while (current_date >= from_date_obj):
+		
 # 		activities_dict = get_usernput_activities(user,current_date)
 # 		data = fitbit_aa.fitbit_aa_chart_one_new(user,current_date,user_input_activities=activities_dict)
 # 		if data.get('total_time'):
@@ -270,12 +425,15 @@ def store_aadashboard_calculations(user,from_date,to_date):
 
 	Return:None
 	'''
-	device_type = quicklook.calculations.calculation_driver.which_device(user)
-	print(device_type,"device type")
-	if device_type == "garmin":
-		store_garmin_aa_dashboard(user,from_date,to_date)
+	# device_type = quicklook.calculations.calculation_driver.which_device(user)
+	# print(device_type,"device typeFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFff")
+	# if device_type == "garmin":
+
+	store_garmin_aa_dashboard(user,from_date,to_date)
+
 	# elif device_type == "fitbit":
 	# 	print("Fitbit AA chat1 data calculation got started")
 	# 	store_fitbit_aa1(user,from_date,to_date)
 	# 	print("Fitbit AA chat1 data calculation finished")
+
 	return None

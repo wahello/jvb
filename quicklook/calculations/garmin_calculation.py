@@ -919,8 +919,9 @@ def get_filtered_activity_stats(activities_json,user_age,
 				list of both exercise and non-exercise activities as first
 				and second item if "provide_all" is true
 	'''
-
+	
 	activities_json = copy.deepcopy(activities_json)
+	
 	userinput_activities = copy.deepcopy(userinput_activities)
 	manually_updated_json = copy.deepcopy(manually_updated_json)
 	epoch_summaries = kwargs.get('epoch_summaries')
@@ -1013,12 +1014,13 @@ def get_filtered_activity_stats(activities_json,user_age,
 		# If any activity is categorized as HRR as per our logic but
 		# user decided to change it to something else, in that case
 		# do not rename it to HRR
+		
 		is_edited_by_user = False
 		if userinput_activities:
 			is_edited_by_user = (True 
 				if userinput_activities.get(act.get('summaryId'),None) else False)
 			
-		if act['summaryId'] in act_renamed_to_hrr and not is_edited_by_user:
+		if act.get('summaryId') in act_renamed_to_hrr and not is_edited_by_user:
 			act['activityType'] = 'HEART_RATE_RECOVERY'
 		act_type = act.get('activityType','')
 		act_avg_hr = act.get("averageHeartRateInBeatsPerMinute",0)

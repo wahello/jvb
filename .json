@@ -1,0 +1,30 @@
+[1mdiff --git a/quicklook/calculations/garmin_calculation.py b/quicklook/calculations/garmin_calculation.py[m
+[1mindex d377ad9..1dfb4fd 100644[m
+[1m--- a/quicklook/calculations/garmin_calculation.py[m
+[1m+++ b/quicklook/calculations/garmin_calculation.py[m
+[36m@@ -919,8 +919,9 @@[m [mdef get_filtered_activity_stats(activities_json,user_age,[m
+ 				list of both exercise and non-exercise activities as first[m
+ 				and second item if "provide_all" is true[m
+ 	'''[m
+[31m-[m
+[32m+[m[41m	[m
+ 	activities_json = copy.deepcopy(activities_json)[m
+[32m+[m[41m	[m
+ 	userinput_activities = copy.deepcopy(userinput_activities)[m
+ 	manually_updated_json = copy.deepcopy(manually_updated_json)[m
+ 	epoch_summaries = kwargs.get('epoch_summaries')[m
+[36m@@ -1013,12 +1014,13 @@[m [mdef get_filtered_activity_stats(activities_json,user_age,[m
+ 		# If any activity is categorized as HRR as per our logic but[m
+ 		# user decided to change it to something else, in that case[m
+ 		# do not rename it to HRR[m
+[32m+[m[41m		[m
+ 		is_edited_by_user = False[m
+ 		if userinput_activities:[m
+ 			is_edited_by_user = (True [m
+ 				if userinput_activities.get(act.get('summaryId'),None) else False)[m
+ 			[m
+[31m-		if act['summaryId'] in act_renamed_to_hrr and not is_edited_by_user:[m
+[32m+[m		[32mif act.get('summaryId') in act_renamed_to_hrr and not is_edited_by_user:[m
+ 			act['activityType'] = 'HEART_RATE_RECOVERY'[m
+ 		act_type = act.get('activityType','')[m
+ 		act_avg_hr = act.get("averageHeartRateInBeatsPerMinute",0)[m
